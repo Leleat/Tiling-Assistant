@@ -1,0 +1,9 @@
+{
+  "name": "Tiling assistant",
+  "description": "Windows-like snap assist",
+  "uuid": "tiling-assistant@leleat-on-github",
+  "version": 1,
+  "shell-version": [
+    "3.36"
+  ]
+}
