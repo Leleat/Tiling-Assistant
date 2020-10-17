@@ -6,14 +6,18 @@ let openWindowsDash = null;
 let oldWindowPos = {}; // {windowID : frameRect} // also used as a list of tiled windows, closed windows wont be removed though (no harm because of that)
 let windowGrabSignals = {}; // {windowID : signalID}
 
-let ICON_SIZE = 75;
-let ICON_MARGIN = 20;
-let SHOW_LABEL = false;
+let ICON_SIZE;
+let ICON_MARGIN;
+let SHOW_LABEL;
 
 function init() {
 }
 
 function enable() {
+	ICON_SIZE = 75;
+	ICON_MARGIN = 20;
+	SHOW_LABEL = false;
+	
 	// signal connections
 	this.windowGrabBegin = global.display.connect('grab-op-begin', onGrabBegin.bind(this) );
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
@@ -76,11 +80,10 @@ function onSizeChanged(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect
 	let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
 		if (window && window.get_maximized() == Meta.MaximizeFlags.VERTICAL && !openWindowsDash.isVisible()) {
 			let openWindows = global.workspace_manager.get_active_workspace().list_windows();
-			let monitor = global.display.focus_window.get_monitor();
-			let complementingWindow = getComplementingWindow(window, monitor);
+			let complementingWindow = getComplementingWindow(window);
 
 			if ( openWindows.length > 1 && !complementingWindow )
-				openWindowsDash.open(openWindows, global.display.focus_window, monitor);
+				openWindowsDash.open(openWindows, window);
 		}
 
 		GLib.source_remove(sourceID);
@@ -95,11 +98,15 @@ function onShortcutPressed(shellWM, keyBinding) {
 	}
 	
 	let window = global.display.focus_window;
+	if (!window)
+		return;
+
+	let workArea = window.get_work_area_current_monitor();
 	let sourceID = 0;
 
 	switch(keyBinding.get_name()) {
 		case "toggle-tiled-left":
-			if ( (window) && (window.get_frame_rect().x < 5) )
+			if ( (window.get_frame_rect().x - workArea.x < 5) ) // window is on the left on the current monitor (with a margin)
 				if (window.get_id() in oldWindowPos)
 					sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because first the split view will be entered
 						restoreWindowSize(window, true);
@@ -108,7 +115,7 @@ function onShortcutPressed(shellWM, keyBinding) {
 			break;
 
 		case "toggle-tiled-right":
-			if ( (window) && (window.get_frame_rect().x > 5) )
+			if ( (window.get_frame_rect().x - workArea.x > 5) ) // window is on the right on the current monitor (with a margin)
 				if (window.get_id() in oldWindowPos)
 					sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because first the split view will be entered
 						restoreWindowSize(window, true);
@@ -130,7 +137,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, window, grabOp) {
 		
 		case Meta.GrabOp.RESIZING_E:
 		case Meta.GrabOp.RESIZING_W:
-			let complementingWindow = getComplementingWindow(window, window.get_monitor());
+			let complementingWindow = getComplementingWindow(window);
 			if ( complementingWindow && (complementingWindow.get_id() in oldWindowPos || window.get_id() in oldWindowPos) )
 				windowGrabSignals[window.get_id()] = window.connect("size-changed", resizeComplementingWindows.bind(this, window, complementingWindow));
 	}
@@ -143,7 +150,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 
 // Known Issue: 
 // calculation for newPosX seems correct. But it only works when starting the drag in the Topbar AND not moving. After that the window will teleport to a different pos. Same if moving via the window titlebar.
-function restoreWindowSize(window, restore_pos = false) {
+function restoreWindowSize(window, restoreFullPos = false) {
 	if (window && !(window.get_id() in oldWindowPos) )
 		return;
 
@@ -157,7 +164,7 @@ function restoreWindowSize(window, restore_pos = false) {
 		let relativeMouseX = (mouseX - currWindowFrame.x) / currWindowFrame.width; // percentage (in decimal) where the mouse.x is in the current window size
 		let newPosX = mouseX - oldWindowPos[windowID].width * relativeMouseX; // position the window after scaling, so that the mouse is at the same relative position.x e.g. mouse was at 50% of the old window and will be at 50% of the new one
 
-		if (restore_pos)
+		if (restoreFullPos)
 			window.move_resize_frame(true, oldWindowPos[windowID].x, oldWindowPos[windowID].y, oldWindowPos[windowID].width, oldWindowPos[windowID].height);
 
 		else // scale while keeping the top at the same y pos
@@ -167,8 +174,9 @@ function restoreWindowSize(window, restore_pos = false) {
 	}
 };
 
-function getComplementingWindow(w, monitor) {
-	let workArea = w.get_work_area_for_monitor(monitor);
+// get the complementing window to w; i.e. the window which - together with w - fills (close to) the entire monitor
+function getComplementingWindow(w) {
+	let workArea = w.get_work_area_for_monitor(w.get_monitor());
 	let resizeRect = w.get_frame_rect();
 	let openWindows = global.workspace_manager.get_active_workspace().list_windows();
 	openWindows = global.display.sort_windows_by_stacking(openWindows);
@@ -184,7 +192,7 @@ function getComplementingWindow(w, monitor) {
 			continue;
 		
 		let otherRect = openWindows[i].get_frame_rect();
-		// (1: window width = 1/2 monitor width && 2: both windows are distanced at different positions... sorta)
+		// (1: windows width = 1/2 monitor width && 2: both windows are distanced at different positions... sorta)
 		if (equalApprox(resizeRect.width + otherRect.width, workArea.width, 15) && Math.abs(resizeRect.x - otherRect.x) > 15)
 			return openWindows[i];
 	}
@@ -213,9 +221,10 @@ var OpenWindowsDash = GObject.registerClass(
 		_init() {
 			super._init();
 
+			// for move direction of the Dash
 			this.animationDir = 1;
 
-			// darken the background (only half the monitor size) when showing this Dash
+			// darken BG to easily focus this Dash
 			this.darkenBG = new St.Widget({
 				style: ("background-color : black"),
 				x: 0,
@@ -260,7 +269,7 @@ var OpenWindowsDash = GObject.registerClass(
 			this.destroy();
 		}
 
-		open(openWindows, tiledWindow, currentMonitor) {
+		open(openWindows, tiledWindow) {
 			this.appContainer.destroy_all_children();
 			let workArea = tiledWindow.get_work_area_current_monitor();
 			let entireWorkArea = tiledWindow.get_work_area_all_monitors();
@@ -273,7 +282,7 @@ var OpenWindowsDash = GObject.registerClass(
 
 			openWindows.forEach(w => {
 				if (w.get_id() != tiledWindow.get_id()) {
-					let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, side, currentMonitor, {showLabel: SHOW_LABEL});
+					let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, side, tiledWindow.get_monitor(), {showLabel: SHOW_LABEL});
 					this.appContainer.add_child(app);
 					app.set_position(pos, 0);
 					pos += ICON_SIZE + 16 + ICON_MARGIN + ((SHOW_LABEL) ? 28 : 0); // magicNr are margins/paddings from the icon to the full-sized highlighted button
@@ -373,7 +382,7 @@ var OpenWindowsDash = GObject.registerClass(
 // mostly copied and trimmed from appDisplay.js
 var OpenAppIcon = GObject.registerClass( 
 	class OpenAppIcon extends St.Button {
-		_init(app, win, idx, side, isOnMonitor, iconParams = {}) {
+		_init(app, win, idx, side, isOnMonitorNr, iconParams = {}) {
 			super._init({
 				style_class: 'app-well-app',
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
@@ -385,7 +394,7 @@ var OpenAppIcon = GObject.registerClass(
 			this.index = idx;
 			this.window = win;
 			this.side = side;
-			this.isOnMonitor = isOnMonitor;
+			this.isOnMonitorNr = isOnMonitorNr;
 	
 			this.iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
 												  x_expand: true, y_expand: true });
@@ -435,13 +444,10 @@ var OpenAppIcon = GObject.registerClass(
 				
 				this.icon.animateZoomOut();
 
-				this.window.move_to_monitor(this.isOnMonitor);
+				this.window.move_to_monitor(this.isOnMonitorNr);
 				this.window.activate(global.get_current_time());
 				tileWindow(this.window, this.side);
-
-				return;
 			}
 		}
-
 	}
 );
