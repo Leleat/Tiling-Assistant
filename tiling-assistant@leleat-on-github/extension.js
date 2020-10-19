@@ -360,17 +360,12 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 
 		// called with this.appContainer as this
-		focusItemAtIndex(direction, index) {
-			switch (direction) {
-				case Clutter.KEY_Right:
-					index = (index >= this.appCount) ? 0 : index; // wrap around
-					this.get_child_at_index(index).grab_key_focus();
-					break;
+		focusItemAtIndex(index) {
+			// wrap around
+			index = (index < 0) ? this.appCount - 1 : index;
+			index = (index >= this.appCount) ? 0 : index;
 
-				case Clutter.KEY_Left:
-					index = (index < 0) ? this.appCount - 1 : index; // wrap around
-					this.get_child_at_index(index).grab_key_focus();
-			}
+			this.get_child_at_index(index).grab_key_focus();
 		}
 		
 		isVisible() {
@@ -382,7 +377,7 @@ var OpenWindowsDash = GObject.registerClass(
 // mostly copied and trimmed from appDisplay.js
 var OpenAppIcon = GObject.registerClass( 
 	class OpenAppIcon extends St.Button {
-		_init(app, win, idx, side, isOnMonitorNr, iconParams = {}) {
+		_init(app, win, idx, side, moveToMonitorNr, iconParams = {}) {
 			super._init({
 				style_class: 'app-well-app',
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
@@ -394,7 +389,7 @@ var OpenAppIcon = GObject.registerClass(
 			this.index = idx;
 			this.window = win;
 			this.side = side;
-			this.isOnMonitorNr = isOnMonitorNr;
+			this.moveToMonitorNr = moveToMonitorNr;
 	
 			this.iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
 												  x_expand: true, y_expand: true });
@@ -410,11 +405,11 @@ var OpenAppIcon = GObject.registerClass(
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					this.get_parent().focusItemAtIndex(keyEvent.keyval, this.index + 1);
+					this.get_parent().focusItemAtIndex(this.index + 1);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					this.get_parent().focusItemAtIndex(keyEvent.keyval, this.index - 1);
+					this.get_parent().focusItemAtIndex(this.index - 1);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
@@ -444,7 +439,7 @@ var OpenAppIcon = GObject.registerClass(
 				
 				this.icon.animateZoomOut();
 
-				this.window.move_to_monitor(this.isOnMonitorNr);
+				this.window.move_to_monitor(this.moveToMonitorNr);
 				this.window.activate(global.get_current_time());
 				tileWindow(this.window, this.side);
 			}

@@ -1,9 +1,8 @@
 {
   "name": "Tiling assistant",
-  "description": "Windows-like snap assist",
+  "description": "Windows-like snap assist. Please report issues on Github.",
   "uuid": "tiling-assistant@leleat-on-github",
-  "version": 1,
-  "shell-version": [
-    "3.36"
-  ]
+  "version": 1.01,
+  "shell-version": ["3.36"],
+  "url": "https://github.com/Leleat/Tiling-Assist"
 }
