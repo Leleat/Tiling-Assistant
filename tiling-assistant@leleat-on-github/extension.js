@@ -74,10 +74,9 @@ function tileWindow(window, side) {
 
 // called whenever the maximize state of a window is changed (and maybe at other times as well?)
 function onSizeChanged(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect) {
-	let window = global.display.focus_window;
-
 	// timer to get the correct new window pos and size
 	let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+		let window = global.display.focus_window;
 		if (window && window.get_maximized() == Meta.MaximizeFlags.VERTICAL && !openWindowsDash.isVisible()) {
 			let openWindows = global.workspace_manager.get_active_workspace().list_windows();
 			let complementingWindow = getComplementingWindow(window);
