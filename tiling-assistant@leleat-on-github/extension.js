@@ -13,11 +13,12 @@ let ICON_MARGIN;
 let SHOW_LABEL;
 
 // TODO
-// resizing of windows
 // new tiling keyboard shortcuts
+// update README and preview with new howto (like keyboard shortcut with alt/shift to tile partly)
+// test quarter tiling on my Dell monitor
 
 // Known issue:
-// breaks GNOME's resize animations
+// doesnt use GNOME's resize/maximize animations
 
 function init() {
 };
@@ -333,24 +334,90 @@ function onShortcutPressed(shellWM, keyBinding) {
 };
 
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
-function onGrabBegin(_metaDisplay, metaDisplay, window, grabOp) {
-	if (!window)
+function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
+	if (!grabbedWindow)
 		return;
 	
-	if (!windowGrabSignals[window.get_id()])
-		windowGrabSignals[window.get_id()] = [];
+	if (!windowGrabSignals[grabbedWindow.get_id()])
+		windowGrabSignals[grabbedWindow.get_id()] = [];
+
+	// for resizing op
+	let sameSideWindow = null;
+	let opposingWindows = [];
+	let grabbedRect = grabbedWindow.get_frame_rect();
+
+	let activeWS = global.workspace_manager.get_active_workspace()
+	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+	openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
-			restoreWindowSize(window);
-			windowGrabSignals[window.get_id()].push( window.connect("position-changed", onWindowMoving.bind(this, window)) );	
+			restoreWindowSize(grabbedWindow);
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow)) );	
 			break;
 		
 		case Meta.GrabOp.RESIZING_N:
+			for (let i = 0; i < openWindows.length; i++) {
+				if (!(openWindows[i] in tiledWindows))
+					break;
+
+				let otherRect = openWindows[i].get_frame_rect();
+				if (otherRect.y == grabbedRect.y) 
+					sameSideWindow = openWindows[i];
+					
+				else if (equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 2))
+					opposingWindows.push(openWindows[i]);
+			}
+
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("size-changed", resizeComplementingWindows.bind(this, grabbedWindow, sameSideWindow, opposingWindows, grabOp)) );
+			break;
+
 		case Meta.GrabOp.RESIZING_S:
+			for (let i = 0; i < openWindows.length; i++) {
+				if (!(openWindows[i] in tiledWindows))
+					break;
+
+				let otherRect = openWindows[i].get_frame_rect();
+				if (otherRect.y == grabbedRect.y)
+					sameSideWindow = openWindows[i];
+					
+				else if (equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 2))
+					opposingWindows.push(openWindows[i]);
+			}
+
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("size-changed", resizeComplementingWindows.bind(this, grabbedWindow, sameSideWindow, opposingWindows, grabOp)) );
+			break;
+
 		case Meta.GrabOp.RESIZING_E:
+			for (let i = 0; i < openWindows.length; i++) {
+				if (!(openWindows[i] in tiledWindows))
+					break;
+
+				let otherRect = openWindows[i].get_frame_rect();
+				if (otherRect.x == grabbedRect.x)
+					sameSideWindow = openWindows[i];
+					
+				else if (equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 2))
+					opposingWindows.push(openWindows[i]);
+			}
+
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("size-changed", resizeComplementingWindows.bind(this, grabbedWindow, sameSideWindow, opposingWindows, grabOp)) );
+			break;
+
 		case Meta.GrabOp.RESIZING_W:
-			windowGrabSignals[window.get_id()].push( window.connect("size-changed", resizeComplementingWindows.bind(this, window, grabOp)) );
+			for (let i = 0; i < openWindows.length; i++) {
+				if (!(openWindows[i] in tiledWindows))
+					break;
+
+				let otherRect = openWindows[i].get_frame_rect();
+				if (otherRect.x == grabbedRect.x)
+					sameSideWindow = openWindows[i];
+					
+				else if (equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 2))
+					opposingWindows.push(openWindows[i]);
+			}
+
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("size-changed", resizeComplementingWindows.bind(this, grabbedWindow, sameSideWindow, opposingWindows, grabOp)) );
 	}
 };
 
@@ -372,7 +439,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 // calculation for newPosX seems correct. But it only works when starting the drag in the Topbar AND not moving. 
 // After that the window will teleport to a different pos.
 function restoreWindowSize(window, restoreFullPos = false) {
-	if (window && !(window in tiledWindows) )
+	if (!(window in tiledWindows))
 		return;
 
 	if (window.get_maximized())
@@ -487,25 +554,62 @@ function onWindowMoving(window) {
 		tilePreview.close();
 };
 
-function resizeComplementingWindows(resizedWindow, grabOp) {
-	let workArea = resizedWindow.get_work_area_current_monitor(); 
-	let resizedFrame = resizedWindow.get_frame_rect();	
+// sameSideWindow is the window which is on the same side as the resizedRect based on the drag direction
+// opposingWindows is the opposite
+function resizeComplementingWindows(resizedWindow, sameSideWindow, opposingWindows, grabOp) {
+	if (!(resizedWindow in tiledWindows))
+		return;
+
+	let resizedRect = resizedWindow.get_frame_rect();
+	let workArea = resizedWindow.get_work_area_current_monitor();
 
 	switch (grabOp) {
 		case Meta.GrabOp.RESIZING_N:
-			
+			if (sameSideWindow) {
+				let sameSideRect = sameSideWindow.get_frame_rect();
+				sameSideWindow.move_resize_frame(true, sameSideRect.x, resizedRect.y, sameSideRect.width, resizedRect.height);
+			}
+
+			opposingWindows.forEach(w => {
+				let wRect = w.get_frame_rect();
+				w.move_resize_frame(true, wRect.x, wRect.y, wRect.width, workArea.height - resizedRect.height);
+			});
 			break;
 
 		case Meta.GrabOp.RESIZING_S:
+			if (sameSideWindow) {
+				let sameSideRect = sameSideWindow.get_frame_rect();
+				sameSideWindow.move_resize_frame(true, sameSideRect.x, sameSideRect.y, sameSideRect.width, resizedRect.height);
+			}
 
+			opposingWindows.forEach(w => {
+				let wRect = w.get_frame_rect();
+				w.move_resize_frame(true, wRect.x, resizedRect.y + resizedRect.height, wRect.width, workArea.height - resizedRect.height);
+			});
 			break;
 
 		case Meta.GrabOp.RESIZING_E:
+			if (sameSideWindow) {
+				let sameSideRect = sameSideWindow.get_frame_rect();
+				sameSideWindow.move_resize_frame(true, sameSideRect.x, sameSideRect.y, resizedRect.width, sameSideRect.height);
+			}
 
+			opposingWindows.forEach(w => {
+				let wRect = w.get_frame_rect();
+				w.move_resize_frame(true, resizedRect.x + resizedRect.width, wRect.y, workArea.width - resizedRect.width, wRect.height);
+			});
 			break;
 
 		case Meta.GrabOp.RESIZING_W:
+			if (sameSideWindow) {
+				let sameSideRect = sameSideWindow.get_frame_rect();
+				sameSideWindow.move_resize_frame(true, resizedRect.x, sameSideRect.y, resizedRect.width, sameSideRect.height);
+			}
 
+			opposingWindows.forEach(w => {
+				let wRect = w.get_frame_rect();
+				w.move_resize_frame(true, wRect.x, wRect.y, workArea.width - resizedRect.width, wRect.height);
+			});
 	}
 };
 
@@ -721,10 +825,10 @@ var MyTilePreview = GObject.registerClass(
 			this._updateStyle(monitor);
 	
 			if (!this._showing || changeMonitor) {
-				let monitorRect = new Meta.Rectangle({ x: monitor.x,
-													   y: monitor.y,
-													   width: monitor.width,
-													   height: monitor.height });
+				let monitorRect = new Meta.Rectangle({	x: monitor.x,
+														y: monitor.y,
+														width: monitor.width,
+														height: monitor.height });
 				let [, rect] = window.get_frame_rect().intersect(monitorRect);
 				this.set_size(rect.width, rect.height);
 				this.set_position(rect.x, rect.y);
