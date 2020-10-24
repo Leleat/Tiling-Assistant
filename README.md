@@ -6,4 +6,4 @@ An extension which adds a Windows-like snap assist to GNOME. This is only intend
 
 ## Installation
 
-You should install it via extensions.gnome.org. Alternatively you can also download the `tiling-assistant@leleat-on-github` folder and move it to the extensions folder (for example: /home/USERNAME/.local/share/gnome-shell/extensions).
+You should install it via https://extensions.gnome.org. Alternatively, you can download the `tiling-assistant@leleat-on-github` folder and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`.
