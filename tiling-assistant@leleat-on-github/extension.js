@@ -5,27 +5,17 @@ const ExtensionUtils = imports.misc.extensionUtils;
 
 let openWindowsDash = null;
 let tilePreview = null;
-let tiledWindows = {}; // {window : old frame rect}
+let tiledWindows = {}; // {window : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
 
-let ICON_SIZE;
-let ICON_MARGIN;
-let SHOW_LABEL;
-let USE_ANIM; // make the use of GNOME's animations optional because there are error messages in journalctl abd there are animation issues with other extensions who hide the titlebar on maximization
-
-// TODO
-// new tiling keyboard shortcuts and restore size on keyboard shortcut
-// test quarter tiling on my Dell monitor / multi monitor testing
+let settings = null;
 
 function init() {
 };
 
 function enable() {
-	ICON_SIZE = 75;
-	ICON_MARGIN = 20;
-	SHOW_LABEL = false;
-	USE_ANIM = true;
-	
+	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
+
 	// signal connections
 	this.windowGrabBegin = global.display.connect('grab-op-begin', onGrabBegin.bind(this) );
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
@@ -39,12 +29,22 @@ function enable() {
 	// disable native tiling
 	// taken from ShellTile@emasab.it - https://extensions.gnome.org/extension/657/shelltile/
 	// dont know why gnome_shell_settings tiling is disabled...
-	// Known Issue:
-	// sometimes the window wont move to the top completely; instead there is an invisible barrier below the topbar and only on enough force will the window snaps to top
 	this.gnome_mutter_settings = ExtensionUtils.getSettings("org.gnome.mutter");
 	this.gnome_mutter_settings.set_boolean("edge-tiling", false);
 	this.gnome_shell_settings = ExtensionUtils.getSettings("org.gnome.shell.overrides");
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
+
+	// tiling keybindings
+	this.keyBindings = ["tile-top-half", "tile-bottom-half", "tile-topleft-quarter", "tile-topright-quarter", "tile-bottomleft-quarter", "tile-bottomright-quarter"];
+	this.keyBindings.forEach(key => {
+		main.wm.addKeybinding(
+			key,
+			settings,
+			Meta.KeyBindingFlags.NONE,
+			Shell.ActionMode.NORMAL,
+			onCustomShortcutPressed.bind(this, key)
+		);
+	});
 };
 
 function disable() {
@@ -56,15 +56,18 @@ function disable() {
 	main.overview.disconnect(this.overviewShown);
 
 	tilePreview.destroy();
-
 	openWindowsDash._destroy();
-	ICON_SIZE = null;
-	ICON_MARGIN = null;
-	SHOW_LABEL = null;
 
 	// re-enable native tiling
 	this.gnome_mutter_settings.reset("edge-tiling");
 	this.gnome_shell_settings.reset("edge-tiling");
+
+	// remove keybindings
+	this.keyBindings.forEach(key => {
+		main.wm.removeKeybinding(key);
+	});
+
+	settings = null;
 };
 
 function tileWindow(window, rect) {
@@ -77,15 +80,27 @@ function tileWindow(window, rect) {
 	if (!window.allows_resize() || !window.allows_move())
 		return;
 		
-	tiledWindows[window] = window.get_frame_rect();
+	if ( !(window in tiledWindows) )
+		tiledWindows[window] = window.get_frame_rect();
+	else
+		tiledWindows[window] = new Meta.Rectangle({
+			x: rect.x,
+			y: rect.y,
+			width: tiledWindows[window].width,
+			height: tiledWindows[window].height,
+		});
+
 	let wActor = window.get_compositor_private();
 	wActor.connect("destroy", ((w) => {	
 		if (tiledWindows[w])
 			delete tiledWindows[w];
 	}).bind(this, window));
 
-	if (USE_ANIM)
-		main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+	// make the use of GNOME's animations optional
+	// there are error messages in journalctl and animation issues with other extensions who rely on the size-change signal 
+	// e.g. hiding the titlebar on maximization
+	if (settings.get_boolean("use-anim"))
+		main.wm._prepareAnimationInfo(global.window_manager, wActor, tiledWindows[window], 0);
 
 	window.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
 	window.focus(global.get_current_time());
@@ -99,7 +114,7 @@ function tileWindow(window, rect) {
 		GLib.source_remove(sID);
 	}); // timer needed to correctly shade the bg / focusing
 
-	if (USE_ANIM) {
+	if (settings.get_boolean("use-anim")) {
 		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => { // wait for GNOME's sizing anim to be done
 			GLib.source_remove(sourceID);
 	
@@ -122,6 +137,104 @@ function tileWindow(window, rect) {
 		
 		else if (rect.width >= workArea.width - 2)
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+	}
+};
+
+function onCustomShortcutPressed(shortcutName) {
+	let window = global.display.focus_window;
+	if (!window)
+		return;
+
+	let rect;
+	let workArea = window.get_work_area_current_monitor();	
+	switch (shortcutName) {
+		case "tile-top-half":
+			rect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: workArea.width,
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-bottom-half":
+			rect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + Math.floor(workArea.height / 2),
+				width: workArea.width,
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-topleft-quarter":
+			rect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: Math.floor(workArea.width / 2),
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-topright-quarter":
+			rect = new Meta.Rectangle({
+				x: workArea.x + Math.floor(workArea.width / 2),
+				y: workArea.y,
+				width: Math.floor(workArea.width / 2),
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-bottomleft-quarter":
+			rect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + Math.floor(workArea.height / 2),
+				width: Math.floor(workArea.width / 2),
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-bottomright-quarter":
+			rect = new Meta.Rectangle({
+				x: workArea.x + Math.floor(workArea.width / 2),
+				y: workArea.y + Math.floor(workArea.height / 2),
+				width: Math.floor(workArea.width / 2),
+				height: Math.floor(workArea.height / 2)
+			});
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
 	}
 };
 
@@ -456,20 +569,16 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 	}
 };
 
-// TODO 
-// calculation for newPosX seems correct. But it only works when starting the drag in the Topbar AND not moving. 
-// After that the window will teleport to a different pos.
 function restoreWindowSize(window, restoreFullPos = false) {
 	if (!(window in tiledWindows))
 		return;
 
 	let windowIsQuartered = !window.get_maximized();
-	if (window.get_maximized()) {
+	if (window.get_maximized())
 		window.unmaximize(window.get_maximized());
-	}
 
 	if (window.allows_resize() && window.allows_move()) {
-		if (windowIsQuartered) { // custom restore anim since GNOME doesnt have one for this case
+		if (windowIsQuartered && settings.get_boolean("use-anim")) { // custom restore anim since GNOME doesnt have one for this case
 			let oldFrameRect = window.get_frame_rect();
 			let actorContent = Shell.util_get_content_for_window_actor(window.get_compositor_private(), oldFrameRect);
 			let actorClone = new St.Widget({ 
@@ -483,7 +592,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 
 			actorClone.ease({
 				opacity: 0,
-				duration: 200,
+				duration: 250,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 				onComplete: () => actorClone.destroy()
 			});
@@ -505,22 +614,28 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	}
 };
 
-// TODO corner detection is kinda iffy
 function onWindowMoving(window) {
 	let [mouseX, mouseY] = global.get_pointer();
 	let workArea = window.get_work_area_current_monitor();
 
-	let tileMaximized = mouseY <= 20;
-	// on the left and the right side of the panel
-	let tileTopHalf = mouseY <= 20 && ( (mouseX > 20 && mouseX < workArea.width / 4) || (mouseX < workArea.y + workArea.width - 20 && mouseX > workArea.y + workArea.width - workArea.width / 4) );
-	let tileTopLeftQuarter = mouseX <= workArea.x + 20 && mouseY <= workArea.y + 20;
-	let tileTopRightQuarter = mouseX >= workArea.x + workArea.width - 20 && mouseY <= workArea.y + 20;
-	let tileBottomLeftQuarter = mouseX <= workArea.x + 20 && mouseY >= workArea.y + workArea.height - 20;
-	let tileBottomRightQuarter = mouseX >= workArea.x + workArea.width - 20 && mouseY >= workArea.y + workArea.height - 20;
-	let tileRightHalf = mouseX >= workArea.x + workArea.width - 20 && (mouseY >= workArea.y + 20 || mouseY <= workArea.y + workArea.height - 20);
-	let tileLeftHalf = mouseX <= workArea.x + 20 && (mouseY >= workArea.y + 20 || mouseY <= workArea.y + workArea.height - 20);
-	let tileBottomHalf = mouseY >= workArea.y + workArea.height - 20;
+	let onTop = mouseY <= 25;
+	let onBottom = mouseY >= workArea.y + workArea.height - 25;
+	let onLeft = mouseX <= workArea.x + 25;
+	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
+	let tileTopLeftQuarter = onTop && onLeft;
+	let tileTopRightQuarter = onTop && onRight;
+	let tileBottomLeftQuarter = onLeft && onBottom;
+	let tileBottomRightQuarter = onRight && onBottom;
+
+	// tile to top half on the most left and on the most right side of the topbar
+	let tileTopHalf = onTop && ( (mouseX > 25 && mouseX < workArea.width / 4) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 4) );
+	let tileRightHalf = onRight
+	let tileLeftHalf = onLeft;
+	let tileMaximized = onTop;
+	let tileBottomHalf = onBottom;
+
+	// prioritize quarter over other tiling
 	if (tileTopLeftQuarter)
 		tilePreview.open(window, new Meta.Rectangle({
 			x: workArea.x,
@@ -697,7 +812,6 @@ var OpenWindowsDash = GObject.registerClass(
 
 			// visual BG for the Dash
 			this.bgGrid = new St.Widget({
-				height: ICON_SIZE + 16 + ICON_MARGIN + ((SHOW_LABEL) ? 28 : 0), // magicNr are margins/paddings from the icon to the full-sized highlighted button
 				style_class: "my-open-windows-dash",
 			});
 			main.layoutManager.addChrome(this.bgGrid);
@@ -745,10 +859,10 @@ var OpenWindowsDash = GObject.registerClass(
 			}
 
 			openWindows.forEach(w => {
-				let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, freeScreenRect, tiledWindow.get_monitor(), {showLabel: SHOW_LABEL});
+				let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, freeScreenRect, tiledWindow.get_monitor(), {showLabel: settings.get_boolean("show-label")});
 				this.appContainer.add_child(app);
 				app.set_position(pos, 0);
-				pos += ICON_SIZE + 16 + ICON_MARGIN + ((SHOW_LABEL) ? 28 : 0); // magicNr are margins/paddings from the icon to the full-sized highlighted button
+				pos += settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0); // magicNr are margins/paddings from the icon to the full-sized highlighted button
 			});
 
 			// timer needed to correctly calculate the center position because the app.height isnt correct without a timer
@@ -762,7 +876,7 @@ var OpenWindowsDash = GObject.registerClass(
 
 			// setup bgGrid
 			this.bgGrid.show();
-			this.bgGrid.set_width(pos);
+			this.bgGrid.set_size(pos, settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0)); // magicNr are margins/paddings from the icon to the full-sized highlighted button
 			this.bgGrid.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.bgGrid.width / 2
 				, freeScreenRect.y + freeScreenRect.height / 2 - this.bgGrid.height / 2);
 			
@@ -789,7 +903,8 @@ var OpenWindowsDash = GObject.registerClass(
 			if (windowActor)
 				global.window_group.set_child_below_sibling(this.shadeBG, windowActor);
 
-			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height);
+			//this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
+			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
 			this.shadeBG.show();
 			this.shadeBG.ease({
 				opacity: 180,
@@ -799,7 +914,7 @@ var OpenWindowsDash = GObject.registerClass(
 
 			// setup mouseCatcher
 			this.mouseCatcher.show();
-			this.mouseCatcher.set_size(entireWorkArea.width, entireWorkArea.height);
+			this.mouseCatcher.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
 		}
 
 		close() {
@@ -950,7 +1065,7 @@ var OpenAppIcon = GObject.registerClass(
 	
 			this.set_child(this.iconContainer);
 	
-			iconParams['createIcon'] = this._createIcon.bind(this, app, ICON_SIZE);
+			iconParams['createIcon'] = this._createIcon.bind(this, app, settings.get_int("icon-size"));
 			iconParams['setSizeManually'] = true;
 			this.icon = new iconGrid.BaseIcon(app.get_name(), iconParams);
 			this.iconContainer.add_child(this.icon);
@@ -1003,8 +1118,8 @@ var OpenAppIcon = GObject.registerClass(
 
 				let event = Clutter.get_current_event();
 				let modifiers = event ? event.get_state() : 0;
-				let isAltPressed = (modifiers & Clutter.ModifierType.MOD1_MASK) != 0;
-				let isShiftPressed = (modifiers & Clutter.ModifierType.SHIFT_MASK) != 0;
+				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 				let workArea = this.window.get_work_area_current_monitor();
 
 				if (isAltPressed) {
