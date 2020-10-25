@@ -11,14 +11,11 @@ let windowGrabSignals = {}; // {windowID : [signalIDs]}
 let ICON_SIZE;
 let ICON_MARGIN;
 let SHOW_LABEL;
+let USE_ANIM; // make the use of GNOME's animations optional because there are error messages in journalctl abd there are animation issues with other extensions who hide the titlebar on maximization
 
 // TODO
-// new tiling keyboard shortcuts
-// update README and preview with new howto (like keyboard shortcut with alt/shift to tile partly)
-// test quarter tiling on my Dell monitor
-
-// Known issue:
-// doesnt use GNOME's resize/maximize animations
+// new tiling keyboard shortcuts and restore size on keyboard shortcut
+// test quarter tiling on my Dell monitor / multi monitor testing
 
 function init() {
 };
@@ -27,12 +24,14 @@ function enable() {
 	ICON_SIZE = 75;
 	ICON_MARGIN = 20;
 	SHOW_LABEL = false;
+	USE_ANIM = true;
 	
 	// signal connections
 	this.windowGrabBegin = global.display.connect('grab-op-begin', onGrabBegin.bind(this) );
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
 	this.shortcutPressed = global.window_manager.connect( "filter-keybinding", onShortcutPressed.bind(this));
 	this.maximizedStateChanged = global.window_manager.connect("size-change", onMaxStateChanged.bind(this));
+	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
 
 	openWindowsDash = new OpenWindowsDash();
 	tilePreview = new MyTilePreview();
@@ -54,6 +53,7 @@ function disable() {
 	global.display.disconnect(this.windowGrabEnd);
 	global.window_manager.disconnect(this.shortcutPressed);
 	global.window_manager.disconnect(this.maximizedStateChanged);
+	main.overview.disconnect(this.overviewShown);
 
 	tilePreview.destroy();
 
@@ -84,29 +84,49 @@ function tileWindow(window, rect) {
 			delete tiledWindows[w];
 	}).bind(this, window));
 
+	if (USE_ANIM)
+		main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+
 	window.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
 	window.focus(global.get_current_time());
 
 	let workArea = window.get_work_area_current_monitor();
-	if (rect.height == workArea.height && rect.width == workArea.width)
-		window.maximize(Meta.MaximizeFlags.BOTH);
+	let sourceID = 0;
+	let sID = 0;
 
-	else if (rect.height >= workArea.height - 2)
-		window.maximize(Meta.MaximizeFlags.VERTICAL);
+	sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+		openDash(window);
+		GLib.source_remove(sID);
+	}); // timer needed to correctly shade the bg / focusing
+
+	if (USE_ANIM) {
+		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => { // wait for GNOME's sizing anim to be done
+			GLib.source_remove(sourceID);
 	
-	else if (rect.width >= workArea.width - 2)
-		window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+			if (rect.height == workArea.height && rect.width == workArea.width)
+				window.maximize(Meta.MaximizeFlags.BOTH);
+		
+			else if (rect.height >= workArea.height - 2)
+				window.maximize(Meta.MaximizeFlags.VERTICAL);
+			
+			else if (rect.width >= workArea.width - 2)
+				window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+		});
 
-	// directly check wether to open the dash on quartered since there is no signal (like size-change)
-	if (equalApprox(rect.width, workArea.width / 2, 2) && equalApprox(rect.height, workArea.height / 2, 2))
-		GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => openDash(window)); // timer needed to correctly shade the bg (on multiple tiling)
+	} else {
+		if (rect.height == workArea.height && rect.width == workArea.width)
+			window.maximize(Meta.MaximizeFlags.BOTH);
+	
+		else if (rect.height >= workArea.height - 2)
+			window.maximize(Meta.MaximizeFlags.VERTICAL);
+		
+		else if (rect.width >= workArea.width - 2)
+			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+	}
 };
 
 // called whenever the maximize state of a window is changed (...and maybe at other times as well; I dont know?)
 function onMaxStateChanged(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect) {
-	if (openWindowsDash.isVisible())
-		return;
-		
 	let tiledWindow = actor.get_meta_window();
 	if (!tiledWindow.get_maximized() || tiledWindow.get_maximized() == Meta.MaximizeFlags.BOTH)
 		return;
@@ -119,9 +139,11 @@ function onMaxStateChanged(shellwm, actor, whichChange, oldFrameRect, _oldBuffer
 };
 
 // called when a window is tiled
-// either through the size-change signal when maximizing or directly when this extensions quarters a window.
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function openDash(tiledWindow) {
+	if (openWindowsDash.isVisible())
+		return;
+
 	let workArea = tiledWindow.get_work_area_current_monitor();
 
 	// first we assume the entire screen is free space.
@@ -214,15 +236,15 @@ function getComplementingWindows(remainingQuadOrigins, openWindows) {
 
 		// top left still in remainingPoints
 		if (topLeftPoint && windowRect.x == topLeftPoint.x && windowRect.y == topLeftPoint.y) {
-			if (window.get_maximized() != Meta.MaximizeFlags.BOTH) {
-				if (window.get_maximized() == Meta.MaximizeFlags.VERTICAL) {
+			if (!(windowRect.height == workArea.height && windowRect.width == workArea.width)) { // isnt maximized
+				if (windowRect.height == workArea.height) { // is vertically maximized
 					maximizedIdx = remainingPoints.indexOf(bottomLeftPoint);
 					if (maximizedIdx == -1)
 						return false;
 
 					remainingPoints.splice(maximizedIdx, 1);
 					
-				} else if (window.get_maximized() == Meta.MaximizeFlags.HORIZONTAL) {
+				} else if (windowRect.width == workArea.width) { // is horizontally maximized
 					maximizedIdx = remainingPoints.indexOf(topRightPoint);
 					if (maximizedIdx == -1)
 						return false;
@@ -240,7 +262,7 @@ function getComplementingWindows(remainingQuadOrigins, openWindows) {
 
 		// top right still in remainingPoints
 		} else if (topRightPoint && windowRect.x == topRightPoint.x && windowRect.y == topRightPoint.y) {
-			if (window.get_maximized() == Meta.MaximizeFlags.VERTICAL) {
+			if (windowRect.height == workArea.height && windowRect.width != workArea.width) { // is vertically maximized
 				maximizedIdx = remainingPoints.indexOf(bottomRightPoint);
 				if (maximizedIdx == -1)
 					return false;
@@ -257,7 +279,7 @@ function getComplementingWindows(remainingQuadOrigins, openWindows) {
 
 		// bottom left still in remainingPoints
 		} else if (bottomLeftPoint && windowRect.x == bottomLeftPoint.x && windowRect.y == bottomLeftPoint.y) {
-			if (window.get_maximized() == Meta.MaximizeFlags.HORIZONTAL) {
+			if (windowRect.width == workArea.width && windowRect.height != workArea.height) { // is horizontally maximized
 				maximizedIdx = remainingPoints.indexOf(bottomRightPoint);
 				if (maximizedIdx == -1)
 					return false;
@@ -313,7 +335,6 @@ function onShortcutPressed(shellWM, keyBinding) {
 
 	switch(keyBinding.get_name()) {
 		case "toggle-tiled-left":
-			log(window.get_maximized() == Meta.MaximizeFlags.VERTICAL)
 			if ( (window.get_frame_rect().x - workArea.x < 5) ) // window is on the left on the current monitor (with a margin)
 				if (window in tiledWindows && window.get_maximized() == Meta.MaximizeFlags.VERTICAL)
 					sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because first the split view will be entered
@@ -442,10 +463,32 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	if (!(window in tiledWindows))
 		return;
 
-	if (window.get_maximized())
+	let windowIsQuartered = !window.get_maximized();
+	if (window.get_maximized()) {
 		window.unmaximize(window.get_maximized());
+	}
 
 	if (window.allows_resize() && window.allows_move()) {
+		if (windowIsQuartered) { // custom restore anim since GNOME doesnt have one for this case
+			let oldFrameRect = window.get_frame_rect();
+			let actorContent = Shell.util_get_content_for_window_actor(window.get_compositor_private(), oldFrameRect);
+			let actorClone = new St.Widget({ 
+				content: actorContent,
+				x: oldFrameRect.x,
+				y: oldFrameRect.y,
+				width: oldFrameRect.width,
+				height: oldFrameRect.height,
+			});
+			main.uiGroup.add_child(actorClone);
+
+			actorClone.ease({
+				opacity: 0,
+				duration: 200,
+				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+				onComplete: () => actorClone.destroy()
+			});
+		}
+
 		let oldRect = tiledWindows[window];
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
@@ -624,6 +667,8 @@ var OpenWindowsDash = GObject.registerClass(
 		_init() {
 			super._init();
 
+			this._shown = false;
+
 			// for animation move direction of the Dash (the Dash will move from the tiled window pos to the center of the remaining free space)
 			this.animationDir = {x: 0, y: 0};
 
@@ -673,7 +718,9 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 
 		open(openWindows, tiledWindow, freeSpaceOriginPoints, lastTiledW) {
+			this._shown = true;
 			this.appContainer.destroy_all_children();
+
 			let workArea = tiledWindow.get_work_area_current_monitor();
 			let entireWorkArea = tiledWindow.get_work_area_all_monitors();
 
@@ -733,7 +780,7 @@ var OpenWindowsDash = GObject.registerClass(
 				x: finalX,
 				y: finalY,
 				opacity: 255,
-				duration: 150,
+				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
@@ -746,7 +793,7 @@ var OpenWindowsDash = GObject.registerClass(
 			this.shadeBG.show();
 			this.shadeBG.ease({
 				opacity: 180,
-				duration: 150,
+				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
@@ -756,6 +803,7 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 
 		close() {
+			this._shown = false;
 			this.mouseCatcher.hide();
 
 			let finalX = this.bgGrid.x + 200 * this.animationDir.x;
@@ -787,7 +835,7 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 		
 		isVisible() {
-			return this.bgGrid.visible;
+			return this._shown;
 		}
 	}
 );
@@ -843,7 +891,7 @@ var MyTilePreview = GObject.registerClass(
 				width: tileRect.width,
 				height: tileRect.height,
 				opacity: 255,
-				duration: 150,
+				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 			});
 		}
@@ -855,7 +903,7 @@ var MyTilePreview = GObject.registerClass(
 			this._showing = false;
 			this.ease({
 				opacity: 0,
-				duration: 150,
+				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 				onComplete: () => this._reset(),
 			});
