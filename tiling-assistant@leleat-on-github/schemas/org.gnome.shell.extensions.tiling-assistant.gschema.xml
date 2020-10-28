@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schemalist>
+	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
+		<key name="icon-size" type="i">
+			<default>75</default>
+		</key>
+
+		<key name="icon-margin" type="i">
+			<default>20</default>
+		</key>
+
+		<key name="show-label" type="b">
+			<default>false</default>
+		</key>
+
+		<key name="use-anim" type="b">
+			<default>true</default>
+		</key>
+
+		<key name="tile-top-half" type="as">
+			<default><![CDATA[['<Super>up']]]></default>
+		</key>
+
+		<key name="tile-right-half" type="as">
+			<default><![CDATA[['<Super>right']]]></default>
+		</key>
+
+		<key name="tile-left-half" type="as">
+			<default><![CDATA[['<Super>left']]]></default>
+		</key>
+
+		<key name="tile-bottom-half" type="as">
+			<default><![CDATA[['<Super>down']]]></default>
+		</key>
+
+		<key name="tile-topleft-quarter" type="as">
+			<default><![CDATA[['<Super><Shift>up']]]></default>
+		</key>
+
+		<key name="tile-topright-quarter" type="as">
+			<default><![CDATA[['<Super><Alt>up']]]></default>
+		</key>
+
+		<key name="tile-bottomleft-quarter" type="as">
+			<default><![CDATA[['<Super><Shift>down']]]></default>
+		</key>
+
+		<key name="tile-bottomright-quarter" type="as">
+			<default><![CDATA[['<Super><Alt>down']]]></default>
+		</key>
+	</schema>
+</schemalist>
