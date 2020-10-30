@@ -89,6 +89,7 @@ function tileWindow(window, rect) {
 	}).bind(this, window));
 
 	// there is no animation if changing only the position of a tiled window
+	// e.g. moving a top left tiled window to the top right via keyboard shortcuts
 	// so I animate myself
 	let oldFrameRect = window.get_frame_rect();
 	if (settings.get_boolean("use-anim") && wasTiled && oldFrameRect.width  == rect.width && oldFrameRect.height == rect.height) {
@@ -251,14 +252,15 @@ function onCustomShortcutPressed(shortcutName) {
 
 // called whenever the maximize state of a window is changed (...and maybe at other times as well; I dont know?)
 function onMaxStateChanged(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect) {
-	let tiledWindow = actor.get_meta_window();
-	if (!tiledWindow.get_maximized() || tiledWindow.get_maximized() == Meta.MaximizeFlags.BOTH)
-		return;
-
 	// timer to get the correct new window pos and size
 	let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-		openDash(tiledWindow);
 		GLib.source_remove(sourceID);
+
+		let tiledWindow = actor.get_meta_window();
+		if (!tiledWindow.get_maximized() || tiledWindow.get_maximized() == Meta.MaximizeFlags.BOTH)
+			return;
+
+		openDash(tiledWindow);
 	});
 };
 
@@ -403,6 +405,8 @@ function openDash(tiledWindow) {
 
 	let _height = 0;
 	let _width = 0;
+	let limitWidth = 0;
+	let limitHeight = 0;
 
 	// only 1 quad is free
 	if (freeQuadCount == 1) {
@@ -453,43 +457,42 @@ function openDash(tiledWindow) {
 			return;
 
 		if (currTileGroup.TOP_LEFT == null && currTileGroup.TOP_RIGHT == null) {
-			_height = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
+			limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
 
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
 				width: workArea.width,
-				height: (_height) ? workArea.height - _height : workArea.height / 2,
+				height: (limitHeight) ? workArea.height - limitHeight : workArea.height / 2,
 			});
 
 		} else if (currTileGroup.TOP_RIGHT == null && currTileGroup.BOTTOM_RIGHT == null) {
-
-			let _width = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
+			let limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
 
 			freeScreenRect = new Meta.Rectangle({
-				x: workArea.x + ((_width) ? _width : workArea.width / 2),
+				x: workArea.x + ((limitWidth) ? limitWidth : workArea.width / 2),
 				y: workArea.y,
-				width: (_width) ? workArea.width - _width : workArea.width / 2,
+				width: (limitWidth) ? workArea.width - limitWidth : workArea.width / 2,
 				height: workArea.height
 			});
 
 		} else if (currTileGroup.BOTTOM_RIGHT == null && currTileGroup.BOTTOM_LEFT == null) {
-			_height = getMaxHeight(topLeftRect, topRightRect, workArea);
+			limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
 
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x,
-				y: workArea.y + ((_height) ? _height : workArea.height / 2),
+				y: workArea.y + ((limitHeight) ? limitHeight : workArea.height / 2),
 				width: workArea.width,
-				height: (_height) ? workArea.height - _height : workArea.height / 2
+				height: (limitHeight) ? workArea.height - limitHeight : workArea.height / 2
 			});
 
 		} else if (currTileGroup.BOTTOM_LEFT == null && currTileGroup.TOP_LEFT == null) {
-			_width = getMaxWidth(topRightRect, bottomRightRect, workArea);
+			limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
 
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
-				width: (_width) ? workArea.width - _width : workArea.width / 2,
+				width: (limitWidth) ? workArea.width - limitWidth : workArea.width / 2,
 				height: workArea.height
 			});
 		}
@@ -507,6 +510,9 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		windowGrabSignals[grabbedWindow.get_id()] = [];
 
 	// for resizing op
+	// sameSideWindow is the window which is on the same side relative to where the grab began
+	// e.g. if resizing the top left on the E side, the bottom right window is the sameSideWindow
+	// opposingWindows are the remaining windows
 	let sameSideWindow = null;
 	let opposingWindows = [];
 	let grabbedRect = grabbedWindow.get_frame_rect();
@@ -810,6 +816,7 @@ function onWindowMoving(window) {
 };
 
 // sameSideWindow is the window which is on the same side as the resizedRect based on the drag direction
+// e.g. if resizing the top left on the E side, the bottom right window is the sameSideWindow
 // opposingWindows is the opposite
 function resizeComplementingWindows(resizedWindow, sameSideWindow, opposingWindows, grabOp) {
 	if (!(resizedWindow in tiledWindows))
@@ -875,9 +882,9 @@ return false;
 };
 
 function getMaxWidth(rect1, rect2, workArea) {
+	// ignore maximized windows
 	if (rect1 && rect1.width == workArea.width)
 		rect1 = null;
-
 	if (rect2 && rect2.width == workArea.width)
 		rect2 = null;
 
@@ -892,9 +899,9 @@ function getMaxWidth(rect1, rect2, workArea) {
 };
 
 function getMaxHeight(rect1, rect2, workArea) {
+	// ignore maximized windows
 	if (rect1 && rect1.height == workArea.height)
 		rect1 = null;
-
 	if (rect2 && rect2.height == workArea.height)
 		rect2 = null;
 
@@ -912,7 +919,7 @@ function getMaxHeight(rect1, rect2, workArea) {
 // for example: if we try to get the free space for the top left quad, the diagonal rect is at the bottom right
 // if a window is maximized, 2 rects can be equal
 // vertToDiaRect/horiToDiaRect are the quads in relation to the diagonal quad
-// ONLY used to 1 quad and not more (i. e. not maximized windows)
+// ONLY used to get the dimensions for 1 quad and not more (i. e. not maximized windows)
 function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect) {
 	// 0 other rect
 	if (!diagonalRect && !vertToDiaRect && !horiToDiaRect) {

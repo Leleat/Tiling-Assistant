@@ -9,6 +9,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 If the free space spans 2 quadrants, you can hold `Shift` while activating the icon to tile the window to the top or the left free quadrant depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right quadrant.
 
+**You should disable GNOME's default shortcuts for the split view and use the shortcuts of this extension.**
+
 ![Preview](preview.gif)
 
 ## Installation

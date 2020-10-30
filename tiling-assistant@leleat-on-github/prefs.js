@@ -82,6 +82,7 @@ const MyPrefsWidget = new GObject.Class({
         this.updateShortcutRow(this.settings.get_strv(this.TILE_RIGHT_SETTING)[0], this.TILE_RIGHT_SETTING);
     },
 
+    // TODO: dont exactly understand how the tree/CellRendererAccel stuff works, so I just copy/pasted functions multiple times...
     configureShortcutTreeView: function(builder) {
         let treeView = builder.get_object("tile-top-half-treeview");
 
@@ -299,7 +300,7 @@ const MyPrefsWidget = new GObject.Class({
     },
 
     updateShortcutRow: function(accel, settingsName) {
-        let [key, mods] = (accel !== null) ? Gtk.accelerator_parse(accel) : [0, 0];
+        let [key, mods] = (accel) ? Gtk.accelerator_parse(accel) : [0, 0];
 
         switch (settingsName) {
             case this.TILE_TOP_HALF_SETTING: 
