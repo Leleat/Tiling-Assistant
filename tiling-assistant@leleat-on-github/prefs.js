@@ -44,6 +44,8 @@ const MyPrefsWidget = new GObject.Class({
         // shortcut configuration taken from drop-down-terminal@gs-extensions.zzrough.org - https://extensions.gnome.org/extension/442/drop-down-terminal/
         // settings name for shortcut
         this.TILE_TOP_HALF_SETTING = "tile-top-half";
+        this.TILE_LEFT_SETTING = "tile-left-half";
+        this.TILE_RIGHT_SETTING = "tile-right-half";
         this.TILE_BOTTOM_HALF_SETTING = "tile-bottom-half";
         this.TILE_TOP_LEFT_SETTING = "tile-topleft-quarter";
         this.TILE_TOP_RIGHT_SETTING = "tile-topright-quarter";
@@ -53,6 +55,8 @@ const MyPrefsWidget = new GObject.Class({
         this.configureShortcutTreeView(builder);
         
         this.topHalfListStore = builder.get_object("top-half-liststore");
+        this.leftHalfListStore = builder.get_object("left-liststore");
+        this.rightHalfListStore = builder.get_object("right-liststore");
         this.bottomHalfListStore = builder.get_object("bottom-half-liststore");
         this.topLeftListStore = builder.get_object("top-left-liststore");
         this.topRightListStore = builder.get_object("top-right-liststore");
@@ -65,6 +69,8 @@ const MyPrefsWidget = new GObject.Class({
         this.tileTopRightRow = this.topRightListStore.append();
         this.tileBottomLeftRow = this.bottomLeftListStore.append();
         this.tileBottomRightRow = this.bottomRightListStore.append();
+        this.tileLeftRow = this.leftHalfListStore.append();
+        this.tileRightRow = this.rightHalfListStore.append();
 
         this.updateShortcutRow(this.settings.get_strv(this.TILE_TOP_HALF_SETTING)[0], this.TILE_TOP_HALF_SETTING);
         this.updateShortcutRow(this.settings.get_strv(this.TILE_BOTTOM_HALF_SETTING)[0], this.TILE_BOTTOM_HALF_SETTING);
@@ -72,6 +78,8 @@ const MyPrefsWidget = new GObject.Class({
         this.updateShortcutRow(this.settings.get_strv(this.TILE_TOP_RIGHT_SETTING)[0], this.TILE_TOP_RIGHT_SETTING);
         this.updateShortcutRow(this.settings.get_strv(this.TILE_BOTTOM_LEFT_SETTING)[0], this.TILE_BOTTOM_LEFT_SETTING);
         this.updateShortcutRow(this.settings.get_strv(this.TILE_BOTTOM_RIGHT_SETTING)[0], this.TILE_BOTTOM_RIGHT_SETTING);
+        this.updateShortcutRow(this.settings.get_strv(this.TILE_LEFT_SETTING)[0], this.TILE_LEFT_SETTING);
+        this.updateShortcutRow(this.settings.get_strv(this.TILE_RIGHT_SETTING)[0], this.TILE_RIGHT_SETTING);
     },
 
     configureShortcutTreeView: function(builder) {
@@ -162,6 +170,36 @@ const MyPrefsWidget = new GObject.Class({
         column6.add_attribute(renderer6, "accel-mods", 1);
 
         treeView6.append_column(column6);
+
+        //
+
+        let treeView7 = builder.get_object("tile-right-treeview");
+
+        let renderer7 = new Gtk.CellRendererAccel({editable: true});
+        renderer7.connect("accel-edited", this.onShortcutAccelEdited7.bind(this));
+        renderer7.connect("accel-cleared", this.onShortcutAccelCleared7.bind(this));
+
+        let column7 = new Gtk.TreeViewColumn();
+        column7.pack_start(renderer7, true);
+        column7.add_attribute(renderer7, "accel-key", 0);
+        column7.add_attribute(renderer7, "accel-mods", 1);
+
+        treeView7.append_column(column7);
+
+        //
+
+        let treeView8 = builder.get_object("tile-left-treeview");
+
+        let renderer8 = new Gtk.CellRendererAccel({editable: true});
+        renderer8.connect("accel-edited", this.onShortcutAccelEdited8.bind(this));
+        renderer8.connect("accel-cleared", this.onShortcutAccelCleared8.bind(this));
+
+        let column8 = new Gtk.TreeViewColumn();
+        column8.pack_start(renderer8, true);
+        column8.add_attribute(renderer8, "accel-key", 0);
+        column8.add_attribute(renderer8, "accel-mods", 1);
+
+        treeView8.append_column(column8);
     },
     
     onShortcutAccelEdited: function(renderer, path, key, mods, hwCode) {
@@ -206,6 +244,20 @@ const MyPrefsWidget = new GObject.Class({
         this.settings.set_strv(this.TILE_BOTTOM_RIGHT_SETTING, [accel]);
     },
 
+    onShortcutAccelEdited7: function(renderer, path, key, mods, hwCode) {
+        let accel = Gtk.accelerator_name(key, mods);
+        this.updateShortcutRow(accel, this.TILE_RIGHT_SETTING);
+
+        this.settings.set_strv(this.TILE_RIGHT_SETTING, [accel]);
+    },
+
+    onShortcutAccelEdited8: function(renderer, path, key, mods, hwCode) {
+        let accel = Gtk.accelerator_name(key, mods);
+        this.updateShortcutRow(accel, this.TILE_LEFT_SETTING);
+
+        this.settings.set_strv(this.TILE_LEFT_SETTING, [accel]);
+    },
+
     onShortcutAccelCleared: function(renderer, path) {
         this.updateShortcutRow(null, this.TILE_TOP_HALF_SETTING);
         this.settings.set_strv(this.TILE_TOP_HALF_SETTING, []);
@@ -236,6 +288,16 @@ const MyPrefsWidget = new GObject.Class({
         this.settings.set_strv(this.TILE_BOTTOM_RIGHT_SETTING, []);
     },
 
+    onShortcutAccelCleared7: function(renderer, path) {
+        this.updateShortcutRow(null, this.TILE_RIGHT_SETTING);
+        this.settings.set_strv(this.TILE_RIGHT_SETTING, []);
+    },
+
+    onShortcutAccelCleared8: function(renderer, path) {
+        this.updateShortcutRow(null, this.TILE_LEFT_SETTING);
+        this.settings.set_strv(this.TILE_LEFT_SETTING, []);
+    },
+
     updateShortcutRow: function(accel, settingsName) {
         let [key, mods] = (accel !== null) ? Gtk.accelerator_parse(accel) : [0, 0];
 
@@ -262,6 +324,14 @@ const MyPrefsWidget = new GObject.Class({
 
             case this.TILE_BOTTOM_RIGHT_SETTING: 
                 this.bottomRightListStore.set(this.tileBottomRightRow, [0, 1], [key, mods]);
+                break;
+
+            case this.TILE_RIGHT_SETTING: 
+                this.rightHalfListStore.set(this.tileRightRow, [0, 1], [key, mods]);
+                break;
+
+            case this.TILE_LEFT_SETTING: 
+                this.leftHalfListStore.set(this.tileLeftRow, [0, 1], [key, mods]);
                 break;
         }
     },

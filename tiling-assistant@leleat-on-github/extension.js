@@ -19,7 +19,6 @@ function enable() {
 	// signal connections
 	this.windowGrabBegin = global.display.connect('grab-op-begin', onGrabBegin.bind(this) );
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
-	this.shortcutPressed = global.window_manager.connect( "filter-keybinding", onShortcutPressed.bind(this));
 	this.maximizedStateChanged = global.window_manager.connect("size-change", onMaxStateChanged.bind(this));
 	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
 
@@ -35,7 +34,7 @@ function enable() {
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
 
 	// tiling keybindings
-	this.keyBindings = ["tile-top-half", "tile-bottom-half", "tile-topleft-quarter", "tile-topright-quarter", "tile-bottomleft-quarter", "tile-bottomright-quarter"];
+	this.keyBindings = ["tile-top-half", "tile-right-half", "tile-left-half", "tile-bottom-half", "tile-topleft-quarter", "tile-topright-quarter", "tile-bottomleft-quarter", "tile-bottomright-quarter"];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(
 			key,
@@ -51,7 +50,6 @@ function disable() {
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
 	global.display.disconnect(this.windowGrabEnd);
-	global.window_manager.disconnect(this.shortcutPressed);
 	global.window_manager.disconnect(this.maximizedStateChanged);
 	main.overview.disconnect(this.overviewShown);
 
@@ -80,15 +78,9 @@ function tileWindow(window, rect) {
 	if (!window.allows_resize() || !window.allows_move())
 		return;
 
-	if ( !(window in tiledWindows) )
+	let wasTiled = (window in tiledWindows);
+	if (!wasTiled)
 		tiledWindows[window] = window.get_frame_rect();
-	else
-		tiledWindows[window] = new Meta.Rectangle({
-			x: rect.x,
-			y: rect.y,
-			width: tiledWindows[window].width,
-			height: tiledWindows[window].height,
-		});
 
 	let wActor = window.get_compositor_private();
 	wActor.connect("destroy", ((w) => {
@@ -96,11 +88,39 @@ function tileWindow(window, rect) {
 			delete tiledWindows[w];
 	}).bind(this, window));
 
+	// there is no animation if changing only the position of a tiled window
+	// so I animate myself
+	let oldFrameRect = window.get_frame_rect();
+	if (settings.get_boolean("use-anim") && wasTiled && oldFrameRect.width  == rect.width && oldFrameRect.height == rect.height) {
+		let actorContent = Shell.util_get_content_for_window_actor(wActor, oldFrameRect);
+		let clone = new St.Widget({
+			content: actorContent,
+			x: oldFrameRect.x,
+			y: oldFrameRect.y,
+			width: oldFrameRect.width,
+			height: oldFrameRect.height,
+		});
+		main.uiGroup.add_child(clone);
+
+		wActor.hide();
+
+		clone.ease({
+			x: rect.x,
+			y: rect.y,
+			duration: 200,
+			mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+			onComplete: () => {
+				wActor.show();
+				clone.destroy();
+			}
+		});
+
 	// make the use of GNOME's animations optional
 	// there are error messages in journalctl and animation issues with other extensions who rely on the size-change signal
 	// e.g. hiding the titlebar on maximization
-	if (settings.get_boolean("use-anim"))
-		main.wm._prepareAnimationInfo(global.window_manager, wActor, tiledWindows[window], 0);
+	} else if (settings.get_boolean("use-anim")) {
+		main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+	}
 
 	window.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
 	window.focus(global.get_current_time());
@@ -109,7 +129,7 @@ function tileWindow(window, rect) {
 	let sourceID = 0;
 	let sID = 0;
 
-	sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+	sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
 		openDash(window);
 		GLib.source_remove(sID);
 	}); // timer needed to correctly shade the bg / focusing
@@ -117,6 +137,7 @@ function tileWindow(window, rect) {
 	if (settings.get_boolean("use-anim")) {
 		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => { // wait for GNOME's sizing anim to be done
 			GLib.source_remove(sourceID);
+			main.wm._clearAnimationInfo(wActor);
 
 			if (rect.height == workArea.height && rect.width == workArea.width)
 				window.maximize(Meta.MaximizeFlags.BOTH);
@@ -149,12 +170,27 @@ function onCustomShortcutPressed(shortcutName) {
 	let workArea = window.get_work_area_current_monitor();
 	switch (shortcutName) {
 		case "tile-top-half":
-			rect = new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y,
-				width: workArea.width,
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.TOP, workArea)
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+
+		case "tile-left-half":
+			rect = getTileRectFor(Meta.Side.LEFT, workArea)
+
+			if (rect.equal(window.get_frame_rect()))
+				restoreWindowSize(window, true);
+			else
+				tileWindow(window, rect);
+
+			break;
+		
+		case "tile-right-half":
+			rect = getTileRectFor(Meta.Side.RIGHT, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -164,12 +200,7 @@ function onCustomShortcutPressed(shortcutName) {
 			break;
 
 		case "tile-bottom-half":
-			rect = new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y + Math.floor(workArea.height / 2),
-				width: workArea.width,
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.BOTTOM, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -179,12 +210,7 @@ function onCustomShortcutPressed(shortcutName) {
 			break;
 
 		case "tile-topleft-quarter":
-			rect = new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y,
-				width: Math.floor(workArea.width / 2),
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -194,12 +220,7 @@ function onCustomShortcutPressed(shortcutName) {
 			break;
 
 		case "tile-topright-quarter":
-			rect = new Meta.Rectangle({
-				x: workArea.x + Math.floor(workArea.width / 2),
-				y: workArea.y,
-				width: Math.floor(workArea.width / 2),
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -209,12 +230,7 @@ function onCustomShortcutPressed(shortcutName) {
 			break;
 
 		case "tile-bottomleft-quarter":
-			rect = new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y + Math.floor(workArea.height / 2),
-				width: Math.floor(workArea.width / 2),
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -224,12 +240,7 @@ function onCustomShortcutPressed(shortcutName) {
 			break;
 
 		case "tile-bottomright-quarter":
-			rect = new Meta.Rectangle({
-				x: workArea.x + Math.floor(workArea.width / 2),
-				y: workArea.y + Math.floor(workArea.height / 2),
-				width: Math.floor(workArea.width / 2),
-				height: Math.floor(workArea.height / 2)
-			});
+			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea)
 
 			if (rect.equal(window.get_frame_rect()))
 				restoreWindowSize(window, true);
@@ -246,9 +257,110 @@ function onMaxStateChanged(shellwm, actor, whichChange, oldFrameRect, _oldBuffer
 
 	// timer to get the correct new window pos and size
 	let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-		GLib.source_remove(sourceID);
 		openDash(tiledWindow);
+		GLib.source_remove(sourceID);
 	});
+};
+
+// get the top most tiled windows which are in a group (by stack order)
+// and the last tiled window -> to shade the bg correctly for the dash
+// optionally ignore the focused window (needed for tile preview via DND)
+function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow = false) {
+	// first start with an empty tile group
+	// if a quad is null, that means that that space is free screen space
+	let currTileGroup = {
+		TOP_LEFT: null,
+		TOP_RIGHT: null,
+		BOTTOM_LEFT: null,
+		BOTTOM_RIGHT: null
+	};
+
+	// this functions removes at least one empty quad from currTileGroup, if "window" is tiled
+	// it also returns wether "window" is part of the currTileGroup
+	// "window" isnt part of the currTileGroup, if a window in a higher stack order already occupied that quad,
+	// if "window" isnt tiled or if "window" is maximized
+	let removeFreeQuad = function(currTileGroup, window) {
+		if (!(window in tiledWindows) || window.get_maximized() == Meta.MaximizeFlags.BOTH)
+			return false;
+		
+		let wRect = window.get_frame_rect();
+		let workArea = window.get_work_area_current_monitor();
+	
+		// maximization state is checked via their size rather than via get_maximized()
+		// because tileWindow() will delay the maximize(), if animations are enabled
+	
+		// top left window
+		if (wRect.x == workArea.x && wRect.y == workArea.y) {
+			if (currTileGroup.TOP_LEFT)
+				return false;
+				 
+			if (wRect.height == workArea.height) {
+				if (currTileGroup.BOTTOM_LEFT)
+					return false;
+	
+				currTileGroup.BOTTOM_LEFT = window;
+	
+			} else if (wRect.width == workArea.width) {
+				if (currTileGroup.TOP_RIGHT)
+					return false;
+	
+				currTileGroup.TOP_RIGHT = window;
+			}
+	
+			currTileGroup.TOP_LEFT = window;
+			return true;
+		
+		// top right window
+		} else if (wRect.x != workArea.x && wRect.y == workArea.y) {
+			if (currTileGroup.TOP_RIGHT)
+				return false;
+	
+			if (wRect.height == workArea.height) {
+				if (currTileGroup.BOTTOM_RIGHT)
+					return false;
+	
+				currTileGroup.BOTTOM_RIGHT = window;
+			}
+	
+			currTileGroup.TOP_RIGHT = window;
+			return true;
+	
+		// bottom left window
+		} else if (wRect.x == workArea.x && wRect.y != workArea.y) {
+			if (currTileGroup.BOTTOM_LEFT)
+				return false;
+	
+			if (wRect.width == workArea.width) {
+				if (currTileGroup.BOTTOM_RIGHT)
+					return false;
+	
+				currTileGroup.BOTTOM_RIGHT = window;
+			}
+	
+			currTileGroup.BOTTOM_LEFT = window;
+			return true;
+	
+		// bottom right window
+		} else if (wRect.x != workArea.x && wRect.y != workArea.y) {
+			if (currTileGroup.BOTTOM_RIGHT)
+				return false;
+	
+			currTileGroup.BOTTOM_RIGHT = window;
+			return true;
+		}
+	
+		return false;
+	};
+
+	for (let i = ((ignoreFocusedWindow) ? 1 : 0); i < openWindows.length; i++) {
+		let windowIsInTileGroup = removeFreeQuad(currTileGroup, openWindows[i]);
+		if (!windowIsInTileGroup)
+			break;
+
+		lastInTileGroup = openWindows[i];
+	}
+
+	return [currTileGroup, lastInTileGroup];
 };
 
 // called when a window is tiled
@@ -259,211 +371,130 @@ function openDash(tiledWindow) {
 
 	let workArea = tiledWindow.get_work_area_current_monitor();
 
-	// first we assume the entire screen is free space.
-	// the screen will be split into 4 quads and be represented by the origin points of the quads in an array.
-	let topLeftPoint = {
-		x: workArea.x,
-		y: workArea.y,
-	};
-	let topRightPoint = {
-		x: workArea.x + Math.floor(workArea.width / 2),
-		y: workArea.y,
-	};
-	let bottomLeftPoint = {
-		x: workArea.x,
-		y: workArea.y + Math.floor(workArea.height / 2),
-	};
-	let bottomRightPoint = {
-		x: workArea.x + Math.floor(workArea.width / 2),
-		y: workArea.y + Math.floor(workArea.height / 2),
-	};
-	let freeQuadOrigins = [topLeftPoint, topRightPoint, bottomLeftPoint, bottomRightPoint];
+	// window was maximized - dont check via get_maximized()
+	if (tiledWindow.get_frame_rect().width == workArea.width && tiledWindow.get_frame_rect().height == workArea.height)
+		return;
 
 	let activeWS = global.workspace_manager.get_active_workspace()
 	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
-	let groupedWindows = getComplementingWindows(freeQuadOrigins, openWindows);
 
-	if (freeQuadOrigins.length == 1) {
-		openWindows = openWindows.filter((w) => {
-			return !groupedWindows.includes(w);
-		});
+	let [currTileGroup, lastInTileGroup] = getTileGroup(openWindows, tiledWindow);
+	
+	// assume all 4 quads are free
+	// remove a quad for each window in currTileGroup
+	let freeQuadCount = 4;
+	for (let pos in currTileGroup) {
+		if (currTileGroup[pos] != null) {
+			let idx = openWindows.indexOf(currTileGroup[pos]);
+			if (idx != -1)
+				openWindows.splice(idx, 1);
 
-		if (openWindows.length)
-			openWindowsDash.open(openWindows, tiledWindow, freeQuadOrigins, groupedWindows[groupedWindows.length - 1]);
-
-	} else if (freeQuadOrigins.length == 2) {
-		// dont open dash if the free space consists of diagonal quads
-		if ( (freeQuadOrigins.includes(topLeftPoint) && freeQuadOrigins.includes(bottomRightPoint))
-				|| (freeQuadOrigins.includes(topRightPoint) && freeQuadOrigins.includes(bottomLeftPoint)) )
-			return;
-
-		openWindows = openWindows.filter((w) => {
-			return !groupedWindows.includes(w);
-		});
-
-		if (openWindows.length)
-			openWindowsDash.open(openWindows, tiledWindow, freeQuadOrigins, groupedWindows[groupedWindows.length - 1]);
+			freeQuadCount--;
+		}
 	}
-};
 
-// we loop through the windows based on their stack order (top to bottom)
-// and remove the origin points from the free quad array. If the window is maximized, we will remove multiple points.
-// if the point(s) we want to remove arent in the array, that means that the window isnt part of the tile group
-// because a window in a higher order already occupies that space
-// in that case we will break from the loop.
-// only works for windows which are at originial quarter position.
-function getComplementingWindows(remainingQuadOrigins, openWindows) {
-	// returns wether the window is tiled and fully visible considering the available space (which is represented by remainingPoints)
-	let removeQuads = function(remainingPoints, window) {
-		let workArea = window.get_work_area_current_monitor();
+	let freeScreenRect = null;
+	// if a window is maximized, 2 rects can be the same rect
+	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
+	let topLeftRect = (currTileGroup.TOP_LEFT) ? currTileGroup.TOP_LEFT.get_frame_rect() : null;
+	let topRightRect = (currTileGroup.TOP_RIGHT) ? currTileGroup.TOP_RIGHT.get_frame_rect() : null;
+	let bottomLeftRect = (currTileGroup.BOTTOM_LEFT) ? currTileGroup.BOTTOM_LEFT.get_frame_rect() : null;
+	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
 
-		// origin points of the 4 quadrants
-		let topLeftPoint = null;
-		let topRightPoint = null;
-		let bottomLeftPoint = null;
-		let bottomRightPoint = null;
+	let _height = 0;
+	let _width = 0;
 
-		// setup the quadrant's origin point
-		remainingPoints.forEach(point => {
-			// top left point
-			if (point.x == workArea.x && point.y == workArea.y)
-				topLeftPoint = point;
+	// only 1 quad is free
+	if (freeQuadCount == 1) {
+		if (currTileGroup.TOP_LEFT == null) {
+			[_width, _height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: _width,
+				height: _height,
+			});
 
-			// top right point
-			if (point.x == workArea.x + Math.floor(workArea.width / 2) && point.y == workArea.y)
-				topRightPoint = point;
+		} else if (currTileGroup.TOP_RIGHT == null) {
+			[_width, _height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x + workArea.width - _width,
+				y: workArea.y,
+				width: _width,
+				height: _height,
+			});
 
-			// bottom left point
-			if (point.x == workArea.x && point.y == workArea.y + Math.floor(workArea.height / 2))
-				bottomLeftPoint = point;
+		} else if (currTileGroup.BOTTOM_LEFT == null) {
+			[_width, _height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + workArea.height - _height,
+				width: _width,
+				height: _height,
+			});
 
-			// bottom right point
-			if (point.x == workArea.x + Math.floor(workArea.width / 2) && point.y == workArea.y + Math.floor(workArea.height / 2))
-				bottomRightPoint = point;
-		});
-
-		let idx = -1;
-		let maximizedIdx = -1;
-		let windowRect = window.get_frame_rect();
-		let windowIsQuartered = (windowRect.width == Math.floor(workArea.width / 2)) && (windowRect.height == Math.floor(workArea.height / 2));
-
-		// top left still in remainingPoints
-		if (topLeftPoint && windowRect.x == topLeftPoint.x && windowRect.y == topLeftPoint.y) {
-			if (!(windowRect.height == workArea.height && windowRect.width == workArea.width)) { // isnt maximized
-				if (windowRect.height == workArea.height) { // is vertically maximized
-					maximizedIdx = remainingPoints.indexOf(bottomLeftPoint);
-					if (maximizedIdx == -1)
-						return false;
-
-					remainingPoints.splice(maximizedIdx, 1);
-
-				} else if (windowRect.width == workArea.width) { // is horizontally maximized
-					maximizedIdx = remainingPoints.indexOf(topRightPoint);
-					if (maximizedIdx == -1)
-						return false;
-
-					remainingPoints.splice(maximizedIdx, 1);
-
-				} else if (!windowIsQuartered) {
-					return false;
-				}
-
-				idx = remainingPoints.indexOf(topLeftPoint);
-				remainingPoints.splice(idx, 1);
-				return true;
-			}
-
-		// top right still in remainingPoints
-		} else if (topRightPoint && windowRect.x == topRightPoint.x && windowRect.y == topRightPoint.y) {
-			if (windowRect.height == workArea.height && windowRect.width != workArea.width) { // is vertically maximized
-				maximizedIdx = remainingPoints.indexOf(bottomRightPoint);
-				if (maximizedIdx == -1)
-					return false;
-
-				remainingPoints.splice(maximizedIdx, 1);
-
-			} else if (!windowIsQuartered) {
-				return false;
-			}
-
-			idx = remainingPoints.indexOf(topRightPoint);
-			remainingPoints.splice(idx, 1);
-			return true;
-
-		// bottom left still in remainingPoints
-		} else if (bottomLeftPoint && windowRect.x == bottomLeftPoint.x && windowRect.y == bottomLeftPoint.y) {
-			if (windowRect.width == workArea.width && windowRect.height != workArea.height) { // is horizontally maximized
-				maximizedIdx = remainingPoints.indexOf(bottomRightPoint);
-				if (maximizedIdx == -1)
-					return false;
-
-				remainingPoints.splice(maximizedIdx, 1);
-
-			} else if (!windowIsQuartered) {
-				return false;
-			}
-
-			idx = remainingPoints.indexOf(bottomLeftPoint);
-			remainingPoints.splice(idx, 1);
-			return true;
-
-		// bottom right still in remainingPoints
-		} else if (bottomRightPoint && windowRect.x == bottomRightPoint.x && windowRect.y == bottomRightPoint.y) {
-			if (!windowIsQuartered)
-				return false;
-
-			idx = remainingPoints.indexOf(bottomRightPoint);
-			remainingPoints.splice(idx, 1);
-			return true;
+		} else if (currTileGroup.BOTTOM_RIGHT == null) {
+			[_width, _height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x + workArea.width - _width,
+				y: workArea.y + workArea.height - _height,
+				width: _width,
+				height: _height,
+			});
 		}
 
-		return false;
-	};
+		openWindowsDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
 
-	let complementingWindows = [];
-	for (let i = 0; i < openWindows.length; i++) {
-		let windowIsTiledNVisible = removeQuads(remainingQuadOrigins, openWindows[i]);
-		if (!windowIsTiledNVisible)
-			break;
+	// free screen space consists of 2 quads
+	} else if (freeQuadCount == 2) {
+		// dont open the dash if the free space consists of diagonal quads
+		if ( (currTileGroup.TOP_LEFT == null && currTileGroup.BOTTOM_RIGHT == null)
+				|| (currTileGroup.TOP_RIGHT == null && currTileGroup.BOTTOM_LEFT == null) )
+			return;
 
-		complementingWindows.push(openWindows[i]);
-	}
+		if (currTileGroup.TOP_LEFT == null && currTileGroup.TOP_RIGHT == null) {
+			_height = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
 
-	return complementingWindows;
-};
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: workArea.width,
+				height: (_height) ? workArea.height - _height : workArea.height / 2,
+			});
 
-// restore windows which were tiled with this extension and tiling keyboard shortcut pressed
-function onShortcutPressed(shellWM, keyBinding) {
-	if (openWindowsDash.isVisible()) {
-		openWindowsDash.close();
-		return;
-	}
+		} else if (currTileGroup.TOP_RIGHT == null && currTileGroup.BOTTOM_RIGHT == null) {
 
-	let window = global.display.focus_window;
-	if (!window)
-		return;
+			let _width = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
 
-	let workArea = window.get_work_area_current_monitor();
-	let sourceID = 0;
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x + ((_width) ? _width : workArea.width / 2),
+				y: workArea.y,
+				width: (_width) ? workArea.width - _width : workArea.width / 2,
+				height: workArea.height
+			});
 
-	switch(keyBinding.get_name()) {
-		case "toggle-tiled-left":
-			if ( (window.get_frame_rect().x - workArea.x < 5) ) // window is on the left on the current monitor (with a margin)
-				if (window in tiledWindows && window.get_maximized() == Meta.MaximizeFlags.VERTICAL)
-					sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because first the split view will be entered
-						restoreWindowSize(window, true);
-						GLib.source_remove(sourceID);
-					});
-			break;
+		} else if (currTileGroup.BOTTOM_RIGHT == null && currTileGroup.BOTTOM_LEFT == null) {
+			_height = getMaxHeight(topLeftRect, topRightRect, workArea);
 
-		case "toggle-tiled-right":
-			if ( (window.get_frame_rect().x - workArea.x > 5) ) // window is on the right on the current monitor (with a margin)
-				if (window in tiledWindows && window.get_maximized() == Meta.MaximizeFlags.VERTICAL)
-					sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because first the split view will be entered
-						restoreWindowSize(window, true);
-						GLib.source_remove(sourceID);
-					});
-			break;
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + ((_height) ? _height : workArea.height / 2),
+				width: workArea.width,
+				height: (_height) ? workArea.height - _height : workArea.height / 2
+			});
+
+		} else if (currTileGroup.BOTTOM_LEFT == null && currTileGroup.TOP_LEFT == null) {
+			_width = getMaxWidth(topRightRect, bottomRightRect, workArea);
+
+			freeScreenRect = new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: (_width) ? workArea.width - _width : workArea.width / 2,
+				height: workArea.height
+			});
+		}
+
+		openWindowsDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
 	}
 };
 
@@ -496,7 +527,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 					break;
 
 				let otherRect = openWindows[i].get_frame_rect();
-				if (otherRect.y == grabbedRect.y)
+				if (equalApprox(otherRect.y, grabbedRect.y, 2) && equalApprox(otherRect.height, grabbedRect.height, 2))
 					sameSideWindow = openWindows[i];
 
 				else if (equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 2))
@@ -512,7 +543,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 					break;
 
 				let otherRect = openWindows[i].get_frame_rect();
-				if (otherRect.y == grabbedRect.y)
+				if (equalApprox(otherRect.y, grabbedRect.y, 2) && equalApprox(otherRect.height, grabbedRect.height, 2))
 					sameSideWindow = openWindows[i];
 
 				else if (equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 2))
@@ -528,7 +559,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 					break;
 
 				let otherRect = openWindows[i].get_frame_rect();
-				if (otherRect.x == grabbedRect.x)
+				if (equalApprox(otherRect.x, grabbedRect.x, 2) && equalApprox(otherRect.width, grabbedRect.width, 2))
 					sameSideWindow = openWindows[i];
 
 				else if (equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 2))
@@ -540,11 +571,11 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 		case Meta.GrabOp.RESIZING_W:
 			for (let i = 0; i < openWindows.length; i++) {
-				if (!(openWindows[i] in tiledWindows))
+		 		if (!(openWindows[i] in tiledWindows))
 					break;
 
 				let otherRect = openWindows[i].get_frame_rect();
-				if (otherRect.x == grabbedRect.x)
+				if (equalApprox(otherRect.x, grabbedRect.x, 2) && equalApprox(otherRect.width, grabbedRect.width, 2))
 					sameSideWindow = openWindows[i];
 
 				else if (equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 2))
@@ -556,7 +587,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 };
 
 function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
-	// disconnect the signals first
+	// disconnect the signals
 	if ( window && windowGrabSignals[window.get_id()] )
 		for (let i = windowGrabSignals[window.get_id()].length - 1; i >= 0; i--) {
 			window.disconnect( windowGrabSignals[window.get_id()][i] );
@@ -614,6 +645,111 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	}
 };
 
+// used for DND and custom keyboard shortcut
+function getTileRectFor(side, workArea) {
+	let activeWS = global.workspace_manager.get_active_workspace()
+	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+
+	let [currTileGroup] = getTileGroup(openWindows, null, true);
+	// if a window is maximized, 2 rects can be the same rect
+	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
+	let topLeftRect = (currTileGroup.TOP_LEFT) ? currTileGroup.TOP_LEFT.get_frame_rect() : null;
+	let topRightRect = (currTileGroup.TOP_RIGHT) ? currTileGroup.TOP_RIGHT.get_frame_rect() : null;
+	let bottomLeftRect = (currTileGroup.BOTTOM_LEFT) ? currTileGroup.BOTTOM_LEFT.get_frame_rect() : null;
+	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
+
+	let width = 0;
+	let height = 0;
+	// "limit"-dimension are the dimensions of the opposing windows
+	// e.g. if the user wants to tile a window to the right (vertically maximized), 
+	// the width will be limited by the windows in the top left and bottom left quad
+	let limitWidth = 0;
+	let limitHeight = 0;
+	
+	switch (side) {
+		case Meta.Side.LEFT:
+			limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: (limitWidth) ? workArea.width - limitWidth : workArea.width / 2,
+				height: workArea.height,
+			});
+
+		case Meta.Side.RIGHT:
+			limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
+			
+			return new Meta.Rectangle({
+				x: workArea.x + ((limitWidth) ? limitWidth : workArea.width / 2),
+				y: workArea.y,
+				width: (limitWidth) ? workArea.width - limitWidth : workArea.width / 2,
+				height: workArea.height,
+			});
+
+		case Meta.Side.TOP:
+			limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
+			
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: workArea.width,
+				height: (limitHeight) ? workArea.height - limitHeight : workArea.height / 2,
+			});
+
+		case Meta.Side.BOTTOM:
+			limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
+			
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + ((limitHeight) ? limitHeight : workArea.height / 2),
+				width: workArea.width,
+				height: (limitHeight) ? workArea.height - limitHeight : workArea.height / 2,
+			});
+	
+		case Meta.Side.TOP + Meta.Side.LEFT:
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: (width) ? width : workArea.width / 2,
+				height: (height) ? height : workArea.height / 2,
+			});
+
+		case Meta.Side.TOP + Meta.Side.RIGHT:
+			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
+				y: workArea.y,
+				width: (width) ? width : workArea.width / 2,
+				height: (height) ? height : workArea.height / 2,
+			});
+
+		case Meta.Side.BOTTOM + Meta.Side.LEFT:
+			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + ((height) ? workArea.height - height : workArea.height / 2),
+				width: (width) ? width : workArea.width / 2,
+				height: (height) ? height : workArea.height / 2,
+			});
+
+		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
+			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
+				y: workArea.y + ((height) ? workArea.height - height : workArea.height / 2),
+				width: (width) ? width : workArea.width / 2,
+				height: (height) ? height : workArea.height / 2,
+			});
+	}
+}
+
+// tile previewing via DND
 function onWindowMoving(window) {
 	let [mouseX, mouseY] = global.get_pointer();
 	let workArea = window.get_work_area_current_monitor();
@@ -636,71 +772,31 @@ function onWindowMoving(window) {
 	let tileBottomHalf = onBottom;
 
 	// prioritize quarter over other tiling
-	if (tileTopLeftQuarter)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y,
-			width: workArea.width / 2,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	if (tileTopLeftQuarter) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea), window.get_monitor());
 
-	else if (tileTopRightQuarter)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x + workArea.width / 2,
-			y: workArea.y,
-			width: workArea.width / 2,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	} else if (tileTopRightQuarter) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea), window.get_monitor());
 
-	else if (tileBottomLeftQuarter)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y + workArea.height / 2,
-			width: workArea.width / 2,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	} else if (tileBottomLeftQuarter) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea), window.get_monitor());
 
-	else if (tileBottomRightQuarter)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x + workArea.width / 2,
-			y: workArea.y + workArea.height / 2,
-			width: workArea.width / 2,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	} else if (tileBottomRightQuarter) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea), window.get_monitor());
 
-	else if (tileRightHalf)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x + workArea.width / 2,
-			y: workArea.y,
-			width: workArea.width / 2,
-			height: workArea.height,
-		}), window.get_monitor());
+	} else if (tileRightHalf) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.RIGHT, workArea), window.get_monitor());
 
-	else if (tileLeftHalf)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y,
-			width: workArea.width / 2,
-			height: workArea.height,
-		}), window.get_monitor());
+	} else if (tileLeftHalf) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.LEFT, workArea), window.get_monitor());
 
-	else if (tileTopHalf)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y,
-			width: workArea.width,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	} else if (tileTopHalf) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP, workArea), window.get_monitor());
 
-	else if (tileBottomHalf)
-		tilePreview.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y + workArea.height / 2,
-			width: workArea.width,
-			height: workArea.height / 2,
-		}), window.get_monitor());
+	} else if (tileBottomHalf) {
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM, workArea), window.get_monitor());
 
-	else if (tileMaximized)
+	} else if (tileMaximized) {
 		tilePreview.open(window, new Meta.Rectangle({
 			x: workArea.x,
 			y: workArea.y,
@@ -708,8 +804,9 @@ function onWindowMoving(window) {
 			height: workArea.height,
 		}), window.get_monitor());
 
-	else
+	} else {
 		tilePreview.close();
+	}
 };
 
 // sameSideWindow is the window which is on the same side as the resizedRect based on the drag direction
@@ -777,6 +874,88 @@ function equalApprox(value, value2, margin) {
 return false;
 };
 
+function getMaxWidth(rect1, rect2, workArea) {
+	if (rect1 && rect1.width == workArea.width)
+		rect1 = null;
+
+	if (rect2 && rect2.width == workArea.width)
+		rect2 = null;
+
+	if (rect1 && rect2)
+		return Math.max(rect1.width, rect2.width);
+	else if (rect1)
+		return rect1.width;
+	else if (rect2)
+		return rect2.width;
+	else
+		return 0;
+};
+
+function getMaxHeight(rect1, rect2, workArea) {
+	if (rect1 && rect1.height == workArea.height)
+		rect1 = null;
+
+	if (rect2 && rect2.height == workArea.height)
+		rect2 = null;
+
+	if (rect1 && rect2)
+		return Math.max(rect1.height, rect2.height);
+	else if (rect1)
+		return rect1.height;
+	else if (rect2)
+		return rect2.height;
+	else
+		return 0;
+};
+
+// diagonalRect is the rect which is in the diagonal quad to the space we try to get the rect for
+// for example: if we try to get the free space for the top left quad, the diagonal rect is at the bottom right
+// if a window is maximized, 2 rects can be equal
+// vertToDiaRect/horiToDiaRect are the quads in relation to the diagonal quad
+// ONLY used to 1 quad and not more (i. e. not maximized windows)
+function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect) {
+	// 0 other rect
+	if (!diagonalRect && !vertToDiaRect && !horiToDiaRect) {
+		return [workArea.width / 2, workArea.height / 2];
+
+	// 1 rect isnt null
+	} else if (diagonalRect && !vertToDiaRect && !horiToDiaRect) {
+		return [workArea.width - diagonalRect.width, workArea.height - diagonalRect.height];
+
+	} else if (!diagonalRect && vertToDiaRect && !horiToDiaRect) {
+		return [workArea.width - vertToDiaRect.width, vertToDiaRect.height];
+
+	} else if (!diagonalRect && !vertToDiaRect && horiToDiaRect) {
+		return [horiToDiaRect.width, workArea.height - horiToDiaRect.height];
+
+	// 2 rects arent null
+	} else if (diagonalRect && vertToDiaRect && !horiToDiaRect) {
+		return [workArea.width - vertToDiaRect.width, (diagonalRect.equal(vertToDiaRect)) ? workArea.height / 2 : vertToDiaRect.height];
+
+	} else if (diagonalRect && !vertToDiaRect && horiToDiaRect) {
+		return [(diagonalRect.equal(horiToDiaRect)) ? workArea.width / 2 : horiToDiaRect.width, workArea.height - horiToDiaRect.height];
+
+	} else if (!diagonalRect && vertToDiaRect && horiToDiaRect) {
+		return [horiToDiaRect.width, vertToDiaRect.height];
+
+	// 3 rects arent null
+	} else {
+		// if there are 3 differently sized windows, there are (at least?) 2 possible rects
+		// one, where the height is limited by the union between the diagonalRect and the horiToDiaRect and the width is limited by vertToDiaRect
+		// and the other one, where the height is limited by the horiToDiaRect and the width is limited by the union between the diagonalRect and the vertToDiaRect
+		let vertUnion = (!diagonalRect.equal(horiToDiaRect)) ? diagonalRect.union(vertToDiaRect) : vertToDiaRect;
+		let horiUnion = (!diagonalRect.equal(vertToDiaRect)) ? diagonalRect.union(horiToDiaRect) : horiToDiaRect;
+
+		let r1 = [workArea.width - vertUnion.width, workArea.height - horiToDiaRect.height];
+		let r1area = r1[0] * r1[1];
+
+		let r2 = [workArea.width - vertToDiaRect.width, workArea.height - horiUnion.height];
+		let r2area = r2[0] * r2[1];
+		
+		return (r1area > r2area) ? r1 : r2;
+	}
+};
+
 var OpenWindowsDash = GObject.registerClass(
 	class OpenWindowsDash extends St.Widget {
 		_init() {
@@ -832,39 +1011,24 @@ var OpenWindowsDash = GObject.registerClass(
 			this.destroy();
 		}
 
-		open(openWindows, tiledWindow, freeSpaceOriginPoints, lastTiledW) {
+		open(openWindows, tiledWindow, freeScreenRect, lastInTileGroupW) {
 			this._shown = true;
 			this.appContainer.destroy_all_children();
 
-			let workArea = tiledWindow.get_work_area_current_monitor();
 			let entireWorkArea = tiledWindow.get_work_area_all_monitors();
+			let monitorScale = global.display.get_monitor_scale(tiledWindow.get_monitor());
 
 			// fill appContainer
 			let winTracker = Shell.WindowTracker.get_default();
 			this.appContainer.appCount = 0;
-			let freeScreenRect = new Meta.Rectangle({
-				x: freeSpaceOriginPoints[0].x,
-				y: freeSpaceOriginPoints[0].y,
-				width: Math.floor(workArea.width / 2),
-				height: Math.floor(workArea.height / 2)
-			});
-			if (freeSpaceOriginPoints.length > 1) {
-				let r = new Meta.Rectangle({
-					x: freeSpaceOriginPoints[1].x,
-					y: freeSpaceOriginPoints[1].y,
-					width: Math.floor(workArea.width / 2),
-					height: Math.floor(workArea.height / 2)
-				});
-				freeScreenRect = freeScreenRect.union(r);
-			}
 
-			let buttonSize = settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0); // magicNr are margins/paddings from the icon to the full-sized highlighted button
+			let buttonSize = monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0)); // magicNr are margins/paddings from the icon to the full-sized highlighted button
 			this.maxColumnCount = Math.floor((freeScreenRect.width * 0.7) / buttonSize);
 
 			// dont allow "too empty" rows
 			if (openWindows.length % this.maxColumnCount <= this.maxColumnCount / 2)
 				for (let i = this.maxColumnCount; i >= 1; i--) {
-					if (openWindows.length % i + i / 2 - 1 >= i) {
+					if (openWindows.length % i >= Math.ceil(i / 2)) {
 						this.maxColumnCount = i;
 						break;
 					}
@@ -872,7 +1036,7 @@ var OpenWindowsDash = GObject.registerClass(
 
 			let dashHeight = Math.ceil(openWindows.length / this.maxColumnCount) * buttonSize;
 			let dashWidth = Math.min(this.maxColumnCount, openWindows.length) * buttonSize;
-
+			
 			this.bgGrid.set_size(dashWidth, dashHeight);
 			this.appContainer.set_size(dashWidth, dashHeight);
 
@@ -896,7 +1060,7 @@ var OpenWindowsDash = GObject.registerClass(
 				, freeScreenRect.y + freeScreenRect.height / 2 - this.bgGrid.height / 2);
 
 			// setup appContainer
-			this.appContainer.set_position(settings.get_int("icon-margin") / 2, settings.get_int("icon-margin") / 2);
+			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
 			this.appContainer.get_child_at_index(0).grab_key_focus();
 
 			// move bgContainer FROM final posX to animate (move) to final posX
@@ -914,7 +1078,7 @@ var OpenWindowsDash = GObject.registerClass(
 			});
 
 			// setup shadeBG
-			let windowActor = lastTiledW.get_compositor_private();
+			let windowActor = lastInTileGroupW.get_compositor_private();
 			if (windowActor)
 				global.window_group.set_child_below_sibling(this.shadeBG, windowActor);
 
@@ -971,7 +1135,7 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 	}
 );
-
+ 
 // pretty much copied from windowManager.js
 // only moved the position in the window group above the dragged window because otherwise quarter-sized previews arent visible
 var MyTilePreview = GObject.registerClass(

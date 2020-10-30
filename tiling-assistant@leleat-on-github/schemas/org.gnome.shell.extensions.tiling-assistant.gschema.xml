@@ -21,6 +21,14 @@
 			<default><![CDATA[['<Super>up']]]></default>
 		</key>
 
+		<key name="tile-right-half" type="as">
+			<default><![CDATA[['<Super>right']]]></default>
+		</key>
+
+		<key name="tile-left-half" type="as">
+			<default><![CDATA[['<Super>left']]]></default>
+		</key>
+
 		<key name="tile-bottom-half" type="as">
 			<default><![CDATA[['<Super>down']]]></default>
 		</key>
