@@ -10,6 +10,9 @@ let windowGrabSignals = {}; // {windowID : [signalIDs]}
 
 let settings = null;
 
+// TODO raise tiled windows in a pair
+// open windows in tiled mode / maximized
+
 function init() {
 };
 
@@ -761,7 +764,7 @@ function onWindowMoving(window) {
 	let workArea = window.get_work_area_current_monitor();
 
 	let onTop = mouseY <= 25;
-	let onBottom = mouseY >= workArea.y + workArea.height - 25;
+	let onBottom = mouseY >= workArea.y + workArea.height - 25 - ((window.get_frame_rect().y - mouseY > 15) ? window.get_frame_rect().y - mouseY + 15 : 0); // mitigation for wrong mouseY when grabbing from topbar, see #2
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
