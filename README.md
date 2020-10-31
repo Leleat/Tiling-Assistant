@@ -2,12 +2,14 @@
 
 An extension which adds a Windows-like snap assist to GNOME. It also changes GNOME's 2 column tiling design to a 2x2 grid (i.e. 4 quadrants).
 
-## Usage
+## Usage and features
 
-When a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows from the current workspace will open. The Dash will be centered on the free (/unoccupied) screen space. 
+- When a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows from the current workspace will open. The Dash will be centered on the free (/unoccupied) screen space. 
 Activating an icon will tile the corresponding window to fill the free space. 
 
-If the free space spans 2 quadrants, you can hold `Shift` while activating the icon to tile the window to the top or the left free quadrant depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right quadrant.
+- If the free space spans 2 quadrants, you can hold `Shift` while activating the icon to tile the window to the top or the left free quadrant depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right quadrant.
+
+- You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock).
 
 **You should disable GNOME's default shortcuts for the split view and use the shortcuts of this extension.**
 

@@ -1,5 +1,5 @@
 const Lang = imports.lang;
-const {main, iconGrid} = imports.ui;
+const {main, iconGrid, appDisplay} = imports.ui;
 const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -7,11 +7,11 @@ let openWindowsDash = null;
 let tilePreview = null;
 let tiledWindows = {}; // {window : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
+let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[apps, to, tile, ...], [side, to, tile, to, ...]]
 
 let settings = null;
 
 // TODO raise tiled windows in a pair
-// open windows in tiled mode / maximized
 
 function init() {
 };
@@ -24,6 +24,7 @@ function enable() {
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
 	this.maximizedStateChanged = global.window_manager.connect("size-change", onMaxStateChanged.bind(this));
 	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
+	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
 
 	openWindowsDash = new OpenWindowsDash();
 	tilePreview = new MyTilePreview();
@@ -47,6 +48,10 @@ function enable() {
 			onCustomShortcutPressed.bind(this, key)
 		);
 	});
+
+	// change appDisplay.AppIcon.activate function
+	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
+	appDisplay.AppIcon.prototype.activate = newAppActivate;
 };
 
 function disable() {
@@ -55,6 +60,7 @@ function disable() {
 	global.display.disconnect(this.windowGrabEnd);
 	global.window_manager.disconnect(this.maximizedStateChanged);
 	main.overview.disconnect(this.overviewShown);
+	global.display.disconnect(this.windowCreated);
 
 	tilePreview.destroy();
 	openWindowsDash._destroy();
@@ -68,7 +74,67 @@ function disable() {
 		main.wm.removeKeybinding(key);
 	});
 
+	// restore app activate function
+	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
+
 	settings = null;
+};
+
+// allow to directly open an app in a tiled state
+// via holding Alt or Shift when activating the icon
+function newAppActivate(button) {
+	let event = Clutter.get_current_event();
+	let modifiers = event ? event.get_state() : 0;
+	let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+	let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+	let isMiddleButton = button && button == Clutter.BUTTON_MIDDLE;
+	let isCtrlPressed = (modifiers & Clutter.ModifierType.CONTROL_MASK) != 0;
+	let openNewWindow = this.app.can_open_new_window() &&
+						this.app.state == Shell.AppState.RUNNING &&
+						(isCtrlPressed || isMiddleButton);
+
+	if (this.app.state == Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
+		this.animateLaunch();
+
+	if (openNewWindow) {
+		this.app.open_new_window(-1);
+
+	} else if (isShiftPressed && this.app.can_open_new_window()) {
+		newWindowsToTile[0].push(this.app.get_name());
+		newWindowsToTile[1].push(Meta.Side.LEFT);
+
+		this.app.open_new_window(-1);
+
+	} else if (isAltPressed && this.app.can_open_new_window()) {
+		newWindowsToTile[0].push(this.app.get_name());
+		newWindowsToTile[1].push(Meta.Side.RIGHT);
+
+		this.app.open_new_window(-1);
+
+	} else {
+		this.app.activate();
+	}
+
+	main.overview.hide();
+};
+
+// to tile a window after it has been created via holding alt/shift on an icon
+function onWindowCreated (src, w) {
+	let app = Shell.WindowTracker.get_default().get_window_app(w);
+	if (app) {
+		let idx = newWindowsToTile[0].indexOf(app.get_name());
+		if (idx != -1 && w.get_window_type() != Meta.WindowType.SPLASHSCREEN) {
+			let sourceID = GLib.timeout_add( GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet; so tiling wont work properly yet
+				GLib.source_remove(sourceID);
+
+				let rect = getTileRectFor(newWindowsToTile[1][idx], w.get_work_area_current_monitor());
+				tileWindow(w, rect);
+
+				newWindowsToTile[0].splice(idx, 1);
+				newWindowsToTile[1].splice(idx, 1);
+			} );
+		}
+	}
 };
 
 function tileWindow(window, rect) {
