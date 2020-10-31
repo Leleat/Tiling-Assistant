@@ -453,6 +453,7 @@ function openDash(tiledWindow) {
 	
 	// assume all 4 quads are free
 	// remove a quad for each window in currTileGroup
+	// and remove the tiled windows from openWindows for the Dash
 	let freeQuadCount = 4;
 	for (let pos in currTileGroup) {
 		if (currTileGroup[pos] != null) {
@@ -463,6 +464,8 @@ function openDash(tiledWindow) {
 			freeQuadCount--;
 		}
 	}
+
+	tiledWindow.tileGroup = currTileGroup;
 
 	let freeScreenRect = null;
 	// if a window is maximized, 2 rects can be the same rect
@@ -704,6 +707,8 @@ function restoreWindowSize(window, restoreFullPos = false) {
 			});
 		}
 
+
+
 		let oldRect = tiledWindows[window];
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
@@ -743,7 +748,8 @@ function getTileRectFor(side, workArea) {
 	
 	switch (side) {
 		case Meta.Side.LEFT:
-			limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
+			if (!topLeftRect && !bottomLeftRect)
+				limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -753,7 +759,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.RIGHT:
-			limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
+			if (!topRightRect && !bottomRightRect)
+				limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x + ((limitWidth) ? limitWidth : workArea.width / 2),
@@ -763,7 +770,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.TOP:
-			limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
+			if (!topRightRect && !topLeftRect)
+				limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -773,7 +781,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM:
-			limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
+			if (!bottomLeftRect && !bottomRightRect)
+				limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -783,7 +792,8 @@ function getTileRectFor(side, workArea) {
 			});
 	
 		case Meta.Side.TOP + Meta.Side.LEFT:
-			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+			if (!topLeftRect)
+				[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -793,7 +803,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.TOP + Meta.Side.RIGHT:
-			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+			if (!topRightRect)
+				[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
@@ -803,7 +814,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.LEFT:
-			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+			if (!bottomLeftRect)
+				[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -813,7 +825,8 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
-			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+			if (!bottomRightRect)
+				[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
