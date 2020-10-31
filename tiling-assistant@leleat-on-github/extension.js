@@ -11,8 +11,6 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 
 let settings = null;
 
-// TODO raise tiled windows in a pair
-
 function init() {
 };
 
@@ -457,6 +455,21 @@ function openDash(tiledWindow) {
 	let freeQuadCount = 4;
 	for (let pos in currTileGroup) {
 		if (currTileGroup[pos] != null) {
+			// focus tiled windows in a group
+			let w = currTileGroup[pos];
+			let wActor = w.get_compositor_private();
+			w.tileGroup = currTileGroup;
+			w.connect("focus", () => {
+				for (let pos in w.tileGroup) {
+					let window = w.tileGroup[pos];
+					if (window in tiledWindows)
+						window.raise();
+				}
+
+				w.raise();
+			});
+			wActor.connect("destroy", () => w.tileGroup[pos] = null);
+
 			let idx = openWindows.indexOf(currTileGroup[pos]);
 			if (idx != -1)
 				openWindows.splice(idx, 1);
@@ -464,8 +477,6 @@ function openDash(tiledWindow) {
 			freeQuadCount--;
 		}
 	}
-
-	tiledWindow.tileGroup = currTileGroup;
 
 	let freeScreenRect = null;
 	// if a window is maximized, 2 rects can be the same rect
@@ -748,8 +759,7 @@ function getTileRectFor(side, workArea) {
 	
 	switch (side) {
 		case Meta.Side.LEFT:
-			if (!topLeftRect && !bottomLeftRect)
-				limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
+			limitWidth = getMaxWidth(topRightRect, bottomRightRect, workArea);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -759,8 +769,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.RIGHT:
-			if (!topRightRect && !bottomRightRect)
-				limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
+			limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x + ((limitWidth) ? limitWidth : workArea.width / 2),
@@ -770,8 +779,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.TOP:
-			if (!topRightRect && !topLeftRect)
-				limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
+			limitHeight = getMaxHeight(bottomLeftRect, bottomRightRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -781,8 +789,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM:
-			if (!bottomLeftRect && !bottomRightRect)
-				limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
+			limitHeight = getMaxHeight(topLeftRect, topRightRect, workArea);
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -792,8 +799,7 @@ function getTileRectFor(side, workArea) {
 			});
 	
 		case Meta.Side.TOP + Meta.Side.LEFT:
-			if (!topLeftRect)
-				[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -803,8 +809,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.TOP + Meta.Side.RIGHT:
-			if (!topRightRect)
-				[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
@@ -814,8 +819,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.LEFT:
-			if (!bottomLeftRect)
-				[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -825,8 +829,7 @@ function getTileRectFor(side, workArea) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
-			if (!bottomRightRect)
-				[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
 
 			return new Meta.Rectangle({
 				x: workArea.x + ((width) ? workArea.width - width : workArea.width / 2),
@@ -843,7 +846,7 @@ function onWindowMoving(window) {
 	let workArea = window.get_work_area_current_monitor();
 
 	let onTop = mouseY <= 25;
-	let onBottom = mouseY >= workArea.y + workArea.height - 25 - ((window.get_frame_rect().y - mouseY > 15) ? window.get_frame_rect().y - mouseY + 15 : 0); // mitigation for wrong mouseY when grabbing from topbar, see #2
+	let onBottom = mouseY >= workArea.y + workArea.height - 25 - ((window.get_frame_rect().y - mouseY > 15) ? window.get_frame_rect().y - mouseY + 15 : 0); // mitigation for wrong mouseY when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME apps cause problems)
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 

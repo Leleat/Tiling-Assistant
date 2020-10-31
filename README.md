@@ -11,6 +11,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock).
 
+- Raise/focus tiled windows as a group.
+
 **You should disable GNOME's default shortcuts for the split view and use the shortcuts of this extension.**
 
 ![Preview](preview.gif)
