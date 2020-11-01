@@ -478,6 +478,9 @@ function openDash(tiledWindow) {
 		}
 	}
 
+	if (openWindows.length == 0)
+		return;
+
 	let freeScreenRect = null;
 	// if a window is maximized, 2 rects can be the same rect
 	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
