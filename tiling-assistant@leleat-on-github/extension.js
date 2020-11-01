@@ -150,10 +150,10 @@ function tileWindow(window, rect) {
 		tiledWindows[window] = window.get_frame_rect();
 
 	let wActor = window.get_compositor_private();
-	wActor.connect("destroy", ((w) => {
-		if (tiledWindows[w])
-			delete tiledWindows[w];
-	}).bind(this, window));
+	wActor.connect("destroy", () => {
+		if (tiledWindows[window])
+			delete tiledWindows[window];
+	});
 
 	// there is no animation if changing only the position of a tiled window
 	// e.g. moving a top left tiled window to the top right via keyboard shortcuts
@@ -186,6 +186,7 @@ function tileWindow(window, rect) {
 	// make the use of GNOME's animations optional
 	// there are error messages in journalctl and animation issues with other extensions who rely on the size-change signal
 	// e.g. hiding the titlebar on maximization
+	// in GNOME 3.38 the animations look buggier than in 3.36
 	} else if (settings.get_boolean("use-anim")) {
 		main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
 	}
@@ -489,8 +490,10 @@ function openDash(tiledWindow) {
 	let bottomLeftRect = (currTileGroup.BOTTOM_LEFT) ? currTileGroup.BOTTOM_LEFT.get_frame_rect() : null;
 	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
 
+	// the dimensions of the free screen rect
 	let _height = 0;
 	let _width = 0;
+	// dimensions of windows which limit the size of the free screen rect
 	let limitWidth = 0;
 	let limitHeight = 0;
 

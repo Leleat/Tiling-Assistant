@@ -18,35 +18,35 @@
 		</key>
 
 		<key name="tile-top-half" type="as">
-			<default><![CDATA[['<Super>up']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-right-half" type="as">
-			<default><![CDATA[['<Super>right']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-left-half" type="as">
-			<default><![CDATA[['<Super>left']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-bottom-half" type="as">
-			<default><![CDATA[['<Super>down']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-topleft-quarter" type="as">
-			<default><![CDATA[['<Super><Shift>up']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-topright-quarter" type="as">
-			<default><![CDATA[['<Super><Alt>up']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-bottomleft-quarter" type="as">
-			<default><![CDATA[['<Super><Shift>down']]]></default>
+			<default>[]</default>
 		</key>
 
 		<key name="tile-bottomright-quarter" type="as">
-			<default><![CDATA[['<Super><Alt>down']]]></default>
+			<default>[]</default>
 		</key>
 	</schema>
 </schemalist>

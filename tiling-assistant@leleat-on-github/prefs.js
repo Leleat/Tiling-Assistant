@@ -72,6 +72,8 @@ const MyPrefsWidget = new GObject.Class({
         this.tileLeftRow = this.leftHalfListStore.append();
         this.tileRightRow = this.rightHalfListStore.append();
 
+        log("---------asdasd-------")
+        log(this.settings.get_strv(this.TILE_TOP_HALF_SETTING)[0] + "---------")
         this.updateShortcutRow(this.settings.get_strv(this.TILE_TOP_HALF_SETTING)[0], this.TILE_TOP_HALF_SETTING);
         this.updateShortcutRow(this.settings.get_strv(this.TILE_BOTTOM_HALF_SETTING)[0], this.TILE_BOTTOM_HALF_SETTING);
         this.updateShortcutRow(this.settings.get_strv(this.TILE_TOP_LEFT_SETTING)[0], this.TILE_TOP_LEFT_SETTING);

@@ -248,7 +248,9 @@
                 <property name="tooltip-text" translatable="yes">This causes errors (see journalctl) and animation issues with other extensions who rely on the size-change signal
 (for ex. when hiding the titlebar on maximization).
 
-The error messages don't seem to have any effect though.</property>
+The error messages don't seem to have any effect though.
+
+In GOME 3.38 the animations also seem buggier than in 3.36.</property>
                 <property name="margin-start">20</property>
                 <property name="margin-end">20</property>
                 <property name="margin-top">12</property>
