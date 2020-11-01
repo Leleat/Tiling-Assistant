@@ -135,18 +135,21 @@ function onWindowCreated (src, w) {
 	}
 };
 
-function tileWindow(window, rect) {
+function tileWindow(window, newRect) {
 	if (!window)
 		return;
 
-	if (window.get_maximized())
+	let wasMaximized = window.get_maximized();
+	if (wasMaximized)
 		window.unmaximize(window.get_maximized());
 
 	if (!window.allows_resize() || !window.allows_move())
 		return;
 
-	let wasTiled = (window in tiledWindows);
-	if (!wasTiled)
+	let oldRect = window.get_frame_rect();
+	let workArea = window.get_work_area_current_monitor();
+	
+	if (!(window in tiledWindows))
 		tiledWindows[window] = window.get_frame_rect();
 
 	let wActor = window.get_compositor_private();
@@ -155,46 +158,17 @@ function tileWindow(window, rect) {
 			delete tiledWindows[window];
 	});
 
-	// there is no animation if changing only the position of a tiled window
-	// e.g. moving a top left tiled window to the top right via keyboard shortcuts
-	// so I animate myself
-	let oldFrameRect = window.get_frame_rect();
-	if (settings.get_boolean("use-anim") && wasTiled && oldFrameRect.width  == rect.width && oldFrameRect.height == rect.height) {
-		let actorContent = Shell.util_get_content_for_window_actor(wActor, oldFrameRect);
-		let clone = new St.Widget({
-			content: actorContent,
-			x: oldFrameRect.x,
-			y: oldFrameRect.y,
-			width: oldFrameRect.width,
-			height: oldFrameRect.height,
-		});
-		main.uiGroup.add_child(clone);
-
-		wActor.hide();
-
-		clone.ease({
-			x: rect.x,
-			y: rect.y,
-			duration: 200,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-			onComplete: () => {
-				wActor.show();
-				clone.destroy();
-			}
-		});
-
-	// make the use of GNOME's animations optional
-	// there are error messages in journalctl and animation issues with other extensions who rely on the size-change signal
-	// e.g. hiding the titlebar on maximization
-	// in GNOME 3.38 the animations look buggier than in 3.36
-	} else if (settings.get_boolean("use-anim")) {
-		main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+	let onlyMove = oldRect.width == newRect.width && oldRect.height == newRect.height;
+	if (settings.get_boolean("use-anim")) {
+		if (onlyMove || wasMaximized) // custom anim because otherwise it is pretty bad (even worse than this custom one)
+			animate(window, newRect, (onlyMove) ? true : false);
+		else
+			main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
 	}
 
-	window.move_resize_frame(true, rect.x, rect.y, rect.width, rect.height);
+	window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
 	window.focus(global.get_current_time());
 
-	let workArea = window.get_work_area_current_monitor();
 	let sourceID = 0;
 	let sID = 0;
 
@@ -204,30 +178,81 @@ function tileWindow(window, rect) {
 	}); // timer needed to correctly shade the bg / focusing
 
 	if (settings.get_boolean("use-anim")) {
-		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => { // wait for GNOME's sizing anim to be done
+		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => { // wait for anim to be done
 			GLib.source_remove(sourceID);
-			main.wm._clearAnimationInfo(wActor);
 
-			if (rect.height == workArea.height && rect.width == workArea.width)
+			if (newRect.height == workArea.height && newRect.width == workArea.width)
 				window.maximize(Meta.MaximizeFlags.BOTH);
 
-			else if (rect.height >= workArea.height - 2)
+			else if (newRect.height >= workArea.height - 2)
 				window.maximize(Meta.MaximizeFlags.VERTICAL);
 
-			else if (rect.width >= workArea.width - 2)
+			else if (newRect.width >= workArea.width - 2)
 				window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 		});
 
 	} else {
-		if (rect.height == workArea.height && rect.width == workArea.width)
+		if (newRect.height == workArea.height && newRect.width == workArea.width)
 			window.maximize(Meta.MaximizeFlags.BOTH);
 
-		else if (rect.height >= workArea.height - 2)
+		else if (newRect.height >= workArea.height - 2)
 			window.maximize(Meta.MaximizeFlags.VERTICAL);
 
-		else if (rect.width >= workArea.width - 2)
+		else if (newRect.width >= workArea.width - 2)
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
+};
+
+// TODO could definitly use some improvements for resizing animation
+function animate(window, newRect, onlyMove = true) {
+	let oldRect = window.get_frame_rect();
+	let wActor = window.get_compositor_private();
+	let actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
+	let clone = new St.Widget({
+		content: actorContent,
+		x: oldRect.x,
+		y: oldRect.y,
+		width: oldRect.width,
+		height: oldRect.height,
+	});
+	main.uiGroup.add_child(clone);
+	wActor.hide();
+
+	clone.ease({
+		x: newRect.x,
+		y: newRect.y,
+		width: newRect.width,
+		height: newRect.height,
+		duration: 200,
+		mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+		onComplete: () => {
+			wActor.show();
+			clone.destroy();
+
+			if (!onlyMove) {
+				let fadeOutClone = new St.Widget({
+					content: actorContent,
+					x: newRect.x,
+					y: newRect.y,
+					width: newRect.width,
+					height: newRect.height,
+				});
+				main.uiGroup.add_child(fadeOutClone);
+				fadeOutClone.set_pivot_point(.5, .5);
+		
+				fadeOutClone.ease({
+					scale_x: 0.9,
+					scale_y: 0.9,
+					opacity: 0,
+					duration: 100,
+					mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+					onComplete: () => {
+						fadeOutClone.destroy();
+					}
+				});
+			}
+		}
+	});
 };
 
 function onCustomShortcutPressed(shortcutName) {
@@ -724,8 +749,6 @@ function restoreWindowSize(window, restoreFullPos = false) {
 			});
 		}
 
-
-
 		let oldRect = tiledWindows[window];
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
@@ -733,9 +756,9 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		let newPosX = mouseX - oldRect.width * relativeMouseX; // position the window after scaling, so that the mouse is at the same relative position.x e.g. mouse was at 50% of the old window and will be at 50% of the new one
 
 		if (restoreFullPos)
-			window.move_resize_frame(true, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
-
-		else // scale while keeping the top at the same y pos
+			window.move_resize_frame(true, oldRect.x, oldRect.y, oldRect.width, oldRect.height)
+			
+		else // scale while keeping the top at the same y pos -> for example when DND
 			window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 
 		delete tiledWindows[window];
