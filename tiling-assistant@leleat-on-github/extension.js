@@ -1,5 +1,5 @@
 const Lang = imports.lang;
-const {main, iconGrid, appDisplay} = imports.ui;
+const {main, iconGrid, appDisplay, panel} = imports.ui;
 const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -50,7 +50,10 @@ function enable() {
 	// change appDisplay.AppIcon.activate function
 	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
 	appDisplay.AppIcon.prototype.activate = newAppActivate;
-};
+
+	this.oldTryDragWindow = panel.Panel.prototype._tryDragWindow;
+	panel.Panel.prototype._tryDragWindow = newTryDragWindow;
+	};
 
 function disable() {
 	// disconnect signals
@@ -72,8 +75,9 @@ function disable() {
 		main.wm.removeKeybinding(key);
 	});
 
-	// restore app activate function
+	// restore old function
 	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
+	panel.Panel.prototype._tryDragWindow = this.oldTryDragWindow;
 
 	settings = null;
 };
@@ -114,6 +118,34 @@ function newAppActivate(button) {
 	}
 
 	main.overview.hide();
+};
+
+// partially addresses the bad window restore position (see #1 on github) when grabbing from the topbar
+function newTryDragWindow(event) {
+	if (main.modalCount > 0)
+		return Clutter.EVENT_PROPAGATE;
+
+	if (event.source != this)
+		return Clutter.EVENT_PROPAGATE;
+
+	let { x, y } = event;
+	let dragWindow = this._getDraggableWindowForPosition(x);
+
+	if (!dragWindow)
+		return Clutter.EVENT_PROPAGATE;
+
+	if (dragWindow in tiledWindows)
+		restoreWindowSize(dragWindow);
+	
+	return global.display.begin_grab_op(
+		dragWindow,
+		Meta.GrabOp.MOVING,
+		false, /* pointer grab */
+		true, /* frame action */
+		event.button || -1,
+		event.modifier_state,
+		event.time,
+		x, y) ? Clutter.EVENT_STOP : Clutter.EVENT_PROPAGATE;
 };
 
 // to tile a window after it has been created via holding alt/shift on an icon
@@ -761,7 +793,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		else // scale while keeping the top at the same y pos -> for example when DND
 			window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 
-		delete tiledWindows[window];
+			delete tiledWindows[window];
 	}
 };
 
@@ -871,11 +903,12 @@ function getTileRectFor(side, workArea) {
 
 // tile previewing via DND
 function onWindowMoving(window) {
-	let [mouseX, mouseY] = global.get_pointer();
+	let [mouseX] = global.get_pointer(); // mouseY is unreliable, so not used; instead reliance on windowRect's y
 	let workArea = window.get_work_area_current_monitor();
+	let wRect = window.get_frame_rect();
 
-	let onTop = mouseY <= 25;
-	let onBottom = mouseY >= workArea.y + workArea.height - 25 - ((window.get_frame_rect().y - mouseY > 15) ? window.get_frame_rect().y - mouseY + 15 : 0); // mitigation for wrong mouseY when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME apps cause problems)
+	let onTop = wRect.y < main.panel.height + 15;
+	let onBottom = workArea.height - wRect.y < 75; // mitigation for wrong grabPos when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME apps cause problems)
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
