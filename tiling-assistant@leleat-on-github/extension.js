@@ -11,7 +11,6 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 
 let settings = null;
 
-// TODO steam tiling (for ex.) start not working
 // TODO newsflash focus issue with tiling start
 
 function init() {
@@ -124,7 +123,7 @@ function onWindowCreated (src, w) {
 	let app = Shell.WindowTracker.get_default().get_window_app(w);
 	if (app) {
 		let idx = newWindowsToTile[0].indexOf(app.get_name());
-		if (idx != -1 && w.get_window_type() != Meta.WindowType.SPLASHSCREEN) {
+		if (idx != -1 && w.get_window_type() != Meta.WindowType.SPLASHSCREEN && w.allows_move() && w.allows_resize()) {
 			let sourceID = GLib.timeout_add( GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet; so tiling wont work properly yet
 				GLib.source_remove(sourceID);
 
