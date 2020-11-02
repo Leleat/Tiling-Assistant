@@ -11,6 +11,9 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 
 let settings = null;
 
+// TODO steam tiling (for ex.) start not working
+// TODO newsflash focus issue with tiling start
+
 function init() {
 };
 
@@ -161,7 +164,7 @@ function tileWindow(window, newRect) {
 	let onlyMove = oldRect.width == newRect.width && oldRect.height == newRect.height;
 	if (settings.get_boolean("use-anim")) {
 		if (onlyMove || wasMaximized) // custom anim because otherwise it is pretty bad (even worse than this custom one)
-			animate(window, newRect, (onlyMove) ? true : false);
+			animate(window, newRect, onlyMove);
 		else
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
 	}
@@ -518,7 +521,9 @@ function openDash(tiledWindow) {
 	// the dimensions of the free screen rect
 	let _height = 0;
 	let _width = 0;
-	// dimensions of windows which limit the size of the free screen rect
+	// "limit"-dimension are the dimensions of the opposing windows
+	// e.g. if the user wants to tile a window to the right (vertically maximized), 
+	// the width will be limited by the windows in the top left and bottom left quad
 	let limitWidth = 0;
 	let limitHeight = 0;
 
@@ -581,7 +586,7 @@ function openDash(tiledWindow) {
 			});
 
 		} else if (currTileGroup.TOP_RIGHT == null && currTileGroup.BOTTOM_RIGHT == null) {
-			let limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
+			limitWidth = getMaxWidth(topLeftRect, bottomLeftRect, workArea);
 
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x + ((limitWidth) ? limitWidth : workArea.width / 2),
@@ -625,7 +630,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 	// for resizing op
 	// sameSideWindow is the window which is on the same side relative to where the grab began
-	// e.g. if resizing the top left on the E side, the bottom right window is the sameSideWindow
+	// e.g. if resizing the top left on the E side, the bottom left window is the sameSideWindow
 	// opposingWindows are the remaining windows
 	let sameSideWindow = null;
 	let opposingWindows = [];
@@ -781,6 +786,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		else // scale while keeping the top at the same y pos -> for example when DND
 			window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 
+		window.tileGroup = null;
 		delete tiledWindows[window];
 	}
 };
@@ -951,7 +957,7 @@ function onWindowMoving(window) {
 };
 
 // sameSideWindow is the window which is on the same side as the resizedRect based on the drag direction
-// e.g. if resizing the top left on the E side, the bottom right window is the sameSideWindow
+// e.g. if resizing the top left on the E side, the bottom left window is the sameSideWindow
 // opposingWindows is the opposite
 function resizeComplementingWindows(resizedWindow, sameSideWindow, opposingWindows, grabOp) {
 	if (!(resizedWindow in tiledWindows))
@@ -1139,7 +1145,7 @@ var OpenWindowsDash = GObject.registerClass(
 			main.layoutManager.addChrome(this.bgGrid);
 			this.bgGrid.hide();
 
-			// container for appIcons, same pos as bgGrid
+			// container for appIcons, centered in bgGrid
 			this.appContainer = new St.Widget();
 			this.appContainer.focusItemAtIndex = this.focusItemAtIndex;
 			this.bgGrid.add_child(this.appContainer);
@@ -1205,7 +1211,7 @@ var OpenWindowsDash = GObject.registerClass(
 			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
 			this.appContainer.get_child_at_index(0).grab_key_focus();
 
-			// move bgContainer FROM final posX to animate (move) to final posX
+			// move bgContainer FROM final pos to animate (move) to final pos
 			let finalX = this.bgGrid.x;
 			let finalY = this.bgGrid.y;
 			this.animationDir.x = Math.sign(tiledWindow.get_frame_rect().x - freeScreenRect.x);
