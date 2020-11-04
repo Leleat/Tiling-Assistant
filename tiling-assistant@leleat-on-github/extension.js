@@ -12,6 +12,8 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 let settings = null;
 let grabStarted = false;
 
+// TODO grab begin on titlebar will not release it
+
 function init() {
 };
 
@@ -500,7 +502,10 @@ function openDash(tiledWindow) {
 
 				w.raise();
 			});
-			wActor.connect("destroy", () => w.tileGroup[pos] = null);
+			wActor.connect("destroy", () => {
+				if (w.tileGroup[pos])
+					w.tileGroup[pos] = null;
+			});
 
 			let idx = openWindows.indexOf(currTileGroup[pos]);
 			if (idx != -1)
@@ -632,7 +637,7 @@ function shouldStartGrab(window, grabBeginPos) {
 	let moveVec = [mX - grabBeginPos[0], mY - grabBeginPos[1]];
 	let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
 
-	let DNDstarted = (grabBeginPos[1] >= main.panel.height) ? moveDist >= 10 : mY >= main.panel.height;
+	let DNDstarted = (grabBeginPos[1] >= main.panel.height) ? moveDist >= 25 : mY >= main.panel.height;
 	if (DNDstarted) {
 		restoreWindowSize(window);
 
