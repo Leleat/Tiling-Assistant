@@ -10,6 +10,7 @@ let windowGrabSignals = {}; // {windowID : [signalIDs]}
 let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[apps, to, tile, ...], [side, to, tile, to, ...]]
 
 let settings = null;
+let grabStarted = false;
 
 function init() {
 };
@@ -23,6 +24,10 @@ function enable() {
 	this.maximizedStateChanged = global.window_manager.connect("size-change", onMaxStateChanged.bind(this));
 	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
 	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
+	this.toppanelButtonRelease = main.panel.connect("button-release-event", (event) => {
+		grabStarted = null;
+		return false;
+	});
 
 	openWindowsDash = new OpenWindowsDash();
 	tilePreview = new MyTilePreview();
@@ -50,7 +55,7 @@ function enable() {
 	// change appDisplay.AppIcon.activate function
 	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
 	appDisplay.AppIcon.prototype.activate = newAppActivate;
-	};
+};
 
 function disable() {
 	// disconnect signals
@@ -59,6 +64,7 @@ function disable() {
 	global.window_manager.disconnect(this.maximizedStateChanged);
 	main.overview.disconnect(this.overviewShown);
 	global.display.disconnect(this.windowCreated);
+	main.panel.disconnect(this.toppanelButtonRelease);
 
 	tilePreview.destroy();
 	openWindowsDash._destroy();
@@ -617,6 +623,39 @@ function openDash(tiledWindow) {
 	}
 };
 
+// only called in onGrabBegin()
+function shouldStartGrab(window, grabBeginPos) {
+	if (grabStarted == null)
+		return;
+
+	let [mX, mY] = global.get_pointer();
+	let moveVec = [mX - grabBeginPos[0], mY - grabBeginPos[1]];
+	let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+
+	let DNDstarted = (grabBeginPos[1] >= main.panel.height) ? moveDist >= 10 : mY >= main.panel.height;
+	if (DNDstarted) {
+		restoreWindowSize(window);
+
+		grabStarted = true;
+		global.display.begin_grab_op(
+			window,
+			Meta.GrabOp.MOVING,
+			false, // pointer already grabbed
+			true, // frame action
+			-1, // button
+			0, // modifier
+			global.get_current_time(),
+			mX, mY
+		);
+
+	} else {
+		let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
+			GLib.source_remove(sID);
+			shouldStartGrab(window, grabBeginPos);
+		});
+	}
+};
+
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
 function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	if (!grabbedWindow)
@@ -639,28 +678,19 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
-			// to properly restore the position with move_resize_frame() I need to end the grab
-			// and restart it after the restoration is done
-			if (grabbedWindow in tiledWindows) {
-				global.display.end_grab_op(global.get_current_time())
-				
-				restoreWindowSize(grabbedWindow);
+			// if the grab started in the topbar 
+			// start the grab for tiled windows after leaving the topbar
+			// else start the grab after moving a small distance
+			if (!grabStarted && grabbedWindow in tiledWindows) {
+				global.display.end_grab_op(global.get_current_time());
 				
 				let [x, y] = global.get_pointer();
-				global.display.begin_grab_op(
-					grabbedWindow, 
-					Meta.GrabOp.MOVING, 
-					false, // pointer already grabbed
-					true, // frame action
-					-1, // button
-					0, // modifier
-					global.get_current_time(), 
-					x, y
-				);
+				shouldStartGrab(grabbedWindow, [x, y]);
 
-				return;
+			} else {
+				windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow)) );
 			}
-			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow)) );
+
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
@@ -729,6 +759,8 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 };
 
 function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
+	grabStarted = false;
+
 	// disconnect the signals
 	if ( window && windowGrabSignals[window.get_id()] )
 		for (let i = windowGrabSignals[window.get_id()].length - 1; i >= 0; i--) {
@@ -770,7 +802,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 				onComplete: () => actorClone.destroy()
 			});
 		}
-
+ 
 		let oldRect = tiledWindows[window];
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
