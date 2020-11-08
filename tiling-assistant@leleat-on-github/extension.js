@@ -11,6 +11,7 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 
 let settings = null;
 let grabStarted = false;
+let grabbedOnTitlebar = false;
 
 function init() {
 };
@@ -632,9 +633,12 @@ function shouldStartGrab(window, grabBeginPos) {
 
 	let [mX, mY] = global.get_pointer();
 
-	let DNDstarted = (grabBeginPos[1] >= main.panel.height) ? true : mY >= main.panel.height;
-	if (DNDstarted) {
-		restoreWindowSize(window);
+	grabbedOnTitlebar = (grabBeginPos[1] >= main.panel.height);
+	let startDND = (grabbedOnTitlebar) ? true : mY >= main.panel.height;
+
+	if (startDND) {
+		if (!grabbedOnTitlebar)
+			restoreWindowSize(window);
 
 		grabStarted = true;
 		global.display.begin_grab_op(
@@ -678,17 +682,17 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
+			let [x, y] = global.get_pointer();
+
 			// if the grab started in the topbar 
 			// start the grab for tiled windows after leaving the topbar
 			// else start the grab after moving a small distance
 			if (!grabStarted && grabbedWindow in tiledWindows) {
 				global.display.end_grab_op(global.get_current_time());
-				
-				let [x, y] = global.get_pointer();
 				shouldStartGrab(grabbedWindow, [x, y]);
 
 			} else {
-				windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow)) );
+				windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y])) );
 			}
 
 			break;
@@ -925,13 +929,24 @@ function getTileRectFor(side, workArea) {
 }
 
 // tile previewing via DND
-function onWindowMoving(window) {
-	let [mouseX, mouseY] = global.get_pointer(); // mouseY alone is unreliable, so windowRect's y will also be used
+function onWindowMoving(window, grabStartPos) {
+	let [mouseX, mouseY] = global.get_pointer();
+
+	if (grabbedOnTitlebar) {
+		let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
+		let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+
+		if (moveDist >= 5) {
+			grabbedOnTitlebar = false;
+			restoreWindowSize(window);
+		}
+	}
+
 	let workArea = window.get_work_area_current_monitor();
 	let wRect = window.get_frame_rect();
 
-	let onTop = wRect.y < main.panel.height + 15;
-	let onBottom = workArea.height - wRect.y < 75 || mouseY > workArea.height - 25; // mitigation for wrong grabPos when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME apps cause problems)
+	let onTop = wRect.y < main.panel.height + 15; // mouseY alone is unreliable, so windowRect's y will also be used
+	let onBottom = workArea.height - wRect.y < 75 || mouseY > workArea.height - 25; // mitigation for wrong grabPos when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME/GTK apps cause problems)
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
