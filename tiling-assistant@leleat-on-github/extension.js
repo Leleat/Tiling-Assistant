@@ -173,8 +173,10 @@ function tileWindow(window, newRect) {
 		else
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
 	}
+	
+	if (!(newRect.height == workArea.height && newRect.width == workArea.width)) // if not maximized both
+		window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
 
-	window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
 	window.focus(global.get_current_time());
 
 	let sourceID = 0;
@@ -183,16 +185,13 @@ function tileWindow(window, newRect) {
 	sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
 		openDash(window);
 		GLib.source_remove(sID);
-	}); // timer needed to correctly shade the bg / focusing
+	}); // timer needed to correctly shade the bg / focuse the first dash icon
 
-	if (settings.get_boolean("use-anim")) {
+	if (settings.get_boolean("use-anim") && !(newRect.height == workArea.height && newRect.width == workArea.width)) {
 		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => { // wait for anim to be done
 			GLib.source_remove(sourceID);
 
-			if (newRect.height == workArea.height && newRect.width == workArea.width)
-				window.maximize(Meta.MaximizeFlags.BOTH);
-
-			else if (newRect.height >= workArea.height - 2)
+			if (newRect.height >= workArea.height - 2)
 				window.maximize(Meta.MaximizeFlags.VERTICAL);
 
 			else if (newRect.width >= workArea.width - 2)

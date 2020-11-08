@@ -241,6 +241,7 @@
           <object class="GtkListBoxRow" id="listboxrow3">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="tooltip-text" translatable="yes">Needs improvement when going from a maximized state to a different tiled state.</property>
             <child>
               <object class="GtkBox" id="box3">
                 <property name="visible">True</property>
