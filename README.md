@@ -4,6 +4,8 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 ## Usage and features
 
+**You should disable GNOME's default keybindings for the split view/tiling and set them with this extension's settings page.**
+
 - When a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows from the current workspace will open. The Dash will be centered on the free (/unoccupied) screen space. 
 Activating an icon will tile the corresponding window to fill the free space. 
 
@@ -12,8 +14,6 @@ Activating an icon will tile the corresponding window to fill the free space.
 - You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock).
 
 - Raise/focus tiled windows as a group.
-
-**You should disable GNOME's default shortcuts for the split view and use the shortcuts of this extension.**
 
 ![Preview](preview.gif)
 
