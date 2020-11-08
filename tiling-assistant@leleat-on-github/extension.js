@@ -210,6 +210,7 @@ function tileWindow(window, newRect) {
 };
 
 // TODO could definitly use some improvements for resizing animation
+// this is only used when going from a maximized state (horiz, vert or both) to a tiled state
 function animate(window, newRect, onlyMove = true) {
 	let oldRect = window.get_frame_rect();
 	let wActor = window.get_compositor_private();
@@ -501,7 +502,7 @@ function openDash(tiledWindow) {
 				w.raise();
 			});
 			wActor.connect("destroy", () => {
-				if (w.tileGroup[pos])
+				if (w.tileGroup)
 					w.tileGroup[pos] = null;
 			});
 
@@ -634,13 +635,9 @@ function shouldStartGrab(window, grabBeginPos) {
 	let [mX, mY] = global.get_pointer();
 
 	grabbedOnTitlebar = (grabBeginPos[1] >= main.panel.height);
-	let startDND = (grabbedOnTitlebar) ? true : mY >= main.panel.height;
+	grabStarted = (grabbedOnTitlebar) ? true : mY >= main.panel.height;
 
-	if (startDND) {
-		if (!grabbedOnTitlebar)
-			restoreWindowSize(window);
-
-		grabStarted = true;
+	if (grabStarted) {
 		global.display.begin_grab_op(
 			window,
 			Meta.GrabOp.MOVING,
@@ -814,7 +811,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		let newPosX = mouseX - oldRect.width * relativeMouseX; // position the window after scaling, so that the mouse is at the same relative position.x e.g. mouse was at 50% of the old window and will be at 50% of the new one
 
 		if (restoreFullPos)
-			window.move_resize_frame(true, oldRect.x, oldRect.y, oldRect.width, oldRect.height)
+			window.move_resize_frame(true, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
 			
 		else // scale while keeping the top at the same y pos -> for example when DND
 			window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
@@ -940,6 +937,9 @@ function onWindowMoving(window, grabStartPos) {
 			grabbedOnTitlebar = false;
 			restoreWindowSize(window);
 		}
+		
+	} else {
+		restoreWindowSize(window);
 	}
 
 	let workArea = window.get_work_area_current_monitor();
