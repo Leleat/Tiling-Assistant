@@ -12,6 +12,7 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 let settings = null;
 let grabStarted = false;
 let grabbedOnTitlebar = false;
+let disableTilingOnGrab = false;
 
 function init() {
 };
@@ -382,9 +383,6 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	// "window" isnt part of the currTileGroup, if a window in a higher stack order already occupied that quad,
 	// if "window" isnt tiled or if "window" is maximized
 	let removeFreeQuad = function(currTileGroup, window) {
-		if (!(window in tiledWindows) || window.get_maximized() == Meta.MaximizeFlags.BOTH)
-			return false;
-		
 		let wRect = window.get_frame_rect();
 		let workArea = window.get_work_area_current_monitor();
 	
@@ -398,13 +396,13 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 				 
 			if (wRect.height == workArea.height) {
 				if (currTileGroup.BOTTOM_LEFT)
-					return false;
+					return null;
 	
 				currTileGroup.BOTTOM_LEFT = window;
 	
 			} else if (wRect.width == workArea.width) {
 				if (currTileGroup.TOP_RIGHT)
-					return false;
+					return null;
 	
 				currTileGroup.TOP_RIGHT = window;
 			}
@@ -419,7 +417,7 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	
 			if (wRect.height == workArea.height) {
 				if (currTileGroup.BOTTOM_RIGHT)
-					return false;
+					return null;
 	
 				currTileGroup.BOTTOM_RIGHT = window;
 			}
@@ -434,7 +432,7 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	
 			if (wRect.width == workArea.width) {
 				if (currTileGroup.BOTTOM_RIGHT)
-					return false;
+					return null;
 	
 				currTileGroup.BOTTOM_RIGHT = window;
 			}
@@ -455,11 +453,15 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	};
 
 	for (let i = ((ignoreFocusedWindow) ? 1 : 0); i < openWindows.length; i++) {
-		let windowIsInTileGroup = removeFreeQuad(currTileGroup, openWindows[i]);
-		if (!windowIsInTileGroup)
+		if (!(openWindows[i] in tiledWindows) || openWindows[i].get_maximized() == Meta.MaximizeFlags.BOTH)
 			break;
 
-		lastInTileGroup = openWindows[i];
+		let windowIsInTileGroup = removeFreeQuad(currTileGroup, openWindows[i]);
+		if (windowIsInTileGroup == null) // stretches into already taken space
+			break;
+
+		else if (windowIsInTileGroup)
+			lastInTileGroup = openWindows[i];
 	}
 
 	return [currTileGroup, lastInTileGroup];
@@ -769,7 +771,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 			windowGrabSignals[window.get_id()].splice(i, 1);
 		}
 
-	if (tilePreview._showing) {
+	if (tilePreview._showing && !disableTilingOnGrab) {
 		tileWindow(window, tilePreview._rect);
 		tilePreview.close();
 	}
@@ -929,17 +931,50 @@ function getTileRectFor(side, workArea) {
 function onWindowMoving(window, grabStartPos) {
 	let [mouseX, mouseY] = global.get_pointer();
 
-	if (grabbedOnTitlebar) {
-		let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
-		let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+	if (window in tiledWindows) {
+		disableTilingOnGrab = true;
 
-		if (moveDist >= 5) {
-			grabbedOnTitlebar = false;
+		if (grabbedOnTitlebar) {
+			let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
+			let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+	
+			if (moveDist >= 1) {
+				grabbedOnTitlebar = false;
+				global.display.end_grab_op(global.get_current_time());
+
+				restoreWindowSize(window);
+
+				disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
+				global.display.begin_grab_op(
+					window,
+					Meta.GrabOp.MOVING,
+					true, // pointer already grabbed
+					true, // frame action
+					-1, // button
+					0, // modifier
+					global.get_current_time(),
+					mouseX, main.panel.height + 15
+				);
+			}
+			
+		} else {
+			global.display.end_grab_op(global.get_current_time());
+
 			restoreWindowSize(window);
+
+			disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
+			grabStarted = true;
+			global.display.begin_grab_op(
+				window,
+				Meta.GrabOp.MOVING,
+				true, // pointer already grabbed
+				true, // frame action
+				-1, // button
+				0, // modifier
+				global.get_current_time(),
+				mouseX, main.panel.height + 15
+			);
 		}
-		
-	} else {
-		restoreWindowSize(window);
 	}
 
 	let workArea = window.get_work_area_current_monitor();
