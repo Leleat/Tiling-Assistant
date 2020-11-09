@@ -12,6 +12,7 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 let settings = null;
 let grabStarted = false;
 let grabbedOnTitlebar = false;
+let disableTilingOnGrab = false;
 
 function init() {
 };
@@ -769,7 +770,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 			windowGrabSignals[window.get_id()].splice(i, 1);
 		}
 
-	if (tilePreview._showing) {
+	if (tilePreview._showing && !disableTilingOnGrab) {
 		tileWindow(window, tilePreview._rect);
 		tilePreview.close();
 	}
@@ -929,17 +930,50 @@ function getTileRectFor(side, workArea) {
 function onWindowMoving(window, grabStartPos) {
 	let [mouseX, mouseY] = global.get_pointer();
 
-	if (grabbedOnTitlebar) {
-		let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
-		let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+	if (window in tiledWindows) {
+		disableTilingOnGrab = true;
 
-		if (moveDist >= 5) {
-			grabbedOnTitlebar = false;
+		if (grabbedOnTitlebar) {
+			let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
+			let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+	
+			if (moveDist >= 1) {
+				grabbedOnTitlebar = false;
+				global.display.end_grab_op(global.get_current_time());
+
+				restoreWindowSize(window);
+
+				disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
+				global.display.begin_grab_op(
+					window,
+					Meta.GrabOp.MOVING,
+					true, // pointer already grabbed
+					true, // frame action
+					-1, // button
+					0, // modifier
+					global.get_current_time(),
+					mouseX, main.panel.height + 15
+				);
+			}
+			
+		} else {
+			global.display.end_grab_op(global.get_current_time());
+
 			restoreWindowSize(window);
+
+			disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
+			grabStarted = true;
+			global.display.begin_grab_op(
+				window,
+				Meta.GrabOp.MOVING,
+				true, // pointer already grabbed
+				true, // frame action
+				-1, // button
+				0, // modifier
+				global.get_current_time(),
+				mouseX, main.panel.height + 15
+			);
 		}
-		
-	} else {
-		restoreWindowSize(window);
 	}
 
 	let workArea = window.get_work_area_current_monitor();
