@@ -10,9 +10,8 @@ let windowGrabSignals = {}; // {windowID : [signalIDs]}
 let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[apps, to, tile, ...], [side, to, tile, to, ...]]
 
 let settings = null;
-let grabStarted = false;
-let grabbedOnTitlebar = false;
-let disableTilingOnGrab = false;
+let startGrab = false;
+
 
 function init() {
 };
@@ -27,7 +26,7 @@ function enable() {
 	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
 	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
 	this.toppanelButtonRelease = main.panel.connect("button-release-event", (event) => {
-		grabStarted = null;
+		startGrab = null;
 		return false;
 	});
 
@@ -630,15 +629,22 @@ function openDash(tiledWindow) {
 
 // only called in onGrabBegin()
 function shouldStartGrab(window, grabBeginPos) {
-	if (grabStarted == null)
+	if (startGrab == null)
 		return;
 
 	let [mX, mY] = global.get_pointer();
 
-	grabbedOnTitlebar = (grabBeginPos[1] >= main.panel.height);
-	grabStarted = (grabbedOnTitlebar) ? true : mY >= main.panel.height;
+	// begin the grab immediatly when grabbing on titlebar
+	// when grabbing from top panel then only start after leaving the panel
+	// reason: 
+	// the mouse press state cant be checked here (well, at least I dont know how to).
+	// so the user could just click once and move the mouse around and the grab would restart with this function
+	// even though the user already released the click.
+	// for the top panel there is the button-release-event, which sets the startGrab to null, which in turn breaks out of this recursive function.
+	// no such thing for the titlebar
+	startGrab = (grabBeginPos[1] >= main.panel.height) ? true : mY >= main.panel.height;
 
-	if (grabStarted) {
+	if (startGrab) {
 		global.display.begin_grab_op(
 			window,
 			Meta.GrabOp.MOVING,
@@ -685,7 +691,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 			// if the grab started in the topbar 
 			// start the grab for tiled windows after leaving the topbar
 			// else start the grab after moving a small distance
-			if (!grabStarted && grabbedWindow in tiledWindows) {
+			if (!startGrab && grabbedWindow in tiledWindows) {
 				global.display.end_grab_op(global.get_current_time());
 				shouldStartGrab(grabbedWindow, [x, y]);
 
@@ -761,7 +767,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 };
 
 function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
-	grabStarted = false;
+	startGrab = false;
 
 	// disconnect the signals
 	if ( window && windowGrabSignals[window.get_id()] )
@@ -930,20 +936,24 @@ function getTileRectFor(side, workArea) {
 function onWindowMoving(window, grabStartPos) {
 	let [mouseX, mouseY] = global.get_pointer();
 
+	// restore the window size
 	if (window in tiledWindows) {
-		disableTilingOnGrab = true;
-
-		if (grabbedOnTitlebar) {
+		// grab started on window title bar
+		if (grabStartPos[1] < main.panel.height) {
 			let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
 			let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
 	
-			if (moveDist >= 1) {
-				grabbedOnTitlebar = false;
-				global.display.end_grab_op(global.get_current_time());
+			if (moveDist <= 0)
+				return;
 
+			global.display.end_grab_op(global.get_current_time());
+
+			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
+			// so far I only noticed this behaviour with firefox
+			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
 				restoreWindowSize(window);
 
-				disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
+				startGrab = true;
 				global.display.begin_grab_op(
 					window,
 					Meta.GrabOp.MOVING,
@@ -954,26 +964,32 @@ function onWindowMoving(window, grabStartPos) {
 					global.get_current_time(),
 					mouseX, main.panel.height + 15
 				);
-			}
+			});
 			
+		// grab started on top panel and already left it with the mouse
 		} else {
 			global.display.end_grab_op(global.get_current_time());
 
-			restoreWindowSize(window);
+			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
+			// so far I only noticed this behaviour with firefox
+			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+				restoreWindowSize(window);
 
-			disableTilingOnGrab = false; // to not accidently activate tiling since we ended the grab above (it was fairly rare)
-			grabStarted = true;
-			global.display.begin_grab_op(
-				window,
-				Meta.GrabOp.MOVING,
-				true, // pointer already grabbed
-				true, // frame action
-				-1, // button
-				0, // modifier
-				global.get_current_time(),
-				mouseX, main.panel.height + 15
-			);
+				startGrab = true;
+				global.display.begin_grab_op(
+					window,
+					Meta.GrabOp.MOVING,
+					true, // pointer already grabbed
+					true, // frame action
+					-1, // button
+					0, // modifier
+					global.get_current_time(),
+					mouseX, main.panel.height + 15
+				);
+			});
 		}
+
+		return;
 	}
 
 	let workArea = window.get_work_area_current_monitor();

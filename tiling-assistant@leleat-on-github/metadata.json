@@ -2,7 +2,7 @@
   "name": "Tiling assistant",
   "description": "An extension which adds a Windows-like snap assist to GNOME. It changes GNOME's 2 column tiling design to a 2x2 grid. You should remove GNOME's tiling keybindings and set them in the settings of this extension. Please check the README on Github and report issues there as well.",
   "uuid": "tiling-assistant@leleat-on-github",
-  "version": 4,
+  "version": 5,
   "shell-version": ["3.36", "3.38"],
   "url": "https://github.com/Leleat/Tiling-Assist"
 }
