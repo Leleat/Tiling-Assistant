@@ -12,6 +12,7 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 let settings = null;
 let startGrab = false;
 
+
 function init() {
 };
 
@@ -775,7 +776,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 			windowGrabSignals[window.get_id()].splice(i, 1);
 		}
 
-	if (tilePreview._showing) {
+	if (tilePreview._showing && !disableTilingOnGrab) {
 		tileWindow(window, tilePreview._rect);
 		tilePreview.close();
 	}
