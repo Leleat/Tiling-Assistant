@@ -514,6 +514,15 @@ function openDash(tiledWindow) {
 		}
 	}
 
+	// add windows of all other workspaces to the dash list
+	for (let i = 0; i < global.workspace_manager.get_n_workspaces(); i++) {
+		if (activeWS.index() == i)
+			continue;
+
+		let ws = global.workspace_manager.get_workspace_by_index(i);
+		openWindows = openWindows.concat(ws.list_windows());
+	}
+
 	if (openWindows.length == 0)
 		return;
 
@@ -776,7 +785,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 			windowGrabSignals[window.get_id()].splice(i, 1);
 		}
 
-	if (tilePreview._showing && !disableTilingOnGrab) {
+	if (tilePreview._showing) {
 		tileWindow(window, tilePreview._rect);
 		tilePreview.close();
 	}
@@ -962,7 +971,7 @@ function onWindowMoving(window, grabStartPos) {
 					-1, // button
 					0, // modifier
 					global.get_current_time(),
-					mouseX, main.panel.height + 15
+					mouseX, grabStartPos[1]
 				);
 			});
 			
@@ -984,7 +993,7 @@ function onWindowMoving(window, grabStartPos) {
 					-1, // button
 					0, // modifier
 					global.get_current_time(),
-					mouseX, main.panel.height + 15
+					mouseX, grabStartPos[1]
 				);
 			});
 		}
@@ -1565,6 +1574,7 @@ var OpenAppIcon = GObject.registerClass(
 				this.icon.animateZoomOut();
 
 				this.window.move_to_monitor(this.moveToMonitorNr);
+				this.window.change_workspace(global.workspace_manager.get_active_workspace());
 				this.window.activate(global.get_current_time());
 
 				let event = Clutter.get_current_event();
