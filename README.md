@@ -7,7 +7,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 - 3.36
 - 3.38
 
-Development started on GNOME 3.36. But as of November 2020 all testing happens with GNOME 3.38.
+Development started on GNOME 3.36. But as of November 2020 all development/testing happens on GNOME 3.38.
 
 ## Usage and features
 
