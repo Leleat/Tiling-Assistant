@@ -3,3 +3,17 @@
   border-radius: 15px;
   border: 2px solid rgba(65, 66, 68, 0.85);
 }
+
+.window-preview {
+  outline-style: solid;
+  outline-color: #3584e4;
+  outline-width: 2px;
+}
+
+.running-dot {
+  height: 5px;
+  width: 5px;
+  background-color: white;
+  border-radius:5px;
+  margin: 0px 2px 1px;
+}

@@ -12,7 +12,6 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 let settings = null;
 let startGrab = false;
 
-
 function init() {
 };
 
@@ -82,6 +81,7 @@ function disable() {
 	// restore old function
 	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 
+	settings.run_dispose();
 	settings = null;
 };
 
@@ -522,6 +522,23 @@ function openDash(tiledWindow) {
 		let ws = global.workspace_manager.get_workspace_by_index(i);
 		openWindows = openWindows.concat(ws.list_windows());
 	}
+
+	// filter the openWindows array, so that no duuplicate apps are shown
+	let winTracker = Shell.WindowTracker.get_default();
+	let openApps = []; 
+	openWindows.forEach((w) => {
+		openApps.push(winTracker.get_window_app(w));
+	});
+
+	let tmpOpenWindows = [];
+	for(let i = 0; i < openApps.length; i++) {
+		let app = openApps[i];
+
+		// first occurrence only
+		if (openApps.indexOf(app) == i)
+			tmpOpenWindows.push(openWindows[i]);
+	}
+	openWindows = tmpOpenWindows;
 
 	if (openWindows.length == 0)
 		return;
@@ -1252,6 +1269,10 @@ var OpenWindowsDash = GObject.registerClass(
 			this.appContainer = new St.Widget();
 			this.appContainer.focusItemAtIndex = this.focusItemAtIndex;
 			this.bgGrid.add_child(this.appContainer);
+
+			// container for window previews if an app has multiple windows open
+			this.windowContainer = new St.Widget();
+			global.window_group.add_child(this.windowContainer);
 		}
 
 		_destroy() {
@@ -1259,6 +1280,7 @@ var OpenWindowsDash = GObject.registerClass(
 			this.mouseCatcher.disconnect(this.onMouseCaught);
 			this.mouseCatcher.destroy();
 			this.bgGrid.destroy();
+			this.windowContainer.destroy();
 			this.destroy();
 		}
 
@@ -1334,10 +1356,12 @@ var OpenWindowsDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
-			// setup shadeBG
+			// setup shadeBG & window preview
 			let windowActor = lastInTileGroupW.get_compositor_private();
-			if (windowActor)
+			if (windowActor) {
 				global.window_group.set_child_below_sibling(this.shadeBG, windowActor);
+				global.window_group.set_child_below_sibling(this.windowContainer, windowActor);
+			}
 
 			//this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
 			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
@@ -1390,9 +1414,118 @@ var OpenWindowsDash = GObject.registerClass(
 		getAppCount() {
 			return this.appContainer.appCount;
 		}
+
+		// show window previews if an app icon is activated 
+		// and it has multiple windows open
+		showWindowPreviews(app, freeScreenRect) {
+			this.windowContainer.destroy_all_children();
+
+			let windows = global.display.sort_windows_by_stacking(app.get_windows()).reverse();
+			let windowCount = windows.length;
+			let windowMargin = 20;
+			let maxWidth = freeScreenRect.width * .9;
+			let maxHeight = freeScreenRect.height * .9;
+
+			let [idealRowCount, idealColumnCount] = this.getIdealLayout(freeScreenRect, windowCount);
+
+			log("wCount: " + windows.length)
+			log("ideal row count: " + idealRowCount)
+			log("ideal column count: " + idealColumnCount)
+
+			let fullWindowWidth = 0;
+			windows.forEach(w => {
+				fullWindowWidth += w.get_frame_rect().width;
+			});
+			let avgWindowWidth = fullWindowWidth / windowCount;
+			let idealRowWidth = avgWindowWidth * idealRowCount;
+			let rows = []; // rows[row] = [list, of, windows]
+
+			for (let win = 0, r = 0, currRowWidth = 0; win < windowCount; win++) {
+				if (currRowWidth > idealRowWidth || currRowWidth + windows[win].get_frame_rect().width > idealRowWidth) { // TODO redo; hori split doesnt work if 1 is maxmized since we immediatly increase
+					r++;
+					currRowWidth = 0;
+				}
+
+				if (!rows[r])
+					rows[r] = [];
+				
+				rows[r].push(windows[win]);
+				currRowWidth += windows[win].get_frame_rect().width;
+			}
+
+			let scaleFactor = this.getScaleFactor(freeScreenRect, rows, windowMargin);
+
+			if (rows[0])
+				log("row 0: " + rows[0].length)
+			if (rows[1])
+				log("row 1: " + rows[1].length)
+			if (rows[2])
+				log("row 2: " + rows[2].length)
+			log("")
+			log("scale Factor: " + scaleFactor);
+			log("scaled width 0: " + windows[0].get_frame_rect().width * scaleFactor)
+			log("scaled height 0: " + windows[0].get_frame_rect().height * scaleFactor)
+			log("scaled width 1: " + windows[1].get_frame_rect().width * scaleFactor)
+			log("scaled height 1: " + windows[1].get_frame_rect().height * scaleFactor)
+			log("----------------------------------------------")
+		}
+
+		// ideal layout if all windows were the same size (doesnt take the window size itself into account, only the aspect ratio of the layouts)
+		getIdealLayout(freeScreenRect, windowCount) {
+			let rowCount = 1; 
+			let columnCount = windowCount / rowCount;
+
+			let ratio = freeScreenRect.width / freeScreenRect.height;
+
+			for (let i = 2; i < windowCount; i++) {
+				let c = Math.ceil(windowCount / i);
+
+				let currRatio = columnCount / rowCount;
+				let newRatio = c / i;
+
+				if (Math.abs(newRatio - ratio) < Math.abs(currRatio - ratio) && i * c - windowCount <= 2) { // second half so we only accepts designs when the last rowCount is almost completely filled
+					rowCount = i;
+					columnCount = c;
+				}
+			}
+
+			return [rowCount, columnCount];
+		}
+
+		getScaleFactor(freeScreenRect, rows, windowMargin) {
+			let maxWidth = freeScreenRect.width * .9;
+			let maxHeight = freeScreenRect.height * .9;
+
+			let scaleFactor = 1;
+
+			let fullColumnHeight = 0;
+			// limit the scale factor by the width first
+			// also save the largest window height of each row to limit the scale factor by the height later
+			for (let row = 0; row < rows.length; row++) {
+				let fullRowWidth = 0;
+				let maxWindowHeight = 0;
+				rows[row].forEach(window => {
+					fullRowWidth += window.get_frame_rect().width;
+					if (window.get_frame_rect().height > maxWindowHeight)
+						maxWindowHeight = window.get_frame_rect().height;
+				});
+
+				fullColumnHeight += maxWindowHeight;
+
+				let sF = (maxWidth - windowMargin * (rows[row].length - 1)) / fullRowWidth;
+				if (sF < scaleFactor)
+					scaleFactor = sF;
+			}
+
+			let sF = (maxHeight - windowMargin * (rows.length - 1)) / fullColumnHeight;
+			if (sF < scaleFactor)
+				scaleFactor = sF;
+
+			return scaleFactor;
+		}
 	}
 );
- 
+
 // pretty much copied from windowManager.js
 // only moved the position in the window group above the dragged window because otherwise quarter-sized previews arent visible
 var MyTilePreview = GObject.registerClass(
@@ -1493,6 +1626,7 @@ var OpenAppIcon = GObject.registerClass(
 				can_focus: true,
 			});
 
+			this.app = app;
 			this.index = idx;
 			this.window = win;
 			this.freeScreenRect = freeScreenRect;
@@ -1507,6 +1641,20 @@ var OpenAppIcon = GObject.registerClass(
 			iconParams['setSizeManually'] = true;
 			this.icon = new iconGrid.BaseIcon(app.get_name(), iconParams);
 			this.iconContainer.add_child(this.icon);
+
+			this.dotContainer = new St.BoxLayout ({
+				x_expand: true,
+				y_expand: true,
+				x_align: Clutter.ActorAlign.CENTER,
+				y_align: Clutter.ActorAlign.END,
+			});
+			this.iconContainer.add_child(this.dotContainer);
+
+			if (app.get_n_windows() > 1)
+				for(let i = 0; i < 1 /* app.get_n_windows() */; i++) { // TODO show only 1 running dot or for each window?
+					let dot = new St.Widget({style_class: 'running-dot'});
+					this.dotContainer.add_child(dot);
+				}
 		}
 
 		vfunc_key_press_event(keyEvent) {
@@ -1568,46 +1716,112 @@ var OpenAppIcon = GObject.registerClass(
 		}
 
 		activate(button) {
-			if (openWindowsDash.isVisible()) {
-				openWindowsDash.close();
+			if (!openWindowsDash.isVisible())
+				return;
 
-				this.icon.animateZoomOut();
+			if (this.app.get_n_windows() > 1) {
+				openWindowsDash.showWindowPreviews(this.app, this.freeScreenRect);
+				return;
+			}
 
-				this.window.move_to_monitor(this.moveToMonitorNr);
-				this.window.change_workspace(global.workspace_manager.get_active_workspace());
-				this.window.activate(global.get_current_time());
+			openWindowsDash.close();
 
-				let event = Clutter.get_current_event();
-				let modifiers = event ? event.get_state() : 0;
-				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
-				let workArea = this.window.get_work_area_current_monitor();
+			this.icon.animateZoomOut();
 
-				if (isAltPressed) {
-					// tile to right if free screen = 2 horizontal quadrants
-					if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
-						this.freeScreenRect.width = workArea.width / 2;
-						this.freeScreenRect.x = workArea.x + workArea.width / 2;
-					// tile to bottom if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
-						this.freeScreenRect.height = workArea.height / 2;
-						this.freeScreenRect.y = workArea.y + workArea.height / 2;
-					}
+			this.window.move_to_monitor(this.moveToMonitorNr);
+			this.window.change_workspace(global.workspace_manager.get_active_workspace());
+			this.window.activate(global.get_current_time());
 
-				} else if (isShiftPressed) {
-					// tile to left if free screen = 2 horizontal quadrants
-					if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
-						this.freeScreenRect.width = workArea.width / 2;
-						this.freeScreenRect.x = workArea.x;
-					// tile to top if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
-						this.freeScreenRect.height = workArea.height / 2;
-						this.freeScreenRect.y = workArea.y;
-					}
+			let event = Clutter.get_current_event();
+			let modifiers = event ? event.get_state() : 0;
+			let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+			let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+			let workArea = this.window.get_work_area_current_monitor();
+
+			if (isAltPressed) {
+				// tile to right if free screen = 2 horizontal quadrants
+				if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
+					this.freeScreenRect.width = workArea.width / 2;
+					this.freeScreenRect.x = workArea.x + workArea.width / 2;
+				// tile to bottom if free screen = 2 vertical quadrants
+				} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
+					this.freeScreenRect.height = workArea.height / 2;
+					this.freeScreenRect.y = workArea.y + workArea.height / 2;
 				}
 
-				tileWindow(this.window, this.freeScreenRect);
+			} else if (isShiftPressed) {
+				// tile to left if free screen = 2 horizontal quadrants
+				if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
+					this.freeScreenRect.width = workArea.width / 2;
+					this.freeScreenRect.x = workArea.x;
+				// tile to top if free screen = 2 vertical quadrants
+				} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
+					this.freeScreenRect.height = workArea.height / 2;
+					this.freeScreenRect.y = workArea.y;
+				}
 			}
+
+			tileWindow(this.window, this.freeScreenRect);
 		}
 	}
 );
+
+var OpenWindowPreview = GObject.registerClass(
+	class OpenWindowPreview extends St.Button {
+		_init(app, win, idx, freeScreenRect, moveToMonitorNr) {
+			super._init({
+				x: win.get_frame_rect().x,
+				y: win.get_frame_rect().y,
+				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
+				style_class: 'window-preview',
+				reactive: true,
+				button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
+				can_focus: true,
+			});
+
+			this.app = app;
+			this.index = idx;
+			this.window = win;
+			this.freeScreenRect = freeScreenRect;
+			this.moveToMonitorNr = moveToMonitorNr;
+
+			this.container = new St.Widget({ layout_manager: new Clutter.BinLayout(),
+				x_expand: true, y_expand: true });
+
+			this.set_child(this.container);
+
+			let rect = win.get_frame_rect();
+			let actorContent = Shell.util_get_content_for_window_actor(win.get_compositor_private(), rect);
+			this.clone = new St.Widget({
+				content: actorContent,
+				width: rect.width,
+				height: rect.height,
+			});
+			this.container.add_child(this.clone);
+		}
+
+		vfunc_key_press_event(keyEvent) {
+			switch (keyEvent.keyval) {
+				case Clutter.KEY_Return:
+				case Clutter.KEY_space:
+					this.activate();
+					return Clutter.EVENT_STOP;
+			}
+
+			return Clutter.EVENT_PROPAGATE;
+		}
+
+		vfunc_clicked(button) {
+			this.activate(button);
+		}
+
+		activate(button) {
+			if (!openWindowsDash.isVisible())
+				return;
+
+			openWindowsDash.close();
+
+			log("----- window preview activated --------")
+		}
+	}
+)
