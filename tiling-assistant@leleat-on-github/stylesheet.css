@@ -11,3 +11,15 @@
   border-radius:5px;
   margin: 0px 2px 1px;
 }
+
+.focused {
+  background-color: rgba(238, 238, 236, 0.25);
+  margin: 15px 15px 15px;
+  border-radius: 10px;
+}
+
+.unfocused {
+  margin: 15px 15px 15px;
+  border-radius: 10px;
+}
+
