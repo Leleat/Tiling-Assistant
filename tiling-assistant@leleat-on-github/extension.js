@@ -168,10 +168,39 @@ function tileWindow(window, newRect) {
 
 	let onlyMove = oldRect.width == newRect.width && oldRect.height == newRect.height;
 	if (settings.get_boolean("use-anim")) {
-		if (onlyMove || wasMaximized) // custom anim because otherwise it is pretty bad (even worse than this custom one)
-			animate(window, newRect, onlyMove);
-		else
+		if (onlyMove) {// custom anim because they dont exist
+			let oldRect = window.get_frame_rect();
+			let wActor = window.get_compositor_private();
+			let actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
+			let clone = new St.Widget({
+				content: actorContent,
+				x: oldRect.x,
+				y: oldRect.y,
+				width: oldRect.width,
+				height: oldRect.height,
+			});
+			main.uiGroup.add_child(clone);
+			wActor.hide();
+
+			clone.ease({
+				x: newRect.x,
+				y: newRect.y,
+				width: newRect.width,
+				height: newRect.height,
+				duration: 200,
+				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+				onComplete: () => {
+					wActor.show();
+					clone.destroy();
+				}
+			});
+
+		} else if (wasMaximized) {
+			// TODO need animation
+			
+		} else {
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+		}
 	}
 	
 	if (!(newRect.height == workArea.height && newRect.width == workArea.width)) // if not maximized both
@@ -208,59 +237,6 @@ function tileWindow(window, newRect) {
 		else if (newRect.width >= workArea.width - 2)
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
-};
-
-// TODO could definitly use some improvements for resizing animation
-// this is only used when going from a maximized state (horiz, vert or both) to a tiled state
-function animate(window, newRect, onlyMove = true) {
-	let oldRect = window.get_frame_rect();
-	let wActor = window.get_compositor_private();
-	let actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
-	let clone = new St.Widget({
-		content: actorContent,
-		x: oldRect.x,
-		y: oldRect.y,
-		width: oldRect.width,
-		height: oldRect.height,
-	});
-	main.uiGroup.add_child(clone);
-	wActor.hide();
-
-	clone.ease({
-		x: newRect.x,
-		y: newRect.y,
-		width: newRect.width,
-		height: newRect.height,
-		duration: 200,
-		mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-		onComplete: () => {
-			wActor.show();
-			clone.destroy();
-
-			if (!onlyMove) {
-				let fadeOutClone = new St.Widget({
-					content: actorContent,
-					x: newRect.x,
-					y: newRect.y,
-					width: newRect.width,
-					height: newRect.height,
-				});
-				main.uiGroup.add_child(fadeOutClone);
-				fadeOutClone.set_pivot_point(.5, .5);
-		
-				fadeOutClone.ease({
-					scale_x: 0.9,
-					scale_y: 0.9,
-					opacity: 0,
-					duration: 100,
-					mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-					onComplete: () => {
-						fadeOutClone.destroy();
-					}
-				});
-			}
-		}
-	});
 };
 
 function onCustomShortcutPressed(shortcutName) {
@@ -1418,10 +1394,13 @@ var OpenWindowsDash = GObject.registerClass(
 			let posX = 0;
 			let posY = 0;
 
-			if (windows.length != appIcon.windowCount)
+			if (windows.length != appIcon.windowCount) // tiled window is the same app as the activated appIcon
 				windows.splice(0, 1);
 
 			for (let i = 0; i < windows.length; i++) {
+				if (!windows[i].located_on_workspace(global.workspace_manager.get_active_workspace()))
+					continue;
+
 				let preview = new WindowPreview(windows[i], appIcon, i);
 				this.windowPreviewBg.add_child(preview);
 				preview.set_position(posX, posY);
@@ -1718,7 +1697,8 @@ var WindowPreview = GObject.registerClass(
 			this.appIcon = appIcon;
 			this.index = index;
 
-			let PREVIEW_BUTTON_SIZE = (256 + 30) * openWindowsDash.monitorScale; // 30 = margin from stylesheet
+			let monitorHeight = global.display.get_monitor_geometry(win.get_monitor()).height; // might need a more consistent way to get a good button size
+			let PREVIEW_BUTTON_SIZE = Math.round(200 * monitorHeight / 1000);
 
 			this.iconContainer = new St.Widget({ 
 				layout_manager: new Clutter.BinLayout(),
