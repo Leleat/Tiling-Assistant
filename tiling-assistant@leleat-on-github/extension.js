@@ -1,5 +1,5 @@
 const Lang = imports.lang;
-const {main, iconGrid, appDisplay, panel, altTab} = imports.ui;
+const {main, iconGrid, appDisplay, panel, altTab, switcherPopup} = imports.ui;
 const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -11,7 +11,6 @@ let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[ap
 
 let settings = null;
 let startGrab = false;
-
 
 function init() {
 };
@@ -1220,13 +1219,6 @@ var OpenWindowsDash = GObject.registerClass(
 					this.close();
 			});
 
-			// visual BG for the Dash of open appIcons
-			this.bgGrid = new St.Widget({
-				style_class: "my-open-windows-dash",
-			});
-			main.layoutManager.addChrome(this.bgGrid);
-			this.bgGrid.hide();
-
 			// visual BG for the Dash of open windows (of one app)
 			this.windowPreviewBg = new St.Widget({
 				style_class: "my-open-windows-dash",
@@ -1237,8 +1229,18 @@ var OpenWindowsDash = GObject.registerClass(
 			this.windowPreviewBg.set_opacity(0);
 			this.windowPreviewBg.hide();
 
+			// visual BG for the Dash of open appIcons
+			this.bgGrid = new St.Widget({
+				style_class: "my-open-windows-dash",
+				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
+			});
+			main.layoutManager.addChrome(this.bgGrid);
+			this.bgGrid.hide();
+
 			// container for appIcons, centered in bgGrid
-			this.appContainer = new St.Widget();
+			this.appContainer = new St.Widget({
+				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
+			});
 			this.appContainer.focusItemAtIndex = this.focusItemAtIndex;
 			this.bgGrid.add_child(this.appContainer);
 		}
@@ -1260,42 +1262,30 @@ var OpenWindowsDash = GObject.registerClass(
 			this.monitorScale = global.display.get_monitor_scale(tiledWindow.get_monitor());
 
 			// fill appContainer
-			let winTracker = Shell.WindowTracker.get_default();
 			this.appContainer.appCount = 0;
-
 			let buttonSize = this.monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0)); // magicNr are margins/paddings from the icon to the full-sized highlighted button
-			this.maxColumnCount = Math.floor((freeScreenRect.width * 0.7) / buttonSize);
 
-			// dont allow "too empty" rows
-			if (openWindows.length % this.maxColumnCount <= this.maxColumnCount / 2)
-				for (let i = this.maxColumnCount; i >= 1; i--) {
-					if (openWindows.length % i >= Math.ceil(i / 2)) {
-						this.maxColumnCount = i;
-						break;
-					}
-				}
-
-			let dashHeight = Math.ceil(openWindows.length / this.maxColumnCount) * buttonSize;
-			let dashWidth = Math.min(this.maxColumnCount, openWindows.length) * buttonSize;
-			
+			let dashHeight = buttonSize;
+			let dashWidth = openWindows.length * buttonSize;			
 			this.bgGrid.set_size(dashWidth, dashHeight);
 			this.appContainer.set_size(dashWidth, dashHeight);
 
 			let posX = 0;
 			let posY = 0;
+			let winTracker = Shell.WindowTracker.get_default();
 			openWindows.forEach(w => {
 				let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, freeScreenRect, tiledWindow.get_monitor(), {showLabel: settings.get_boolean("show-label")});
 				this.appContainer.add_child(app);
 				app.set_position(posX, posY);
 				posX += buttonSize;
-
-				if (posX >= dashWidth) {
-					posX = 0;
-					posY += buttonSize;
-				}
 			});
 
 			// setup bgGrid
+			this.bgGrid.set_scale(1, 1);
+			if (this.bgGrid.width > freeScreenRect.width * .95) {
+				let scale = freeScreenRect.width * .95 / this.bgGrid.width;
+				this.bgGrid.set_scale(scale, scale);
+			}
 			this.bgGrid.show();
 			this.bgGrid.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.bgGrid.width / 2
 				, freeScreenRect.y + freeScreenRect.height / 2 - this.bgGrid.height / 2);
@@ -1387,69 +1377,77 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 
 		openWindowPreview(appIcon) {
+			if (!appIcon.arrowContainer)
+				return;
+				
 			this.windowPreviewBg.destroy_all_children();
+			this.windowPreviewBg.currPreviewedAppIcon = appIcon;
 			this.windowPreviewBg.show();
+			this.windowPreviewBg.set_scale(1, 1);
 
-			let windows = appIcon.app.get_windows();
-			if (windows.length != appIcon.windowCount) // tiled window is the same app as the activated appIcon
-				windows.splice(0, 1);
+			let windows = appIcon.windows;
+
+			let monitorRect = global.display.get_monitor_geometry(windows[0].get_monitor()); 
+			let size = Math.round(200 * monitorRect.height / 1000); // might need a more consistent way to get a good button size
 
 			let posX = 0;
-			let posY = 0;
-
-			let monitorHeight = global.display.get_monitor_geometry(windows[0].get_monitor()).height; // might need a more consistent way to get a good button size
-			let size = Math.round(200 * monitorHeight / 1000);
-
-			appIcon.maxColumnCount = Math.floor((appIcon.freeScreenRect.width * .8) / size);
-			// dont allow "too empty" rows
-			if (windows.length % appIcon.maxColumnCount <= appIcon.maxColumnCount / 2)
-				for (let i = appIcon.maxColumnCount; i >= 1; i--) {
-					if (windows.length % i >= Math.ceil(i / 2)) {
-						appIcon.maxColumnCount = i;
-						break;
-					}
-				}
-
 			// create previews
 			for (let i = 0; i < windows.length; i++) {
-				if (!windows[i].located_on_workspace(global.workspace_manager.get_active_workspace()))
-					continue;
-
 				let preview = new WindowPreview(windows[i], appIcon, i, size);
 				this.windowPreviewBg.add_child(preview);
-				preview.set_position(posX, posY);
+				preview.set_position(posX, 0);
 				posX += preview.width;
-
-				if (posX >= appIcon.maxColumnCount * size) {
-					posX = 0;
-					posY += preview.height;
-				}
 			}
 			
-			// 30 = margin from stylesheet; ternary op in case the row has reached max count
-			this.windowPreviewBg.set_size(Math.min(appIcon.maxColumnCount, windows.length) * (size + 30), posY + ((posX == 0) ? 0 : this.windowPreviewBg.get_child_at_index(0).height));
+			// 30 = margin from stylesheet
+			this.windowPreviewBg.set_size(windows.length * (size + 30), size + 30);
 
 			// animate opening
-			let freeScreen = appIcon.freeScreenRect;
-			let finalX = freeScreen.x + freeScreen.width / 2 - this.windowPreviewBg.width / 2;
-			let finalY = freeScreen.y + freeScreen.height / 2 - this.windowPreviewBg.height / 2;
-			let finalWidth = this.windowPreviewBg.width; // needed because setting the scale seems to affect the size
+			let finalWidth = this.windowPreviewBg.width;
 			let finalHeight = this.windowPreviewBg.height;
-			this.windowPreviewBg.set_position(appIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + appIcon.width / 2, appIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + appIcon.height / 2);
+			let finalScale = (finalWidth > monitorRect.width * .95) ? monitorRect.width * .95 / finalWidth : 1;
+			let finalX = appIcon.get_transformed_position()[0] + appIcon.width / 2 - this.windowPreviewBg.width / 2;
+			let finalY = this.bgGrid.y + ((appIcon.arrowIsAbove) ? - 20 - finalHeight : this.bgGrid.height + 20);
+
+			if (finalX + finalWidth > monitorRect.width)
+				finalX = monitorRect.width - 20 - finalWidth;
+			else if (finalX < monitorRect.x)
+				finalX = monitorRect.x + 20;
+
+			this.windowPreviewBg.set_position(appIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + appIcon.width / 2, appIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + appIcon.height / 2);			
 			this.windowPreviewBg.set_scale(0, 0);
 			this.windowPreviewBg.ease({
-				x: finalX,
-				y: finalY,
-				scale_x: 1,
-				scale_y: 1,
+				x: (finalScale != 1) ? monitorRect.x + monitorRect.width / 2 - finalWidth / 2 : finalX,
+				y: finalY + ((appIcon.arrowIsAbove) ? 1 : -1) * (finalHeight - finalHeight * finalScale) / 2,
+				scale_x: finalScale,
+				scale_y: finalScale,
 				width: finalWidth,
 				height: finalHeight,
 				opacity: 255,
-				duration: 200,
+				duration: 250,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
 			this.windowPreviewBg.get_child_at_index(0).grab_key_focus();
+		}
+
+		closeWindowPreview() {
+			let currAppIcon = this.windowPreviewBg.currPreviewedAppIcon;
+			this.windowPreviewBg.currPreviewedAppIcon = null;
+			currAppIcon.grab_key_focus();
+
+			let finalX = currAppIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + currAppIcon.width / 2;
+			let finalY = currAppIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + currAppIcon.height / 2
+			this.windowPreviewBg.ease({
+				x: finalX,
+				y: finalY,
+				scale_x: 0,
+				scale_y: 0,
+				opacity: 0,
+				duration: 250,
+				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+				onComplete: () => this.windowPreviewBg.hide()
+			});
 		}
 	}
 );
@@ -1577,32 +1575,56 @@ var OpenAppIcon = GObject.registerClass(
 			let isFocused = (focusedApp == this.app) ? 1 : 0;
 			let hasMultipleWindowsOpen = (this.app.get_n_windows() - isFocused) > 1;
 			if (hasMultipleWindowsOpen) {
-				this.dotContainer = new St.BoxLayout ({
+				let workArea = win.get_work_area_current_monitor();
+				this.arrowIsAbove = freeScreenRect.y != workArea.y && freeScreenRect.height != workArea.height;
+				this.arrowContainer = new St.BoxLayout ({
 					x_expand: true,
 					y_expand: true,
 					x_align: Clutter.ActorAlign.CENTER,
-					y_align: Clutter.ActorAlign.END,
+					y_align: (this.arrowIsAbove) ? Clutter.ActorAlign.START : Clutter.ActorAlign.END,
 				});
-				this.iconContainer.add_child(this.dotContainer);
+				this.iconContainer.add_child(this.arrowContainer);
 
-				let dot = new St.Widget({style_class: 'running-dot'});
-				this.dotContainer.add_child(dot);
+				let arrow = new St.DrawingArea({ 
+					width: 8,
+					height: 4,
+					style: (this.arrowIsAbove) ? 'margin-top: 3px' : 'margin-bottom: 3px'
+				});
+				arrow.connect('repaint', () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
+				this.arrowContainer.add_child(arrow);
 
-				this.windowCount = this.app.get_n_windows() - ((isFocused) ? 1 : 0);
+				let ws = this.app.get_windows();
+				this.windows = [];
+				for (let i = 0; i < ws.length; i++) {
+					if (!ws[i].located_on_workspace(global.workspace_manager.get_active_workspace()))
+						break;
+
+					this.windows.push(ws[i]);
+				}
+
+				if (isFocused)
+					this.windows.splice(0, 1);
 			}
+
+			this.connect("enter-event", () => {
+				this.isHovered = true;
+				if (openWindowsDash.windowPreviewBg.visible && openWindowsDash.windowPreviewBg.currPreviewedAppIcon != this)
+					openWindowsDash.closeWindowPreview()
+
+				let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
+					if (this.isHovered && openWindowsDash.isVisible() && openWindowsDash.windowPreviewBg.currPreviewedAppIcon != this)
+						openWindowsDash.openWindowPreview(this);
+	
+					GLib.source_remove(sourceID);
+				});
+			});
+
+			this.connect("leave-event", () => {
+				this.isHovered = false;
+			});
 		}
 
 		vfunc_key_press_event(keyEvent) {
-			let index = 0;
-			let getLastRowFirstItem = function(appCount, maxColumnCount) {
-				let rowCountBeforeLast = Math.floor(appCount / maxColumnCount);
-				if (appCount % maxColumnCount == 0)
-					rowCountBeforeLast--;
-	
-				let firstItem = rowCountBeforeLast * maxColumnCount;
-				return firstItem;
-			};
-
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
 					this.get_parent().focusItemAtIndex(this.index + 1, openWindowsDash.getAppCount());
@@ -1613,15 +1635,11 @@ var OpenAppIcon = GObject.registerClass(
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
-					index = this.index - openWindowsDash.maxColumnCount;
-					index = (index < 0) ? getLastRowFirstItem(openWindowsDash.getAppCount(), openWindowsDash.maxColumnCount) + this.index : index;
-					this.get_parent().focusItemAtIndex(index, openWindowsDash.getAppCount());
+					openWindowsDash.openWindowPreview(this);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Down:
-					index = this.index + openWindowsDash.maxColumnCount;
-					index = (index >= openWindowsDash.getAppCount()) ? this.index - getLastRowFirstItem(openWindowsDash.getAppCount(), openWindowsDash.maxColumnCount) : index;
-					this.get_parent().focusItemAtIndex(index, openWindowsDash.getAppCount());
+					openWindowsDash.openWindowPreview(this);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
@@ -1653,11 +1671,6 @@ var OpenAppIcon = GObject.registerClass(
 
 		activate() {
 			if (openWindowsDash.isVisible()) {
-				if (this.dotContainer) { // multiple windows of the same app
-					openWindowsDash.openWindowPreview(this);
-					return;
-				}
-
 				openWindowsDash.close();
 
 				this.icon.animateZoomOut();
@@ -1729,10 +1742,13 @@ var WindowPreview = GObject.registerClass(
 			this.iconContainer.add_child(this.icon);
 
 			this.connect("enter-event", () => {
-				if (this.get_parent().currFocused)
-					this.get_parent().currFocused.set_style_class_name("unfocused");
-				this.get_parent().currFocused = this;
-				this.set_style_class_name('focused');
+				if (this.get_style_class_name() != "focused")
+					this.set_style_class_name('hovered');
+			});
+
+			this.connect("leave-event", () => {
+				if (this.get_style_class_name() != "focused")
+					this.set_style_class_name('unfocused');
 			});
 		}
 
@@ -1741,42 +1757,28 @@ var WindowPreview = GObject.registerClass(
 		}
 
 		vfunc_key_focus_in() {
-			if (this.get_parent().currFocused)
-				this.get_parent().currFocused.set_style_class_name("unfocused");
-			this.get_parent().currFocused = this;
+			if (this.get_parent().currFocusedPreview)
+				this.get_parent().currFocusedPreview.set_style_class_name("unfocused");
+			this.get_parent().currFocusedPreview = this;
 			this.set_style_class_name('focused');
 		}
 
 		vfunc_key_press_event(keyEvent) {
-			let index = 0;
-			let getLastRowFirstItem = function(windowCount, maxColumnCount) {
-				let rowCountBeforeLast = Math.floor(windowCount / maxColumnCount);
-				if (windowCount % maxColumnCount == 0)
-					rowCountBeforeLast--;
-	
-				let firstItem = rowCountBeforeLast * maxColumnCount;
-				return firstItem;
-			};
-
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					this.get_parent().focusItemAtIndex(this.index + 1, this.appIcon.windowCount);
+					this.get_parent().focusItemAtIndex(this.index + 1, this.appIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					this.get_parent().focusItemAtIndex(this.index - 1, this.appIcon.windowCount);
+					this.get_parent().focusItemAtIndex(this.index - 1, this.appIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
-					index = this.index - this.appIcon.maxColumnCount;
-					index = (index < 0) ? getLastRowFirstItem(this.appIcon.windowCount, this.appIcon.maxColumnCount) + this.index : index;
-					this.get_parent().focusItemAtIndex(index, this.appIcon.windowCount);
+					openWindowsDash.closeWindowPreview();
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Down:
-					index = this.index + this.appIcon.maxColumnCount;
-					index = (index >= this.appIcon.windowCount) ? this.index - getLastRowFirstItem(this.appIcon.windowCount, this.appIcon.maxColumnCount) : index;
-					this.get_parent().focusItemAtIndex(index, this.appIcon.windowCount);
+					openWindowsDash.closeWindowPreview();
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:

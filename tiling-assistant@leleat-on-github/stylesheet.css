@@ -1,19 +1,17 @@
 .my-open-windows-dash {
-  background-color: rgba(22, 22, 22, 0.95);
+  background-color: rgb(22, 22, 22);
   border-radius: 15px;
   border: 2px solid rgba(65, 66, 68, 0.85);
 }
 
-.running-dot {
-  height: 5px;
-  width: 5px;
-  background-color: white;
-  border-radius:5px;
-  margin: 0px 2px 1px;
+.focused {
+  background-color: rgba(238, 238, 236, 0.3);
+  margin: 15px 15px 15px;
+  border-radius: 10px;
 }
 
-.focused {
-  background-color: rgba(238, 238, 236, 0.25);
+.hovered {
+  background-color: rgba(238, 238, 236, 0.1);
   margin: 15px 15px 15px;
   border-radius: 10px;
 }
