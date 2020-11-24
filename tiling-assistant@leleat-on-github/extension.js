@@ -1373,7 +1373,7 @@ var OpenWindowsDash = GObject.registerClass(
 
 		// called with this.appContainer or this.windowPreviewBg as this
 		focusItemAtIndex(index, maxCount) {
-			index = (index < 0 ) ?  maxCount - 1 : index;
+			index = (index < 0 ) ? maxCount - 1 : index;
 			index = (index >= maxCount) ? 0 : index;
 			this.get_child_at_index(index).grab_key_focus();
 		}
@@ -1391,32 +1391,51 @@ var OpenWindowsDash = GObject.registerClass(
 			this.windowPreviewBg.show();
 
 			let windows = appIcon.app.get_windows();
-			let posX = 0;
-			let posY = 0;
-
 			if (windows.length != appIcon.windowCount) // tiled window is the same app as the activated appIcon
 				windows.splice(0, 1);
 
+			let posX = 0;
+			let posY = 0;
+
+			let monitorHeight = global.display.get_monitor_geometry(windows[0].get_monitor()).height; // might need a more consistent way to get a good button size
+			let size = Math.round(200 * monitorHeight / 1000);
+
+			appIcon.maxColumnCount = Math.floor((appIcon.freeScreenRect.width * .8) / size);
+			// dont allow "too empty" rows
+			if (windows.length % appIcon.maxColumnCount <= appIcon.maxColumnCount / 2)
+				for (let i = appIcon.maxColumnCount; i >= 1; i--) {
+					if (windows.length % i >= Math.ceil(i / 2)) {
+						appIcon.maxColumnCount = i;
+						break;
+					}
+				}
+
+			// create previews
 			for (let i = 0; i < windows.length; i++) {
 				if (!windows[i].located_on_workspace(global.workspace_manager.get_active_workspace()))
 					continue;
 
-				let preview = new WindowPreview(windows[i], appIcon, i);
+				let preview = new WindowPreview(windows[i], appIcon, i, size);
 				this.windowPreviewBg.add_child(preview);
 				preview.set_position(posX, posY);
 				posX += preview.width;
+
+				if (posX >= appIcon.maxColumnCount * size) {
+					posX = 0;
+					posY += preview.height;
+				}
 			}
+			
+			// 30 = margin from stylesheet; ternary op in case the row has reached max count
+			this.windowPreviewBg.set_size(Math.min(appIcon.maxColumnCount, windows.length) * (size + 30), posY + ((posX == 0) ? 0 : this.windowPreviewBg.get_child_at_index(0).height));
 
-			this.windowPreviewBg.set_size(posX, this.windowPreviewBg.get_child_at_index(0).height);
-
+			// animate opening
 			let freeScreen = appIcon.freeScreenRect;
 			let finalX = freeScreen.x + freeScreen.width / 2 - this.windowPreviewBg.width / 2;
 			let finalY = freeScreen.y + freeScreen.height / 2 - this.windowPreviewBg.height / 2;
 			let finalWidth = this.windowPreviewBg.width; // needed because setting the scale seems to affect the size
 			let finalHeight = this.windowPreviewBg.height;
-
-			this.windowPreviewBg.set_position(appIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2
-					, appIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2);
+			this.windowPreviewBg.set_position(appIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + appIcon.width / 2, appIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + appIcon.height / 2);
 			this.windowPreviewBg.set_scale(0, 0);
 			this.windowPreviewBg.ease({
 				x: finalX,
@@ -1575,12 +1594,12 @@ var OpenAppIcon = GObject.registerClass(
 
 		vfunc_key_press_event(keyEvent) {
 			let index = 0;
-			let getLastRowFirstItem = function() {
-				let rowCountBeforeLast = Math.floor(openWindowsDash.getAppCount() / openWindowsDash.maxColumnCount);
-				if (openWindowsDash.getAppCount() % openWindowsDash.maxColumnCount == 0)
+			let getLastRowFirstItem = function(appCount, maxColumnCount) {
+				let rowCountBeforeLast = Math.floor(appCount / maxColumnCount);
+				if (appCount % maxColumnCount == 0)
 					rowCountBeforeLast--;
 	
-				let firstItem = rowCountBeforeLast * openWindowsDash.maxColumnCount;
+				let firstItem = rowCountBeforeLast * maxColumnCount;
 				return firstItem;
 			};
 
@@ -1595,13 +1614,13 @@ var OpenAppIcon = GObject.registerClass(
 
 				case Clutter.KEY_Up:
 					index = this.index - openWindowsDash.maxColumnCount;
-					index = (index < 0) ? getLastRowFirstItem() + this.index : index;
+					index = (index < 0) ? getLastRowFirstItem(openWindowsDash.getAppCount(), openWindowsDash.maxColumnCount) + this.index : index;
 					this.get_parent().focusItemAtIndex(index, openWindowsDash.getAppCount());
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Down:
 					index = this.index + openWindowsDash.maxColumnCount;
-					index = (index >= openWindowsDash.getAppCount()) ? this.index - getLastRowFirstItem() : index;
+					index = (index >= openWindowsDash.getAppCount()) ? this.index - getLastRowFirstItem(openWindowsDash.getAppCount(), openWindowsDash.maxColumnCount) : index;
 					this.get_parent().focusItemAtIndex(index, openWindowsDash.getAppCount());
 					return Clutter.EVENT_STOP;
 
@@ -1685,7 +1704,7 @@ var OpenAppIcon = GObject.registerClass(
 // changed from St.BoxLayout to St.Button
 var WindowPreview = GObject.registerClass(
 	class WindowPreview extends St.Button {
-		_init(win, appIcon, index) {
+		_init(win, appIcon, index, fullSize) {
 			super._init({
 				style_class: 'unfocused',
 				reactive: true,
@@ -1697,27 +1716,23 @@ var WindowPreview = GObject.registerClass(
 			this.appIcon = appIcon;
 			this.index = index;
 
-			let monitorHeight = global.display.get_monitor_geometry(win.get_monitor()).height; // might need a more consistent way to get a good button size
-			let PREVIEW_BUTTON_SIZE = Math.round(200 * monitorHeight / 1000);
-
 			this.iconContainer = new St.Widget({ 
 				layout_manager: new Clutter.BinLayout(),
 				x_expand: true, 
 				y_expand: true,
-				width: PREVIEW_BUTTON_SIZE,
-				height: PREVIEW_BUTTON_SIZE,
+				width: fullSize,
+				height: fullSize,
 			});
 			this.set_child(this.iconContainer);
 
-			this.icon = altTab._createWindowClone(win.get_compositor_private(), PREVIEW_BUTTON_SIZE - 20 * openWindowsDash.monitorScale); // 20 = small gap from preview size to actual window preview
+			this.icon = altTab._createWindowClone(win.get_compositor_private(), fullSize - 20 * openWindowsDash.monitorScale); // 20 = small gap from preview size to actual window preview
 			this.iconContainer.add_child(this.icon);
 
 			this.connect("enter-event", () => {
+				if (this.get_parent().currFocused)
+					this.get_parent().currFocused.set_style_class_name("unfocused");
+				this.get_parent().currFocused = this;
 				this.set_style_class_name('focused');
-			});
-
-			this.connect("leave-event", () => {
-				this.set_style_class_name('unfocused');
 			});
 		}
 
@@ -1726,14 +1741,23 @@ var WindowPreview = GObject.registerClass(
 		}
 
 		vfunc_key_focus_in() {
+			if (this.get_parent().currFocused)
+				this.get_parent().currFocused.set_style_class_name("unfocused");
+			this.get_parent().currFocused = this;
 			this.set_style_class_name('focused');
 		}
 
-		vfunc_key_focus_out() {
-			this.set_style_class_name('unfocused');
-		}
-
 		vfunc_key_press_event(keyEvent) {
+			let index = 0;
+			let getLastRowFirstItem = function(windowCount, maxColumnCount) {
+				let rowCountBeforeLast = Math.floor(windowCount / maxColumnCount);
+				if (windowCount % maxColumnCount == 0)
+					rowCountBeforeLast--;
+	
+				let firstItem = rowCountBeforeLast * maxColumnCount;
+				return firstItem;
+			};
+
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
 					this.get_parent().focusItemAtIndex(this.index + 1, this.appIcon.windowCount);
@@ -1741,6 +1765,18 @@ var WindowPreview = GObject.registerClass(
 
 				case Clutter.KEY_Left:
 					this.get_parent().focusItemAtIndex(this.index - 1, this.appIcon.windowCount);
+					return Clutter.EVENT_STOP;
+
+				case Clutter.KEY_Up:
+					index = this.index - this.appIcon.maxColumnCount;
+					index = (index < 0) ? getLastRowFirstItem(this.appIcon.windowCount, this.appIcon.maxColumnCount) + this.index : index;
+					this.get_parent().focusItemAtIndex(index, this.appIcon.windowCount);
+					return Clutter.EVENT_STOP;
+
+				case Clutter.KEY_Down:
+					index = this.index + this.appIcon.maxColumnCount;
+					index = (index >= this.appIcon.windowCount) ? this.index - getLastRowFirstItem(this.appIcon.windowCount, this.appIcon.maxColumnCount) : index;
+					this.get_parent().focusItemAtIndex(index, this.appIcon.windowCount);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
