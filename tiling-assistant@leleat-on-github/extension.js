@@ -1719,7 +1719,7 @@ var WindowPreview = GObject.registerClass(
 	class WindowPreview extends St.Button {
 		_init(win, appIcon, index, fullSize) {
 			super._init({
-				style_class: 'unfocused',
+				style_class: 'tiling-unfocused',
 				reactive: true,
 				button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
 				can_focus: true,
@@ -1742,13 +1742,13 @@ var WindowPreview = GObject.registerClass(
 			this.iconContainer.add_child(this.icon);
 
 			this.connect("enter-event", () => {
-				if (this.get_style_class_name() != "focused")
-					this.set_style_class_name('hovered');
+				if (this.get_style_class_name() != "tiling-focused")
+					this.set_style_class_name('tiling-hovered');
 			});
 
 			this.connect("leave-event", () => {
-				if (this.get_style_class_name() != "focused")
-					this.set_style_class_name('unfocused');
+				if (this.get_style_class_name() != "tiling-focused")
+					this.set_style_class_name('tiling-unfocused');
 			});
 		}
 
@@ -1758,9 +1758,9 @@ var WindowPreview = GObject.registerClass(
 
 		vfunc_key_focus_in() {
 			if (this.get_parent().currFocusedPreview)
-				this.get_parent().currFocusedPreview.set_style_class_name("unfocused");
+				this.get_parent().currFocusedPreview.set_style_class_name("tiling-unfocused");
 			this.get_parent().currFocusedPreview = this;
-			this.set_style_class_name('focused');
+			this.set_style_class_name('tiling-focused');
 		}
 
 		vfunc_key_press_event(keyEvent) {

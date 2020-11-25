@@ -11,8 +11,8 @@ function buildPrefsWidget () {
 }
 
 const MyPrefsWidget = new GObject.Class({
-    Name : "My.Prefs.Widget",
-    GTypeName : "MyPrefsWidget",
+    Name : "My.tiling.Prefs.Widget",
+    GTypeName : "MyTilingPrefsWidget",
     Extends : Gtk.Box, // or ScrolledWindow if this gets too big
   
     _init : function (params) {
