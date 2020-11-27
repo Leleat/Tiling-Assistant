@@ -3,11 +3,11 @@ const {main, iconGrid, appDisplay, panel, altTab, switcherPopup} = imports.ui;
 const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 
-let openWindowsDash = null;
+let appDash = null;
 let tilePreview = null;
 let tiledWindows = {}; // {window : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
-let newWindowsToTile = [[], []]; // to open apps directly in tiled state -> [[apps, to, tile, ...], [side, to, tile, to, ...]]
+let newWindowsToTile = {}; // to open apps directly in tiled state -> {app.name: Meta.Side.X}
 
 let settings = null;
 let startGrab = false;
@@ -21,16 +21,15 @@ function enable() {
 	// signal connections
 	this.windowGrabBegin = global.display.connect('grab-op-begin', onGrabBegin.bind(this) );
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
-	this.maximizedStateChanged = global.window_manager.connect("size-change", onMaxStateChanged.bind(this));
-	this.overviewShown = main.overview.connect("showing", () => {if (openWindowsDash.isVisible()) openWindowsDash.close();});
+	this.overviewShown = main.overview.connect("showing", () => {if (appDash.shown) appDash.close();});
 	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
 	this.toppanelButtonRelease = main.panel.connect("button-release-event", (event) => {
 		startGrab = null;
 		return false;
 	});
 
-	openWindowsDash = new OpenWindowsDash();
-	tilePreview = new MyTilePreview();
+	appDash = new TilingAppDash();
+	tilePreview = new TilingTilePreview();
 
 	// disable native tiling
 	// taken from ShellTile@emasab.it - https://extensions.gnome.org/extension/657/shelltile/
@@ -61,13 +60,12 @@ function disable() {
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
 	global.display.disconnect(this.windowGrabEnd);
-	global.window_manager.disconnect(this.maximizedStateChanged);
 	main.overview.disconnect(this.overviewShown);
 	global.display.disconnect(this.windowCreated);
 	main.panel.disconnect(this.toppanelButtonRelease);
 
 	tilePreview.destroy();
-	openWindowsDash._destroy();
+	appDash._destroy();
 
 	// re-enable native tiling
 	this.gnome_mutter_settings.reset("edge-tiling");
@@ -105,15 +103,11 @@ function newAppActivate(button) {
 		this.app.open_new_window(-1);
 
 	} else if (isShiftPressed && this.app.can_open_new_window()) {
-		newWindowsToTile[0].push(this.app.get_name());
-		newWindowsToTile[1].push(Meta.Side.LEFT);
-
+		newWindowsToTile[this.app.get_name()] = Meta.Side.LEFT;
 		this.app.open_new_window(-1);
 
 	} else if (isAltPressed && this.app.can_open_new_window()) {
-		newWindowsToTile[0].push(this.app.get_name());
-		newWindowsToTile[1].push(Meta.Side.RIGHT);
-
+		newWindowsToTile[this.app.get_name()] = Meta.Side.RIGHT;
 		this.app.open_new_window(-1);
 
 	} else {
@@ -126,19 +120,19 @@ function newAppActivate(button) {
 // to tile a window after it has been created via holding alt/shift on an icon
 function onWindowCreated (src, w) {
 	let app = Shell.WindowTracker.get_default().get_window_app(w);
-	if (app) {
-		let idx = newWindowsToTile[0].indexOf(app.get_name());
-		if (idx != -1 && w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
-			let sourceID = GLib.timeout_add( GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet; so tiling wont work properly yet
-				GLib.source_remove(sourceID);
+	if (!app)
+		return;
 
-				let rect = getTileRectFor(newWindowsToTile[1][idx], w.get_work_area_current_monitor());
-				tileWindow(w, rect);
+	let tileSide = newWindowsToTile[app.get_name()];
+	if (tileSide && w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
+		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet
+			GLib.source_remove(sourceID);
 
-				newWindowsToTile[0].splice(idx, 1);
-				newWindowsToTile[1].splice(idx, 1);
-			} );
-		}
+			let rect = getTileRectFor(tileSide, w.get_work_area_current_monitor());
+			tileWindow(w, rect);
+
+			delete newWindowsToTile[app.get_name()];
+		});
 	}
 };
 
@@ -168,8 +162,6 @@ function tileWindow(window, newRect) {
 	let onlyMove = oldRect.width == newRect.width && oldRect.height == newRect.height;
 	if (settings.get_boolean("use-anim")) {
 		if (onlyMove) {// custom anim because they dont exist
-			let oldRect = window.get_frame_rect();
-			let wActor = window.get_compositor_private();
 			let actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
 			let clone = new St.Widget({
 				content: actorContent,
@@ -198,7 +190,7 @@ function tileWindow(window, newRect) {
 			// TODO need animation
 			
 		} else {
-			main.wm._prepareAnimationInfo(global.window_manager, wActor, window.get_frame_rect(), 0);
+			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, 0);
 		}
 	}
 	
@@ -213,7 +205,7 @@ function tileWindow(window, newRect) {
 	sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
 		openDash(window);
 		GLib.source_remove(sID);
-	}); // timer needed to correctly shade the bg / focuse the first dash icon
+	}); // timer needed to correctly shade the bg / focus the first dash icon
 
 	if (settings.get_boolean("use-anim") && !(newRect.height == workArea.height && newRect.width == workArea.width)) {
 		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => { // wait for anim to be done
@@ -326,23 +318,10 @@ function onCustomShortcutPressed(shortcutName) {
 	}
 };
 
-// called whenever the maximize state of a window is changed (...and maybe at other times as well; I dont know?)
-function onMaxStateChanged(shellwm, actor, whichChange, oldFrameRect, _oldBufferRect) {
-	// timer to get the correct new window pos and size
-	let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-		GLib.source_remove(sourceID);
-
-		let tiledWindow = actor.get_meta_window();
-		if (!tiledWindow.get_maximized() || tiledWindow.get_maximized() == Meta.MaximizeFlags.BOTH)
-			return;
-
-		openDash(tiledWindow);
-	});
-};
-
-// get the top most tiled windows which are in a group (by stack order)
+// get the top most tiled windows which are in a group (looped through window list by stack order)
+// break if a non-tiled window is encountered
 // and the last tiled window -> to shade the bg correctly for the dash
-// optionally ignore the focused window (needed for tile preview via DND)
+// optionally ignore the focused window (needed for DND since the grabbed window isnt tiled yet)
 function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow = false) {
 	// first start with an empty tile group
 	// if a quad is null, that means that that space is free screen space
@@ -357,7 +336,7 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	// it also returns wether "window" is part of the currTileGroup
 	// "window" isnt part of the currTileGroup, if a window in a higher stack order already occupied that quad,
 	// if "window" isnt tiled or if "window" is maximized
-	let removeFreeQuad = function(currTileGroup, window) {
+	let wIsInTileGroup = function(currTileGroup, window) {
 		if (!(window in tiledWindows) || window.get_maximized() == Meta.MaximizeFlags.BOTH)
 			return false;
 		
@@ -431,7 +410,7 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 	};
 
 	for (let i = ((ignoreFocusedWindow) ? 1 : 0); i < openWindows.length; i++) {
-		let windowIsInTileGroup = removeFreeQuad(currTileGroup, openWindows[i]);
+		let windowIsInTileGroup = wIsInTileGroup(currTileGroup, openWindows[i]);
 		if (!windowIsInTileGroup)
 			break;
 
@@ -444,12 +423,12 @@ function getTileGroup(openWindows, lastInTileGroup = null, ignoreFocusedWindow =
 // called when a window is tiled
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function openDash(tiledWindow) {
-	if (openWindowsDash.isVisible())
+	if (appDash.shown)
 		return;
 
 	let workArea = tiledWindow.get_work_area_current_monitor();
 
-	// window was maximized - dont check via get_maximized()
+	// window was maximized - dont check via get_maximized() since tileWindow() delays the maximize() call if anim are enabled
 	if (tiledWindow.get_frame_rect().width == workArea.width && tiledWindow.get_frame_rect().height == workArea.height)
 		return;
 
@@ -460,7 +439,6 @@ function openDash(tiledWindow) {
 	
 	// assume all 4 quads are free
 	// remove a quad for each window in currTileGroup
-	// and remove the tiled windows from openWindows for the Dash
 	let freeQuadCount = 4;
 	for (let pos in currTileGroup) {
 		if (currTileGroup[pos] != null) {
@@ -482,6 +460,7 @@ function openDash(tiledWindow) {
 					w.tileGroup[pos] = null;
 			});
 
+			// remove the tiled windows from openWindows to populate the Dash
 			let idx = openWindows.indexOf(currTileGroup[pos]);
 			if (idx != -1)
 				openWindows.splice(idx, 1);
@@ -490,19 +469,19 @@ function openDash(tiledWindow) {
 		}
 	}
 
+	if (openWindows.length == 0)
+		return;
+
 	// filter the openWindows array, so that no duplicate apps are shown
 	let winTracker = Shell.WindowTracker.get_default();
 	let openApps = []; 
 	openWindows.forEach((w) => { openApps.push(winTracker.get_window_app(w)) });
 	let tmpOpenWindows = [];
-	for(let i = 0; i < openApps.length; i++) {
+	for (let i = 0; i < openApps.length; i++) {
 		if (openApps.indexOf(openApps[i]) == i) // first occurrence only
 			tmpOpenWindows.push(openWindows[i]);
 	}
 	openWindows = tmpOpenWindows;
-
-	if (openWindows.length == 0)
-		return;
 
 	let freeScreenRect = null;
 	// if a window is maximized, 2 rects can be the same rect
@@ -513,8 +492,8 @@ function openDash(tiledWindow) {
 	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
 
 	// the dimensions of the free screen rect
-	let _height = 0;
-	let _width = 0;
+	let height = 0;
+	let width = 0;
 	// "limit"-dimension are the dimensions of the opposing windows
 	// e.g. if the user wants to tile a window to the right (vertically maximized), 
 	// the width will be limited by the windows in the top left and bottom left quad
@@ -524,43 +503,43 @@ function openDash(tiledWindow) {
 	// only 1 quad is free
 	if (freeQuadCount == 1) {
 		if (currTileGroup.TOP_LEFT == null) {
-			[_width, _height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
-				width: _width,
-				height: _height,
+				width: width,
+				height: height,
 			});
 
 		} else if (currTileGroup.TOP_RIGHT == null) {
-			[_width, _height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
 			freeScreenRect = new Meta.Rectangle({
-				x: workArea.x + workArea.width - _width,
+				x: workArea.x + workArea.width - width,
 				y: workArea.y,
-				width: _width,
-				height: _height,
+				width: width,
+				height: height,
 			});
 
 		} else if (currTileGroup.BOTTOM_LEFT == null) {
-			[_width, _height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
 			freeScreenRect = new Meta.Rectangle({
 				x: workArea.x,
-				y: workArea.y + workArea.height - _height,
-				width: _width,
-				height: _height,
+				y: workArea.y + workArea.height - height,
+				width: width,
+				height: height,
 			});
 
 		} else if (currTileGroup.BOTTOM_RIGHT == null) {
-			[_width, _height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
 			freeScreenRect = new Meta.Rectangle({
-				x: workArea.x + workArea.width - _width,
-				y: workArea.y + workArea.height - _height,
-				width: _width,
-				height: _height,
+				x: workArea.x + workArea.width - width,
+				y: workArea.y + workArea.height - height,
+				width: width,
+				height: height,
 			});
 		}
 
-		openWindowsDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
+		appDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
 
 	// free screen space consists of 2 quads
 	} else if (freeQuadCount == 2) {
@@ -610,7 +589,7 @@ function openDash(tiledWindow) {
 			});
 		}
 
-		openWindowsDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
+		appDash.open(openWindows, tiledWindow, freeScreenRect, lastInTileGroup);
 	}
 };
 
@@ -677,7 +656,6 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 			// if the grab started in the topbar
 			// start the grab for tiled windows after leaving the topbar
-			// else start the grab after moving a small distance
 			if (!startGrab && grabbedWindow in tiledWindows) {
 				global.display.end_grab_op(global.get_current_time());
 				shouldStartGrab(grabbedWindow, [x, y]);
@@ -757,14 +735,14 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 	startGrab = false;
 
 	// disconnect the signals
-	if ( window && windowGrabSignals[window.get_id()] )
+	if (window && windowGrabSignals[window.get_id()])
 		for (let i = windowGrabSignals[window.get_id()].length - 1; i >= 0; i--) {
 			window.disconnect( windowGrabSignals[window.get_id()][i] );
 			windowGrabSignals[window.get_id()].splice(i, 1);
 		}
 
-	if (tilePreview._showing) {
-		tileWindow(window, tilePreview._rect);
+	if (tilePreview.showing) {
+		tileWindow(window, tilePreview.rect);
 		tilePreview.close();
 	}
 };
@@ -816,6 +794,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 };
 
 // used for DND and custom keyboard shortcut
+// TODO can getMaxHeight/getMaxWidth be replaced by getRectDimensions?
 function getTileRectFor(side, workArea) {
 	let activeWS = global.workspace_manager.get_active_workspace()
 	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
@@ -1039,7 +1018,7 @@ function onWindowMoving(window, grabStartPos) {
 
 // sameSideWindow is the window which is on the same side as the resizedRect based on the drag direction
 // e.g. if resizing the top left on the E side, the bottom left window is the sameSideWindow
-// opposingWindows is the opposite
+// opposingWindows is the rest
 function resizeComplementingWindows(resizedWindow, sameSideWindow, opposingWindows, grabOp) {
 	if (!(resizedWindow in tiledWindows))
 		return;
@@ -1100,7 +1079,7 @@ function resizeComplementingWindows(resizedWindow, sameSideWindow, opposingWindo
 function equalApprox(value, value2, margin) {
 	if (value >= value2 - margin && value <= value2 + margin)
 		return true;
-return false;
+	return false;
 };
 
 function getMaxWidth(rect1, rect2, workArea) {
@@ -1139,15 +1118,15 @@ function getMaxHeight(rect1, rect2, workArea) {
 
 // diagonalRect is the rect which is in the diagonal quad to the space we try to get the rect for
 // for example: if we try to get the free space for the top left quad, the diagonal rect is at the bottom right
-// if a window is maximized, 2 rects can be equal
+// if a window is maximized, 2 rects can be equal. E. g. possible: vertToDiaRect == diagonalRect.
 // vertToDiaRect/horiToDiaRect are the quads in relation to the diagonal quad
-// ONLY used to get the dimensions for 1 quad and not more (i. e. not maximized windows)
+// ONLY used to get the dimensions for 1 quad and not more (i. e. not hori/vert maximized windows)
 function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect) {
-	// 0 other rect
+	// 0 other tiled windows; default size
 	if (!diagonalRect && !vertToDiaRect && !horiToDiaRect) {
 		return [workArea.width / 2, workArea.height / 2];
 
-	// 1 rect isnt null
+	// 1 (quartered) tiled window
 	} else if (diagonalRect && !vertToDiaRect && !horiToDiaRect) {
 		return [workArea.width - diagonalRect.width, workArea.height - diagonalRect.height];
 
@@ -1157,7 +1136,7 @@ function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect)
 	} else if (!diagonalRect && !vertToDiaRect && horiToDiaRect) {
 		return [horiToDiaRect.width, workArea.height - horiToDiaRect.height];
 
-	// 2 rects arent null
+	// 2 quads taken by tiled window(s)
 	} else if (diagonalRect && vertToDiaRect && !horiToDiaRect) {
 		return [workArea.width - vertToDiaRect.width, (diagonalRect.equal(vertToDiaRect)) ? workArea.height / 2 : vertToDiaRect.height];
 
@@ -1167,7 +1146,7 @@ function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect)
 	} else if (!diagonalRect && vertToDiaRect && horiToDiaRect) {
 		return [horiToDiaRect.width, vertToDiaRect.height];
 
-	// 3 rects arent null
+	// 3 quads taken by tiled window(s)
 	} else {
 		// if there are 3 differently sized windows, there are (at least?) 2 possible rects
 		// one, where the height is limited by the union between the diagonalRect and the horiToDiaRect and the width is limited by vertToDiaRect
@@ -1185,13 +1164,12 @@ function getRectDimensions(workArea, diagonalRect, vertToDiaRect, horiToDiaRect)
 	}
 };
 
-var OpenWindowsDash = GObject.registerClass(
-	class OpenWindowsDash extends St.Widget {
+var TilingAppDash = GObject.registerClass(
+	class TilingAppDash extends St.Widget {
 		_init() {
 			super._init();
 
-			this._shown = false;
-			this.maxColumnCount = 0;
+			this.shown = false;
 
 			// for animation move direction of the Dash (the Dash will move from the tiled window pos to the center of the remaining free space)
 			this.animationDir = {x: 0, y: 0};
@@ -1199,8 +1177,7 @@ var OpenWindowsDash = GObject.registerClass(
 			// shade BG when the Dash is open for easier visibility
 			this.shadeBG = new St.Widget({
 				style: ("background-color : black"),
-				x: 0,
-				y: 0,
+				x: 0, y: 0,
 				opacity: 0
 			});
 			global.window_group.add_child(this.shadeBG);
@@ -1209,103 +1186,101 @@ var OpenWindowsDash = GObject.registerClass(
 			// hide Dash on mouse clicks
 			this.mouseCatcher = new St.Widget({
 				reactive: true,
-				x: 0,
-				y: 0,
+				x: 0, y: 0,
 			});
 			main.layoutManager.addChrome(this.mouseCatcher);
 			this.mouseCatcher.hide();
 			this.onMouseCaught = this.mouseCatcher.connect("button-press-event", () => {
-				if (this.isVisible())
+				if (this.shown)
 					this.close();
 			});
 
-			// visual BG for the Dash of open windows (of one app)
-			this.windowPreviewBg = new St.Widget({
+			// visual BG for the Dash if an app has multiple open windows
+			this.windowDash = new St.Widget({
 				style_class: "my-open-windows-dash",
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
 			});
-			main.layoutManager.addChrome(this.windowPreviewBg);
-			this.windowPreviewBg.focusItemAtIndex = this.focusItemAtIndex;
-			this.windowPreviewBg.set_opacity(0);
-			this.windowPreviewBg.hide();
+			main.layoutManager.addChrome(this.windowDash);
+			this.windowDash.focusItemAtIndex = this.focusItemAtIndex;
+			this.windowDash.set_opacity(0);
+			this.windowDash.hide();
 
 			// visual BG for the Dash of open appIcons
-			this.bgGrid = new St.Widget({
+			this.dashBG = new St.Widget({
 				style_class: "my-open-windows-dash",
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
 			});
-			main.layoutManager.addChrome(this.bgGrid);
-			this.bgGrid.hide();
+			main.layoutManager.addChrome(this.dashBG);
+			this.dashBG.hide();
 
-			// container for appIcons, centered in bgGrid
+			// container for appIcons, centered in dashBG
 			this.appContainer = new St.Widget({
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
 			});
 			this.appContainer.focusItemAtIndex = this.focusItemAtIndex;
-			this.bgGrid.add_child(this.appContainer);
+			this.dashBG.add_child(this.appContainer);
 		}
 
 		_destroy() {
 			this.shadeBG.destroy();
 			this.mouseCatcher.disconnect(this.onMouseCaught);
 			this.mouseCatcher.destroy();
-			this.bgGrid.destroy();
-			this.windowPreviewBg.destroy();
+			this.dashBG.destroy();
+			this.windowDash.destroy();
 			this.destroy();
 		}
 
 		open(openWindows, tiledWindow, freeScreenRect, lastInTileGroupW) {
-			this._shown = true;
+			this.shown = true;
 			this.appContainer.destroy_all_children();
 
+			this.freeScreenRect = freeScreenRect;
+			this.monitor = tiledWindow.get_monitor();
+
 			let entireWorkArea = tiledWindow.get_work_area_all_monitors();
-			this.monitorScale = global.display.get_monitor_scale(tiledWindow.get_monitor());
+			let monitorScale = global.display.get_monitor_scale(tiledWindow.get_monitor());
 
-			// fill appContainer
-			this.appContainer.appCount = 0;
-			let buttonSize = this.monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0)); // magicNr are margins/paddings from the icon to the full-sized highlighted button
-
-			let dashHeight = buttonSize;
+			// fill appContainer; Dash -> 1 row only
+			// magicNr are margins/paddings from the icon to the full-sized highlighted button
+			let buttonSize = monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0));
 			let dashWidth = openWindows.length * buttonSize;			
-			this.bgGrid.set_size(dashWidth, dashHeight);
-			this.appContainer.set_size(dashWidth, dashHeight);
+			this.dashBG.set_size(dashWidth, buttonSize);
+			this.appContainer.set_size(dashWidth, buttonSize);
 
-			let posX = 0;
-			let posY = 0;
-			let winTracker = Shell.WindowTracker.get_default();
-			openWindows.forEach(w => {
-				let app = new OpenAppIcon(winTracker.get_window_app(w), w, this.appContainer.appCount++, freeScreenRect, tiledWindow.get_monitor(), {showLabel: settings.get_boolean("show-label")});
-				this.appContainer.add_child(app);
-				app.set_position(posX, posY);
-				posX += buttonSize;
-			});
-
-			// setup bgGrid
-			this.bgGrid.set_scale(1, 1);
-			if (this.bgGrid.width > freeScreenRect.width * .95) {
-				let scale = freeScreenRect.width * .95 / this.bgGrid.width;
-				this.bgGrid.set_scale(scale, scale);
+			for (let idx = 0, posX = 0; idx < openWindows.length; idx++, posX += buttonSize) {
+				let appIcon = new TilingAppIcon(openWindows[idx], idx, {showLabel: settings.get_boolean("show-label")});
+				this.appContainer.add_child(appIcon);
+				appIcon.set_position(posX, 0);
 			}
-			this.bgGrid.show();
-			this.bgGrid.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.bgGrid.width / 2
-				, freeScreenRect.y + freeScreenRect.height / 2 - this.bgGrid.height / 2);
+
+			// setup dashBG; scale it to fit the freeScreenRect
+			this.dashBG.set_scale(1, 1);
+			if (this.dashBG.width > freeScreenRect.width * .95) {
+				let scale = freeScreenRect.width * .95 / this.dashBG.width;
+				this.dashBG.set_scale(scale, scale);
+			}
+			this.dashBG.show();
+			this.dashBG.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.dashBG.width / 2
+				, freeScreenRect.y + freeScreenRect.height / 2 - this.dashBG.height / 2);
 
 			// setup appContainer
-			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * this.monitorScale, settings.get_int("icon-margin") / 2 * this.monitorScale);
+			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
 			this.appContainer.get_child_at_index(0).grab_key_focus();
 
 			// move bgContainer FROM final pos to animate (move) to final pos
-			let finalX = this.bgGrid.x;
-			let finalY = this.bgGrid.y;
+			let finalX = this.dashBG.x;
+			let finalY = this.dashBG.y;
 			this.animationDir.x = Math.sign(tiledWindow.get_frame_rect().x - freeScreenRect.x);
 			this.animationDir.y = Math.sign(tiledWindow.get_frame_rect().y - freeScreenRect.y);
-			this.bgGrid.set_position(finalX + 200 * this.animationDir.x, this.bgGrid.y + 200 * this.animationDir.y);
-			this.bgGrid.ease({
+			this.dashBG.set_position(finalX + 200 * this.animationDir.x, this.dashBG.y + 200 * this.animationDir.y);
+			this.dashBG.ease({
 				x: finalX,
 				y: finalY,
 				opacity: 255,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+				// while the first icon already grabbed the focus before; some apps seem to grab the focus away again (especially when opening an app in a tiled state). So regrab it after the anim
+				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus()
 			});
 
 			// setup shadeBG
@@ -1328,29 +1303,29 @@ var OpenWindowsDash = GObject.registerClass(
 		}
 
 		close() {
-			this._shown = false;
+			this.shown = false;
 			this.mouseCatcher.hide();
 
-			let finalX = this.bgGrid.x + 200 * this.animationDir.x;
-			let finalY = this.bgGrid.y + 200 * this.animationDir.y;
-			this.bgGrid.ease({
+			let finalX = this.dashBG.x + 200 * this.animationDir.x;
+			let finalY = this.dashBG.y + 200 * this.animationDir.y;
+			this.dashBG.ease({
 				x: finalX,
 				y: finalY,
 				opacity: 0,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.bgGrid.hide()
+				onComplete: () => this.dashBG.hide()
 			});
 
-			let finalX2 = this.windowPreviewBg.x + 200 * this.animationDir.x;
-			let finalY2 = this.windowPreviewBg.y + 200 * this.animationDir.y;
-			this.windowPreviewBg.ease({
+			let finalX2 = this.windowDash.x + 200 * this.animationDir.x;
+			let finalY2 = this.windowDash.y + 200 * this.animationDir.y;
+			this.windowDash.ease({
 				x: finalX2,
 				y: finalY2,
 				opacity: 0,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.windowPreviewBg.hide()
+				onComplete: () => this.windowDash.hide()
 			});
 
 			this.shadeBG.ease({
@@ -1361,64 +1336,59 @@ var OpenWindowsDash = GObject.registerClass(
 			});
 		}
 
-		// called with this.appContainer or this.windowPreviewBg as this
+		// called with this.appContainer or this.windowDash as this
 		focusItemAtIndex(index, maxCount) {
 			index = (index < 0 ) ? maxCount - 1 : index;
 			index = (index >= maxCount) ? 0 : index;
 			this.get_child_at_index(index).grab_key_focus();
 		}
 
-		isVisible() {
-			return this._shown;
-		}
-
 		getAppCount() {
-			return this.appContainer.appCount;
+			return this.appContainer.get_n_children();
 		}
 
 		openWindowPreview(appIcon) {
-			if (!appIcon.arrowContainer)
+			if (!appIcon.hasMultipleWindows())
 				return;
 				
-			this.windowPreviewBg.destroy_all_children();
-			this.windowPreviewBg.currPreviewedAppIcon = appIcon;
-			this.windowPreviewBg.show();
-			this.windowPreviewBg.set_scale(1, 1);
+			this.windowDash.destroy_all_children();
+			this.windowDash.show();
+			this.windowDash.set_scale(1, 1);
+			this.windowDash.previewedAppIcon = appIcon;
 
 			let windows = appIcon.windows;
 
 			let monitorRect = global.display.get_monitor_geometry(windows[0].get_monitor()); 
 			let size = Math.round(200 * monitorRect.height / 1000); // might need a more consistent way to get a good button size
 
-			let posX = 0;
-			// create previews
-			for (let i = 0; i < windows.length; i++) {
-				let preview = new WindowPreview(windows[i], appIcon, i, size);
-				this.windowPreviewBg.add_child(preview);
+			// create window previews
+			for (let idx = 0, posX = 0; idx < windows.length; idx++) {
+				let preview = new TilingWindowPreview(windows[idx], idx, size);
+				this.windowDash.add_child(preview);
 				preview.set_position(posX, 0);
 				posX += preview.width;
 			}
 			
 			// 30 = margin from stylesheet
-			this.windowPreviewBg.set_size(windows.length * (size + 30), size + 30);
+			this.windowDash.set_size(windows.length * (size + 30), size + 30);
 
 			// animate opening
-			let finalWidth = this.windowPreviewBg.width;
-			let finalHeight = this.windowPreviewBg.height;
-			let finalScale = (finalWidth > monitorRect.width * .95) ? monitorRect.width * .95 / finalWidth : 1;
-			let finalX = appIcon.get_transformed_position()[0] + appIcon.width / 2 - this.windowPreviewBg.width / 2;
-			let finalY = this.bgGrid.y + ((appIcon.arrowIsAbove) ? - 20 - finalHeight : this.bgGrid.height + 20);
+			let finalWidth = this.windowDash.width;
+			let finalHeight = this.windowDash.height;
+			let finalScale = (finalWidth > monitorRect.width * .95) ? monitorRect.width * .95 / finalWidth : 1; // scale to fit screen if its too big
+			let finalX = appIcon.get_transformed_position()[0] + appIcon.width / 2 - this.windowDash.width / 2;
+			let finalY = this.dashBG.y + ((appIcon.arrowIsAbove) ? - 20 - finalHeight : this.dashBG.height + 20);
 
 			if (finalX + finalWidth > monitorRect.width)
 				finalX = monitorRect.width - 20 - finalWidth;
 			else if (finalX < monitorRect.x)
 				finalX = monitorRect.x + 20;
 
-			this.windowPreviewBg.set_position(appIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + appIcon.width / 2, appIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + appIcon.height / 2);			
-			this.windowPreviewBg.set_scale(0, 0);
-			this.windowPreviewBg.ease({
-				x: (finalScale != 1) ? monitorRect.x + monitorRect.width / 2 - finalWidth / 2 : finalX,
-				y: finalY + ((appIcon.arrowIsAbove) ? 1 : -1) * (finalHeight - finalHeight * finalScale) / 2,
+			this.windowDash.set_position(appIcon.get_transformed_position()[0] - this.windowDash.width / 2 + appIcon.width / 2, appIcon.get_transformed_position()[1] - this.windowDash.height / 2 + appIcon.height / 2);			
+			this.windowDash.set_scale(0, 0);
+			this.windowDash.ease({
+				x: (finalScale != 1) ? monitorRect.x + monitorRect.width / 2 - finalWidth / 2 : finalX, // center to screen if scale < 1 else center around appIcon
+				y: finalY + ((appIcon.arrowIsAbove) ? 1 : -1) * (finalHeight - finalHeight * finalScale) / 2, // position 20 px above or below Dash respecting the finalScale
 				scale_x: finalScale,
 				scale_y: finalScale,
 				width: finalWidth,
@@ -1428,17 +1398,18 @@ var OpenWindowsDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
-			this.windowPreviewBg.get_child_at_index(0).grab_key_focus();
+			this.windowDash.get_child_at_index(0).grab_key_focus();
 		}
 
 		closeWindowPreview() {
-			let currAppIcon = this.windowPreviewBg.currPreviewedAppIcon;
-			this.windowPreviewBg.currPreviewedAppIcon = null;
+			let currAppIcon = this.windowDash.previewedAppIcon;
 			currAppIcon.grab_key_focus();
+			this.windowDash.previewedAppIcon = null;
 
-			let finalX = currAppIcon.get_transformed_position()[0] - this.windowPreviewBg.width / 2 + currAppIcon.width / 2;
-			let finalY = currAppIcon.get_transformed_position()[1] - this.windowPreviewBg.height / 2 + currAppIcon.height / 2
-			this.windowPreviewBg.ease({
+			// scale in to the appIcon
+			let finalX = currAppIcon.get_transformed_position()[0] - this.windowDash.width / 2 + currAppIcon.width / 2;
+			let finalY = currAppIcon.get_transformed_position()[1] - this.windowDash.height / 2 + currAppIcon.height / 2
+			this.windowDash.ease({
 				x: finalX,
 				y: finalY,
 				scale_x: 0,
@@ -1446,7 +1417,7 @@ var OpenWindowsDash = GObject.registerClass(
 				opacity: 0,
 				duration: 250,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.windowPreviewBg.hide()
+				onComplete: () => this.windowDash.hide()
 			});
 		}
 	}
@@ -1454,14 +1425,14 @@ var OpenWindowsDash = GObject.registerClass(
 
 // pretty much copied from windowManager.js
 // only moved the position in the window group above the dragged window because otherwise quarter-sized previews arent visible
-var MyTilePreview = GObject.registerClass(
-	class MyTilePreview extends St.Widget {
+var TilingTilePreview = GObject.registerClass(
+	class TilingTilePreview extends St.Widget {
 		_init() {
 			super._init();
 			global.window_group.add_actor(this);
 
-			this._reset();
-			this._showing = false;
+			this.reset();
+			this.showing = false;
 		}
 
 		open(window, tileRect, monitorIndex) {
@@ -1471,20 +1442,28 @@ var MyTilePreview = GObject.registerClass(
 
 			global.window_group.set_child_above_sibling(this, windowActor);
 
-			if (this._rect && this._rect.equal(tileRect))
+			if (this.rect && this.rect.equal(tileRect))
 				return;
 
-			let changeMonitor = this._monitorIndex == -1 ||
-								 this._monitorIndex != monitorIndex;
+			let changeMonitor = this.monitorIndex == -1 ||
+								 this.monitorIndex != monitorIndex;
 
-			this._monitorIndex = monitorIndex;
-			this._rect = tileRect;
+			this.monitorIndex = monitorIndex;
+			this.rect = tileRect;
 
 			let monitor = main.layoutManager.monitors[monitorIndex];
 
-			this._updateStyle(monitor);
+			// update style class
+			let styles = ['tile-preview'];
+			if (this.monitorIndex == main.layoutManager.primaryIndex)
+				styles.push('on-primary');
+			if (this.rect.x == monitor.x)
+				styles.push('tile-preview-left');
+			if (this.rect.x + this.rect.width == monitor.x + monitor.width)
+				styles.push('tile-preview-right');
+			this.style_class = styles.join(' ');
 
-			if (!this._showing || changeMonitor) {
+			if (!this.showing || changeMonitor) {
 				let monitorRect = new Meta.Rectangle({	x: monitor.x,
 														y: monitor.y,
 														width: monitor.width,
@@ -1495,7 +1474,7 @@ var MyTilePreview = GObject.registerClass(
 				this.opacity = 0;
 			}
 
-			this._showing = true;
+			this.showing = true;
 			this.show();
 			this.ease({
 				x: tileRect.x,
@@ -1509,41 +1488,30 @@ var MyTilePreview = GObject.registerClass(
 		}
 
 		close() {
-			if (!this._showing)
+			if (!this.showing)
 				return;
 
-			this._showing = false;
+			this.showing = false;
 			this.ease({
 				opacity: 0,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-				onComplete: () => this._reset(),
+				onComplete: () => this.reset(),
 			});
 		}
 
-		_reset() {
+		reset() {
 			this.hide();
-			this._rect = null;
-			this._monitorIndex = -1;
+			this.rect = null;
+			this.monitorIndex = -1;
 		}
-
-		_updateStyle(monitor) {
-			let styles = ['tile-preview'];
-			if (this._monitorIndex == main.layoutManager.primaryIndex)
-				styles.push('on-primary');
-			if (this._rect.x == monitor.x)
-				styles.push('tile-preview-left');
-			if (this._rect.x + this._rect.width == monitor.x + monitor.width)
-				styles.push('tile-preview-right');
-
-			this.style_class = styles.join(' ');
-		}
-	});
+	}
+);
 
 // mostly copied but trimmed from appDisplay.js
-var OpenAppIcon = GObject.registerClass(
-	class OpenAppIcon extends St.Button {
-		_init(app, win, idx, freeScreenRect, moveToMonitorNr, iconParams = {}) {
+var TilingAppIcon = GObject.registerClass(
+	class TilingAppIcon extends St.Button {
+		_init(window, idx, iconParams = {}) {
 			super._init({
 				style_class: 'app-well-app',
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
@@ -1553,30 +1521,42 @@ var OpenAppIcon = GObject.registerClass(
 			});
 
 			this.index = idx;
-			this.window = win;
-			this.app = app;
-			this.freeScreenRect = freeScreenRect;
-			this.moveToMonitorNr = moveToMonitorNr;
+			this.window = window;
 
-			this.iconContainer = new St.Widget({ layout_manager: new Clutter.BinLayout(),
-												  x_expand: true, y_expand: true });
-
+			this.iconContainer = new St.Widget({
+				layout_manager: new Clutter.BinLayout(), 
+				x_expand: true, 
+				y_expand: true
+			});
 			this.set_child(this.iconContainer);
 
-			iconParams['createIcon'] = this._createIcon.bind(this, app, settings.get_int("icon-size"));
+			let winTracker = Shell.WindowTracker.get_default();
+			let app = winTracker.get_window_app(window);
+
+			iconParams['createIcon'] = () => app.create_icon_texture(settings.get_int("icon-size"));
 			iconParams['setSizeManually'] = true;
 			this.icon = new iconGrid.BaseIcon(app.get_name(), iconParams);
 			this.iconContainer.add_child(this.icon);
 			
-			// app has multiple window; ignore focused window
-			let focusedApp;
-			if (global.display.focus_window)
-				focusedApp = Shell.WindowTracker.get_default().get_window_app(global.display.focus_window);
-			let isFocused = (focusedApp == this.app) ? 1 : 0;
-			let hasMultipleWindowsOpen = (this.app.get_n_windows() - isFocused) > 1;
-			if (hasMultipleWindowsOpen) {
-				let workArea = win.get_work_area_current_monitor();
-				this.arrowIsAbove = freeScreenRect.y != workArea.y && freeScreenRect.height != workArea.height;
+			let tmpWindows = app.get_windows();
+			if (tmpWindows.length <= 1)
+				return;
+			
+			// show arrow indicator if app has multiple windows; ignore focused window (i. e. the just-tiled window) if its the same app
+			let activeWS = global.workspace_manager.get_active_workspace();
+			let focusedApp = winTracker.get_window_app(global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse()[0]); // global.display.focus_window isnt reliable
+			this.windows = [];
+
+			for (let i = (focusedApp == app) ? 1 : 0; i < tmpWindows.length; i++) {
+				if (!tmpWindows[i].located_on_workspace(activeWS))
+					break;
+
+				this.windows.push(tmpWindows[i]);
+			}
+
+			if (this.windows.length > 1) {
+				let workArea = window.get_work_area_current_monitor();
+				this.arrowIsAbove = appDash.freeScreenRect.y != workArea.y; // arrow above == true, if free quad is either the bottom left or bottom right quad
 				this.arrowContainer = new St.BoxLayout ({
 					x_expand: true,
 					y_expand: true,
@@ -1592,30 +1572,18 @@ var OpenAppIcon = GObject.registerClass(
 				});
 				arrow.connect('repaint', () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 				this.arrowContainer.add_child(arrow);
-
-				let ws = this.app.get_windows();
-				this.windows = [];
-				for (let i = 0; i < ws.length; i++) {
-					if (!ws[i].located_on_workspace(global.workspace_manager.get_active_workspace()))
-						break;
-
-					this.windows.push(ws[i]);
-				}
-
-				if (isFocused)
-					this.windows.splice(0, 1);
 			}
 
 			this.connect("enter-event", () => {
 				this.isHovered = true;
-				if (openWindowsDash.windowPreviewBg.visible && openWindowsDash.windowPreviewBg.currPreviewedAppIcon != this)
-					openWindowsDash.closeWindowPreview()
+
+				if (appDash.windowDash.visible && appDash.windowDash.previewedAppIcon != this)
+					appDash.closeWindowPreview()
 
 				let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
-					if (this.isHovered && openWindowsDash.isVisible() && openWindowsDash.windowPreviewBg.currPreviewedAppIcon != this)
-						openWindowsDash.openWindowPreview(this);
-	
 					GLib.source_remove(sourceID);
+					if (this.isHovered && appDash.shown && appDash.windowDash.previewedAppIcon != this)
+						appDash.openWindowPreview(this);
 				});
 			});
 
@@ -1624,22 +1592,26 @@ var OpenAppIcon = GObject.registerClass(
 			});
 		}
 
+		hasMultipleWindows() {
+			return (this.arrowContainer) ? true : false;
+		}
+
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					this.get_parent().focusItemAtIndex(this.index + 1, openWindowsDash.getAppCount());
+					appDash.appContainer.focusItemAtIndex(this.index + 1, appDash.getAppCount());
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					this.get_parent().focusItemAtIndex(this.index - 1, openWindowsDash.getAppCount());
+					appDash.appContainer.focusItemAtIndex(this.index - 1, appDash.getAppCount());
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
-					openWindowsDash.openWindowPreview(this);
+					appDash.openWindowPreview(this);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Down:
-					openWindowsDash.openWindowPreview(this);
+					appDash.openWindowPreview(this);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
@@ -1655,14 +1627,10 @@ var OpenAppIcon = GObject.registerClass(
 			}
 
 			// close the Dash on all other key inputs
-			if (openWindowsDash.isVisible())
-				openWindowsDash.close();
+			if (appDash.shown)
+				appDash.close();
 
 			return Clutter.EVENT_PROPAGATE;
-		}
-
-		_createIcon(app, iconSize) {
-			return app.create_icon_texture(iconSize);
 		}
 
 		vfunc_clicked(button) {
@@ -1670,12 +1638,12 @@ var OpenAppIcon = GObject.registerClass(
 		}
 
 		activate() {
-			if (openWindowsDash.isVisible()) {
-				openWindowsDash.close();
+			if (appDash.shown) {
+				appDash.close();
 
 				this.icon.animateZoomOut();
 
-				this.window.move_to_monitor(this.moveToMonitorNr);
+				this.window.move_to_monitor(appDash.monitor);
 				this.window.activate(global.get_current_time());
 
 				let event = Clutter.get_current_event();
@@ -1686,28 +1654,28 @@ var OpenAppIcon = GObject.registerClass(
 
 				if (isAltPressed) {
 					// tile to right if free screen = 2 horizontal quadrants
-					if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
-						this.freeScreenRect.width = workArea.width / 2;
-						this.freeScreenRect.x = workArea.x + workArea.width / 2;
+					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+						appDash.freeScreenRect.width = workArea.width / 2;
+						appDash.freeScreenRect.x = workArea.x + workArea.width / 2;
 					// tile to bottom if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
-						this.freeScreenRect.height = workArea.height / 2;
-						this.freeScreenRect.y = workArea.y + workArea.height / 2;
+					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+						appDash.freeScreenRect.height = workArea.height / 2;
+						appDash.freeScreenRect.y = workArea.y + workArea.height / 2;
 					}
 
 				} else if (isShiftPressed) {
 					// tile to left if free screen = 2 horizontal quadrants
-					if (equalApprox(this.freeScreenRect.width, workArea.width, 2)) {
-						this.freeScreenRect.width = workArea.width / 2;
-						this.freeScreenRect.x = workArea.x;
+					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+						appDash.freeScreenRect.width = workArea.width / 2;
+						appDash.freeScreenRect.x = workArea.x;
 					// tile to top if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.freeScreenRect.height, workArea.height, 2)) {
-						this.freeScreenRect.height = workArea.height / 2;
-						this.freeScreenRect.y = workArea.y;
+					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+						appDash.freeScreenRect.height = workArea.height / 2;
+						appDash.freeScreenRect.y = workArea.y;
 					}
 				}
 
-				tileWindow(this.window, this.freeScreenRect);
+				tileWindow(this.window, appDash.freeScreenRect);
 			}
 		}
 	}
@@ -1715,18 +1683,17 @@ var OpenAppIcon = GObject.registerClass(
 
 // copied and trimmed from altTab.WindowIcon
 // changed from St.BoxLayout to St.Button
-var WindowPreview = GObject.registerClass(
-	class WindowPreview extends St.Button {
-		_init(win, appIcon, index, fullSize) {
+var TilingWindowPreview = GObject.registerClass(
+	class TilingWindowPreview extends St.Button {
+		_init(window, index, fullSize) {
 			super._init({
-				style_class: 'tiling-unfocused',
+				style_class: 'tiling-window-unfocused',
 				reactive: true,
 				button_mask: St.ButtonMask.ONE | St.ButtonMask.TWO,
 				can_focus: true,
 			});
 
-			this.window = win;
-			this.appIcon = appIcon;
+			this.window = window;
 			this.index = index;
 
 			this.iconContainer = new St.Widget({ 
@@ -1738,17 +1705,17 @@ var WindowPreview = GObject.registerClass(
 			});
 			this.set_child(this.iconContainer);
 
-			this.icon = altTab._createWindowClone(win.get_compositor_private(), fullSize - 20 * openWindowsDash.monitorScale); // 20 = small gap from preview size to actual window preview
+			this.icon = altTab._createWindowClone(window.get_compositor_private(), fullSize - 20); // 20 = small gap from preview size to actual window preview
 			this.iconContainer.add_child(this.icon);
 
 			this.connect("enter-event", () => {
-				if (this.get_style_class_name() != "tiling-focused")
-					this.set_style_class_name('tiling-hovered');
+				if (this.get_style_class_name() != "tiling-window-focused")
+					this.set_style_class_name('tiling-window-hovered');
 			});
 
 			this.connect("leave-event", () => {
-				if (this.get_style_class_name() != "tiling-focused")
-					this.set_style_class_name('tiling-unfocused');
+				if (this.get_style_class_name() != "tiling-window-focused")
+					this.set_style_class_name('tiling-window-unfocused');
 			});
 		}
 
@@ -1757,28 +1724,28 @@ var WindowPreview = GObject.registerClass(
 		}
 
 		vfunc_key_focus_in() {
-			if (this.get_parent().currFocusedPreview)
-				this.get_parent().currFocusedPreview.set_style_class_name("tiling-unfocused");
-			this.get_parent().currFocusedPreview = this;
-			this.set_style_class_name('tiling-focused');
+			if (appDash.windowDash.focusedWindow)
+				appDash.windowDash.focusedWindow.set_style_class_name("tiling-window-unfocused");
+			appDash.windowDash.focusedWindow = this;
+			this.set_style_class_name('tiling-window-focused');
 		}
 
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					this.get_parent().focusItemAtIndex(this.index + 1, this.appIcon.windows.length);
+					appDash.windowDash.focusItemAtIndex(this.index + 1, appDash.windowDash.previewedAppIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					this.get_parent().focusItemAtIndex(this.index - 1, this.appIcon.windows.length);
+					appDash.windowDash.focusItemAtIndex(this.index - 1, appDash.windowDash.previewedAppIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
-					openWindowsDash.closeWindowPreview();
+					appDash.closeWindowPreview();
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Down:
-					openWindowsDash.closeWindowPreview();
+					appDash.closeWindowPreview();
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
@@ -1794,17 +1761,17 @@ var WindowPreview = GObject.registerClass(
 			}
 
 			// close the Dash on all other key inputs
-			if (openWindowsDash.isVisible())
-				openWindowsDash.close();
+			if (appDash.shown)
+				appDash.close();
 
 			return Clutter.EVENT_PROPAGATE;
 		}
 
 		activate() {
-			if (openWindowsDash.isVisible()) {
-				openWindowsDash.close();
+			if (appDash.shown) {
+				appDash.close();
 
-				this.window.move_to_monitor(this.appIcon.moveToMonitorNr);
+				this.window.move_to_monitor(appDash.monitor);
 				this.window.activate(global.get_current_time());
 
 				let event = Clutter.get_current_event();
@@ -1815,28 +1782,28 @@ var WindowPreview = GObject.registerClass(
 
 				if (isAltPressed) {
 					// tile to right if free screen = 2 horizontal quadrants
-					if (equalApprox(this.appIcon.freeScreenRect.width, workArea.width, 2)) {
-						this.appIcon.freeScreenRect.width = workArea.width / 2;
-						this.appIcon.freeScreenRect.x = workArea.x + workArea.width / 2;
+					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+						appDash.freeScreenRect.width = workArea.width / 2;
+						appDash.freeScreenRect.x = workArea.x + workArea.width / 2;
 					// tile to bottom if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.appIcon.freeScreenRect.height, workArea.height, 2)) {
-						this.appIcon.freeScreenRect.height = workArea.height / 2;
-						this.appIcon.freeScreenRect.y = workArea.y + workArea.height / 2;
+					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+						appDash.freeScreenRect.height = workArea.height / 2;
+						appDash.freeScreenRect.y = workArea.y + workArea.height / 2;
 					}
 
 				} else if (isShiftPressed) {
 					// tile to left if free screen = 2 horizontal quadrants
-					if (equalApprox(this.appIcon.freeScreenRect.width, workArea.width, 2)) {
-						this.appIcon.freeScreenRect.width = workArea.width / 2;
-						this.appIcon.freeScreenRect.x = workArea.x;
+					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+						appDash.freeScreenRect.width = workArea.width / 2;
+						appDash.freeScreenRect.x = workArea.x;
 					// tile to top if free screen = 2 vertical quadrants
-					} else if (equalApprox(this.appIcon.freeScreenRect.height, workArea.height, 2)) {
-						this.appIcon.freeScreenRect.height = workArea.height / 2;
-						this.appIcon.freeScreenRect.y = workArea.y;
+					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+						appDash.freeScreenRect.height = workArea.height / 2;
+						appDash.freeScreenRect.y = workArea.y;
 					}
 				}
 
-				tileWindow(this.window, this.appIcon.freeScreenRect);
+				tileWindow(this.window, appDash.freeScreenRect);
 			}
 		}
  	}
