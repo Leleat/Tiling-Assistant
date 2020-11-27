@@ -54,6 +54,10 @@ function enable() {
 	// change appDisplay.AppIcon.activate function
 	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
 	appDisplay.AppIcon.prototype.activate = newAppActivate;
+
+	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
+	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
+	main.panel._getDraggableWindowForPosition = newGetDraggableWindowForPosition;
 };
 
 function disable() {
@@ -78,6 +82,7 @@ function disable() {
 
 	// restore old function
 	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
+	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	settings.run_dispose();
 	settings = null;
@@ -115,6 +120,24 @@ function newAppActivate(button) {
 	}
 
 	main.overview.hide();
+};
+
+// allow the DND of quartered windows (which touch the panel) from the panel
+function newGetDraggableWindowForPosition(stageX) {
+	let workspaceManager = global.workspace_manager;
+	const windows = workspaceManager.get_active_workspace().list_windows();
+	const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
+
+	return allWindowsByStacking.find(metaWindow => {
+		let rect = metaWindow.get_frame_rect();
+		let workArea = metaWindow.get_work_area_current_monitor();
+
+		return metaWindow.is_on_primary_monitor() &&
+			metaWindow.showing_on_its_workspace() &&
+			metaWindow.get_window_type() != Meta.WindowType.DESKTOP &&
+			(metaWindow.maximized_vertically || (metaWindow in tiledWindows && rect.y == workArea.y)) &&
+			stageX > rect.x && stageX < rect.x + rect.width;
+	});
 };
 
 // to tile a window after it has been created via holding alt/shift on an icon
