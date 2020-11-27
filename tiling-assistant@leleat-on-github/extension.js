@@ -1565,14 +1565,27 @@ var TilingAppIcon = GObject.registerClass(
 			if (tmpWindows.length <= 1)
 				return;
 			
-			// show arrow indicator if app has multiple windows; ignore focused window (i. e. the just-tiled window) if its the same app
+			// show arrow indicator if app has multiple windows; ignore the focused window (i. e. the just-tiled window) if its the same app
 			let activeWS = global.workspace_manager.get_active_workspace();
-			let focusedApp = winTracker.get_window_app(global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse()[0]); // global.display.focus_window isnt reliable
+			let tiledWindow = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse()[0];
 			this.windows = [];
 
-			for (let i = (focusedApp == app) ? 1 : 0; i < tmpWindows.length; i++) {
+			for (let i = 0; i < tmpWindows.length; i++) {
 				if (!tmpWindows[i].located_on_workspace(activeWS))
 					break;
+
+				// dont add the windows to the preview, if they are part of the current tileGroup
+				if (tiledWindow.tileGroup) {
+					let _continue = false;
+					for (let pos in tiledWindow.tileGroup)
+						if (tiledWindow.tileGroup[pos] == tmpWindows[i]) {
+							_continue = true;
+							break;
+						}
+
+					if (_continue)
+						continue;
+				}
 
 				this.windows.push(tmpWindows[i]);
 			}
