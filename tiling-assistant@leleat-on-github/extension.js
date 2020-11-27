@@ -41,7 +41,7 @@ function enable() {
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
 
 	// tiling keybindings
-	this.keyBindings = ["tile-top-half", "tile-right-half", "tile-left-half", "tile-bottom-half", "tile-topleft-quarter", "tile-topright-quarter", "tile-bottomleft-quarter", "tile-bottomright-quarter"];
+	this.keyBindings = ["tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter"];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(
 			key,
@@ -675,7 +675,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		case Meta.GrabOp.MOVING:
 			let [x, y] = global.get_pointer();
 
-			// if the grab started in the topbar 
+			// if the grab started in the topbar
 			// start the grab for tiled windows after leaving the topbar
 			// else start the grab after moving a small distance
 			if (!startGrab && grabbedWindow in tiledWindows) {
@@ -1588,7 +1588,7 @@ var OpenAppIcon = GObject.registerClass(
 				let arrow = new St.DrawingArea({ 
 					width: 8,
 					height: 4,
-					style: (this.arrowIsAbove) ? 'margin-top: 3px' : 'margin-bottom: 3px'
+					style: (this.arrowIsAbove) ? 'margin-top: 2px' : 'margin-bottom: 2px'
 				});
 				arrow.connect('repaint', () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 				this.arrowContainer.add_child(arrow);

@@ -8,37 +8,13 @@
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkListStore" id="bottom-half-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="bottom-left-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="bottom-right-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
   <object class="GtkAdjustment" id="iconSize">
     <property name="upper">200</property>
     <property name="value">75</property>
     <property name="step-increment">1</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkListStore" id="left-liststore">
+  <object class="GtkListStore" id="tile-bottom-half-liststore">
     <columns>
       <!-- column-name key -->
       <column type="gint"/>
@@ -46,15 +22,7 @@
       <column type="gint"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="right-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name gint1 -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="top-half-liststore">
+  <object class="GtkListStore" id="tile-bottomleft-quarter-liststore">
     <columns>
       <!-- column-name key -->
       <column type="gint"/>
@@ -62,7 +30,7 @@
       <column type="gint"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="top-left-liststore">
+  <object class="GtkListStore" id="tile-bottomright-quarter-liststore">
     <columns>
       <!-- column-name key -->
       <column type="gint"/>
@@ -70,7 +38,39 @@
       <column type="gint"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="top-right-liststore">
+  <object class="GtkListStore" id="tile-left-half-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="tile-right-half-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="tile-top-half-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="tile-topleft-quarter-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
+  <object class="GtkListStore" id="tile-topright-quarter-liststore">
     <columns>
       <!-- column-name key -->
       <column type="gint"/>
@@ -318,7 +318,7 @@
                     <property name="can-focus">False</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">top-half-liststore</property>
+                    <property name="model">tile-top-half-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="activate-on-single-click">True</property>
@@ -370,7 +370,7 @@
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">bottom-half-liststore</property>
+                    <property name="model">tile-bottom-half-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -418,12 +418,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-top-left-treeview">
+                  <object class="GtkTreeView" id="tile-topleft-quarter-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">top-left-liststore</property>
+                    <property name="model">tile-topleft-quarter-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -471,12 +471,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-top-right-treeview">
+                  <object class="GtkTreeView" id="tile-topright-quarter-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">top-right-liststore</property>
+                    <property name="model">tile-topright-quarter-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -524,12 +524,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-bottom-left-treeview">
+                  <object class="GtkTreeView" id="tile-bottomleft-quarter-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">bottom-left-liststore</property>
+                    <property name="model">tile-bottomleft-quarter-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -577,12 +577,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-bottom-right-treeview">
+                  <object class="GtkTreeView" id="tile-bottomright-quarter-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">bottom-right-liststore</property>
+                    <property name="model">tile-bottomright-quarter-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -631,12 +631,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-right-treeview">
+                  <object class="GtkTreeView" id="tile-right-half-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">right-liststore</property>
+                    <property name="model">tile-right-half-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
@@ -685,12 +685,12 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkTreeView" id="tile-left-treeview">
+                  <object class="GtkTreeView" id="tile-left-half-treeview">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="model">left-liststore</property>
+                    <property name="model">tile-left-half-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>
