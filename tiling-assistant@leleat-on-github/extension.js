@@ -366,9 +366,20 @@ function getTileGroup(openWindows, tiledWindow = null) {
 		let [, wRectOnMonitor] = monitorRect.intersect(wRect);
 		let workArea = window.get_work_area_current_monitor();
 
-		// the just-tiled window completly overlaps the window's rect
-		if (tiledWindow && tiledWindow != window && tiledWindow.get_frame_rect().contains_rect(wRectOnMonitor))
-			return null;
+		// called via openDash because a window was just tiled
+		if (tiledWindow) {
+			if (tiledWindow.get_monitor() != window.get_monitor())
+				return null;
+
+			// the just-tiled window completly overlaps the window's rect
+			if (tiledWindow != window && tiledWindow.get_frame_rect().contains_rect(wRectOnMonitor))
+				return null;
+		
+		// via DND of a window
+		} else {
+			if (global.display.get_current_monitor() != window.get_monitor())
+				return null;
+		}
 
 		if (!(window.get_id() in tiledWindows)) {
 			// window's rect doesnt overlap with tiled windows (except the one which was just tiled)
@@ -939,7 +950,8 @@ function onWindowMoving(window, grabStartPos) {
 		return;
 	}
 
-	let workArea = window.get_work_area_current_monitor();
+	let monitorNr = global.display.get_current_monitor();
+	let workArea = window.get_work_area_for_monitor(monitorNr);
 	let wRect = window.get_frame_rect();
 
 	let onTop = wRect.y < main.panel.height + 15; // mouseY alone is unreliable, so windowRect's y will also be used
@@ -961,28 +973,28 @@ function onWindowMoving(window, grabStartPos) {
 
 	// prioritize quarter over other tiling
 	if (tileTopLeftQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea), monitorNr);
 
 	} else if (tileTopRightQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea), monitorNr);
 
 	} else if (tileBottomLeftQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea), monitorNr);
 
 	} else if (tileBottomRightQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea), monitorNr);
 
 	} else if (tileRightHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.RIGHT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.RIGHT, workArea), monitorNr);
 
 	} else if (tileLeftHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.LEFT, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.LEFT, workArea), monitorNr);
 
 	} else if (tileTopHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.TOP, workArea), monitorNr);
 
 	} else if (tileBottomHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM, workArea), window.get_monitor());
+		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM, workArea), monitorNr);
 
 	} else if (tileMaximized) {
 		tilePreview.open(window, new Meta.Rectangle({
@@ -990,7 +1002,7 @@ function onWindowMoving(window, grabStartPos) {
 			y: workArea.y,
 			width: workArea.width,
 			height: workArea.height,
-		}), window.get_monitor());
+		}), monitorNr);
 
 	} else {
 		tilePreview.close();
