@@ -1,5 +1,5 @@
 const Lang = imports.lang;
-const {main, iconGrid, appDisplay, panel, altTab, switcherPopup} = imports.ui;
+const {main, iconGrid, appDisplay, panel, altTab, switcherPopup, windowManager} = imports.ui;
 const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 
@@ -190,7 +190,7 @@ function tileWindow(window, newRect) {
 
 	let onlyMove = oldRect.width == newRect.width && oldRect.height == newRect.height;
 	if (settings.get_boolean("use-anim")) {
-		if (onlyMove) {// custom anim because they dont exist
+		if (onlyMove) { // custom anim because they dont exist
 			let actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
 			let clone = new St.Widget({
 				content: actorContent,
@@ -207,7 +207,7 @@ function tileWindow(window, newRect) {
 				y: newRect.y,
 				width: newRect.width,
 				height: newRect.height,
-				duration: 200,
+				duration: windowManager.WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 				onComplete: () => {
 					wActor.show();
@@ -225,14 +225,10 @@ function tileWindow(window, newRect) {
 	
 	if (!(newRect.height == workArea.height && newRect.width == workArea.width)) // if not maximized both
 		window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
-
-	window.focus(global.get_current_time());
-	
-	openDash(window);
 	
 	let sourceID = 0;
 	if (settings.get_boolean("use-anim") && !(newRect.height == workArea.height && newRect.width == workArea.width)) {
-		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => { // wait for anim to be done
+		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, windowManager.WINDOW_ANIMATION_TIME, () => { // wait for anim to be done
 			GLib.source_remove(sourceID);
 
 			if (newRect.height >= workArea.height - 2)
@@ -252,6 +248,8 @@ function tileWindow(window, newRect) {
 		else if (newRect.width >= workArea.width - 2)
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
+
+	openDash(window);
 };
 
 function onMyTilingShortcutPressed(shortcutName) {
@@ -495,7 +493,7 @@ function openDash(tiledWindow) {
 			w.connect("focus", () => {
 				for (let pos in w.tileGroup) {
 					let window = w.tileGroup[pos];
-					if (window.get_id() in tiledWindows && window.get_maximized() != Meta.MaximizeFlags.BOTH)
+					if (window && window.get_id() in tiledWindows && window.get_maximized() != Meta.MaximizeFlags.BOTH)
 						window.raise();
 				}
 
@@ -1237,10 +1235,9 @@ var TilingAppDash = GObject.registerClass(
 				x: finalX,
 				y: finalY,
 				opacity: 255,
-				duration: 200,
+				duration: windowManager.WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				// while the first icon already grabbed the focus before; some apps seem to grab the focus away again (especially when opening an app in a tiled state). So regrab it after the anim
-				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus()
+				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus() // when opening window tiled, that will grab focus away; so regrab it after opening anim; need a better way
 			});
 
 			// setup shadeBG
@@ -1270,7 +1267,7 @@ var TilingAppDash = GObject.registerClass(
 			this.shadeBG.show();
 			this.shadeBG.ease({
 				opacity: 180,
-				duration: 200,
+				duration: windowManager.WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
@@ -1289,7 +1286,7 @@ var TilingAppDash = GObject.registerClass(
 				x: finalX,
 				y: finalY,
 				opacity: 0,
-				duration: 200,
+				duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => this.dashBG.hide()
 			});
@@ -1300,14 +1297,14 @@ var TilingAppDash = GObject.registerClass(
 				x: finalX2,
 				y: finalY2,
 				opacity: 0,
-				duration: 200,
+				duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => this.windowDash.hide()
 			});
 
 			this.shadeBG.ease({
 				opacity: 0,
-				duration: 200,
+				duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => {
 					this.shadeBG.hide();
@@ -1569,6 +1566,7 @@ var TilingAppIcon = GObject.registerClass(
 				arrow.connect('repaint', () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 				this.arrowContainer.add_child(arrow);
 			}
+
 
 			this.connect("enter-event", () => {
 				this.isHovered = true;
