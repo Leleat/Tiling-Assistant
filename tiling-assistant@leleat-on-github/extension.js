@@ -249,7 +249,12 @@ function tileWindow(window, newRect) {
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
 
-	openDash(window);
+	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)
+	// seems to also improve Wayland usage... at least in a VM
+	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+		GLib.source_remove(sID);
+		openDash(window);
+	});
 };
 
 function onMyTilingShortcutPressed(shortcutName) {
@@ -1252,7 +1257,7 @@ var TilingAppDash = GObject.registerClass(
 
 			// setup shadeBG
 			this.windowClones = [];
-			for (let pos in tiledWindow.tileGroup) {
+			for (let pos in tiledWindow.tileGroup)
 				if (tiledWindow.tileGroup[pos]) {
 					if (tiledWindow.tileGroup[pos] == tiledWindow)
 						continue;
@@ -1267,12 +1272,11 @@ var TilingAppDash = GObject.registerClass(
 					main.uiGroup.add_child(clone);
 					this.windowClones.push(clone);
 				}
-			}
+				
 			let windowActor = tiledWindow.get_compositor_private();
 			if (windowActor)
 				global.window_group.set_child_below_sibling(this.shadeBG, windowActor);
 
-			//this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
 			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
 			this.shadeBG.show();
 			this.shadeBG.ease({
