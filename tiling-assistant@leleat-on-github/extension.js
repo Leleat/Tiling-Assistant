@@ -496,32 +496,30 @@ function openDash(tiledWindow) {
 	// remove a quad for each window in currTileGroup
 	let freeQuadCount = 4;
 	for (let pos in currTileGroup) {
-		if (currTileGroup[pos] != null) {
-			// focus tiled windows in a group
-			let w = currTileGroup[pos];
-			let wActor = w.get_compositor_private();
-			w.tileGroup = currTileGroup;
-			w.connect("focus", () => {
-				for (let pos in w.tileGroup) {
-					let window = w.tileGroup[pos];
-					if (window && window.get_id() in tiledWindows && window.get_maximized() != Meta.MaximizeFlags.BOTH)
-						window.raise();
+		if (currTileGroup[pos] == null)
+			continue;
+		
+		// focus tiled windows in a group
+		let w = currTileGroup[pos];
+		w.tileGroup = currTileGroup;
+		w.connect("focus", () => {
+			for (let pos in w.tileGroup) {
+				let window = w.tileGroup[pos];
+				if (window && window.get_id() in tiledWindows) {
+					window.tileGroup = w.tileGroup; // update the tileGroup with the current tileGroup
+					window.raise();
 				}
+			}
 
-				w.raise();
-			});
-			wActor.connect("destroy", () => {
-				if (w.tileGroup)
-					w.tileGroup[pos] = null;
-			});
+			w.raise();
+		});
 
-			// remove the tiled windows from openWindows to populate the Dash
-			let idx = openWindows.indexOf(currTileGroup[pos]);
-			if (idx != -1)
-				openWindows.splice(idx, 1);
+		// remove the tiled windows from openWindows to populate the Dash
+		let idx = openWindows.indexOf(currTileGroup[pos]);
+		if (idx != -1)
+			openWindows.splice(idx, 1);
 
-			freeQuadCount--;
-		}
+		freeQuadCount--;
 	}
 
 	if (freeQuadCount == 0 || freeQuadCount == 3)
