@@ -1254,7 +1254,7 @@ var TilingAppDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus() // when opening window tiled, that will grab focus away; so regrab it after opening anim; need a better way
 			});
-
+			
 			// setup shadeBG
 			this.windowClones = [];
 			for (let pos in tiledWindow.tileGroup)
@@ -1272,7 +1272,7 @@ var TilingAppDash = GObject.registerClass(
 					main.uiGroup.add_child(clone);
 					this.windowClones.push(clone);
 				}
-				
+			
 			let windowActor = tiledWindow.get_compositor_private();
 			if (windowActor)
 				global.window_group.set_child_below_sibling(this.shadeBG, windowActor);
@@ -1293,6 +1293,11 @@ var TilingAppDash = GObject.registerClass(
 		close() {
 			this.shown = false;
 			this.mouseCatcher.hide();
+
+			this.windowClones.forEach(clone => {
+				clone.source.show();
+				clone.destroy();
+			});
 
 			let finalX = this.dashBG.x + 200 * this.animationDir.x;
 			let finalY = this.dashBG.y + 200 * this.animationDir.y;
@@ -1322,10 +1327,6 @@ var TilingAppDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => {
 					this.shadeBG.hide();
-					this.windowClones.forEach(clone => {
-						clone.source.show();
-						clone.destroy();
-					});
 				}
 			});
 		}
