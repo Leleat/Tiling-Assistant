@@ -4,6 +4,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 ## Supported GNOME versions
 
+- 3.36
 - 3.38
 
 Development started on GNOME 3.36. But as of November 2020 all development happens on 3.38. While it may (and I think it still should) work on 3.36, I can't test it.
@@ -25,6 +26,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 - You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock).
 
 - Raise/focus tiled windows as a group.
+
+- Resize tiled windows in a group (horizontal and vertical only)
 
 ![Preview](preview.gif)
 
