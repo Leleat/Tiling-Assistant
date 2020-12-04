@@ -216,7 +216,6 @@ function tileWindow(window, newRect) {
 			});
 
 		} else if (wasMaximized) {
-			// TODO need animation
 			
 		} else {
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, 0);
@@ -345,137 +344,98 @@ function onMyTilingShortcutPressed(shortcutName) {
 	}
 };
 
-// get the top most tiled windows which are in a group (looped through window list by stack order).
-// break if a non-tiled window is encountered (with some exceptions)
-// optionally ignore the focused window (needed for DND since the grabbed window isnt tiled yet)
-function getTileGroup(openWindows, tiledWindow = null) {
-	// first start with an empty tile group
-	// if a quad is null, that means that that space is free screen space
-	let currTileGroup = {
-		TOP_LEFT: null,
-		TOP_RIGHT: null,
-		BOTTOM_LEFT: null,
-		BOTTOM_RIGHT: null
-	};
+// get the top most tiled windows which are in a group (looped through window list by stack order: top -> bottom)
+function getTileGroup(openWindows, DNDing = false) {
+	// maximization state is checked via their size rather than via get_maximized()
+	// because tileWindow() will delay the maximize(), if animations are enabled
 
-	// this functions removes at least one empty quad from currTileGroup, if "window" is tiled
-	// it also returns wether "window" is part of the currTileGroup
-	// "window" isnt part of the currTileGroup, if a window in a higher stack order already occupied that quad,
-	// if "window" isnt tiled or if "window" is maximized
-	let wIsInTileGroup = function(currTileGroup, window) {
-		if (window.get_maximized() == Meta.MaximizeFlags.BOTH)
-			return false;
-	
-		let wRect = window.get_frame_rect();
-		let monitorRect = global.display.get_monitor_geometry(window.get_monitor());
-		let [, wRectOnMonitor] = monitorRect.intersect(wRect);
-		let workArea = window.get_work_area_current_monitor();
+	let groupedWindows = []; // tiled windows which are considered in a group
+	let notGroupedWindows = []; // normal and tiled windows which appear between grouped windows in the stack order
 
-		// called via openDash because a window was just tiled
-		if (tiledWindow) {
-			if (tiledWindow.get_monitor() != window.get_monitor())
-				return null;
+	for (let i = (DNDing) ? 1 : 0; i < openWindows.length; i++) { // ignore the topmost window if DNDing
+		let window = openWindows[i];
 
-			// the just-tiled window completly overlaps the window's rect
-			if (tiledWindow != window && tiledWindow.get_frame_rect().contains_rect(wRectOnMonitor))
-				return null;
-		
-		// via DND of a window
-		} else {
-			if (global.display.get_current_monitor() != window.get_monitor())
-				return null;
-		}
-
-		if (!(window.get_id() in tiledWindows)) {
-			// window's rect doesnt overlap with tiled windows (except the one which was just tiled)
-			for (let wID in tiledWindows) {
-				let tw = tiledWindows[wID].win;
-				if (tiledWindow && tw.get_frame_rect().overlap(tiledWindow.get_frame_rect()))
-					continue;
-
-				if (tw != tiledWindow && !tw.get_frame_rect().overlap(wRectOnMonitor))
-					return null;
-			}
-
-			return false;
-		}
-
-		// maximization state is checked via their size rather than via get_maximized()
-		// because tileWindow() will delay the maximize(), if animations are enabled
-	
-		// top left window
-		if (wRect.x == workArea.x && wRect.y == workArea.y) {
-			if (currTileGroup.TOP_LEFT)
-				return false;
-				 
-			if (wRect.height == workArea.height) {
-				if (currTileGroup.BOTTOM_LEFT)
-					return false;
-	
-				currTileGroup.BOTTOM_LEFT = window;
-	
-			} else if (wRect.width == workArea.width) {
-				if (currTileGroup.TOP_RIGHT)
-					return false;
-	
-				currTileGroup.TOP_RIGHT = window;
-			}
-	
-			currTileGroup.TOP_LEFT = window;
-			return true;
-		
-		// top right window
-		} else if (wRect.x != workArea.x && wRect.y == workArea.y) {
-			if (currTileGroup.TOP_RIGHT)
-				return false;
-	
-			if (wRect.height == workArea.height) {
-				if (currTileGroup.BOTTOM_RIGHT)
-					return false;
-	
-				currTileGroup.BOTTOM_RIGHT = window;
-			}
-	
-			currTileGroup.TOP_RIGHT = window;
-			return true;
-	
-		// bottom left window
-		} else if (wRect.x == workArea.x && wRect.y != workArea.y) {
-			if (currTileGroup.BOTTOM_LEFT)
-				return false;
-	
-			if (wRect.width == workArea.width) {
-				if (currTileGroup.BOTTOM_RIGHT)
-					return false;
-	
-				currTileGroup.BOTTOM_RIGHT = window;
-			}
-	
-			currTileGroup.BOTTOM_LEFT = window;
-			return true;
-	
-		// bottom right window
-		} else if (wRect.x != workArea.x && wRect.y != workArea.y) {
-			if (currTileGroup.BOTTOM_RIGHT)
-				return false;
-	
-			currTileGroup.BOTTOM_RIGHT = window;
-			return true;
-		}
-	
-		return false;
-	};
-
-	for (let i = ((tiledWindow == null) ? 1 : 0); i < openWindows.length; i++) { // tiledWindow == null => this func was called during DND/shortcut press, so topmost window isnt tiled yet
-		let windowIsInTileGroup = wIsInTileGroup(currTileGroup, openWindows[i]);
-
-		// stop if the window isnt tiled; null are some exceptions
-		if (windowIsInTileGroup == null)
+		if (window.get_monitor() != ((DNDing) ? global.display.get_current_monitor() : openWindows[0].get_monitor()))
 			continue;
 
-		else if (windowIsInTileGroup == false)
-			break;
+		if (window.get_id() in tiledWindows) {
+			let workArea = window.get_work_area_current_monitor();
+			let wRect = window.get_frame_rect();
+			if (wRect.width == workArea.width && wRect.height == workArea.height)
+				break;
+
+			let notInGroup = false;
+
+			// if a non-tiled window overlaps the currently tested tiled window, 
+			// the currently tested tiled window isnt part of the topmost tile group
+			for (let j = 0; j < notGroupedWindows.length; j++)
+				if (notGroupedWindows[j].get_frame_rect().overlap(window.get_frame_rect())) {
+					notInGroup = true;
+					break;
+				}
+
+			if (!notInGroup)
+				// same for for tiled windows which are overlapped by tiled windows in a higher stack order
+				for (let j = 0; j < groupedWindows.length; j++)
+					if (groupedWindows[j].get_frame_rect().overlap(window.get_frame_rect())) {
+						notInGroup = true;
+						notGroupedWindows.push(window);
+						break;
+					}
+	
+			if (!notInGroup)
+				groupedWindows.push(window);
+
+		} else {
+			notGroupedWindows.push(window);
+		}
 	}
+
+	let currTileGroup = {
+		TOP_LEFT: null, 
+		TOP_RIGHT: null, 
+		BOTTOM_LEFT: null, 
+		BOTTOM_RIGHT: null
+	};
+	
+	if (!groupedWindows.length)
+		return currTileGroup;
+
+	let workArea = groupedWindows[0].get_work_area_current_monitor();
+	groupedWindows.forEach(tiledWindow => {
+		let wRect = tiledWindow.get_frame_rect();
+
+		// origin: top left
+		if (wRect.x == workArea.x && wRect.y == workArea.y) {
+			currTileGroup.TOP_LEFT = tiledWindow;
+
+			if (wRect.width == workArea.width)
+				currTileGroup.TOP_RIGHT = tiledWindow;
+
+			if (wRect.height == workArea.height)
+				currTileGroup.BOTTOM_LEFT = tiledWindow;
+		}
+
+		// origin: top right
+		if (wRect.x != workArea.x && wRect.y == workArea.y) {
+			currTileGroup.TOP_RIGHT = tiledWindow;
+
+			if (wRect.height == workArea.height)
+				currTileGroup.BOTTOM_RIGHT = tiledWindow;
+		}
+		
+		// origin: bottom left
+		if (wRect.x == workArea.x && wRect.y != workArea.y) {
+			currTileGroup.BOTTOM_LEFT = tiledWindow;
+
+			if (wRect.width == workArea.width)
+				currTileGroup.BOTTOM_RIGHT = tiledWindow;
+		}
+
+		// origin: bottom right
+		if (wRect.x != workArea.x && wRect.y != workArea.y)
+			currTileGroup.BOTTOM_RIGHT = tiledWindow;
+	});
 
 	return currTileGroup;
 };
@@ -495,7 +455,7 @@ function openDash(tiledWindow) {
 	let activeWS = global.workspace_manager.get_active_workspace()
 	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
 
-	let currTileGroup = getTileGroup(openWindows, tiledWindow);
+	let currTileGroup = getTileGroup(openWindows);
 	
 	// assume all 4 quads are free
 	// remove a quad for each window in currTileGroup
@@ -510,10 +470,11 @@ function openDash(tiledWindow) {
 		w.connect("focus", () => {
 			for (let pos in w.tileGroup) {
 				let window = w.tileGroup[pos];
-				if (window && window.get_id() in tiledWindows) {
-					window.tileGroup = w.tileGroup; // update the tileGroup with the current tileGroup
-					window.raise();
-				}
+				if (!window)
+					continue;
+
+				window.tileGroup = w.tileGroup; // update the tileGroup with the current tileGroup
+				window.raise();
 			}
 
 			w.raise();
@@ -536,13 +497,8 @@ function openDash(tiledWindow) {
 	// filter the openWindows array, so that no duplicate apps are shown
 	let winTracker = Shell.WindowTracker.get_default();
 	let openApps = []; 
-	openWindows.forEach((w) => { openApps.push(winTracker.get_window_app(w)) });
-	let tmpOpenWindows = [];
-	for (let i = 0; i < openApps.length; i++) {
-		if (openApps.indexOf(openApps[i]) == i) // first occurrence only
-			tmpOpenWindows.push(openWindows[i]);
-	}
-	openWindows = tmpOpenWindows;
+	openWindows.forEach( w => openApps.push(winTracker.get_window_app(w)) );
+	openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);
 	
 	let freeScreenRect = null;
 
@@ -790,7 +746,23 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		else // scale while keeping the top at the same y pos -> for example when DND
 			window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 
+		// remove the tileGroup to prevent wrongly raising each other
+		// first find the correct tiling pos of the restored window
+		// then loop through the other tiled windows checking that pos in their .tileGroup and setting it to null
+		for (let pos in window.tileGroup) {
+			if (window.tileGroup[pos] == window) {
+				for (let id in tiledWindows) {
+					let otherWindow = tiledWindows[id].win;
+					if (otherWindow == window)
+						continue;
+
+					if (otherWindow.tileGroup && otherWindow.tileGroup[pos] == window)
+						otherWindow.tileGroup[pos] = null;
+				}
+			}
+		}
 		window.tileGroup = null;
+
 		delete tiledWindows[window.get_id()];
 	}
 };
@@ -799,7 +771,7 @@ function getTileRectFor(side, workArea) {
 	let activeWS = global.workspace_manager.get_active_workspace()
 	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
 
-	let currTileGroup = getTileGroup(openWindows);
+	let currTileGroup = getTileGroup(openWindows, true);
 	// if a window is maximized, 2 rects can be the same rect
 	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
 	let topLeftRect = (currTileGroup.TOP_LEFT) ? currTileGroup.TOP_LEFT.get_frame_rect() : null;
@@ -1581,7 +1553,6 @@ var TilingAppIcon = GObject.registerClass(
 				arrow.connect('repaint', () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 				this.arrowContainer.add_child(arrow);
 			}
-
 
 			this.connect("enter-event", () => {
 				this.isHovered = true;
