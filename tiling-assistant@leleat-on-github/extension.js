@@ -8,6 +8,12 @@ let tilePreview = null;
 let tiledWindows = {}; // {windowID : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
 let newWindowsToTile = {}; // to open apps directly in tiled state -> {app.name: Meta.Side.X}
+let DELAY_AFTER_MAXIMIZE = [ // some apps (some terminals?) need to have openDash be delayed after their maximize call to function properly
+	"Terminal",
+	"MATE Terminal",
+	"XTerm",
+	"Roxterm", // delay doesnt seem work for Roxterm
+];
 
 let settings = null;
 let startGrab = false;
@@ -248,9 +254,13 @@ function tileWindow(window, newRect) {
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
 
+	let winTracker = Shell.WindowTracker.get_default();
+	let appName = winTracker.get_window_app(window).get_name();
+	let timer = (settings.get_boolean("use-anim") && DELAY_AFTER_MAXIMIZE.indexOf(appName) != -1) ? windowManager.WINDOW_ANIMATION_TIME : 100;
+
 	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)
 	// seems to also improve Wayland usage... at least in a VM
-	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, timer, () => {
 		GLib.source_remove(sID);
 		openDash(window);
 	});
