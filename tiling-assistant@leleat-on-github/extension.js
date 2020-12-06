@@ -22,6 +22,8 @@ let startGrab = false;
 // 1. tiled with keyboard shortcut (of this extension) => calls onMyTilingShortcutPressed()
 // 2. tiled via DND => signal calls onGrabBegin()
 
+// TODO opening an app in a tiled state spams the log with errors
+
 function init() {
 };
 
@@ -224,16 +226,28 @@ function tileWindow(window, newRect) {
 		} else if (wasMaximized) {
 			
 		} else {
+			// hack => journalctl: error in size change accounting && Old animationInfo removed from actor
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, 0);
 		}
 	}
+
+	let willMaximizeBoth = newRect.height == workArea.height && newRect.width == workArea.width;
+
+	// some terminals seem to not work with this extension
+	// delaying some stuff after the maximize() call seems to be a workaround
+	let winTracker = Shell.WindowTracker.get_default();
+	let appName = winTracker.get_window_app(window).get_name();
+	let terminalWorkaround = (settings.get_boolean("use-anim") && DELAY_AFTER_MAXIMIZE.indexOf(appName) != -1) ;
 	
-	if (!(newRect.height == workArea.height && newRect.width == workArea.width)) // if not maximized both
+	if (!willMaximizeBoth) { // moving frame is unnecessary when maximizing both
+		if (terminalWorkaround) // animation workaround. Better animation when setting user_op in move_resize_frame() to false; But I dont know the aftereffects, so I wont use that...
+			window.move_frame(true, newRect.x, newRect.y);
+
 		window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
+	}
 	
-	let sourceID = 0;
-	if (settings.get_boolean("use-anim") && !(newRect.height == workArea.height && newRect.width == workArea.width)) {
-		sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, windowManager.WINDOW_ANIMATION_TIME, () => { // wait for anim to be done
+	if (settings.get_boolean("use-anim") && !willMaximizeBoth) { // wait for anim to be done before maximize(); otherwise maximize() will skip anim
+		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, windowManager.WINDOW_ANIMATION_TIME, () => {
 			GLib.source_remove(sourceID);
 
 			if (newRect.height >= workArea.height - 2)
@@ -244,7 +258,7 @@ function tileWindow(window, newRect) {
 		});
 
 	} else {
-		if (newRect.height == workArea.height && newRect.width == workArea.width)
+		if (willMaximizeBoth)
 			window.maximize(Meta.MaximizeFlags.BOTH);
 
 		else if (newRect.height >= workArea.height - 2)
@@ -254,13 +268,8 @@ function tileWindow(window, newRect) {
 			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
 
-	let winTracker = Shell.WindowTracker.get_default();
-	let appName = winTracker.get_window_app(window).get_name();
-	let timer = (settings.get_boolean("use-anim") && DELAY_AFTER_MAXIMIZE.indexOf(appName) != -1) ? windowManager.WINDOW_ANIMATION_TIME : 100;
-
 	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)
-	// seems to also improve Wayland usage... at least in a VM
-	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, timer, () => {
+	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (terminalWorkaround) ? windowManager.WINDOW_ANIMATION_TIME : 100, () => {
 		GLib.source_remove(sID);
 		openDash(window);
 	});
@@ -777,110 +786,14 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	}
 };
 
-function getTileRectFor(side, workArea) {
-	let activeWS = global.workspace_manager.get_active_workspace()
-	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
-
-	let currTileGroup = getTileGroup(openWindows, true);
-	// if a window is maximized, 2 rects can be the same rect
-	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
-	let topLeftRect = (currTileGroup.TOP_LEFT) ? currTileGroup.TOP_LEFT.get_frame_rect() : null;
-	let topRightRect = (currTileGroup.TOP_RIGHT) ? currTileGroup.TOP_RIGHT.get_frame_rect() : null;
-	let bottomLeftRect = (currTileGroup.BOTTOM_LEFT) ? currTileGroup.BOTTOM_LEFT.get_frame_rect() : null;
-	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
-
-	let width = 0;
-	let height = 0;
-
-	switch (side) {
-		case Meta.Side.LEFT:
-			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
-
-			return new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y,
-				width: width,
-				height: workArea.height,
-			});
-
-		case Meta.Side.RIGHT:
-			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
-			
-			return new Meta.Rectangle({
-				x: workArea.x + workArea.width - width,
-				y: workArea.y,
-				width: width,
-				height: workArea.height,
-			});
-
-		case Meta.Side.TOP:
-			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
-			
-			return new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y,
-				width: workArea.width,
-				height: height,
-			});
-
-		case Meta.Side.BOTTOM:
-			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
-			
-			return new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y + workArea.height - height,
-				width: workArea.width,
-				height: height,
-			});
-	
-		case Meta.Side.TOP + Meta.Side.LEFT:
-			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
-
-			return new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y,
-				width: width,
-				height: height,
-			});
-
-		case Meta.Side.TOP + Meta.Side.RIGHT:
-			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
-
-			return new Meta.Rectangle({
-				x: workArea.x + workArea.width - width,
-				y: workArea.y,
-				width: width,
-				height: height,
-			});
-
-		case Meta.Side.BOTTOM + Meta.Side.LEFT:
-			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
-
-			return new Meta.Rectangle({
-				x: workArea.x,
-				y: workArea.y + workArea.height - height,
-				width: width,
-				height: height,
-			});
-
-		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
-			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
-
-			return new Meta.Rectangle({
-				x: workArea.x + workArea.width - width,
-				y: workArea.y + workArea.height - height,
-				width: width,
-				height: height,
-			});
-	}
-}
-
 // tile previewing via DND
 function onWindowMoving(window, grabStartPos) {
 	let [mouseX, mouseY] = global.get_pointer();
 
 	// restore the window size
 	if (window.get_id() in tiledWindows) {
+		let sourceID = 0;
+
 		// grab started on window title bar
 		if (grabStartPos[1] < main.panel.height) {
 			let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
@@ -893,7 +806,9 @@ function onWindowMoving(window, grabStartPos) {
 
 			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
 			// so far I only noticed this behaviour with firefox
-			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+				GLib.source_remove(sourceID);
+
 				restoreWindowSize(window);
 
 				startGrab = true;
@@ -915,7 +830,9 @@ function onWindowMoving(window, grabStartPos) {
 
 			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
 			// so far I only noticed this behaviour with firefox
-			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+				GLib.source_remove(sourceID);
+
 				restoreWindowSize(window);
 
 				startGrab = true;
@@ -1059,6 +976,104 @@ function equalApprox(value, value2, margin) {
 		return true;
 	return false;
 };
+
+function getTileRectFor(side, workArea) {
+	let activeWS = global.workspace_manager.get_active_workspace()
+	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+
+	let currTileGroup = getTileGroup(openWindows, true);
+	// if a window is maximized, 2 rects can be the same rect
+	// e.g. a window vertically maxmized on the left will set topLeftRect and bottomLeftRect to its rect
+	let topLeftRect = (currTileGroup.TOP_LEFT) ? currTileGroup.TOP_LEFT.get_frame_rect() : null;
+	let topRightRect = (currTileGroup.TOP_RIGHT) ? currTileGroup.TOP_RIGHT.get_frame_rect() : null;
+	let bottomLeftRect = (currTileGroup.BOTTOM_LEFT) ? currTileGroup.BOTTOM_LEFT.get_frame_rect() : null;
+	let bottomRightRect = (currTileGroup.BOTTOM_RIGHT) ? currTileGroup.BOTTOM_RIGHT.get_frame_rect() : null;
+
+	let width = 0;
+	let height = 0;
+
+	switch (side) {
+		case Meta.Side.LEFT:
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: width,
+				height: workArea.height,
+			});
+
+		case Meta.Side.RIGHT:
+			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+			
+			return new Meta.Rectangle({
+				x: workArea.x + workArea.width - width,
+				y: workArea.y,
+				width: width,
+				height: workArea.height,
+			});
+
+		case Meta.Side.TOP:
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+			
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: workArea.width,
+				height: height,
+			});
+
+		case Meta.Side.BOTTOM:
+			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+			
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + workArea.height - height,
+				width: workArea.width,
+				height: height,
+			});
+	
+		case Meta.Side.TOP + Meta.Side.LEFT:
+			[width, height] = getRectDimensions(workArea, bottomRightRect, topRightRect, bottomLeftRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: width,
+				height: height,
+			});
+
+		case Meta.Side.TOP + Meta.Side.RIGHT:
+			[width, height] = getRectDimensions(workArea, bottomLeftRect, topLeftRect, bottomRightRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x + workArea.width - width,
+				y: workArea.y,
+				width: width,
+				height: height,
+			});
+
+		case Meta.Side.BOTTOM + Meta.Side.LEFT:
+			[width, height] = getRectDimensions(workArea, topRightRect, bottomRightRect, topLeftRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y + workArea.height - height,
+				width: width,
+				height: height,
+			});
+
+		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
+			[width, height] = getRectDimensions(workArea, topLeftRect, bottomLeftRect, topRightRect);
+
+			return new Meta.Rectangle({
+				x: workArea.x + workArea.width - width,
+				y: workArea.y + workArea.height - height,
+				width: width,
+				height: height,
+			});
+	}
+}
 
 // diagonalRect is the rect which is in the diagonal quad to the space we try to get the rect for
 // for example: if we try to get the free space for the top left quad, the diagonal rect is at the bottom right
@@ -1329,6 +1344,7 @@ var TilingAppDash = GObject.registerClass(
 				return;
 				
 			this.windowDash.destroy_all_children();
+			this.windowDash.focusedWindow = null;
 			this.windowDash.show();
 			this.windowDash.set_scale(1, 1);
 			this.windowDash.previewedAppIcon = appIcon;
@@ -1485,7 +1501,7 @@ var TilingTilePreview = GObject.registerClass(
 	}
 );
 
-// mostly copied but trimmed from appDisplay.js
+// a lot copied from appDisplay.js
 var TilingAppIcon = GObject.registerClass(
 	class TilingAppIcon extends St.Button {
 		_init(window, idx, iconParams = {}) {
@@ -1641,22 +1657,22 @@ var TilingAppIcon = GObject.registerClass(
 
 				if (isAltPressed) {
 					// tile to right if free screen = 2 horizontal quadrants
-					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+					if (appDash.freeScreenRect.width == workArea.width) {
 						appDash.freeScreenRect.width = workArea.width / 2;
 						appDash.freeScreenRect.x = workArea.x + workArea.width / 2;
 					// tile to bottom if free screen = 2 vertical quadrants
-					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+					} else if (appDash.freeScreenRect.height == workArea.height) {
 						appDash.freeScreenRect.height = workArea.height / 2;
 						appDash.freeScreenRect.y = workArea.y + workArea.height / 2;
 					}
 
 				} else if (isShiftPressed) {
 					// tile to left if free screen = 2 horizontal quadrants
-					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+					if (appDash.freeScreenRect.width == workArea.width) {
 						appDash.freeScreenRect.width = workArea.width / 2;
 						appDash.freeScreenRect.x = workArea.x;
 					// tile to top if free screen = 2 vertical quadrants
-					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+					} else if (appDash.freeScreenRect.height == workArea.height) {
 						appDash.freeScreenRect.height = workArea.height / 2;
 						appDash.freeScreenRect.y = workArea.y;
 					}
@@ -1766,22 +1782,22 @@ var TilingWindowPreview = GObject.registerClass(
 
 				if (isAltPressed) {
 					// tile to right if free screen = 2 horizontal quadrants
-					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+					if (appDash.freeScreenRect.width == workArea.width) {
 						appDash.freeScreenRect.width = workArea.width / 2;
 						appDash.freeScreenRect.x = workArea.x + workArea.width / 2;
 					// tile to bottom if free screen = 2 vertical quadrants
-					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+					} else if (appDash.freeScreenRect.height == workArea.height) {
 						appDash.freeScreenRect.height = workArea.height / 2;
 						appDash.freeScreenRect.y = workArea.y + workArea.height / 2;
 					}
 
 				} else if (isShiftPressed) {
 					// tile to left if free screen = 2 horizontal quadrants
-					if (equalApprox(appDash.freeScreenRect.width, workArea.width, 2)) {
+					if (appDash.freeScreenRect.width == workArea.width) {
 						appDash.freeScreenRect.width = workArea.width / 2;
 						appDash.freeScreenRect.x = workArea.x;
 					// tile to top if free screen = 2 vertical quadrants
-					} else if (equalApprox(appDash.freeScreenRect.height, workArea.height, 2)) {
+					} else if (appDash.freeScreenRect.height == workArea.height) {
 						appDash.freeScreenRect.height = workArea.height / 2;
 						appDash.freeScreenRect.y = workArea.y;
 					}
