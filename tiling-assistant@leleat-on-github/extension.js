@@ -8,7 +8,7 @@ let tilePreview = null;
 let tiledWindows = {}; // {windowID : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
 let newWindowsToTile = {}; // to open apps directly in tiled state -> {app.name: Meta.Side.X}
-let DELAY_AFTER_MAXIMIZE = [ // some apps (some terminals?) need to have openDash be delayed after their maximize call to function properly
+let TERMINALS_TO_WORKAROUND = [ // some apps (some terminals?) need to have openDash be delayed after their maximize call to function properly
 	"Terminal",
 	"MATE Terminal",
 	"XTerm",
@@ -161,12 +161,11 @@ function onWindowCreated (src, w) {
 	let tileSide = newWindowsToTile[app.get_name()];
 	if (tileSide && w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
 		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet
-			GLib.source_remove(sourceID);
-
 			let rect = getTileRectFor(tileSide, w.get_work_area_current_monitor());
 			tileWindow(w, rect);
 
 			delete newWindowsToTile[app.get_name()];
+			GLib.source_remove(sourceID);
 		});
 	}
 };
@@ -237,7 +236,7 @@ function tileWindow(window, newRect) {
 	// delaying some stuff after the maximize() call seems to be a workaround
 	let winTracker = Shell.WindowTracker.get_default();
 	let appName = winTracker.get_window_app(window).get_name();
-	let terminalWorkaround = (settings.get_boolean("use-anim") && DELAY_AFTER_MAXIMIZE.indexOf(appName) != -1) ;
+	let terminalWorkaround = TERMINALS_TO_WORKAROUND.indexOf(appName) != -1;
 	
 	if (!willMaximizeBoth) { // moving frame is unnecessary when maximizing both
 		if (terminalWorkaround) // animation workaround. Better animation when setting user_op in move_resize_frame() to false; But I dont know the aftereffects, so I wont use that...
@@ -248,13 +247,13 @@ function tileWindow(window, newRect) {
 	
 	if (settings.get_boolean("use-anim") && !willMaximizeBoth) { // wait for anim to be done before maximize(); otherwise maximize() will skip anim
 		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, windowManager.WINDOW_ANIMATION_TIME, () => {
-			GLib.source_remove(sourceID);
-
 			if (newRect.height >= workArea.height - 2)
 				window.maximize(Meta.MaximizeFlags.VERTICAL);
 
 			else if (newRect.width >= workArea.width - 2)
 				window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+
+			GLib.source_remove(sourceID);
 		});
 
 	} else {
@@ -269,9 +268,9 @@ function tileWindow(window, newRect) {
 	}
 
 	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)
-	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (terminalWorkaround) ? windowManager.WINDOW_ANIMATION_TIME : 100, () => {
-		GLib.source_remove(sID);
+	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (terminalWorkaround && settings.get_boolean("use-anim")) ? windowManager.WINDOW_ANIMATION_TIME : 100, () => {
 		openDash(window);
+		GLib.source_remove(sID);
 	});
 };
 
@@ -315,7 +314,14 @@ function onMyTilingShortcutPressed(shortcutName) {
 			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea);
 	}
 
-	if (rect.equal(window.get_frame_rect()))
+	// TERMINALS_TO_WORKAROUND seem to cause problems when using Meta.Rectangle.equal because there are slight differences
+	let rectsAreAboutEqual = (r1, r2) => {
+		let samePos = Math.abs(r1.x - r2.x) < 10 && Math.abs(r1.y - r2.y) < 10;
+		let sameSize = Math.abs(r1.width - r2.width) < 10 && Math.abs(r1.height - r2.height) < 10;
+		return samePos && sameSize;
+	};
+
+	if (window.get_id() in tiledWindows && rectsAreAboutEqual(rect, window.get_frame_rect()))
 		restoreWindowSize(window, true);
 	else
 		tileWindow(window, rect);
@@ -547,8 +553,8 @@ function shouldStartGrab(window, grabBeginPos) {
 
 	} else {
 		let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
-			GLib.source_remove(sID);
 			shouldStartGrab(window, grabBeginPos);
+			GLib.source_remove(sID);
 		});
 	}
 };
@@ -765,8 +771,6 @@ function onWindowMoving(window, grabStartPos) {
 			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
 			// so far I only noticed this behaviour with firefox
 			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
-				GLib.source_remove(sourceID);
-
 				restoreWindowSize(window);
 
 				startGrab = true;
@@ -780,6 +784,8 @@ function onWindowMoving(window, grabStartPos) {
 					global.get_current_time(),
 					mouseX, grabStartPos[1]
 				);
+
+				GLib.source_remove(sourceID);
 			});
 			
 		// grab started on top panel and already left it with the mouse
@@ -789,8 +795,6 @@ function onWindowMoving(window, grabStartPos) {
 			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
 			// so far I only noticed this behaviour with firefox
 			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
-				GLib.source_remove(sourceID);
-
 				restoreWindowSize(window);
 
 				startGrab = true;
@@ -804,6 +808,8 @@ function onWindowMoving(window, grabStartPos) {
 					global.get_current_time(),
 					mouseX, grabStartPos[1]
 				);
+
+				GLib.source_remove(sourceID);
 			});
 		}
 
@@ -1586,9 +1592,9 @@ var TilingAppIcon = GObject.registerClass(
 					appDash.closeWindowPreview()
 
 				let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
-					GLib.source_remove(sourceID);
 					if (this.isHovered && appDash.shown && appDash.windowDash.previewedAppIcon != this)
 						appDash.openWindowPreview(this);
+					GLib.source_remove(sourceID);
 				});
 			});
 
