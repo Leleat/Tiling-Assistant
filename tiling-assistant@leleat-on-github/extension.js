@@ -22,8 +22,6 @@ let startGrab = false;
 // 1. tiled with keyboard shortcut (of this extension) => calls onMyTilingShortcutPressed()
 // 2. tiled via DND => signal calls onGrabBegin()
 
-// TODO opening an app in a tiled state spams the log with errors
-
 function init() {
 };
 
