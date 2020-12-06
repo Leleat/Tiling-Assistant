@@ -2,11 +2,11 @@
 <schemalist>
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 		<key name="icon-size" type="i">
-			<default>75</default>
+			<default>96</default>
 		</key>
 
 		<key name="icon-margin" type="i">
-			<default>20</default>
+			<default>25</default>
 		</key>
 
 		<key name="show-label" type="b">

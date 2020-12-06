@@ -37,8 +37,10 @@ const MyPrefsWidget = new GObject.Class({
 			// bind settings to the UI objects
 			// make sure the objects in prefs.ui have the same name as the keys in the settings (schema.xml)
 			this._settingsSchema.list_keys().forEach(key => {
-				if (this.builder.get_object(key) != null)
-					this.settings.bind(key, this.builder.get_object(key), this.getBindProperty(key), Gio.SettingsBindFlags.DEFAULT);
+				let bindProperty = this.getBindProperty(key);
+				let builderObject = this.builder.get_object(key);
+				if (builderObject != null && bindProperty)
+					this.settings.bind(key, builderObject, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 			});
 
 			let shortcuts = ["tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter"];
@@ -96,5 +98,8 @@ const MyPrefsWidget = new GObject.Class({
 
 			else if (bools.includes(key))
 				return "active"; //  switch.active
+
+			else
+				return null;
 		},
 });

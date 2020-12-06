@@ -16,7 +16,6 @@ let TERMINALS_TO_WORKAROUND = [ // some apps (some terminals?) need to have open
 ];
 
 let settings = null;
-let startGrab = false;
 
 // 2 entry points "into this extension".
 // 1. tiled with keyboard shortcut (of this extension) => calls onMyTilingShortcutPressed()
@@ -33,10 +32,6 @@ function enable() {
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
 	this.overviewShown = main.overview.connect("showing", () => {if (appDash.shown) appDash.close();});
 	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
-	this.toppanelButtonRelease = main.panel.connect("button-release-event", (event) => {
-		startGrab = null;
-		return false;
-	});
 
 	appDash = new TilingAppDash();
 	tilePreview = new TilingTilePreview();
@@ -76,7 +71,6 @@ function disable() {
 	global.display.disconnect(this.windowGrabEnd);
 	main.overview.disconnect(this.overviewShown);
 	global.display.disconnect(this.windowCreated);
-	main.panel.disconnect(this.toppanelButtonRelease);
 
 	tilePreview.destroy();
 	appDash._destroy();
@@ -224,7 +218,7 @@ function tileWindow(window, newRect) {
 			
 		} else {
 			// hack => journalctl: error in size change accounting && Old animationInfo removed from actor
-			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, 0);
+			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, Meta.SizeChange.MAXIMIZE); // Meta.SizeChange.MAXIMIZE works even for quartering
 		}
 	}
 
@@ -266,7 +260,7 @@ function tileWindow(window, newRect) {
 	}
 
 	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)
-	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (terminalWorkaround && settings.get_boolean("use-anim")) ? windowManager.WINDOW_ANIMATION_TIME : 100, () => {
+	let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, (settings.get_boolean("use-anim") && terminalWorkaround) ? windowManager.WINDOW_ANIMATION_TIME : 50, () => {
 		openDash(window);
 		GLib.source_remove(sID);
 	});
@@ -326,17 +320,17 @@ function onMyTilingShortcutPressed(shortcutName) {
 };
 
 // get the top most tiled windows which are in a group (looped through window list by stack order: top -> bottom)
-function getTileGroup(openWindows, DNDing = false) {
+function getTileGroup(openWindows, ignoreTopWindow = false) {
 	// maximization state is checked via their size rather than via get_maximized()
 	// because tileWindow() will delay the maximize(), if animations are enabled
 
 	let groupedWindows = []; // tiled windows which are considered in a group
 	let notGroupedWindows = []; // normal and tiled windows which appear between grouped windows in the stack order
 
-	for (let i = (DNDing) ? 1 : 0; i < openWindows.length; i++) { // ignore the topmost window if DNDing
+	for (let i = (ignoreTopWindow) ? 1 : 0; i < openWindows.length; i++) { // ignore the topmost window if DNDing, Tiling via keybinding and opening a window in a tiled state
 		let window = openWindows[i];
 
-		if (window.get_monitor() != ((DNDing) ? global.display.get_current_monitor() : openWindows[0].get_monitor()))
+		if (window.get_monitor() != ((ignoreTopWindow) ? global.display.get_current_monitor() : openWindows[0].get_monitor()))
 			continue;
 
 		if (window.get_id() in tiledWindows) {
@@ -520,43 +514,6 @@ function openDash(tiledWindow) {
 	appDash.open(openWindows, tiledWindow, freeScreenRect);
 };
 
-// only called in onGrabBegin()
-function shouldStartGrab(window, grabBeginPos) {
-	if (startGrab == null)
-		return;
-
-	let [mX, mY] = global.get_pointer();
-
-	// begin the grab immediatly when grabbing on titlebar
-	// when grabbing from top panel then only start after leaving the panel
-	// reason: 
-	// the mouse press state cant be checked here (well, at least I dont know how to).
-	// so the user could just click once and move the mouse around and the grab would restart with this function
-	// even though the user already released the click.
-	// for the top panel there is the button-release-event, which sets the startGrab to null, which in turn breaks out of this recursive function.
-	// no such thing for the titlebar
-	startGrab = (grabBeginPos[1] >= main.panel.height) ? true : mY >= main.panel.height;
-
-	if (startGrab) {
-		global.display.begin_grab_op(
-			window,
-			Meta.GrabOp.MOVING,
-			false, // pointer already grabbed
-			true, // frame action
-			-1, // button
-			0, // modifier
-			global.get_current_time(),
-			mX, mY
-		);
-
-	} else {
-		let sID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 10, () => {
-			shouldStartGrab(window, grabBeginPos);
-			GLib.source_remove(sID);
-		});
-	}
-};
-
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
 function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	if (!grabbedWindow)
@@ -580,17 +537,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
 			let [x, y] = global.get_pointer();
-
-			// if the grab started in the topbar
-			// start the grab for tiled windows after leaving the topbar
-			if (!startGrab && grabbedWindow.get_id() in tiledWindows) {
-				global.display.end_grab_op(global.get_current_time());
-				shouldStartGrab(grabbedWindow, [x, y]);
-
-			} else {
-				windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y])) );
-			}
-
+			windowGrabSignals[grabbedWindow.get_id()].push( grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y])) );
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
@@ -671,8 +618,6 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 };
 
 function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
-	startGrab = false;
-
 	// disconnect the signals
 	if (window && windowGrabSignals[window.get_id()])
 		for (let i = windowGrabSignals[window.get_id()].length - 1; i >= 0; i--) {
@@ -752,64 +697,35 @@ function restoreWindowSize(window, restoreFullPos = false) {
 function onWindowMoving(window, grabStartPos) {
 	let [mouseX, mouseY] = global.get_pointer();
 
-	// restore the window size
+	// restore the window size of tiled windows after DND distance of at least 1px.
+	// prevents restoring the window after just clicking on the title/top bar
 	if (window.get_id() in tiledWindows) {
-		let sourceID = 0;
+		let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
+		let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
 
-		// grab started on window title bar
-		if (grabStartPos[1] < main.panel.height) {
-			let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
-			let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
-	
-			if (moveDist <= 0)
-				return;
+		if (moveDist <= 0)
+			return;
 
-			global.display.end_grab_op(global.get_current_time());
+		global.display.end_grab_op(global.get_current_time());
 
-			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
-			// so far I only noticed this behaviour with firefox
-			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
-				restoreWindowSize(window);
+		// timer needed because for some apps the grab will overwrite/ignore the size changes of restoreWindowSize()
+		// so far I only noticed this behaviour with firefox
+		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+			restoreWindowSize(window);
 
-				startGrab = true;
-				global.display.begin_grab_op(
-					window,
-					Meta.GrabOp.MOVING,
-					true, // pointer already grabbed
-					true, // frame action
-					-1, // button
-					0, // modifier
-					global.get_current_time(),
-					mouseX, grabStartPos[1]
-				);
+			global.display.begin_grab_op(
+				window,
+				Meta.GrabOp.MOVING,
+				true, // pointer already grabbed
+				true, // frame action
+				-1, // button
+				0, // modifier
+				global.get_current_time(),
+				mouseX, Math.max(grabStartPos[1], window.get_frame_rect().y)
+			);
 
-				GLib.source_remove(sourceID);
-			});
-			
-		// grab started on top panel and already left it with the mouse
-		} else {
-			global.display.end_grab_op(global.get_current_time());
-
-			// timer needed because for some apps the grab will overwrite the size changes of my restoreWindowSize()
-			// so far I only noticed this behaviour with firefox
-			sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
-				restoreWindowSize(window);
-
-				startGrab = true;
-				global.display.begin_grab_op(
-					window,
-					Meta.GrabOp.MOVING,
-					true, // pointer already grabbed
-					true, // frame action
-					-1, // button
-					0, // modifier
-					global.get_current_time(),
-					mouseX, grabStartPos[1]
-				);
-
-				GLib.source_remove(sourceID);
-			});
-		}
+			GLib.source_remove(sourceID);
+		});
 
 		return;
 	}
@@ -977,6 +893,8 @@ function equalApprox(value, value2, margin) {
 	return false;
 };
 
+// called when DNDing, tiling via keybinding and opening an app in a tiled state
+// that's why getTileGroup() will ignore the topmost window when called in this function
 function getTileRectFor(side, workArea) {
 	let activeWS = global.workspace_manager.get_active_workspace()
 	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
@@ -1163,7 +1081,7 @@ var TilingAppDash = GObject.registerClass(
 			this.onMouseCaught = this.mouseCatcher.connect("button-press-event", () => {
 				if (this.shown)
 					this.close();
-			});
+			 });
 
 			// visual BG for the Dash if an app has multiple open windows
 			this.windowDash = new St.Widget({
@@ -1249,7 +1167,7 @@ var TilingAppDash = GObject.registerClass(
 				opacity: 255,
 				duration: windowManager.WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus() // when opening window tiled, that will grab focus away; so regrab it after opening anim; need a better way
+				onComplete: () => this.appContainer.get_child_at_index(0).grab_key_focus() // when opening window tiled, that will grab focus away; so regrab it after opening anim
 			});
 			
 			// setup shadeBG
