@@ -284,83 +284,41 @@ function onMyTilingShortcutPressed(shortcutName) {
 	let workArea = window.get_work_area_current_monitor();
 	switch (shortcutName) {
 		case "tile-top-half":
-			rect = getTileRectFor(Meta.Side.TOP, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.TOP, workArea);
 			break;
 
 		case "tile-left-half":
-			rect = getTileRectFor(Meta.Side.LEFT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.LEFT, workArea);
 			break;
 		
 		case "tile-right-half":
-			rect = getTileRectFor(Meta.Side.RIGHT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.RIGHT, workArea);
 			break;
 
 		case "tile-bottom-half":
-			rect = getTileRectFor(Meta.Side.BOTTOM, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.BOTTOM, workArea);
 			break;
 
 		case "tile-topleft-quarter":
-			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea);
 			break;
 
 		case "tile-topright-quarter":
-			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea);
 			break;
 
 		case "tile-bottomleft-quarter":
-			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
-
+			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea);
 			break;
 
 		case "tile-bottomright-quarter":
-			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea)
-
-			if (rect.equal(window.get_frame_rect()))
-				restoreWindowSize(window, true);
-			else
-				tileWindow(window, rect);
+			rect = getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea);
 	}
+
+	if (rect.equal(window.get_frame_rect()))
+		restoreWindowSize(window, true);
+	else
+		tileWindow(window, rect);
 };
 
 // get the top most tiled windows which are in a group (looped through window list by stack order: top -> bottom)
@@ -873,33 +831,71 @@ function onWindowMoving(window, grabStartPos) {
 	let tileMaximized = onTop;
 	let tileBottomHalf = onBottom;
 
+	let pos = 0;
+
 	// prioritize quarter over other tiling
 	if (tileTopLeftQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.LEFT, workArea), monitorNr);
+		pos = Meta.Side.TOP + Meta.Side.LEFT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileTopRightQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP + Meta.Side.RIGHT, workArea), monitorNr);
+		pos = Meta.Side.TOP + Meta.Side.RIGHT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileBottomLeftQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea), monitorNr);
+		pos = Meta.Side.BOTTOM + Meta.Side.LEFT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileBottomRightQuarter) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea), monitorNr);
+		pos = Meta.Side.BOTTOM + Meta.Side.RIGHT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileRightHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.RIGHT, workArea), monitorNr);
+		pos = Meta.Side.RIGHT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileLeftHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.LEFT, workArea), monitorNr);
+		pos = Meta.Side.LEFT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileTopHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.TOP, workArea), monitorNr);
+		pos = Meta.Side.TOP;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileBottomHalf) {
-		tilePreview.open(window, getTileRectFor(Meta.Side.BOTTOM, workArea), monitorNr);
+		pos = Meta.Side.BOTTOM;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, getTileRectFor(pos, workArea), monitorNr);
 
 	} else if (tileMaximized) {
-		tilePreview.open(window, new Meta.Rectangle({
+		pos = Meta.Side.TOP + Meta.Side.BOTTOM + Meta.Side.LEFT + Meta.Side.RIGHT;
+		if (tilePreview.currPos == pos)
+			return;
+
+		tilePreview.open(window, pos, new Meta.Rectangle({
 			x: workArea.x,
 			y: workArea.y,
 			width: workArea.width,
@@ -1426,9 +1422,10 @@ var TilingTilePreview = GObject.registerClass(
 
 			this.reset();
 			this.showing = false;
+			this.currPos = 0; // Meta.Side
 		}
 
-		open(window, tileRect, monitorIndex) {
+		open(window, pos, tileRect, monitorIndex) {
 			let windowActor = window.get_compositor_private();
 			if (!windowActor)
 				return;
@@ -1443,6 +1440,7 @@ var TilingTilePreview = GObject.registerClass(
 
 			this.monitorIndex = monitorIndex;
 			this.rect = tileRect;
+			this.currPos = pos;
 
 			let monitor = main.layoutManager.monitors[monitorIndex];
 
@@ -1485,6 +1483,7 @@ var TilingTilePreview = GObject.registerClass(
 				return;
 
 			this.showing = false;
+			this.currPos = 0;
 			this.ease({
 				opacity: 0,
 				duration: 200,
