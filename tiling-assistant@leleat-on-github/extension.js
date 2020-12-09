@@ -164,12 +164,11 @@ function onWindowCreated(src, w) {
 
 	let tileSide = newWindowsToTile[app.get_name()];
 	if (tileSide && w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
-		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => { // timer needed because window won't be sized correctly on the window-created signal yet
+		w.get_compositor_private().connect("first-frame", () => {
 			let rect = getTileRectFor(tileSide, w.get_work_area_current_monitor());
 			tileWindow(w, rect);
 
 			delete newWindowsToTile[app.get_name()];
-			GLib.source_remove(sourceID);
 		});
 	}
 };
