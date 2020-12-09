@@ -9,7 +9,7 @@ let appDash = null;
 let tilePreview = null;
 let tiledWindows = {}; // {windowID : oldFrameRect}
 let windowGrabSignals = {}; // {windowID : [signalIDs]}
-let newWindowsToTile = {}; // to open apps directly in tiled state -> {app.name: Meta.Side.X}
+let newWindowsToTile = []; // to open apps directly in tiled state -> [Meta.Side.X]
 let TERMINALS_TO_WORKAROUND = []; // some apps (some terminals?) need to have openDash be delayed after their maximize call to function properly
 let settings = null;
 
@@ -28,6 +28,13 @@ function enable() {
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
 	this.overviewShown = main.overview.connect("showing", () => { if (appDash.shown) appDash.close(); });
 	this.windowCreated = global.display.connect("window-created", onWindowCreated.bind(this));
+	this.shortcutPressed = global.window_manager.connect("filter-keybinding", (shellWM, keyBinding) => {
+		if (appDash.shown) {
+			appDash.close();
+			return true;
+		}
+		return false;
+	});
 
 	appDash = new TilingAppDash();
 	tilePreview = new TilingTilePreview();
@@ -74,6 +81,7 @@ function disable() {
 	global.display.disconnect(this.windowGrabEnd);
 	main.overview.disconnect(this.overviewShown);
 	global.display.disconnect(this.windowCreated);
+	global.window_manager.disconnect(this.shortcutPressed);
 
 	tilePreview.destroy();
 	appDash._destroy();
@@ -96,7 +104,7 @@ function disable() {
 
 	tiledWindows = {};
 	windowGrabSignals = {};
-	newWindowsToTile = {};
+	newWindowsToTile = [];
 	TERMINALS_TO_WORKAROUND = [];
 };
 
@@ -120,11 +128,11 @@ function newAppActivate(button) {
 		this.app.open_new_window(-1);
 
 	} else if (isShiftPressed && this.app.can_open_new_window()) {
-		newWindowsToTile[this.app.get_name()] = Meta.Side.LEFT;
+		newWindowsToTile.push(Meta.Side.LEFT);
 		this.app.open_new_window(-1);
 
 	} else if (isAltPressed && this.app.can_open_new_window()) {
-		newWindowsToTile[this.app.get_name()] = Meta.Side.RIGHT;
+		newWindowsToTile.push(Meta.Side.RIGHT);
 		this.app.open_new_window(-1);
 
 	} else {
@@ -158,18 +166,23 @@ function onWindowCreated(src, w) {
 	if (appDash.shown)
 		appDash.close()
 
-	let app = Shell.WindowTracker.get_default().get_window_app(w);
-	if (!app)
+	if (!newWindowsToTile.length)
 		return;
 
-	let tileSide = newWindowsToTile[app.get_name()];
-	if (tileSide && w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
+	// some apps use a "loading screen", which are also a Meta.WindowType.NORMAL
+	// so I use to w.allows_move() && w.allows_resize() to "workaround" that.
+	// A multi-window opening process means that other windows can "intercept" this function.
+	// for ex. trying to open GIMP in a tiled state first opens a loading screen.
+	// if the user opens a window before the actual GIMP window has opened, that other window will be tiled instead of GIMP.
+	// originally I used the app.get_name() to confirm they are the same app but app.get_name() didn't work on Wayland
+	// ... so I removed it altogether and mentioned it as a known limitation
+	if (w.get_window_type() == Meta.WindowType.NORMAL && w.allows_move() && w.allows_resize()) {
+		let tileSide = newWindowsToTile.pop();
 		w.get_compositor_private().connect("first-frame", () => {
 			let rect = getTileRectFor(tileSide, w.get_work_area_current_monitor());
 			tileWindow(w, rect);
-
-			delete newWindowsToTile[app.get_name()];
 		});
+		newWindowsToTile = []; // in case the user spammed the tiled opening before it could actually finish first
 	}
 };
 
@@ -241,33 +254,25 @@ function tileWindow(window, newRect) {
 	let appName = winTracker.get_window_app(window).get_name();
 	let terminalWorkaround = TERMINALS_TO_WORKAROUND.indexOf(appName) != -1;
 
-	if (!willMaximizeBoth) { // moving frame is unnecessary when maximizing both
+	if (willMaximizeBoth) { // moving frame is unnecessary when maximizing both
+		window.maximize(Meta.MaximizeFlags.BOTH);
+
+	} else {
 		if (terminalWorkaround) // animation workaround. Better animation when setting user_op in move_resize_frame() to false; But I dont know the aftereffects, so I wont use that...
 			window.move_frame(true, newRect.x, newRect.y);
 
 		window.move_resize_frame(true, newRect.x, newRect.y, newRect.width, newRect.height);
-	}
 
-	if (settings.get_boolean("use-anim") && !willMaximizeBoth) { // wait for anim to be done before maximize(); otherwise maximize() will skip anim
-		let sourceID = GLib.timeout_add(GLib.PRIORITY_DEFAULT, windowManager.WINDOW_ANIMATION_TIME, () => {
+		// wait for animations to be done
+		let signalID = wActor.connect("effects-completed", () => {
 			if (newRect.height >= workArea.height - 2)
 				window.maximize(Meta.MaximizeFlags.VERTICAL);
-
+	
 			else if (newRect.width >= workArea.width - 2)
 				window.maximize(Meta.MaximizeFlags.HORIZONTAL);
-
-			GLib.source_remove(sourceID);
+	
+			wActor.disconnect(signalID);
 		});
-
-	} else {
-		if (willMaximizeBoth)
-			window.maximize(Meta.MaximizeFlags.BOTH);
-
-		else if (newRect.height >= workArea.height - 2)
-			window.maximize(Meta.MaximizeFlags.VERTICAL);
-
-		else if (newRect.width >= workArea.width - 2)
-			window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 	}
 
 	// timer needed to correctly shade the BG of multi-step activation (i.e. via holding shift/alt when tiling)

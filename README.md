@@ -20,7 +20,7 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - If the free space spans 2 quadrants, you can hold `Shift` while activating the icon to tile the window to the top or the left free quadrant depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right quadrant.
 
-- You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock).
+- You can directly open an app from GNOME's search results or appGrid in a tiled state (left or right) by holding `Shift` or `Alt`. It will also effect other extensions which extend appDisplay.AppIcon (e.g. Dash-to-Dock). This is implemented in a "dumb" way. It may not work properly with apps, which have loading screens.
 
 - Raise/focus tiled windows as a group.
 
