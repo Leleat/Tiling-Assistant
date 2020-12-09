@@ -9,10 +9,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 Development started on GNOME 3.36. But as of November 2020 all development happens on 3.38. While it may (and I think it still should) work on 3.36, I can't test it.
 
-Similiar outlook for **Wayland**. I am running NVIDIA drivers, as such I can't really test this extension on Wayland. For both cases I need extensive feedback.
-
-PS: 
-I'm not a developer, so any help in any form is appreciated.
+**Wayland:** While it generally works, I recommend you use X11, if you can. Check out [#17](https://github.com/Leleat/Tiling-Assist/issues/17) for known issues.
 
 ## Usage and features
 
