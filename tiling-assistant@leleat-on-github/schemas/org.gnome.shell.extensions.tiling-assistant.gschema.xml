@@ -17,6 +17,10 @@
 			<default>true</default>
 		</key>
 
+		<key name="tile-maximize" type="as">
+			<default>[]</default>
+		</key>
+
 		<key name="tile-top-half" type="as">
 			<default>[]</default>
 		</key>
@@ -47,6 +51,18 @@
 
 		<key name="tile-bottomright-quarter" type="as">
 			<default>[]</default>
+		</key>
+
+		<key name="tile-empty-space" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="replace-window" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="window-gaps" type="i">
+			<default>0</default>
 		</key>
 	</schema>
 </schemalist>

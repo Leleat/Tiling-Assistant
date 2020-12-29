@@ -43,7 +43,7 @@ const MyPrefsWidget = new GObject.Class({
 					this.settings.bind(key, builderObject, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 			});
 
-			let shortcuts = ["tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter"];
+			let shortcuts = ["replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter"];
 			shortcuts.forEach((sc) => {
 				this.makeShortcutEdit(sc);
 			});
@@ -90,7 +90,7 @@ const MyPrefsWidget = new GObject.Class({
 
 		// manually add the keys to the arrays in this function
 		getBindProperty: function(key) {
-			let ints = ["icon-size", "icon-margin"];
+			let ints = ["icon-size", "icon-margin", "window-gaps"];
 			let bools = ["show-label", "use-anim"];
 
 			if (ints.includes(key)) 
