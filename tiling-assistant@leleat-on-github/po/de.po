@@ -1,0 +1,106 @@
+# German translations for Tiling package.
+# Copyright (C) 2020 THE Tiling'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the Tiling package.
+# Automatically generated, 2020.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiling Assistant\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2020-12-30 17:50+0100\n"
+"PO-Revision-Date: 2020-12-30 17:50+0100\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: de\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: prefs.js:64
+msgid "General"
+msgstr "Allgemein"
+
+#: prefs.js:65
+msgid "Keybindings"
+msgstr "Tastenkürzel"
+
+#: prefs.js:61
+msgid "Dash icon size"
+msgstr "Dash Icon Größe"
+
+#: prefs.js:62
+msgid "Dash icon margin"
+msgstr "Dash Icon Rand"
+
+#: prefs.js:63
+msgid "Show app name"
+msgstr "Zeige den App-Namen"
+
+#: prefs.js:64
+msgid "Enable animations"
+msgstr "Benutze Animationen"
+
+#: prefs.js:65
+msgid "Gap between tiled windows"
+msgstr "Abstand zwischen gekachelten Fenstern"
+
+#: prefs.js:66
+msgid "Toggle maximization"
+msgstr "Fenstermaximierung umschalten"
+
+#: prefs.js:67
+msgid "Tile to top half"
+msgstr "Kachel zur oberen Hälfte"
+
+#: prefs.js:68
+msgid "Tile to bottom half"
+msgstr "Kachel zur unteren Hälfte"
+
+#: prefs.js:69
+msgid "Tile to right half"
+msgstr "Kachel zur rechten Hälfte"
+
+#: prefs.js:70
+msgid "Tile to left half"
+msgstr "Kachel zur linken Hälfte"
+
+#: prefs.js:71
+msgid "Tile to top left quarter"
+msgstr "Kachel nach oben links"
+
+#: prefs.js:72
+msgid "Tile to  top right quarter"
+msgstr "Kachel nach oben rechts"
+
+#: prefs.js:73
+msgid "Tile to bottom left quarter"
+msgstr "Kachel nach unten links"
+
+#: prefs.js:74
+msgid "Tile to bottom right quarter"
+msgstr "Kachel nach unten rechts"
+
+#: prefs.js:75
+msgid "Tile to empty space"
+msgstr "Kachel zum verfügbaren Platz"
+
+#: prefs.js:76
+msgid "Tile to other tiled window"
+msgstr "Kachel zu anderem gekacheltem Fenster"
+
+#: prefs.js:79
+msgid ""
+"Show app names in the dash. Make sure the icons have a sufficient size, if "
+"you want to use this setting."
+msgstr "Zeige den App-Namen im Dash. Vergewissere dich, dass die Icons groß genug sind, falls du diese Einstellung aktivieren möchtest."
+
+#: prefs.js:80
+msgid ""
+"Even if this setting is turned off, not all move/resize animations will be "
+"disabled. Some are native to GNOME and thus unaffected by this setting."
+msgstr "Selbst wenn diese Einstellung deaktiviert ist, bedeutet es nicht, dass alle Fensterbewegungs-/-größenänderungsanimationen deaktiviert werden. Manche kommen von GNOME und bleiben daher von dieser Einstellung unberührt."
+
+#: prefs.js:81
+msgid "If the \"empty space\" is  ambiguous, the window will be maximized."
+msgstr "Falls der \"verfügbare Platz\" nicht eindeutig ist, wird das Fenster maximiert."

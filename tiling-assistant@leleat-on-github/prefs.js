@@ -1,14 +1,21 @@
+"use strict";
+
 const {GObject, Gtk, Gio} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
+const Gettext = imports.gettext;
+Gettext.textdomain("tiling-assistant@leleat-on-github");
+Gettext.bindtextdomain("tiling-assistant@leleat-on-github", Me.dir.get_child("locale").get_path());
+const _ = Gettext.gettext;
+
 function init () {
-}
+};
 
 function buildPrefsWidget () {
 	let widget = new MyPrefsWidget();
 	widget.show_all();
 	return widget;
-}
+};
 
 const MyPrefsWidget = new GObject.Class({
 		Name : "MyTilingPrefsWidget",
@@ -32,7 +39,8 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder = new Gtk.Builder();
 			this.builder.add_from_file(Me.path + '/prefs.ui');   
 	
-			this.add(this.builder.get_object('main_prefs'));
+			let gtkNotebook = this.builder.get_object('main_prefs');
+			this.add(gtkNotebook);
 
 			// bind settings to the UI objects
 			// make sure the objects in prefs.ui have the same name as the keys in the settings (schema.xml)
@@ -47,6 +55,37 @@ const MyPrefsWidget = new GObject.Class({
 			shortcuts.forEach((sc) => {
 				this.makeShortcutEdit(sc);
 			});
+
+			//////////////////
+			// Translations //
+			//////////////////
+
+			// tab labels
+			this.builder.get_object("generalLabel").set_text(_("General"));
+			this.builder.get_object("keybindingsLabel").set_text(_("Keybindings"));
+			
+			// other settings labels
+			this.builder.get_object("label12").set_text(_("Dash icon size"));
+			this.builder.get_object("label13").set_text(_("Dash icon margin"));
+			this.builder.get_object("label14").set_text(_("Show app name"));
+			this.builder.get_object("label15").set_text(_("Enable animations"));
+			this.builder.get_object("label2").set_text(_("Gap between tiled windows"));
+			this.builder.get_object("label3").set_text(_("Toggle maximization"));
+			this.builder.get_object("label20").set_text(_("Tile to top half"));
+			this.builder.get_object("label21").set_text(_("Tile to bottom half"));
+			this.builder.get_object("label26").set_text(_("Tile to right half"));
+			this.builder.get_object("label27").set_text(_("Tile to left half"));
+			this.builder.get_object("label22").set_text(_("Tile to top left quarter"));
+			this.builder.get_object("label23").set_text(_("Tile to  top right quarter"));
+			this.builder.get_object("label24").set_text(_("Tile to bottom left quarter"));
+			this.builder.get_object("label25").set_text(_("Tile to bottom right quarter"));
+			this.builder.get_object("label1").set_text(_("Tile to empty space"));
+			this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
+
+			// tooltips
+			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));
+			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
+			this.builder.get_object("listboxrow1").set_tooltip_text(_("If the \"empty space\" is  ambiguous, the window will be maximized."));
 		},
 
 		// taken from Overview-Improved by human.experience

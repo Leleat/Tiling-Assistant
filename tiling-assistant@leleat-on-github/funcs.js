@@ -1,4 +1,4 @@
-'use strict';
+"use strict";
 
 const {main, windowManager} = imports.ui;
 const {GLib, St, Shell, Clutter, Meta} = imports.gi;
@@ -19,7 +19,7 @@ function rectsAreAboutEqual (r1, r2) {
 };
 
 // given rectA and rectB, calculate the rectangles which remain from rectA, 
-// if rectB is substracted from it. The result is an array of 0 - 4 rects depending on rectA/Bs position.
+// if rectB is substracted from it. The result is an array of 0 - 4 rects depending on rectA/B's position.
 // ignore small rects since some windows (e. g. some Terminals) dont freely resize
 // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference
 function rectDiff (rectA, rectB, ignoreMargin = 15) {
@@ -534,8 +534,10 @@ function restoreWindowSize(window, restoreFullPos = false) {
 // raises the other windows, if it is focused
 function updateTileGroup(tileGroup) {
 	tileGroup.forEach(w => {
-		if (w.groupFocusSignalID)
+		if (w.groupFocusSignalID) {
 			w.disconnect(w.groupFocusSignalID);
+			w.groupFocusSignalID = 0;
+		}
 
 		w.tileGroup = tileGroup;
 
@@ -687,7 +689,7 @@ function replaceTiledWindow(window) {
 		let wRect = currTileGroup[i].tiledRect;
 
 		let rect = new St.Widget({
-			style_class: 'tile-preview',
+			style_class: "tile-preview",
 			x: wRect.x + 10, 
 			y: wRect.y + 10,
 			opacity: 0,
@@ -708,7 +710,7 @@ function replaceTiledWindow(window) {
 			x: wRect.x + wRect.width / 2,
 			y: wRect.y + wRect.height / 2,
 			text: (i + 1).toString(),
-			style: 'font-size: 50px'
+			style: "font-size: 50px"
 		});
 		global.window_group.add_child(label);
 		actors.push(label);
@@ -737,10 +739,10 @@ function replaceTiledWindow(window) {
 	let sID = catcher.connect("key-press-event", (src, event) => {
 		catcher.disconnect(sID);
 		
-		let nrKey = parseInt(event.get_key_unicode());
+		let key = parseInt(event.get_key_unicode());
 
-		if (Number.isInteger(nrKey) && nrKey <= currTileGroup.length)
-			tileWindow(window, currTileGroup[nrKey - 1].tiledRect);
+		if (Number.isInteger(key) && key <= currTileGroup.length)
+			tileWindow(window, currTileGroup[key - 1].tiledRect);
 
 		destroyAll();
 	});

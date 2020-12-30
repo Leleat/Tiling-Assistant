@@ -142,7 +142,7 @@
                   <object class="GtkLabel" id="label12">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Icon size</property>
+                    <property name="label" translatable="yes">Dash icon size</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -192,7 +192,7 @@
                   <object class="GtkLabel" id="label13">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Icon margins</property>
+                    <property name="label" translatable="yes">Dash icon margin</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -245,7 +245,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Show icon label</property>
+                    <property name="label" translatable="yes">Show app name</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -275,7 +275,7 @@
           <object class="GtkListBoxRow" id="listboxrow15">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">Needs improvement when going from a maximized state to a different tiled state and window size restoration.</property>
+            <property name="tooltip-text" translatable="yes">Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting.</property>
             <child>
               <object class="GtkBox" id="box15">
                 <property name="visible">True</property>
@@ -290,7 +290,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Use sizing animations</property>
+                    <property name="label" translatable="yes">Enable animations</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -333,7 +333,7 @@
                   <object class="GtkLabel" id="label2">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
-                    <property name="label" translatable="yes">Window gaps</property>
+                    <property name="label" translatable="yes">Gap between tiled windows</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -370,14 +370,14 @@
       </object>
     </child>
     <child type="tab">
-      <object class="GtkLabel">
+      <object class="GtkLabel" id="generalLabel">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="hexpand">True</property>
         <property name="label" translatable="yes">General</property>
       </object>
       <packing>
-        <property name="tab-fill">False</property>
+        <property name="tab-expand">True</property>
       </packing>
     </child>
     <child>
@@ -406,7 +406,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Maximize</property>
+                    <property name="label" translatable="yes">Toggle maximization</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -550,7 +550,6 @@
           <object class="GtkListBoxRow" id="listboxrow26">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">You should disable GNOME's default keybinding for the tiling</property>
             <child>
               <object class="GtkBox" id="box26">
                 <property name="visible">True</property>
@@ -604,7 +603,6 @@
           <object class="GtkListBoxRow" id="listboxrow27">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">You should disable GNOME's default keybinding for the tiling</property>
             <child>
               <object class="GtkBox" id="box27">
                 <property name="visible">True</property>
@@ -924,7 +922,6 @@
           <object class="GtkListBoxRow" id="listboxrow4">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">Tile window to the same position as an existing tiled window</property>
             <child>
               <object class="GtkBox" id="box4">
                 <property name="width-request">-1</property>
@@ -940,7 +937,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Replace tiled window</property>
+                    <property name="label" translatable="yes">Tile to other tiled window</property>
                     <property name="xalign">0</property>
                   </object>
                   <packing>
@@ -981,7 +978,7 @@
       </packing>
     </child>
     <child type="tab">
-      <object class="GtkLabel">
+      <object class="GtkLabel" id="keybindingsLabel">
         <property name="visible">True</property>
         <property name="can-focus">True</property>
         <property name="hexpand">True</property>
@@ -989,7 +986,7 @@
       </object>
       <packing>
         <property name="position">1</property>
-        <property name="tab-fill">False</property>
+        <property name="tab-expand">True</property>
       </packing>
     </child>
   </object>
