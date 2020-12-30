@@ -13,16 +13,18 @@ Development started on GNOME 3.36. But as of November 2020 all development happe
 
 ## Usage and features
 
-**You should disable GNOME's default keybindings and set them in this extension's settings page.**
+**Disable GNOME's default keybindings and set them in this extension's settings page.**
 
-- When a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows will open. The Dash will be centered on the free screen space. 
+- Windows-like (quarter) tiling: when a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows will open. The Dash will be centered on the free screen space. 
 Activating an icon will tile the corresponding window to fill the free space. 
 
 - You can hold `Shift` while activating an icon to tile the window to the top or the left half of the available screen depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right half. **Your windows shouldn't be tiled to be smaller than a screen quarter unless your resolution is 1440p+. Otherwise you will hit the window's minimum size and the tiled windows will overlap each other.**
 
 - Raise/focus tiled windows as a group.
 
-- Resize tiled windows in a group (**horizontal and vertical only**).
+- Resize tiled windows in a group (**horizontal and vertical only**). Combined with the keybindings to fill the available screen space and to tile to existing tiled windows this enables more complex layouts.
+
+- Configurable window gaps
 
 ![Preview](preview.gif)
 

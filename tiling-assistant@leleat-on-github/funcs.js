@@ -476,29 +476,29 @@ function maximizeBoth(window) {
 	let workArea = window.get_work_area_current_monitor();
 	window.tiledRect = workArea;
 
-	// let gap = MyExtension.settings.get_int("window-gaps");
-	// if (gap) {
-	// 	let rect = new Meta.Rectangle({
-	// 		x: workArea.x + gap,
-	// 		y: workArea.y + gap,
-	// 		width: workArea.width - 2 * gap,
-	// 		height: workArea.height - 2 * gap,
-	// 	});
+	let gap = MyExtension.settings.get_int("window-gaps");
+	if (gap) {
+		let rect = new Meta.Rectangle({
+			x: workArea.x + gap,
+			y: workArea.y + gap,
+			width: workArea.width - 2 * gap,
+			height: workArea.height - 2 * gap,
+		});
 
-	// 	let oldRect = window.get_frame_rect();
+		let oldRect = window.get_frame_rect();
 
-	// 	if (!window.isTiled)
-	// 		window.isTiled = oldRect;
+		if (!window.isTiled)
+			window.isTiled = oldRect;
 
-	// 	if (MyExtension.settings.get_boolean("use-anim"))
-	// 		main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
+		if (MyExtension.settings.get_boolean("use-anim"))
+			main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
 			
 		// setting user_op to false helps with issues on terminals
-	// 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
+		window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
-	// } else {
+	} else {
 		window.maximize(Meta.MaximizeFlags.BOTH);
-	// }
+	}
 };
 
 function restoreWindowSize(window, restoreFullPos = false) {
@@ -585,8 +585,6 @@ function removeFromTileGroup(window) {
 // opposingWindows are the windows bordering the resized window on the grab side
 function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 	let resizedRect = resizedWindow.get_frame_rect();
-	let resizeHeightDiff = resizedWindow.preGrabHeight - resizedRect.height;
-	let resizeWidthDiff = resizedWindow.preGrabWidth - resizedRect.width;
 	let sameSideWindows = resizedWindow.sameSideWindows;
 	let opposingWindows = resizedWindow.opposingWindows;
 
@@ -595,48 +593,50 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, resizedRect.y, wRect.width, w.preGrabHeight - resizeHeightDiff);
+				w.move_resize_frame(false, wRect.x, resizedRect.y, wRect.width, w.preGrabY + w.preGrabHeight - resizedRect.y);
 			});
 
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, wRect.y, wRect.width, w.preGrabHeight + resizeHeightDiff - 2 * 2 * gap);
+				w.move_resize_frame(false, wRect.x, wRect.y, wRect.width, resizedRect.y - wRect.y - 2 * gap);
 			});
 			break;
 
 		case Meta.GrabOp.RESIZING_S:
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, wRect.y, wRect.width, w.preGrabHeight - resizeHeightDiff);
+				w.move_resize_frame(false, wRect.x, wRect.y, wRect.width, resizedRect.y + resizedRect.height - wRect.y);
 			});
 
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, resizedRect.y + resizedRect.height + 2 * gap, wRect.width, w.preGrabHeight + resizeHeightDiff - 2 * 2 * gap);
+				let _y = resizedRect.y + resizedRect.height + 2 * gap;
+				w.move_resize_frame(false, wRect.x, _y, wRect.width, w.preGrabY + w.preGrabHeight - _y);
 			});
 			break;
 
 		case Meta.GrabOp.RESIZING_E:
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, wRect.y, w.preGrabWidth - resizeWidthDiff, wRect.height);
+				w.move_resize_frame(false, wRect.x, wRect.y, resizedRect.x + resizedRect.width - wRect.x, wRect.height);
 			});
 
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, resizedRect.x + resizedRect.width + 2 * gap, wRect.y, w.preGrabWidth + resizeWidthDiff - 2 * 2 * gap, wRect.height);
+				let _x = resizedRect.x + resizedRect.width + 2 * gap;
+				w.move_resize_frame(false, _x, wRect.y, w.preGrabX + w.preGrabWidth - _x, wRect.height);
 			});
 			break;
 
 		case Meta.GrabOp.RESIZING_W:
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, resizedRect.x, wRect.y, w.preGrabWidth - resizeWidthDiff, wRect.height);
+				w.move_resize_frame(false, resizedRect.x, wRect.y, w.preGrabX + w.preGrabWidth - resizedRect.x, wRect.height);
 			});
 
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, wRect.y, w.preGrabWidth + resizedWindow.preGrabWidth - resizedRect.width - 2 * 2 * gap, wRect.height);
+				w.move_resize_frame(false, wRect.x, wRect.y, resizedRect.x - wRect.x - 2 * gap, wRect.height);
 			});
 	}
 };

@@ -187,6 +187,10 @@ function disable() {
 		delete w.tileGroup;
 		delete w.sameSideWindows;
 		delete w.opposingWindows;
+		delete w.preGrabHeight;
+		delete w.preGrabWidth;
+		delete w.preGrabX;
+		delete w.preGrabY;
 
 		if (w.grabSignalIDs)
 			w.grabSignalIDs.forEach(id => w.disconnect(id));
@@ -295,8 +299,11 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		return;
 
 	let grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
-	grabbedWindow.preGrabWidth = grabbedRect.width;
-	grabbedWindow.preGrabHeight = grabbedRect.height;
+	let preGrabRect = grabbedWindow.get_frame_rect();
+	grabbedWindow.preGrabWidth = preGrabRect.width;
+	grabbedWindow.preGrabHeight = preGrabRect.height;
+	grabbedWindow.preGrabX = preGrabRect.x;
+	grabbedWindow.preGrabY = preGrabRect.y;
 
 	grabbedWindow.grabSignalIDs = [];
 
@@ -329,12 +336,18 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				let otherRect = oW.tiledRect;
 				if (Funcs.equalApprox(otherRect.y, grabbedRect.y, 10)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 10)) {
 					grabbedWindow.opposingWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				}
 			}
 
@@ -353,12 +366,18 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				let otherRect = oW.tiledRect;
 				if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, 10)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 10)) {
 					grabbedWindow.opposingWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				}
 			}
 
@@ -377,12 +396,18 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				let otherRect = oW.tiledRect;
 				if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, 10)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 10)) {
 					grabbedWindow.opposingWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				}
 			}
 
@@ -401,12 +426,18 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				let otherRect = oW.tiledRect;
 				if (Funcs.equalApprox(otherRect.x, grabbedRect.x, 10)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 10)) {
 					grabbedWindow.opposingWindows.push(oW);
-					oW.preGrabWidth = otherRect.width;
-					oW.preGrabHeight = otherRect.height;
+					let oR = oW.get_frame_rect();
+					oW.preGrabWidth = oR.width;
+					oW.preGrabHeight = oR.height;
+					oW.preGrabX = oR.x;
+					oW.preGrabY = oR.y;
 				}
 			}
 
@@ -422,47 +453,66 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 	window.grabSignalIDs.forEach(sID => window.disconnect(sID));
 	window.grabSignalIDs = [];
 
-	// update the windows' tiledRects
+	if (grabOp == Meta.GrabOp.MOVING) {
+		if (tilePreview.showing) {
+			let workArea = window.get_work_area_current_monitor();
+			if (workArea.equal(tilePreview.rect))
+				Funcs.maximizeBoth(window);
+			else
+				Funcs.tileWindow(window, tilePreview.rect);
+	
+			tilePreview.close();
+		}
+
+		return;
+	}
+
+	// update the tiledRects.
+	// Careful with resizing issues for some terminals!
 	let gap = settings.get_int("window-gaps");
-	let wR = window.get_frame_rect();
+	let newRect = window.get_frame_rect();
+	let oldTiledRect = window.tiledRect.copy();
+
+	// first calculate the new tiledRect for the grabbed window
+	let diffX = window.preGrabX - newRect.x;
+	let diffY = window.preGrabY - newRect.y;
+
+	let _x = window.tiledRect.x - diffX;
+	let _y = window.tiledRect.y - diffY;
 	window.tiledRect = new Meta.Rectangle({
-		x: wR.x - gap,
-		y: wR.y - gap,
-		width: wR.width + 2 * gap,
-		height: wR.height + 2 * gap
+		x: _x,
+		y: _y,
+		// tiledRect's x2 sticks to where it was, if not resizing on the East
+		width: (grabOp == Meta.GrabOp.RESIZING_E) ? newRect.width + 2 * gap : window.tiledRect.x + window.tiledRect.width - _x,
+		// tiledRect's y2 sticks to where it was, if not resizing on the South
+		height: (grabOp == Meta.GrabOp.RESIZING_S) ? newRect.height + 2 * gap : window.tiledRect.y + window.tiledRect.height - _y
 	});
 
+	// update the diff vars based on the tiledRects diff
+	diffX = oldTiledRect.x - window.tiledRect.x;
+	diffY = oldTiledRect.y - window.tiledRect.y;
+	let diffWidth = oldTiledRect.width - window.tiledRect.width;
+	let diffHeight = oldTiledRect.height - window.tiledRect.height;
+
 	window.sameSideWindows.forEach(w => {
-		let wRect = w.get_frame_rect();
 		w.tiledRect = new Meta.Rectangle({
-			x: wRect.x - gap,
-			y: wRect.y - gap,
-			width: wRect.width + 2 * gap,
-			height: wRect.height + 2 * gap
+			x: w.tiledRect.x - diffX,
+			y: w.tiledRect.y - diffY,
+			width: w.tiledRect.width - diffWidth,
+			height: w.tiledRect.height - diffHeight
 		});
 	});
 	window.sameSideWindows = [];
 
 	window.opposingWindows.forEach(w => {
-		let wRect = w.get_frame_rect();
 		w.tiledRect = new Meta.Rectangle({
-			x: wRect.x - gap,
-			y: wRect.y - gap,
-			width: wRect.width + 2 * gap,
-			height: wRect.height + 2 * gap
+			x: w.tiledRect.x - ((grabOp == Meta.GrabOp.RESIZING_E) ? diffWidth : 0),
+			y: w.tiledRect.y - ((grabOp == Meta.GrabOp.RESIZING_S) ? diffHeight : 0),
+			width: w.tiledRect.width + diffWidth,
+			height: w.tiledRect.height + diffHeight
 		});
 	});
 	window.opposingWindows = [];
-
-	if (tilePreview.showing) {
-		let workArea = window.get_work_area_current_monitor();
-		if (workArea.equal(tilePreview.rect))
-			Funcs.maximizeBoth(window);
-		else
-			Funcs.tileWindow(window, tilePreview.rect);
-
-		tilePreview.close();
-	}
 };
 
 // tile previewing via DND and restore window size, if window is already tiled
@@ -688,7 +738,7 @@ var TilingAppDash = GObject.registerClass(
 			});
 			main.layoutManager.addChrome(this.mouseCatcher);
 			this.mouseCatcher.hide();
-			this.onMouseCaught = this.mouseCatcher.connect("button-press-event", () => {
+			this.mouseCatcher.connect("button-press-event", () => {
 				if (this.shown)
 					this.close();
 			});
@@ -721,7 +771,6 @@ var TilingAppDash = GObject.registerClass(
 
 		_destroy() {
 			this.shadeBG.destroy();
-			this.mouseCatcher.disconnect(this.onMouseCaught);
 			this.mouseCatcher.destroy();
 			this.dashBG.destroy();
 			this.windowDash.destroy();
@@ -842,7 +891,10 @@ var TilingAppDash = GObject.registerClass(
 				opacity: 0,
 				duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.dashBG.hide()
+				onComplete: () => {
+					this.dashBG.hide();
+					//this.appContainer.destroy_all_children();
+				}
 			});
 
 			let finalX2 = this.windowDash.x + 200 * this.animationDir.x;
@@ -940,7 +992,10 @@ var TilingAppDash = GObject.registerClass(
 				opacity: 0,
 				duration: 250,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.windowDash.hide()
+				onComplete: () => {
+					this.windowDash.hide();
+					this.windowDash.destroy_all_children();
+				}
 			});
 		}
 	}
