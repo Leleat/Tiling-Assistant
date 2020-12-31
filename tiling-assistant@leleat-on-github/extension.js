@@ -314,8 +314,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	grabbedWindow.sameSideWindows = [];
 	grabbedWindow.opposingWindows = [];
 
-	let activeWS = global.workspace_manager.get_active_workspace()
-	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+	let openWindows = Funcs.getOpenWindows()
 	openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
 
 	switch (grabOp) {
@@ -655,9 +654,7 @@ function onWindowTiled(tiledWindow) {
 	if (appDash.shown)
 		return;
 
-	let activeWS = global.workspace_manager.get_active_workspace()
-	let openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
-
+	let openWindows = Funcs.getOpenWindows();
 	let currTileGroup = Funcs.getTopTileGroup(openWindows, false);
 	let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
 
@@ -777,6 +774,7 @@ var TilingAppDash = GObject.registerClass(
 			this.destroy();
 		}
 
+		// open when a window is tiled and when there is screen space available
 		open(openWindows, tiledWindow, freeScreenRect) {
 			this.shown = true;
 			this.appContainer.destroy_all_children();

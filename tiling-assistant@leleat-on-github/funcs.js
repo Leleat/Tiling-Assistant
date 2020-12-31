@@ -24,46 +24,90 @@ function rectHasPoint(rect, point) {
 
 // given rectA and rectB, calculate the rectangles which remain from rectA, 
 // if rectB is substracted from it. The result is an array of 0 - 4 rects depending on rectA/B's position.
-// ignore small rects since some windows (e. g. some Terminals) dont freely resize
-// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference
+// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference (Java implementation)
+// they implemented it in a way, which gives the top and bottom rect dimensions higher priority than the left and right rect.
+// I've simplified it a bit and added the option to do it the other way around depending on the monitor orientation.
+// additionally, ignore small rects since some windows (some Terminals) dont freely resize
 function rectDiff (rectA, rectB, ignoreMargin = 15) {
-    let resultRects = [];
+	let resultRects = [];
 
-    // top rect
-    let topRect_height = rectB.y - rectA.y;
-	if (topRect_height > ignoreMargin && rectA.width > ignoreMargin)
-		resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectA.y, width: rectA.width, height: topRect_height}));
+	let displayRect = global.display.get_monitor_geometry(global.display.get_current_monitor());
+	let wideScreen = displayRect.width > displayRect.height * .9; // put more weight on width
 
-    // bottom rect
-    let rectB_y2 = rectB.y + rectB.height;
-    let bottomRect_height = rectA.height - (rectB_y2 - rectA.y);
-    if (bottomRect_height > ignoreMargin && rectB_y2 < rectA.y + rectA.height && rectA.width > ignoreMargin)
-		resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectB_y2, width: rectA.width, height: bottomRect_height}));
+	// prioritize side rects
+	if (wideScreen) {
+		// left rect
+		let leftRect_width = rectB.x - rectA.x;
+		if (leftRect_width > ignoreMargin && rectA.height > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectA.y, width: leftRect_width, height: rectA.height}));
 
-    let rectA_y2 = rectA.y + rectA.height;
-    let sideRects_y = (rectB.y > rectA.y) ? rectB.y : rectA.y;
-    let sideRects_y2 = (rectB_y2 < rectA_y2) ? rectB_y2 : rectA_y2;
-    let sideRects_height = sideRects_y2 - sideRects_y;
+		// right rect
+		let rectA_x2 = rectA.x + rectA.width;
+		let rectB_x2 = rectB.x + rectB.width;
+		let rightRect_width = rectA_x2 - rectB_x2;
+		if (rightRect_width > ignoreMargin && rectA.height > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectB_x2, y: rectA.y, width: rightRect_width, height: rectA.height}));
 
-    // left rect
-    let leftRect_width = rectB.x - rectA.x;
-    if (leftRect_width > ignoreMargin && sideRects_height > ignoreMargin)
-		resultRects.push(new Meta.Rectangle({x: rectA.x, y: sideRects_y, width: leftRect_width, height: sideRects_height}));
+		let sideRects_x = (rectB.x > rectA.x) ? rectB.x : rectA.x;
+		let sideRects_x2 = (rectB_x2 < rectA_x2) ? rectB_x2 : rectA_x2;
+		let sideRects_width = sideRects_x2 - sideRects_x;
 
-    // right rect
-    let rectB_x2 = rectB.x + rectB.width;
-    let rightRect_width = rectA.width - (rectB_x2 - rectA.x);
-    if (rightRect_width > ignoreMargin && sideRects_height > ignoreMargin)
-		resultRects.push(new Meta.Rectangle({x: rectB_x2, y: sideRects_y, width: rightRect_width, height: sideRects_height}));
+		// top rect
+		let topRect_height = rectB.y - rectA.y;
+		if (topRect_height > ignoreMargin && sideRects_width > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: sideRects_x, y: rectA.y, width: sideRects_width, height: topRect_height}));
+
+		// bottom rect
+		let rectA_y2 = rectA.y + rectA.height;
+		let rectB_y2 = rectB.y + rectB.height;
+		let bottomRect_height = rectA_y2 - rectB_y2;
+		if (bottomRect_height > ignoreMargin && sideRects_width > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: sideRects_x, y: rectB_y2, width: sideRects_width, height: bottomRect_height}));
+
+	// prioritize top and bottom rect
+	// mostly from the link mentioned above
+	} else {
+		// top rect
+		let topRect_height = rectB.y - rectA.y;
+		if (topRect_height > ignoreMargin && rectA.width > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectA.y, width: rectA.width, height: topRect_height}));
+	
+		// bottom rect
+		let rectA_y2 = rectA.y + rectA.height;
+		let rectB_y2 = rectB.y + rectB.height;
+		let bottomRect_height = rectA_y2 - rectB_y2;
+		if (bottomRect_height > ignoreMargin && rectA.width > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectB_y2, width: rectA.width, height: bottomRect_height}));
+	
+		let sideRects_y = (rectB.y > rectA.y) ? rectB.y : rectA.y;
+		let sideRects_y2 = (rectB_y2 < rectA_y2) ? rectB_y2 : rectA_y2;
+		let sideRects_height = sideRects_y2 - sideRects_y;
+	
+		// left rect
+		let leftRect_width = rectB.x - rectA.x;
+		if (leftRect_width > ignoreMargin && sideRects_height > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectA.x, y: sideRects_y, width: leftRect_width, height: sideRects_height}));
+	
+		// right rect
+		let rectA_x2 = rectA.x + rectA.width;
+		let rectB_x2 = rectB.x + rectB.width;
+		let rightRect_width = rectA_x2 - rectB_x2;
+		if (rightRect_width > ignoreMargin && sideRects_height > ignoreMargin)
+			resultRects.push(new Meta.Rectangle({x: rectB_x2, y: sideRects_y, width: rightRect_width, height: sideRects_height}));	
+	}
 
     return resultRects;
 };
 
+function getOpenWindows() {
+	let activeWS = global.workspace_manager.get_active_workspace()
+	return global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+}
+
 // get the top most tiled windows which are in a group (window list by stack order: top -> bottom)
 function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 	if (openWindows == null) {
-		let activeWS = global.workspace_manager.get_active_workspace()
-		openWindows = global.display.sort_windows_by_stacking(activeWS.list_windows()).reverse();
+		openWindows = getOpenWindows();
 	}
 
 	let groupedWindows = []; // tiled windows which are considered in a group
@@ -713,8 +757,8 @@ function replaceTiledWindow(window) {
 		});
 
 		let label = new St.Label({
-			x: rect.x + rect.width / 2 - 25,
-			y: rect.y + rect.height / 2 - 25,
+			x: rect.x + rect.width / 2,
+			y: rect.y + rect.height / 2,
 			text: (rects.length).toString(),
 			style: "font-size: 50px"
 		});

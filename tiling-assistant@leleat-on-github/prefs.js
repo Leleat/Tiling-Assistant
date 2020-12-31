@@ -20,7 +20,7 @@ function buildPrefsWidget () {
 const MyPrefsWidget = new GObject.Class({
 		Name : "MyTilingPrefsWidget",
 		GTypeName : "MyTilingPrefsWidget",
-		Extends : Gtk.Box, // or ScrolledWindow if this gets too big
+		Extends : Gtk.ScrolledWindow, // or ScrolledWindow if this gets too big
 	
 		_init : function (params) {
 			let gschema = Gio.SettingsSchemaSource.new_from_directory(
@@ -41,6 +41,8 @@ const MyPrefsWidget = new GObject.Class({
 	
 			let gtkNotebook = this.builder.get_object('main_prefs');
 			this.add(gtkNotebook);
+
+			this.set_min_content_height(700);
 
 			// bind settings to the UI objects
 			// make sure the objects in prefs.ui have the same name as the keys in the settings (schema.xml)
