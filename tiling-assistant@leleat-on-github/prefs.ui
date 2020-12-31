@@ -368,16 +368,19 @@
           </object>
         </child>
       </object>
+      <packing>
+        <property name="tab-fill">False</property>
+      </packing>
     </child>
     <child type="tab">
       <object class="GtkLabel" id="generalLabel">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
+        <property name="can-focus">False</property>
         <property name="hexpand">True</property>
         <property name="label" translatable="yes">General</property>
       </object>
       <packing>
-        <property name="tab-expand">True</property>
+        <property name="tab-fill">False</property>
       </packing>
     </child>
     <child>
@@ -388,11 +391,12 @@
         <property name="margin-bottom">15</property>
         <property name="hexpand">True</property>
         <property name="vexpand">True</property>
-        <property name="selection-mode">none</property>
         <child>
           <object class="GtkListBoxRow" id="listboxrow3">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box3">
                 <property name="visible">True</property>
@@ -445,6 +449,8 @@
           <object class="GtkListBoxRow" id="listboxrow20">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box20">
                 <property name="visible">True</property>
@@ -497,6 +503,8 @@
           <object class="GtkListBoxRow" id="listboxrow21">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box21">
                 <property name="visible">True</property>
@@ -550,6 +558,8 @@
           <object class="GtkListBoxRow" id="listboxrow26">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box26">
                 <property name="visible">True</property>
@@ -603,6 +613,8 @@
           <object class="GtkListBoxRow" id="listboxrow27">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box27">
                 <property name="visible">True</property>
@@ -656,6 +668,8 @@
           <object class="GtkListBoxRow" id="listboxrow22">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box22">
                 <property name="visible">True</property>
@@ -709,6 +723,8 @@
           <object class="GtkListBoxRow" id="listboxrow23">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box23">
                 <property name="visible">True</property>
@@ -762,6 +778,8 @@
           <object class="GtkListBoxRow" id="listboxrow24">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box24">
                 <property name="visible">True</property>
@@ -815,6 +833,8 @@
           <object class="GtkListBoxRow" id="listboxrow25">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box25">
                 <property name="visible">True</property>
@@ -869,6 +889,8 @@
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <property name="tooltip-text" translatable="yes">If the "empty space" is  ambiguous, the window will be maximized.</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box1">
                 <property name="visible">True</property>
@@ -922,6 +944,8 @@
           <object class="GtkListBoxRow" id="listboxrow4">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <property name="activatable">False</property>
+            <property name="selectable">False</property>
             <child>
               <object class="GtkBox" id="box4">
                 <property name="width-request">-1</property>
@@ -975,18 +999,122 @@
       </object>
       <packing>
         <property name="position">1</property>
+        <property name="tab-fill">False</property>
       </packing>
     </child>
     <child type="tab">
       <object class="GtkLabel" id="keybindingsLabel">
         <property name="visible">True</property>
-        <property name="can-focus">True</property>
+        <property name="can-focus">False</property>
         <property name="hexpand">True</property>
         <property name="label" translatable="yes">Keybindings</property>
       </object>
       <packing>
         <property name="position">1</property>
-        <property name="tab-expand">True</property>
+        <property name="tab-fill">False</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox" id="HelpBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">center</property>
+        <property name="margin-start">15</property>
+        <property name="margin-end">15</property>
+        <property name="margin-top">15</property>
+        <property name="margin-bottom">15</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="margin-top">5</property>
+            <property name="label" translatable="yes">Tiling Assistant</property>
+            <property name="track-visited-links">False</property>
+            <attributes>
+              <attribute name="weight" value="ultrabold"/>
+              <attribute name="size" value="15360"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLinkButton">
+            <property name="label">https://github.com/Leleat/Tiling-Assist</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">15</property>
+            <property name="relief">none</property>
+            <property name="use-underline">True</property>
+            <property name="uri">https://github.com/Leleat/Tiling-Assist</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="issueLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="label" translatable="yes">If you want to report a bug or make a feature request, please open an issue on Github.</property>
+            <property name="use-markup">True</property>
+            <property name="justify">center</property>
+            <property name="wrap">True</property>
+            <property name="width-chars">27</property>
+            <property name="max-width-chars">47</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel" id="licenseLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="valign">end</property>
+            <property name="margin-bottom">20</property>
+            <property name="vexpand">True</property>
+            <property name="label" translatable="yes">&lt;small&gt;This extension is licensed under the &lt;a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"&gt;GNU General Public License, version 2 or later&lt;/a&gt; and comes with &lt;u&gt;&lt;b&gt;NO WARRANTY&lt;/b&gt;&lt;/u&gt;.  A copy of this license can be found in the Github repository.&lt;/small&gt;</property>
+            <property name="use-markup">True</property>
+            <property name="justify">center</property>
+            <property name="wrap">True</property>
+            <property name="width-chars">40</property>
+            <property name="max-width-chars">0</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="position">2</property>
+        <property name="tab-fill">False</property>
+      </packing>
+    </child>
+    <child type="tab">
+      <object class="GtkLabel" id="helpLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="hexpand">True</property>
+        <property name="label" translatable="yes">Help</property>
+      </object>
+      <packing>
+        <property name="position">2</property>
+        <property name="tab-fill">False</property>
       </packing>
     </child>
   </object>

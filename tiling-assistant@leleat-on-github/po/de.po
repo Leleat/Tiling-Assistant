@@ -25,82 +25,103 @@ msgstr "Allgemein"
 msgid "Keybindings"
 msgstr "Tastenkürzel"
 
-#: prefs.js:61
+#: prefs.js:66
+msgid "Help"
+msgstr "Hilfe"
+
+#: prefs.js:69
 msgid "Dash icon size"
 msgstr "Dash Icon Größe"
 
-#: prefs.js:62
+#: prefs.js:70
 msgid "Dash icon margin"
 msgstr "Dash Icon Rand"
 
-#: prefs.js:63
+#: prefs.js:71
 msgid "Show app name"
 msgstr "Zeige den App-Namen"
 
-#: prefs.js:64
+#: prefs.js:72
 msgid "Enable animations"
 msgstr "Benutze Animationen"
 
-#: prefs.js:65
+#: prefs.js:73
 msgid "Gap between tiled windows"
 msgstr "Abstand zwischen gekachelten Fenstern"
 
-#: prefs.js:66
+#: prefs.js:74
 msgid "Toggle maximization"
 msgstr "Fenstermaximierung umschalten"
 
-#: prefs.js:67
+#: prefs.js:75
 msgid "Tile to top half"
 msgstr "Kachel zur oberen Hälfte"
 
-#: prefs.js:68
+#: prefs.js:76
 msgid "Tile to bottom half"
 msgstr "Kachel zur unteren Hälfte"
 
-#: prefs.js:69
+#: prefs.js:77
 msgid "Tile to right half"
 msgstr "Kachel zur rechten Hälfte"
 
-#: prefs.js:70
+#: prefs.js:78
 msgid "Tile to left half"
 msgstr "Kachel zur linken Hälfte"
 
-#: prefs.js:71
+#: prefs.js:79
 msgid "Tile to top left quarter"
 msgstr "Kachel nach oben links"
 
-#: prefs.js:72
+#: prefs.js:80
 msgid "Tile to  top right quarter"
 msgstr "Kachel nach oben rechts"
 
-#: prefs.js:73
+#: prefs.js:81
 msgid "Tile to bottom left quarter"
 msgstr "Kachel nach unten links"
 
-#: prefs.js:74
+#: prefs.js:82
 msgid "Tile to bottom right quarter"
 msgstr "Kachel nach unten rechts"
 
-#: prefs.js:75
+#: prefs.js:83
 msgid "Tile to empty space"
 msgstr "Kachel zum verfügbaren Platz"
 
-#: prefs.js:76
+#: prefs.js:84
 msgid "Tile to other tiled window"
 msgstr "Kachel zu anderem gekacheltem Fenster"
 
-#: prefs.js:79
+#: prefs.js:85
+msgid ""
+"If you want to report a bug or make a feature request, please open an issue "
+"on Github."
+msgstr "Falls du einen Bug melden möchtest oder einen Feature-Wunsch hast, öffne bitte ein Issue auf Github."
+
+#: prefs.js:86
+msgid ""
+"<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
+"later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license "
+"can be found in the Github repository.</span>"
+msgstr ""
+"<span size='small'>Diese Erweiterung wird mit der <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 oder "
+"später</a> entwickelt und bietet <u><b>KEINE GARANTIE</b></u>. Eine Kopie der Lizenz befindet sich auf Github.</span>"
+
+#: prefs.js:89
 msgid ""
 "Show app names in the dash. Make sure the icons have a sufficient size, if "
 "you want to use this setting."
 msgstr "Zeige den App-Namen im Dash. Vergewissere dich, dass die Icons groß genug sind, falls du diese Einstellung aktivieren möchtest."
 
-#: prefs.js:80
+#: prefs.js:90
 msgid ""
 "Even if this setting is turned off, not all move/resize animations will be "
 "disabled. Some are native to GNOME and thus unaffected by this setting."
 msgstr "Selbst wenn diese Einstellung deaktiviert ist, bedeutet es nicht, dass alle Fensterbewegungs-/-größenänderungsanimationen deaktiviert werden. Manche kommen von GNOME und bleiben daher von dieser Einstellung unberührt."
 
-#: prefs.js:81
+#: prefs.js:91
 msgid "If the \"empty space\" is  ambiguous, the window will be maximized."
 msgstr "Falls der \"verfügbare Platz\" nicht eindeutig ist, wird das Fenster maximiert."

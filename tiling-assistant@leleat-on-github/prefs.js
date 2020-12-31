@@ -63,6 +63,7 @@ const MyPrefsWidget = new GObject.Class({
 			// tab labels
 			this.builder.get_object("generalLabel").set_text(_("General"));
 			this.builder.get_object("keybindingsLabel").set_text(_("Keybindings"));
+			this.builder.get_object("helpLabel").set_text(_("Help"));
 			
 			// other settings labels
 			this.builder.get_object("label12").set_text(_("Dash icon size"));
@@ -81,6 +82,8 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder.get_object("label25").set_text(_("Tile to bottom right quarter"));
 			this.builder.get_object("label1").set_text(_("Tile to empty space"));
 			this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
+			this.builder.get_object("issueLabel").set_text(_("If you want to report a bug or make a feature request, please open an issue on Github."));
+			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
 
 			// tooltips
 			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));

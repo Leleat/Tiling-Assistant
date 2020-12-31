@@ -18,6 +18,10 @@ function rectsAreAboutEqual (r1, r2) {
     return samePos && sameSize;
 };
 
+function rectHasPoint(rect, point) {
+	return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
+};
+
 // given rectA and rectB, calculate the rectangles which remain from rectA, 
 // if rectB is substracted from it. The result is an array of 0 - 4 rects depending on rectA/B's position.
 // ignore small rects since some windows (e. g. some Terminals) dont freely resize
@@ -476,29 +480,29 @@ function maximizeBoth(window) {
 	let workArea = window.get_work_area_current_monitor();
 	window.tiledRect = workArea;
 
-	let gap = MyExtension.settings.get_int("window-gaps");
-	if (gap) {
-		let rect = new Meta.Rectangle({
-			x: workArea.x + gap,
-			y: workArea.y + gap,
-			width: workArea.width - 2 * gap,
-			height: workArea.height - 2 * gap,
-		});
+	// let gap = MyExtension.settings.get_int("window-gaps");
+	// if (gap) {
+	// 	let rect = new Meta.Rectangle({
+	// 		x: workArea.x + gap,
+	// 		y: workArea.y + gap,
+	// 		width: workArea.width - 2 * gap,
+	// 		height: workArea.height - 2 * gap,
+	// 	});
 
-		let oldRect = window.get_frame_rect();
+	// 	let oldRect = window.get_frame_rect();
 
-		if (!window.isTiled)
-			window.isTiled = oldRect;
+	// 	if (!window.isTiled)
+	// 		window.isTiled = oldRect;
 
-		if (MyExtension.settings.get_boolean("use-anim"))
-			main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
+	// 	if (MyExtension.settings.get_boolean("use-anim"))
+	// 		main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
 			
-		// setting user_op to false helps with issues on terminals
-		window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
+	// 	// setting user_op to false helps with issues on terminals
+	// 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
-	} else {
+	// } else {
 		window.maximize(Meta.MaximizeFlags.BOTH);
-	}
+	// }
 };
 
 function restoreWindowSize(window, restoreFullPos = false) {
@@ -642,9 +646,10 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 };
 
 // called via keybinding:
-// tile a window over an existing tiled window
+// tile a window to existing layout of tiled windows below it
 function replaceTiledWindow(window) {
-	// get the top tile group and sort them from left -> right and top -> bottom (for the numbering)
+	// get the top tile group and sort them from left -> right and top -> bottom
+	// for the numbering of the labels
 	let currTileGroup = getTopTileGroup().sort((w1, w2) => {
 		let w1Rect = w1.get_frame_rect();
 		let w2Rect = w2.get_frame_rect();
@@ -656,8 +661,11 @@ function replaceTiledWindow(window) {
 		return w1Rect.y - w2Rect.y;
 	});
 	
-	if (!currTileGroup.length)
+	let wCount = currTileGroup.length;
+	if (!wCount)
 		return;
+
+	let freeScreenRects = getFreeScreenRects(currTileGroup);
 	
 	// to later destroy all the actors
 	let actors = [];
@@ -684,37 +692,38 @@ function replaceTiledWindow(window) {
 		mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 	});
 
-	// create rectangles and Nr labels to display over the tiled windows
-	for (let i = 0; i < currTileGroup.length; i++) {
-		let wRect = currTileGroup[i].tiledRect;
-
-		let rect = new St.Widget({
+	// create rectangles and Nr labels to display over the tiled windows and freeScreenRects
+	let createRect = function (rect) {
+		// preview is slightly smaller than the Rect rect for visibility 
+		let previewRect = new St.Widget({
 			style_class: "tile-preview",
-			x: wRect.x + 10, 
-			y: wRect.y + 10,
+			x: rect.x + 10, 
+			y: rect.y + 10,
 			opacity: 0,
-			width: wRect.width - 2 * 10,
-			height: wRect.height - 2 * 10,
+			width: rect.width - 2 * 10,
+			height: rect.height - 2 * 10,
 		});
-		global.window_group.add_child(rect);
-		rects.push(rect);
-		rect.idx = i;
+		global.window_group.add_child(previewRect);
+		rects.push(previewRect);
 
-		rect.ease({
+		previewRect.ease({
 			opacity: 255,
 			duration: windowManager.WINDOW_ANIMATION_TIME,
 			mode: Clutter.AnimationMode.EASE_OUT_QUAD
 		});
 
 		let label = new St.Label({
-			x: wRect.x + wRect.width / 2,
-			y: wRect.y + wRect.height / 2,
-			text: (i + 1).toString(),
+			x: rect.x + rect.width / 2 - 25,
+			y: rect.y + rect.height / 2 - 25,
+			text: (rects.length).toString(),
 			style: "font-size: 50px"
 		});
 		global.window_group.add_child(label);
 		actors.push(label);
-	}
+	};
+
+	currTileGroup.forEach(w => createRect(w.tiledRect));
+	freeScreenRects.forEach(r => createRect(r));
 
 	// add a widget to catch the key inputs and mouse clicks
 	let catcher = new St.Widget({
@@ -736,26 +745,30 @@ function replaceTiledWindow(window) {
 
 	// tile via nr keyboard input
 	catcher.grab_key_focus();
-	let sID = catcher.connect("key-press-event", (src, event) => {
-		catcher.disconnect(sID);
-		
+	catcher.connect("key-press-event", (src, event) => {
 		let key = parseInt(event.get_key_unicode());
 
-		if (Number.isInteger(key) && key <= currTileGroup.length)
-			tileWindow(window, currTileGroup[key - 1].tiledRect);
+		if (Number.isInteger(key) && key > 0) {
+			if (key <= wCount)
+				tileWindow(window, currTileGroup[key - 1].tiledRect);
+			else if (key <= wCount + freeScreenRects.length)
+				tileWindow(window, freeScreenRects[key - wCount - 1]);
+		}
 
 		destroyAll();
 	});
 
 	// tile via mouse click
-	let signalID = catcher.connect("button-press-event", (src, event) => {
-		catcher.disconnect(signalID);
-		
+	catcher.connect("button-press-event", (src, event) => {
 		let [mX, mY] = event.get_coords();
 		for(let i = 0; i < rects.length; i++) {
 			let r = rects[i]
-			if (mX > r.x && mX < r.x + r.width && mY > r.y && mY < r.y + r.height) {
-				tileWindow(window, currTileGroup[r.idx].tiledRect);
+			if (rectHasPoint(r, {x: mX, y: mY})) {
+				if (i < wCount)
+					tileWindow(window, currTileGroup[i].tiledRect);
+				else
+					tileWindow(window, freeScreenRects[i - wCount]);
+				
 				break;
 			}
 		}
