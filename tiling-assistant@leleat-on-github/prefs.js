@@ -53,7 +53,7 @@ const MyPrefsWidget = new GObject.Class({
 					this.settings.bind(key, builderObject, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 			});
 
-			let shortcuts = ["replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+			let shortcuts = ["toggle-dash", "half-vertically", "half-horizontally", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 					"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 			shortcuts.forEach((sc) => {
 				this.makeShortcutEdit(sc);
@@ -92,7 +92,6 @@ const MyPrefsWidget = new GObject.Class({
 			// tooltips
 			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));
 			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
-			this.builder.get_object("listboxrow1").set_tooltip_text(_("If the \"empty space\" is  ambiguous, the window will be maximized."));
 			
 			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
 		},
@@ -139,7 +138,7 @@ const MyPrefsWidget = new GObject.Class({
 		// manually add the keys to the arrays in this function
 		getBindProperty: function(key) {
 			let ints = ["icon-size", "icon-margin", "window-gaps"];
-			let bools = ["show-label", "use-anim"];
+			let bools = ["enable-dash", "show-label", "use-anim"];
 
 			if (ints.includes(key)) 
 				return "value"; // spinbox.value

@@ -49,7 +49,8 @@ function enable() {
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
 
 	// tiling keybindings
-	this.keyBindings = ["replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter"];
+	this.keyBindings = ["toggle-dash", "half-vertically", "half-horizontally", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+			"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(
 			key,
@@ -214,6 +215,13 @@ function onMyTilingShortcutPressed(shortcutName) {
 	let rect;
 	let workArea = window.get_work_area_current_monitor();
 	switch (shortcutName) {
+		case "toggle-dash":
+			let toggleTo = !settings.get_boolean("enable-dash");
+			settings.set_boolean("enable-dash", toggleTo);
+
+			main.notify("Tiling Assistant", "Dash " + (toggleTo ? 'enabled' : 'was disabled'));
+			return;
+
 		case "tile-maximize":
 			rect = workArea;
 			break;
@@ -277,9 +285,40 @@ function onMyTilingShortcutPressed(shortcutName) {
 		case "replace-window":
 			Funcs.replaceTiledWindow(window);
 			return;
+
+		case "half-vertically":
+			if (!window.tiledRect)
+				return;
+
+			rect = new Meta.Rectangle({
+				x: window.tiledRect.x,
+				y: window.tiledRect.y,
+				width: window.tiledRect.width,
+				height: window.tiledRect.height / 2
+			});
+			break;
+		
+		case "half-horizontally":
+			if (!window.tiledRect)
+				return;
+
+			rect = new Meta.Rectangle({
+				x: window.tiledRect.x,
+				y: window.tiledRect.y,
+				width: window.tiledRect.width / 2,
+				height: window.tiledRect.height
+			});
+			break;
+
+		case "toggle-always-on-top":
+			if (window.is_above())
+				window.unmake_above();
+			else
+				window.make_above();
+			return;
 	}
 
-	if (Funcs.rectsAreAboutEqual(rect, (window.isTiled) ? window.tiledRect : window.get_frame_rect())) {
+	if ((window.isTiled && Funcs.rectsAreAboutEqual(rect, window.tiledRect)) || (shortcutName == "tile-maximize" && Funcs.rectsAreAboutEqual(workArea, window.get_frame_rect()))) {
 		Funcs.restoreWindowSize(window, true);
 
 	} else {
@@ -299,12 +338,16 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	if (grabOp != Meta.GrabOp.MOVING && !grabbedWindow.isTiled)
 		return;
 
+	let savePregrabRect = function (w) {
+		let oR = w.get_frame_rect();
+		w.preGrabWidth = oR.width;
+		w.preGrabHeight = oR.height;
+		w.preGrabX = oR.x;
+		w.preGrabY = oR.y;
+	};
+
 	let grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
-	let preGrabRect = grabbedWindow.get_frame_rect();
-	grabbedWindow.preGrabWidth = preGrabRect.width;
-	grabbedWindow.preGrabHeight = preGrabRect.height;
-	grabbedWindow.preGrabX = preGrabRect.x;
-	grabbedWindow.preGrabY = preGrabRect.y;
+	savePregrabRect(grabbedWindow);
 
 	grabbedWindow.grabSignalIDs = [];
 
@@ -321,7 +364,8 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
 			let [x, y] = global.get_pointer();
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y])));
+			let tileGroup = Funcs.getTopTileGroup();
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], tileGroup)));
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
@@ -334,20 +378,13 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.y, grabbedRect.y, 10)) {
+				if (Funcs.equalApprox(otherRect.y, grabbedRect.y, 20)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
-				} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 10)) {
+					savePregrabRect(oW);
+
+				} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 20)) {
 					grabbedWindow.opposingWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
+					savePregrabRect(oW);
 				}
 			}
 
@@ -364,20 +401,13 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, 10)) {
+				if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, 20)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
-				} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 10)) {
+					savePregrabRect(oW);
+
+				} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 20)) {
 					grabbedWindow.opposingWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
+					savePregrabRect(oW);
 				}
 			}
 
@@ -394,20 +424,13 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, 10)) {
+				if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, 20)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
-				} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 10)) {
+					savePregrabRect(oW);
+
+				} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 20)) {
 					grabbedWindow.opposingWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
+					savePregrabRect(oW);
 				}
 			}
 
@@ -424,20 +447,13 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.x, grabbedRect.x, 10)) {
+				if (Funcs.equalApprox(otherRect.x, grabbedRect.x, 20)) {
 					grabbedWindow.sameSideWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
-				} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 10)) {
+					savePregrabRect(oW);
+
+				} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 20)) {
 					grabbedWindow.opposingWindows.push(oW);
-					let oR = oW.get_frame_rect();
-					oW.preGrabWidth = oR.width;
-					oW.preGrabHeight = oR.height;
-					oW.preGrabX = oR.x;
-					oW.preGrabY = oR.y;
+					savePregrabRect(oW);
 				}
 			}
 
@@ -457,6 +473,10 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 
 	if (grabOp == Meta.GrabOp.MOVING) {
 		if (tilePreview.showing) {
+			// halving already tiled window
+			if (tilePreview.tiledWindow)
+				Funcs.tileWindow(tilePreview.tiledWindow, Funcs.rectDiff(tilePreview.tiledWindow.tiledRect, tilePreview.rect)[0], false);
+	
 			let workArea = window.get_work_area_current_monitor();
 			if (workArea.equal(tilePreview.rect))
 				Funcs.maximizeBoth(window);
@@ -518,7 +538,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 };
 
 // tile previewing via DND and restore window size, if window is already tiled
-function onWindowMoving(window, grabStartPos) {
+function onWindowMoving(window, grabStartPos, currTileGroup) {
 	let [mouseX, mouseY] = global.get_pointer();
 
 	// restore the window size of tiled windows after DND distance of at least 1px
@@ -575,10 +595,44 @@ function onWindowMoving(window, grabStartPos) {
 	let tileMaximized = onTop;
 	let tileBottomHalf = onBottom;
 
-	let pos = 0;
+	let pos = 0; // Meta.Side.X
 
-	// prioritize quarter over other tiling
-	if (tileTopLeftQuarter) {
+	// halve tiled window which is hovered while pressing ctrl
+	let event = Clutter.get_current_event();
+	let modifiers = event ? event.get_state() : 0;
+	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
+	let isHoveringTiledWindow = false;
+
+	if (isCtrlPressed) {
+		for (let i = 0; i < currTileGroup.length; i++) {
+			let w = currTileGroup[i];
+			let wRect = w.get_frame_rect();
+
+			if (!Funcs.rectHasPoint(wRect, {x: mouseX, y: mouseY}))
+				continue;
+
+			isHoveringTiledWindow = true;
+
+			let top = mouseY < wRect.y + wRect.height * .2;
+			let bottom = mouseY > wRect.y + wRect.height * .8;
+			let vertical = top || bottom;
+			let right = mouseX > wRect.x + wRect.width / 2;
+
+			wRect = w.tiledRect;
+			let r = new Meta.Rectangle({
+				x: wRect.x + (right && !vertical ? wRect.width / 2 : 0),
+				y: wRect.y + (bottom ? wRect.height / 2 : 0),
+				width: wRect.width / (vertical ? 1 : 2),
+				height: wRect.height / (vertical ? 2 : 1)
+			});
+		
+			tilePreview.open(window, 0, r, monitorNr, w);
+		}
+
+		if (!isHoveringTiledWindow)
+			tilePreview.close();
+
+	} else if (tileTopLeftQuarter) {
 		pos = Meta.Side.TOP + Meta.Side.LEFT;
 		if (tilePreview.currPos == pos)
 			return;
@@ -654,7 +708,7 @@ function onWindowMoving(window, grabStartPos) {
 // called when a window is tiled (via tileWindow()).
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function onWindowTiled(tiledWindow) {
-	if (appDash.shown)
+	if (appDash.shown || !settings.get_boolean("enable-dash"))
 		return;
 
 	let openWindows = Funcs.getOpenWindows();
@@ -1015,7 +1069,7 @@ var TilingTilePreview = GObject.registerClass(
 			this.currPos = 0; // Meta.Side
 		}
 
-		open(window, pos, tileRect, monitorIndex) {
+		open(window, pos, tileRect, monitorIndex, tiledWindow = null) {
 			let windowActor = window.get_compositor_private();
 			if (!windowActor)
 				return;
@@ -1029,6 +1083,7 @@ var TilingTilePreview = GObject.registerClass(
 			this.monitorIndex = monitorIndex;
 			this.rect = tileRect;
 			this.currPos = pos;
+			this.tiledWindow = tiledWindow; // preview over tiled window when holding ctrl
 
 			let monitor = main.layoutManager.monitors[monitorIndex];
 
@@ -1073,6 +1128,7 @@ var TilingTilePreview = GObject.registerClass(
 				return;
 
 			this.showing = false;
+			this.tiledWindow = null;
 			this.currPos = 0;
 			this.ease({
 				opacity: 0,

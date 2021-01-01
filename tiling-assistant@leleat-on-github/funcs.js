@@ -31,7 +31,7 @@ function rectHasPoint(rect, point) {
 // they implemented it in a way, which gives the top and bottom rect dimensions higher priority than the left and right rect.
 // I've simplified it a bit and added the option to do it the other way around depending on the monitor orientation.
 // additionally, ignore small rects since some windows (some Terminals) dont freely resize
-function rectDiff (rectA, rectB, ignoreMargin = 15) {
+function rectDiff (rectA, rectB, ignoreMargin = 35) {
 	let resultRects = [];
 
 	let displayRect = global.display.get_monitor_geometry(global.display.get_current_monitor());
@@ -109,9 +109,8 @@ function getOpenWindows() {
 
 // get the top most tiled windows which are in a group (window list by stack order: top -> bottom)
 function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
-	if (openWindows == null) {
+	if (openWindows == null)
 		openWindows = getOpenWindows();
-	}
 
 	let groupedWindows = []; // tiled windows which are considered in a group
 	let notGroupedWindows = []; // normal and tiled windows which appear between grouped windows in the stack order
@@ -696,30 +695,28 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 };
 
 // called via keybinding:
-// tile a window to existing layout of tiled windows below it
+// tile a window to existing layout below it
 function replaceTiledWindow(window) {
-	// get the top tile group and sort them from left -> right and top -> bottom
-	// for the numbering of the labels
-	let currTileGroup = getTopTileGroup().sort((w1, w2) => {
-		let w1Rect = w1.get_frame_rect();
-		let w2Rect = w2.get_frame_rect();
+	let currTileGroup = getTopTileGroup();
+	if (!currTileGroup.length)
+		return;
 
-		let xPos = w1Rect.x - w2Rect.x;
+	let rects = [];
+	currTileGroup.forEach(w => rects.push(w.tiledRect.copy()));
+	let freeScreenRects = getFreeScreenRects(currTileGroup);
+
+	// rects from tileGroup and and freeScreenRects sorted from left -> right and top -> bottom
+	rects = rects.concat(freeScreenRects).sort((r1, r2) => {
+		let xPos = r1.x - r2.x;
 		if (xPos)
 			return xPos;
 
-		return w1Rect.y - w2Rect.y;
+		return r1.y - r2.y;
 	});
-	
-	let wCount = currTileGroup.length;
-	if (!wCount)
-		return;
-
-	let freeScreenRects = getFreeScreenRects(currTileGroup);
 	
 	// to later destroy all the actors
 	let actors = [];
-	let rects = [];
+	let previewRects = [];
 
 	// dim background
 	let entireWorkArea = window.get_work_area_all_monitors();
@@ -743,7 +740,8 @@ function replaceTiledWindow(window) {
 	});
 
 	// create rectangles and Nr labels to display over the tiled windows and freeScreenRects
-	let createRect = function (rect) {
+	let counter = 1;
+	rects.forEach(rect => {
 		// preview is slightly smaller than the Rect rect for visibility 
 		let previewRect = new St.Widget({
 			style_class: "tile-preview",
@@ -754,7 +752,7 @@ function replaceTiledWindow(window) {
 			height: rect.height - 2 * 10,
 		});
 		global.window_group.add_child(previewRect);
-		rects.push(previewRect);
+		previewRects.push(previewRect);
 
 		previewRect.ease({
 			opacity: 255,
@@ -765,15 +763,12 @@ function replaceTiledWindow(window) {
 		let label = new St.Label({
 			x: rect.x + rect.width / 2,
 			y: rect.y + rect.height / 2,
-			text: (rects.length).toString(),
+			text: (counter++).toString(),
 			style: "font-size: 50px"
 		});
 		global.window_group.add_child(label);
 		actors.push(label);
-	};
-
-	currTileGroup.forEach(w => createRect(w.tiledRect));
-	freeScreenRects.forEach(r => createRect(r));
+	});
 
 	// add a widget to catch the key inputs and mouse clicks
 	let catcher = new St.Widget({
@@ -789,7 +784,7 @@ function replaceTiledWindow(window) {
 	actors.push(catcher);
 
 	let destroyAll = function () {
-		rects.forEach(r => r.destroy());
+		previewRects.forEach(r => r.destroy());
 		actors.forEach(a => a.destroy());
 	}
 
@@ -797,13 +792,8 @@ function replaceTiledWindow(window) {
 	catcher.grab_key_focus();
 	catcher.connect("key-press-event", (src, event) => {
 		let key = parseInt(event.get_key_unicode());
-
-		if (Number.isInteger(key) && key > 0) {
-			if (key <= wCount)
-				tileWindow(window, currTileGroup[key - 1].tiledRect);
-			else if (key <= wCount + freeScreenRects.length)
-				tileWindow(window, freeScreenRects[key - wCount - 1]);
-		}
+		if (Number.isInteger(key) && key > 0 && key - 1 < rects.length)
+			tileWindow(window, rects[key - 1]);
 
 		destroyAll();
 	});
@@ -814,10 +804,7 @@ function replaceTiledWindow(window) {
 		for(let i = 0; i < rects.length; i++) {
 			let r = rects[i]
 			if (rectHasPoint(r, {x: mX, y: mY})) {
-				if (i < wCount)
-					tileWindow(window, currTileGroup[i].tiledRect);
-				else
-					tileWindow(window, freeScreenRects[i - wCount]);
+				tileWindow(window, r);
 				
 				break;
 			}

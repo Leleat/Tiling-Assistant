@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
+		<key name="enable-dash" type="b">
+			<default>true</default>
+		</key>
+		
 		<key name="icon-size" type="i">
 			<default>96</default>
 		</key>
@@ -58,6 +62,18 @@
 		</key>
 
 		<key name="replace-window" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="half-horizontally" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="half-vertically" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="toggle-dash" type="as">
 			<default>[]</default>
 		</key>
 
