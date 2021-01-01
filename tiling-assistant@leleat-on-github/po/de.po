@@ -125,3 +125,7 @@ msgstr "Selbst wenn diese Einstellung deaktiviert ist, bedeutet es nicht, dass a
 #: prefs.js:91
 msgid "If the \"empty space\" is  ambiguous, the window will be maximized."
 msgstr "Falls der \"verfügbare Platz\" nicht eindeutig ist, wird das Fenster maximiert."
+
+#: prefs.js:96
+msgid "Reload"
+msgstr "Neu laden"

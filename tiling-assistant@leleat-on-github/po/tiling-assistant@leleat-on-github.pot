@@ -122,3 +122,7 @@ msgstr ""
 #: prefs.js:91
 msgid "If the \"empty space\" is  ambiguous, the window will be maximized."
 msgstr ""
+
+#: prefs.js:96
+msgid "Reload"
+msgstr ""

@@ -13,6 +13,9 @@ function equalApprox(value, value2, margin) {
 };
 
 function rectsAreAboutEqual (r1, r2) {
+	if (!r1 || !r2)
+		return false;
+
     let samePos = equalApprox(r1.x, r2.x, 15) && equalApprox(r1.y, r2.y, 15);
     let sameSize = equalApprox(r1.width, r2.width, 15) && equalApprox(r1.height, r2.height, 15);
     return samePos && sameSize;
@@ -514,7 +517,7 @@ function maximizeBoth(window) {
 	if (!window || !window.allows_move || !window.allows_resize)
 		return;
 	
-	removeFromTileGroup(window);
+	removeTileGroup(window);
 
 	// sometimes, because of the group-focusing (raising),
 	// the focused window will be below another window.
@@ -572,7 +575,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 	}
 
-	removeFromTileGroup(window);
+	removeTileGroup(window);
 	window.isTiled = null;
 	window.tiledRect = null;
 };
@@ -582,31 +585,34 @@ function restoreWindowSize(window, restoreFullPos = false) {
 // raises the other windows, if it is focused
 function updateTileGroup(tileGroup) {
 	tileGroup.forEach(w => {
-		if (w.groupFocusSignalID) {
-			w.disconnect(w.groupFocusSignalID);
-			w.groupFocusSignalID = 0;
-		}
-
 		w.tileGroup = tileGroup;
 
+		if (w.groupFocusSignalID)
+			w.disconnect(w.groupFocusSignalID);
+
 		w.groupFocusSignalID = w.connect("focus", () => {
-			if (!w.tileGroup || w.get_maximized() == Meta.MaximizeFlags.BOTH || (w.isTiled && w.tiledRect.equal(w.get_work_area_current_monitor())))
+			let workArea = w.get_work_area_current_monitor();
+			if (!w.tileGroup || w.get_maximized() == Meta.MaximizeFlags.BOTH || (w.isTiled && rectsAreAboutEqual(w.tiledRect, workArea)))
 				return;
 			
 			w.tileGroup.forEach(ww => {
-				if (ww && ww.isTiled && ww.get_maximized() != Meta.MaximizeFlags.BOTH && !ww.tiledRect.equal(ww.get_work_area_current_monitor())) {
+				if (ww.isTiled && ww.get_maximized() != Meta.MaximizeFlags.BOTH && !rectsAreAboutEqual(ww.tiledRect, workArea)) {
 					// update the tileGroup with the current tileGroup (in case of focusing a non-group but tiled window, which replaces a grouped window)
 					ww.tileGroup = w.tileGroup;
 					ww.raise();
 				}
 			});
 		});
+
+		w.connect("unmanaging", (src) => {
+			removeTileGroup(src);
+		});
 	});
 };
 
 // delete the tileGroup of "window" for group-raising and
 // remove the "window" from the tileGroup of other tiled windows
-function removeFromTileGroup(window) {
+function removeTileGroup(window) {
 	if (!window.tileGroup)
 		return;
 

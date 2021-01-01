@@ -61,6 +61,7 @@ function enable() {
 	});
 
 	// --- disabled until I can come up with a good way since it is unreliable/buggy in edge cases ---
+	// TODO: also open apps to fill empty space
 	// change appDisplay.AppIcon.activate function.
 	// allow to directly open an app in a tiled state
 	// via holding Alt or Shift when activating the icon
@@ -449,8 +450,10 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 		return;
 	
 	// disconnect the signals
-	window.grabSignalIDs.forEach(sID => window.disconnect(sID));
-	window.grabSignalIDs = [];
+	if (window.grabSignalIDs) {
+		window.grabSignalIDs.forEach(sID => window.disconnect(sID));
+		window.grabSignalIDs = [];
+	}
 
 	if (grabOp == Meta.GrabOp.MOVING) {
 		if (tilePreview.showing) {

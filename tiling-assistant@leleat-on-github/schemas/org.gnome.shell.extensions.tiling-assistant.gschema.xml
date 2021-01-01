@@ -64,5 +64,45 @@
 		<key name="window-gaps" type="i">
 			<default>0</default>
 		</key>
+
+		<key name="layout1" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout2" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout3" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout4" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout5" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout6" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout7" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout8" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout9" type="as">
+			<default>[]</default>
+		</key>
+
+		<key name="layout10" type="as">
+			<default>[]</default>
+		</key>
 	</schema>
 </schemalist>
