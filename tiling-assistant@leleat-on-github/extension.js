@@ -277,6 +277,7 @@ function onMyTilingShortcutPressed(shortcutName) {
 
 				let freeArea = rect.area();
 				// free screen space doesnt consist of "aligned" rects, e.g. only 1 quartered window or 2 diagonally quartered windows...
+				// TODO: need better alignment detection; currently it doesnt work if resized was done manually (i .e. holding ctrl) 
 				if (!Funcs.equalApprox(freeArea, area, 5))
 					rect = workArea;
 			}
@@ -361,6 +362,12 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	let openWindows = Funcs.getOpenWindows()
 	openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
 
+	// if ctrl is pressed, tile grabbed window and its directly opposing windows (instead of whole group)
+	let event = Clutter.get_current_event();
+	let modifiers = event ? event.get_state() : 0;
+	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
+	let gap = settings.get_int("window-gaps");
+
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
 			let [x, y] = global.get_pointer();
@@ -378,13 +385,22 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.y, grabbedRect.y, 20)) {
-					grabbedWindow.sameSideWindows.push(oW);
-					savePregrabRect(oW);
 
-				} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, 20)) {
-					grabbedWindow.opposingWindows.push(oW);
-					savePregrabRect(oW);
+				if (isCtrlPressed) {
+					if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap) && Funcs.equalApprox(grabbedRect.x, otherRect.x, gap) && Funcs.equalApprox(grabbedRect.width, otherRect.width, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
+
+				} else {
+					if (Funcs.equalApprox(otherRect.y, grabbedRect.y, gap)) {
+						grabbedWindow.sameSideWindows.push(oW);
+						savePregrabRect(oW);
+	
+					} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
 				}
 			}
 
@@ -401,17 +417,26 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, 20)) {
-					grabbedWindow.sameSideWindows.push(oW);
-					savePregrabRect(oW);
 
-				} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, 20)) {
-					grabbedWindow.opposingWindows.push(oW);
-					savePregrabRect(oW);
+				if (isCtrlPressed) {
+					if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, gap) && Funcs.equalApprox(grabbedRect.x, otherRect.x, gap) && Funcs.equalApprox(grabbedRect.width, otherRect.width, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
+
+				} else {
+					if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, gap)) {
+						grabbedWindow.sameSideWindows.push(oW);
+						savePregrabRect(oW);
+
+					} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
 				}
 			}
 
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Funcs.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gaps"))));
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Funcs.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, gap)));
 			break;
 
 		case Meta.GrabOp.RESIZING_E:
@@ -424,17 +449,26 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, 20)) {
-					grabbedWindow.sameSideWindows.push(oW);
-					savePregrabRect(oW);
 
-				} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, 20)) {
-					grabbedWindow.opposingWindows.push(oW);
-					savePregrabRect(oW);
+				if (isCtrlPressed) {
+					if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, gap) && Funcs.equalApprox(grabbedRect.y, otherRect.y, gap) && Funcs.equalApprox(grabbedRect.height, otherRect.height, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
+
+				} else {
+					if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, gap)) {
+						grabbedWindow.sameSideWindows.push(oW);
+						savePregrabRect(oW);
+
+					} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
 				}
 			}
 
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Funcs.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gaps"))));
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Funcs.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, gap)));
 			break;
 
 		case Meta.GrabOp.RESIZING_W:
@@ -447,13 +481,22 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				}
 
 				let otherRect = oW.tiledRect;
-				if (Funcs.equalApprox(otherRect.x, grabbedRect.x, 20)) {
-					grabbedWindow.sameSideWindows.push(oW);
-					savePregrabRect(oW);
 
-				} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, 20)) {
-					grabbedWindow.opposingWindows.push(oW);
-					savePregrabRect(oW);
+				if (isCtrlPressed) {
+					if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, gap) && Funcs.equalApprox(grabbedRect.y, otherRect.y, gap) && Funcs.equalApprox(grabbedRect.height, otherRect.height, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
+
+				} else {
+					if (Funcs.equalApprox(otherRect.x, grabbedRect.x, gap)) {
+						grabbedWindow.sameSideWindows.push(oW);
+						savePregrabRect(oW);
+
+					} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, gap)) {
+						grabbedWindow.opposingWindows.push(oW);
+						savePregrabRect(oW);
+					}
 				}
 			}
 
@@ -535,6 +578,12 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 		});
 	});
 	window.opposingWindows = [];
+
+	// update tileGroup.
+	// only actually needed, if resizing while holding ctrl to resize single windows
+	let tileGroup = Funcs.getTopTileGroup(null, false);
+	tileGroup.forEach(w => Funcs.removeTileGroup(w));
+	Funcs.updateTileGroup(tileGroup);
 };
 
 // tile previewing via DND and restore window size, if window is already tiled

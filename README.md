@@ -24,7 +24,7 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - Raise/focus tiled windows as a group.
 
-- Resize tiled windows in a group (**horizontal and vertical only**). Combined with the keybindings to fill the available screen space and to tile to existing tiled windows this enables more complex layouts.
+- Resize tiled windows in a group (**horizontal and vertical only**). You can escape the grouped resizing by holding `Ctrl`. Combined with the keybindings to fill the available screen space and to tile to existing tiled windows this enables more complex layouts.
 
 - Configurable window gaps
 

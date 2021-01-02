@@ -195,7 +195,8 @@ function getFreeScreenRects(tileGroup) {
 
 			for (let j = 0, len = freeScreenRects.length; j < len; j++) {
 				let [doIntersect, intersecRec] = freeScreenRects[j].intersect(freeRect);
-				if (doIntersect)
+				let gap = MyExtension.settings.get_int("window-gaps");
+				if (doIntersect && intersecRec.width > gap && intersecRec.height > gap)
 					intersections.push(intersecRec);
 			}
 		}
