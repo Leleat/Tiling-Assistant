@@ -189,10 +189,10 @@ function disable() {
 		delete w.tileGroup;
 		delete w.sameSideWindows;
 		delete w.opposingWindows;
-		delete w.preGrabHeight;
-		delete w.preGrabWidth;
-		delete w.preGrabX;
-		delete w.preGrabY;
+		delete w.preGrabRect.height;
+		delete w.preGrabRect.width;
+		delete w.preGrabRect.x;
+		delete w.preGrabRect.y;
 
 		if (w.grabSignalIDs)
 			w.grabSignalIDs.forEach(id => w.disconnect(id));
@@ -309,14 +309,6 @@ function onMyTilingShortcutPressed(shortcutName) {
 				width: window.tiledRect.width / 2,
 				height: window.tiledRect.height
 			});
-			break;
-
-		case "toggle-always-on-top":
-			if (window.is_above())
-				window.unmake_above();
-			else
-				window.make_above();
-			return;
 	}
 
 	if ((window.isTiled && Funcs.rectsAreAboutEqual(rect, window.tiledRect)) || (shortcutName == "tile-maximize" && Funcs.rectsAreAboutEqual(workArea, window.get_frame_rect()))) {
@@ -340,11 +332,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		return;
 
 	let savePregrabRect = function (w) {
-		let oR = w.get_frame_rect();
-		w.preGrabWidth = oR.width;
-		w.preGrabHeight = oR.height;
-		w.preGrabX = oR.x;
-		w.preGrabY = oR.y;
+		w.preGrabRect = w.get_frame_rect().copy();
 	};
 
 	let grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
@@ -372,7 +360,8 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		case Meta.GrabOp.MOVING:
 			let [x, y] = global.get_pointer();
 			let tileGroup = Funcs.getTopTileGroup();
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], tileGroup)));
+			let freeScreenRects = Funcs.getFreeScreenRects(tileGroup);
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], tileGroup, freeScreenRects)));
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
@@ -514,23 +503,34 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 		window.grabSignalIDs = [];
 	}
 
-	if (grabOp == Meta.GrabOp.MOVING) {
-		if (tilePreview.showing) {
-			// halving already tiled window
-			if (tilePreview.tiledWindow)
-				Funcs.tileWindow(tilePreview.tiledWindow, Funcs.rectDiff(tilePreview.tiledWindow.tiledRect, tilePreview.rect)[0], false);
-	
-			let workArea = window.get_work_area_current_monitor();
-			if (workArea.equal(tilePreview.rect))
-				Funcs.maximizeBoth(window);
-			else
-				Funcs.tileWindow(window, tilePreview.rect);
-	
-			tilePreview.close();
-		}
+	switch (grabOp) {
+		case Meta.GrabOp.RESIZING_N:
+		case Meta.GrabOp.RESIZING_S:
+		case Meta.GrabOp.RESIZING_E:
+		case Meta.GrabOp.RESIZING_W:
+			break;
+		
+		case Meta.GrabOp.MOVING:
+			if (tilePreview.showing) {
+				// halving already tiled window
+				if (tilePreview.tiledWindow)
+					Funcs.tileWindow(tilePreview.tiledWindow, Funcs.rectDiff(tilePreview.tiledWindow.tiledRect, tilePreview.rect)[0], false);
+		
+				let workArea = window.get_work_area_current_monitor();
+				if (workArea.equal(tilePreview.rect))
+					Funcs.maximizeBoth(window);
+				else
+					Funcs.tileWindow(window, tilePreview.rect);
+		
+				tilePreview.close();
+			}
 
-		return;
+		default:
+			return;
 	}
+
+	if (!window.isTiled)
+		return;
 
 	// update the tiledRects.
 	// Careful with resizing issues for some terminals!
@@ -539,8 +539,8 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 	let oldTiledRect = window.tiledRect.copy();
 
 	// first calculate the new tiledRect for the grabbed window
-	let diffX = window.preGrabX - newRect.x;
-	let diffY = window.preGrabY - newRect.y;
+	let diffX = window.preGrabRect.x - newRect.x;
+	let diffY = window.preGrabRect.y - newRect.y;
 
 	let _x = window.tiledRect.x - diffX;
 	let _y = window.tiledRect.y - diffY;
@@ -587,7 +587,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 };
 
 // tile previewing via DND and restore window size, if window is already tiled
-function onWindowMoving(window, grabStartPos, currTileGroup) {
+function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
 	let [mouseX, mouseY] = global.get_pointer();
 
 	// restore the window size of tiled windows after DND distance of at least 1px
@@ -650,17 +650,19 @@ function onWindowMoving(window, grabStartPos, currTileGroup) {
 	let event = Clutter.get_current_event();
 	let modifiers = event ? event.get_state() : 0;
 	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-	let isHoveringTiledWindow = false;
+	let isHoveringRect = false;
+	let mousePoint = {x: mouseX, y: mouseY};
 
 	if (isCtrlPressed) {
+		// tile to half of a tiled window
 		for (let i = 0; i < currTileGroup.length; i++) {
 			let w = currTileGroup[i];
 			let wRect = w.get_frame_rect();
 
-			if (!Funcs.rectHasPoint(wRect, {x: mouseX, y: mouseY}))
+			if (!Funcs.rectHasPoint(wRect, mousePoint))
 				continue;
 
-			isHoveringTiledWindow = true;
+			isHoveringRect = true;
 
 			let top = mouseY < wRect.y + wRect.height * .2;
 			let bottom = mouseY > wRect.y + wRect.height * .8;
@@ -678,8 +680,19 @@ function onWindowMoving(window, grabStartPos, currTileGroup) {
 			tilePreview.open(window, 0, r, monitorNr, w);
 		}
 
-		if (!isHoveringTiledWindow)
+		if (!isHoveringRect) {
+			// tile to freeScreenRect
+			for (let i = 0; i < freeScreenRects.length; i++) {
+				let r = freeScreenRects[i];
+				if (!Funcs.rectHasPoint(r, mousePoint))
+					continue;
+
+				tilePreview.open(window, 0, r, monitorNr);
+				return;
+			}
+			
 			tilePreview.close();
+		}
 
 	} else if (tileTopLeftQuarter) {
 		pos = Meta.Side.TOP + Meta.Side.LEFT;

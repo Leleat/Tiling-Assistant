@@ -647,7 +647,7 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, wRect.x, resizedRect.y, wRect.width, w.preGrabY + w.preGrabHeight - resizedRect.y);
+				w.move_resize_frame(false, wRect.x, resizedRect.y, wRect.width, w.preGrabRect.y + w.preGrabRect.height - resizedRect.y);
 			});
 
 			opposingWindows.forEach(w => {
@@ -665,7 +665,7 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
 				let _y = resizedRect.y + resizedRect.height + 2 * gap;
-				w.move_resize_frame(false, wRect.x, _y, wRect.width, w.preGrabY + w.preGrabHeight - _y);
+				w.move_resize_frame(false, wRect.x, _y, wRect.width, w.preGrabRect.y + w.preGrabRect.height - _y);
 			});
 			break;
 
@@ -678,14 +678,14 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 			opposingWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
 				let _x = resizedRect.x + resizedRect.width + 2 * gap;
-				w.move_resize_frame(false, _x, wRect.y, w.preGrabX + w.preGrabWidth - _x, wRect.height);
+				w.move_resize_frame(false, _x, wRect.y, w.preGrabRect.x + w.preGrabRect.width - _x, wRect.height);
 			});
 			break;
 
 		case Meta.GrabOp.RESIZING_W:
 			sameSideWindows.forEach(w => {
 				let wRect = w.get_frame_rect();
-				w.move_resize_frame(false, resizedRect.x, wRect.y, w.preGrabX + w.preGrabWidth - resizedRect.x, wRect.height);
+				w.move_resize_frame(false, resizedRect.x, wRect.y, w.preGrabRect.x + w.preGrabRect.width - resizedRect.x, wRect.height);
 			});
 
 			opposingWindows.forEach(w => {

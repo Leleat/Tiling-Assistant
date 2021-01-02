@@ -18,7 +18,7 @@ Development started on GNOME 3.36. But as of November 2020 all development happe
 - Windows-like (quarter) tiling: when a window is tiled and at least half the screen is occupied by tiled windows, a Dash containing icons for all non-tiled windows will open. The Dash will be centered on the free screen space. 
 Activating an icon will tile the corresponding window to fill the free space.
 
-- Holding `Ctrl` while DNDing a window over another tiled window will make them share the same space. See the dnd preview below. (Idea from the Shelltile extension)
+- Holding `Ctrl` while DNDing a window over another tiled window will make them share the same space. See the dnd preview below. (Idea from the Shelltile extension). Hovering over empty space while holding `Ctrl` will tile to that space.
 
 - You can hold `Shift` while activating an icon to tile the window to the top or the left half of the available screen depending on the orientation of the free screen space and `Alt` to tile the window to the bottom or right half (-> spiral-ish tiling). **Your windows shouldn't be tiled to be smaller than a screen quarter unless your resolution is 1440p+. Otherwise you will hit the window's minimum size and the tiled windows will overlap each other.**
 
