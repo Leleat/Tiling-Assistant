@@ -61,79 +61,71 @@ function enable() {
 		);
 	});
 
-	// --- disabled until I can come up with a good way since it is unreliable/buggy in edge cases ---
-	// TODO: also open apps to fill empty space
 	// change appDisplay.AppIcon.activate function.
 	// allow to directly open an app in a tiled state
 	// via holding Alt or Shift when activating the icon
-	// this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
-	// appDisplay.AppIcon.prototype.activate = function (button) {
-	// 	let event = Clutter.get_current_event();
-	// 	let modifiers = event ? event.get_state() : 0;
-	// 	let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-	// 	let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
-	// 	let isMiddleButton = button && button == Clutter.BUTTON_MIDDLE;
-	// 	let isCtrlPressed = (modifiers & Clutter.ModifierType.CONTROL_MASK) != 0;
-	// 	let openNewWindow = this.app.can_open_new_window() &&
-	// 			this.app.state == Shell.AppState.RUNNING &&
-	// 			(isCtrlPressed || isMiddleButton);
+	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
+	appDisplay.AppIcon.prototype.activate = function (button) {
+		let event = Clutter.get_current_event();
+		let modifiers = event ? event.get_state() : 0;
+		let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+		let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+		let isMiddleButton = button && button == Clutter.BUTTON_MIDDLE;
+		let isCtrlPressed = (modifiers & Clutter.ModifierType.CONTROL_MASK) != 0;
+		let openNewWindow = this.app.can_open_new_window() &&
+				this.app.state == Shell.AppState.RUNNING &&
+				(isCtrlPressed || isMiddleButton);
 
-	// 	if (this.app.state == Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
-	// 		this.animateLaunch();
+		if (this.app.state == Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
+			this.animateLaunch();
 
-	// 	if (openNewWindow) {
-	// 		this.app.open_new_window(-1);
+		if (openNewWindow) {
+			this.app.open_new_window(-1);
 
-	// 	// main new code
-	// 	} else if ((isShiftPressed || isAltPressed) && this.app.can_open_new_window()) {
-	// 		let wCount = this.app.get_windows().length;
-	// 		let sIdWindowsChanged = 0, sIdFocus = 0, sIdFirstFrame = 0;
+		// main new code
+		} else if ((isShiftPressed || isAltPressed) && this.app.can_open_new_window()) {
+			let winTracker = Shell.WindowTracker.get_default();
+			let ogApp = this.app;
+			let wCreatedId = global.display.connect("window-created", (src, window) => {
+				// here we try to ignore loading screens; different apps use different windows for loading screens:
+				// For ex.: Krita's and GIMP's loading screen returns true for is_skip_taskbar()
+				// Steam's loading screen is a normal window, which doesn't skip the taskbar but doesn't allow_resize()
+				if (window.get_window_type() != Meta.WindowType.NORMAL || window.is_skip_taskbar() || !window.allows_move() || !window.allows_resize())
+					return;
+				
+				global.display.disconnect(wCreatedId);
 
-	// 		sIdWindowsChanged = this.app.connect("windows-changed", (app) => {
-	// 			let newWCount = app.get_windows().length;
+				// in case window detection above didn't work properly.
+				// this breaks, if the current to-be-tiled app loads (-> load screen) and the user opens another window
+				// ... acceptable downside for me
+				let appOpened = winTracker.get_window_app(window)
+				if (appOpened != ogApp)
+					return;
 
-	// 			if (wCount < newWCount) { // new window created
-	// 				let window = app.get_windows()[0];
+				let wActor = window.get_compositor_private();
+				let firstFrameID = wActor.connect("first-frame", () => {
+					wActor.disconnect(firstFrameID);
 
-	// 				// focus signal is probably unreliable, but couldn"t come up with a better way to wait for the window
-	// 				sIdFocus = window.connect("focus", () => {
-	// 					window.disconnect(sIdFocus);
+					let workArea = window.get_work_area_current_monitor();
+					let rect = new Meta.Rectangle({
+						x: workArea.x + (isShiftPressed) ? 0 : workArea.width / 2,
+						y: workArea.y,
+						width: workArea.width / 2,
+						height: workArea.height
+					});		
+	
+					Funcs.tileWindow(window, rect);
+				});
+			});
 
-	// 					// here we try to ignore loading screens; different apps use different windows for loading screens:
-	// 					// For ex.: Krita's and GIMP's loading screen returns true for is_skip_taskbar()
-	// 					// Steam's loading screen is a normal window, which doesn"t skip the taskbar but doesn"t allow_resize()
-	// 					if (window.is_skip_taskbar() || !window.allows_move() || !window.allows_resize())
-	// 						return;
+			this.app.open_new_window(-1);
 
-	// 					let wActor = window.get_compositor_private();
-	// 					sIdFirstFrame = wActor.connect("first-frame", () => {
-	// 						app.disconnect(sIdWindowsChanged);
-	// 						wActor.disconnect(sIdFirstFrame);
-							
-	// 						let workArea = window.get_work_area_current_monitor();
-	// 						let rect = new Meta.Rectangle({
-	// 							x: workArea.x + (isShiftPressed) ? 0 : workArea.width / 2,
-	// 							y: workArea.y,
-	// 							width: workArea.width / 2,
-	// 							height: workArea.height
-	// 						});
-			
-	// 						Funcs.tileWindow(window, rect);
-	// 					});
-	// 				});
-	// 			}
+		} else {
+			this.app.activate();
+		}
 
-	// 			wCount = newWCount;
-	// 		});
-
-	// 		this.app.open_new_window(-1);
-
-	// 	} else {
-	// 		this.app.activate();
-	// 	}
-
-	// 	main.overview.hide();
-	// };
+		main.overview.hide();
+	};
 
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
 	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
@@ -177,7 +169,7 @@ function disable() {
 	});
 
 	// restore old function
-	// appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
+	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	// delete custom properties

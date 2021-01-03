@@ -571,7 +571,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		let relativeMouseX = (mouseX - currWindowFrame.x) / currWindowFrame.width;
 		let newPosX = mouseX - oldRect.width * relativeMouseX;
 		
-		// user_op with true needed to properly restore big window in the bottom half via DND
+		// user_op with true to properly restore big windows via DND so they can go partly offscreen
 		window.move_frame(true, newPosX, currWindowFrame.y); // Wayland workaround for DND/restore position
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 	}
@@ -699,7 +699,8 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 // called via keybinding:
 // tile a window to existing layout below it
 function replaceTiledWindow(window) {
-	let currTileGroup = getTopTileGroup();
+	let openWindows = getOpenWindows();
+	let currTileGroup = getTopTileGroup(openWindows, (openWindows[0].isTiled) ? false : true);
 	if (!currTileGroup.length)
 		return;
 
