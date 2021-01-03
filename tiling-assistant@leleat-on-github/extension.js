@@ -771,6 +771,10 @@ function onWindowTiled(tiledWindow) {
 		if (idx != -1)
 			openWindows.splice(idx, 1);
 	});
+
+	// filter for non-normal windows (like Desktop windows e.g. conky...)
+	let winTracker = Shell.WindowTracker.get_default();
+	openWindows = openWindows.filter((w, idx) => w.get_window_type() == Meta.WindowType.NORMAL && winTracker.get_window_app(w));
 	
 	if (openWindows.length == 0)
 		return;
@@ -793,7 +797,6 @@ function onWindowTiled(tiledWindow) {
 	}
 
 	// filter the openWindows array, so that no duplicate apps are shown
-	let winTracker = Shell.WindowTracker.get_default();
 	let openApps = [];
 	openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
 	openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);

@@ -1,6 +1,6 @@
 "use strict";
 
-const {GObject, Gtk, Gio} = imports.gi;
+const {GObject, Gdk, Gtk, Gio} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 const Gettext = imports.gettext;
@@ -53,47 +53,23 @@ const MyPrefsWidget = new GObject.Class({
 					this.settings.bind(key, builderObject, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 			});
 
+			// bind keybindings
 			let shortcuts = ["toggle-dash", "half-vertically", "half-horizontally", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 					"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 			shortcuts.forEach((sc) => {
 				this.makeShortcutEdit(sc);
 			});
 
-			//////////////////
-			// Translations //
-			//////////////////
+			// draw Layout rects
+			for (let i = 0; i <= 9; i++) {
+				let drawArea = this.builder.get_object("DrawArea" + i);
+				drawArea.connect("draw", (widget, cr) => {
+					let rects = [{x: 0, y: 0, w: .5, h: 1}, {x: .5, y: 0, w: .25, h: .5}, {x: .75, y: 0, w: .25, h: .5}, {x: .5, y: .5, w: .5, h: .5}];
+					this.drawLayoutRects(widget, cr, rects)
+				});
+			}
 
-			// tab labels
-			this.builder.get_object("generalLabel").set_text(_("General"));
-			this.builder.get_object("keybindingsLabel").set_text(_("Keybindings"));
-			this.builder.get_object("layoutsLabel").set_text(_("Layouts"));
-			this.builder.get_object("helpLabel").set_text(_("Help"));
-			
-			// other settings labels
-			this.builder.get_object("label12").set_text(_("Dash icon size"));
-			this.builder.get_object("label13").set_text(_("Dash icon margin"));
-			this.builder.get_object("label14").set_text(_("Show app name"));
-			this.builder.get_object("label15").set_text(_("Enable animations"));
-			this.builder.get_object("label2").set_text(_("Gap between tiled windows"));
-			this.builder.get_object("label3").set_text(_("Toggle maximization"));
-			this.builder.get_object("label20").set_text(_("Tile to top half"));
-			this.builder.get_object("label21").set_text(_("Tile to bottom half"));
-			this.builder.get_object("label26").set_text(_("Tile to right half"));
-			this.builder.get_object("label27").set_text(_("Tile to left half"));
-			this.builder.get_object("label22").set_text(_("Tile to top left quarter"));
-			this.builder.get_object("label23").set_text(_("Tile to  top right quarter"));
-			this.builder.get_object("label24").set_text(_("Tile to bottom left quarter"));
-			this.builder.get_object("label25").set_text(_("Tile to bottom right quarter"));
-			this.builder.get_object("label1").set_text(_("Tile to empty space"));
-			this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
-			this.builder.get_object("issueLabel").set_text(_("If you want to report a bug or make a feature request, please open an issue on Github."));
-			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
-
-			// tooltips
-			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));
-			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
-			
-			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
+			this.setupTranslations();
 		},
 
 		// taken from Overview-Improved by human.experience
@@ -148,5 +124,64 @@ const MyPrefsWidget = new GObject.Class({
 
 			else
 				return null;
+		},
+
+		drawLayoutRects(layoutWidget, cr, rects) {
+			let color = new Gdk.RGBA();
+			let width = layoutWidget.get_allocated_width();
+			let height = layoutWidget.get_allocated_height();
+			cr.setLineWidth(1.0);
+			 
+			rects.forEach(r => {
+				color.parse("rgba(255, 255, 255, .2)");
+				Gdk.cairo_set_source_rgba(cr, color);
+
+				cr.moveTo(r.x * width + 5, r.y * height + 5);
+				cr.lineTo((r.x + r.w) * width - 5, r.y * height + 5);
+				cr.lineTo((r.x + r.w) * width - 5, (r.y + r.h) * height - 5);
+				cr.lineTo(r.x * width + 5, (r.y + r.h) * height - 5);
+				cr.lineTo(r.x * width + 5, r.y * height + 5);
+				cr.strokePreserve();
+				
+				color.parse("rgba(0, 0, 0, .15)");
+				Gdk.cairo_set_source_rgba(cr, color);
+				cr.fill();
+			});
+			
+			cr.$dispose(); // TODO neccessary?
+		},
+
+		setupTranslations: function() {
+			// tab labels
+			this.builder.get_object("generalLabel").set_text(_("General"));
+			this.builder.get_object("keybindingsLabel").set_text(_("Keybindings"));
+			this.builder.get_object("layoutsLabel").set_text(_("Layouts"));
+			this.builder.get_object("helpLabel").set_text(_("Help"));
+
+			// other settings labels
+			this.builder.get_object("label12").set_text(_("Dash icon size"));
+			this.builder.get_object("label13").set_text(_("Dash icon margin"));
+			this.builder.get_object("label14").set_text(_("Show app name"));
+			this.builder.get_object("label15").set_text(_("Enable animations"));
+			this.builder.get_object("label2").set_text(_("Gap between tiled windows"));
+			this.builder.get_object("label3").set_text(_("Toggle maximization"));
+			this.builder.get_object("label20").set_text(_("Tile to top half"));
+			this.builder.get_object("label21").set_text(_("Tile to bottom half"));
+			this.builder.get_object("label26").set_text(_("Tile to right half"));
+			this.builder.get_object("label27").set_text(_("Tile to left half"));
+			this.builder.get_object("label22").set_text(_("Tile to top left quarter"));
+			this.builder.get_object("label23").set_text(_("Tile to  top right quarter"));
+			this.builder.get_object("label24").set_text(_("Tile to bottom left quarter"));
+			this.builder.get_object("label25").set_text(_("Tile to bottom right quarter"));
+			this.builder.get_object("label1").set_text(_("Tile to empty space"));
+			this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
+			this.builder.get_object("issueLabel").set_text(_("If you want to report a bug or make a feature request, please open an issue on Github."));
+			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
+
+			// tooltips
+			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));
+			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
+
+			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
 		},
 });
