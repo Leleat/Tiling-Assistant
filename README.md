@@ -9,8 +9,6 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 Development started on GNOME 3.36. But as of November 2020 all development happens on 3.38. While it may (and I think it still should) work on 3.36, I can't test it.
 
-**Wayland:** While it generally works, I recommend you use X11, if you can. Check out [#17](https://github.com/Leleat/Tiling-Assist/issues/17) for known issues.
-
 ## Usage and features
 
 **Disable GNOME's default keybindings and set them in this extension's settings page.**

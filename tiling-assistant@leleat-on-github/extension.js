@@ -177,7 +177,7 @@ function disable() {
 	});
 
 	// restore old function
-	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
+	// appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	// delete custom properties
@@ -189,10 +189,7 @@ function disable() {
 		delete w.tileGroup;
 		delete w.sameSideWindows;
 		delete w.opposingWindows;
-		delete w.preGrabRect.height;
-		delete w.preGrabRect.width;
-		delete w.preGrabRect.x;
-		delete w.preGrabRect.y;
+		delete w.preGrabRect;
 
 		if (w.grabSignalIDs)
 			w.grabSignalIDs.forEach(id => w.disconnect(id));
@@ -331,12 +328,8 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	if (grabOp != Meta.GrabOp.MOVING && !grabbedWindow.isTiled)
 		return;
 
-	let savePregrabRect = function (w) {
-		w.preGrabRect = w.get_frame_rect().copy();
-	};
-
 	let grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
-	savePregrabRect(grabbedWindow);
+	grabbedWindow.preGrabRect = grabbedWindow.get_frame_rect().copy();
 
 	grabbedWindow.grabSignalIDs = [];
 
@@ -378,17 +371,17 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				if (isCtrlPressed) {
 					if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap) && Funcs.equalApprox(grabbedRect.x, otherRect.x, gap) && Funcs.equalApprox(grabbedRect.width, otherRect.width, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 
 				} else {
 					if (Funcs.equalApprox(otherRect.y, grabbedRect.y, gap)) {
 						grabbedWindow.sameSideWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 	
 					} else if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 				}
 			}
@@ -410,17 +403,17 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				if (isCtrlPressed) {
 					if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, gap) && Funcs.equalApprox(grabbedRect.x, otherRect.x, gap) && Funcs.equalApprox(grabbedRect.width, otherRect.width, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 
 				} else {
 					if (Funcs.equalApprox(otherRect.y + otherRect.height, grabbedRect.y + grabbedRect.height, gap)) {
 						grabbedWindow.sameSideWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 
 					} else if (Funcs.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 				}
 			}
@@ -442,17 +435,17 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				if (isCtrlPressed) {
 					if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, gap) && Funcs.equalApprox(grabbedRect.y, otherRect.y, gap) && Funcs.equalApprox(grabbedRect.height, otherRect.height, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 
 				} else {
 					if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x + grabbedRect.width, gap)) {
 						grabbedWindow.sameSideWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 
 					} else if (Funcs.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 				}
 			}
@@ -474,17 +467,17 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 				if (isCtrlPressed) {
 					if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, gap) && Funcs.equalApprox(grabbedRect.y, otherRect.y, gap) && Funcs.equalApprox(grabbedRect.height, otherRect.height, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 
 				} else {
 					if (Funcs.equalApprox(otherRect.x, grabbedRect.x, gap)) {
 						grabbedWindow.sameSideWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 
 					} else if (Funcs.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
-						savePregrabRect(oW);
+						oW.preGrabRect = oW.get_frame_rect().copy();
 					}
 				}
 			}

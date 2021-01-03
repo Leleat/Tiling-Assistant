@@ -572,6 +572,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		let newPosX = mouseX - oldRect.width * relativeMouseX;
 		
 		// user_op with true needed to properly restore big window in the bottom half via DND
+		window.move_frame(true, newPosX, currWindowFrame.y); // Wayland workaround for DND/restore position
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 	}
 
