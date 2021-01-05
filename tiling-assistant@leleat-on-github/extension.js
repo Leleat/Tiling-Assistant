@@ -10,7 +10,7 @@ const Funcs = Me.imports.funcs;
 
 let appDash = null;
 let tilePreview = null;
-let settings = null;
+var settings = null;
 
 // 2 entry points:
 // 1. tiled with keyboard shortcut (set with this extension) => onMyTilingShortcutPressed()
@@ -755,15 +755,17 @@ function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
 // called when a window is tiled (via tileWindow()).
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function onWindowTiled(tiledWindow) {
-	if (appDash.shown || !settings.get_boolean("enable-dash"))
+	if (appDash.shown)
 		return;
 
 	let openWindows = Funcs.getOpenWindows();
 	let currTileGroup = Funcs.getTopTileGroup(openWindows, false);
-	let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
 
 	// setup tileGroup to raise tiled windows as a group
 	Funcs.updateTileGroup(currTileGroup);
+
+	if (!settings.get_boolean("enable-dash"))
+		return;
 
 	// remove the tiled windows from openWindows to populate the Dash
 	currTileGroup.forEach(w => {
@@ -778,7 +780,13 @@ function onWindowTiled(tiledWindow) {
 	
 	if (openWindows.length == 0)
 		return;
+
+	// filter the openWindows array, so that no duplicate apps are shown
+	let openApps = [];
+	openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
+	openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);
 	
+	let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
 	if (!freeScreenRects.length)
 		return;
 	
@@ -795,11 +803,6 @@ function onWindowTiled(tiledWindow) {
 		if (!Funcs.equalApprox(freeScreenSpace.area(), area, 15))
 			return;		
 	}
-
-	// filter the openWindows array, so that no duplicate apps are shown
-	let openApps = [];
-	openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
-	openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);
 
 	if (freeScreenSpace.width < 200 || freeScreenSpace.height < 200)
 		return;

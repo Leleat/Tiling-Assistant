@@ -20,7 +20,7 @@ function buildPrefsWidget () {
 const MyPrefsWidget = new GObject.Class({
 		Name : "MyTilingPrefsWidget",
 		GTypeName : "MyTilingPrefsWidget",
-		Extends : Gtk.ScrolledWindow, // or ScrolledWindow if this gets too big
+		Extends : Gtk.ScrolledWindow,
 	
 		_init : function (params) {
 			let gschema = Gio.SettingsSchemaSource.new_from_directory(
@@ -64,12 +64,41 @@ const MyPrefsWidget = new GObject.Class({
 			for (let i = 0; i <= 9; i++) {
 				let drawArea = this.builder.get_object("DrawArea" + i);
 				drawArea.connect("draw", (widget, cr) => {
-					let rects = [{x: 0, y: 0, w: .5, h: 1}, {x: .5, y: 0, w: .25, h: .5}, {x: .75, y: 0, w: .25, h: .5}, {x: .5, y: .5, w: .5, h: .5}];
-					this.drawLayoutRects(widget, cr, rects)
+					let rects = this.getLayoutRects(i);
+					let layoutIsValid = this.isLayoutValid(rects);
+
+					if (layoutIsValid) {
+						this.drawLayoutRects(widget, cr, rects);
+
+					} else { // TODO error message
+
+					}
 				});
 			}
 
+			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
+				for (let i = 0; i <= 9; i++) {
+					let drawArea = this.builder.get_object("DrawArea" + i);
+					drawArea.queue_draw();
+				}
+			});
+
 			this.setupTranslations();
+		},
+
+		// manually add the keys to the arrays in this function
+		getBindProperty: function(key) {
+			let ints = ["icon-size", "icon-margin", "window-gaps"];
+			let bools = ["enable-dash", "show-label", "use-anim"];
+
+			if (ints.includes(key)) 
+				return "value"; // spinbox.value
+
+			else if (bools.includes(key))
+				return "active"; //  switch.active
+
+			else
+				return null;
 		},
 
 		// taken from Overview-Improved by human.experience
@@ -111,38 +140,89 @@ const MyPrefsWidget = new GObject.Class({
 			updateShortcutRow(this.settings.get_strv(settingKey)[0]);
 		},
 
-		// manually add the keys to the arrays in this function
-		getBindProperty: function(key) {
-			let ints = ["icon-size", "icon-margin", "window-gaps"];
-			let bools = ["enable-dash", "show-label", "use-anim"];
+		// format should be: x--y--width--height where the variables range from 0.0 to 1.0
+		// for ex.: 0 -- 0 -- .25 -- 0.75
+		// return null, if wrong format
+		getLayoutRects: function(layoutIndex) {
+			let rects = [];
+			let rectProps = ["x", "y", "width", "height"];
 
-			if (ints.includes(key)) 
-				return "value"; // spinbox.value
+			let layoutListBox = this.builder.get_object("LayoutListbox" + layoutIndex)
+			for (let i = 0; i < 8; i++) {
+				let r = {};
 
-			else if (bools.includes(key))
-				return "active"; //  switch.active
+				let entry = layoutListBox.get_row_at_index(i).get_child().get_children()[1];
+				if (!entry.get_text_length())
+					continue;
 
-			else
-				return null;
+				let text = entry.get_text();
+				let splits = text.split("--");
+				if (splits.length != 4)
+					return null;
+
+				for (let j = 0; j < 4; j++) {
+					let propValue = parseFloat(splits[j].trim());
+					if (Number.isNaN(propValue))
+						return null;			
+
+					r[rectProps[j]] = propValue;
+				}
+
+				rects.push(r);
+			}
+
+			return rects;
 		},
 
-		drawLayoutRects(layoutWidget, cr, rects) {
+		isLayoutValid(rects) {
+			// wrong format for rects in Gtk.Entrys
+			// or no text in entries
+			if (!rects || !rects.length)	
+				return false;
+
+			// calculate the surface area of an overlap
+			let rectsOverlap = function(r1, r2) {
+				return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) * Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+			}
+
+			for (let i = 0, len = rects.length; i < len; i++) {
+				let r = rects[i];
+
+				// rects is/reaches outside of screen (i. e. > 1)
+				if (r.x < 0 || r.y < 0 || r.width < 0 || r.height < 0 || r.x + r.width > 1 || r.y + r.height > 1)
+					return false;
+
+				for (let j = i + 1; j < len; j++) {
+					if (rectsOverlap(r, rects[j]))
+						return false;
+				}
+			}
+
+			return true;
+		},
+
+		drawLayoutRects: function(layoutWidget, cr, rects) {
+			//rects = [{x: 0, y: 0, width: .5, height: .5}]			 
 			let color = new Gdk.RGBA();
 			let width = layoutWidget.get_allocated_width();
 			let height = layoutWidget.get_allocated_height();
+			
 			cr.setLineWidth(1.0);
-			 
+
 			rects.forEach(r => {
+				// 1px outline for rect in transparent white
 				color.parse("rgba(255, 255, 255, .2)");
 				Gdk.cairo_set_source_rgba(cr, color);
 
+				// 5 px gaps between rects
 				cr.moveTo(r.x * width + 5, r.y * height + 5);
-				cr.lineTo((r.x + r.w) * width - 5, r.y * height + 5);
-				cr.lineTo((r.x + r.w) * width - 5, (r.y + r.h) * height - 5);
-				cr.lineTo(r.x * width + 5, (r.y + r.h) * height - 5);
+				cr.lineTo((r.x + r.width) * width - 5, r.y * height + 5);
+				cr.lineTo((r.x + r.width) * width - 5, (r.y + r.height) * height - 5);
+				cr.lineTo(r.x * width + 5, (r.y + r.height) * height - 5);
 				cr.lineTo(r.x * width + 5, r.y * height + 5);
 				cr.strokePreserve();
 				
+				// fill rect in transparent black
 				color.parse("rgba(0, 0, 0, .15)");
 				Gdk.cairo_set_source_rgba(cr, color);
 				cr.fill();

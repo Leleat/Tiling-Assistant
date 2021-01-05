@@ -1,7 +1,7 @@
 .my-open-windows-dash {
   background-color: rgb(22, 22, 22);
   border-radius: 15px;
-  border: 2px solid rgba(65, 66, 68, 0.85);
+  border: 1px solid rgba(65, 66, 68, 0.85);
 }
 
 .tiling-window-focused {

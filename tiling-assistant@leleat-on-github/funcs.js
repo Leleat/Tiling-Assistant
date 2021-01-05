@@ -564,13 +564,13 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	if (restoreFullPos) {
 		// user_op as false to restore window while keeping it fully in screen in case DND-tiling dragged it offscreen
 		window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
-
+		
 	} else { // scale while keeping the top at the same relative y pos (for DNDing)
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
 		let relativeMouseX = (mouseX - currWindowFrame.x) / currWindowFrame.width;
 		let newPosX = mouseX - oldRect.width * relativeMouseX;
-		
+				
 		// user_op with true to properly restore big windows via DND so they can go partly offscreen
 		window.move_frame(true, newPosX, currWindowFrame.y); // Wayland workaround for DND/restore position
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);

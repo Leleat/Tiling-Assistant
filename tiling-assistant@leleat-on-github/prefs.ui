@@ -2123,7 +2123,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox0">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -2436,7 +2436,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkFrame" id="FR">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="margin-start">10</property>
@@ -2524,7 +2524,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox1">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -2925,7 +2925,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox2">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -3300,6 +3300,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image4</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -3326,7 +3327,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox3">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -3701,6 +3702,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image5</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -3727,7 +3729,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox4">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -4102,6 +4104,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image6</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -4128,7 +4131,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox5">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -4503,6 +4506,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image7</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -4529,7 +4533,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox6">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -4904,6 +4908,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image8</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -4930,7 +4935,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox7">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -5305,6 +5310,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image9</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -5331,7 +5337,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox8">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
@@ -5706,6 +5712,7 @@
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
                                 <property name="receives-default">True</property>
+                                <property name="margin-bottom">15</property>
                                 <property name="image">image10</property>
                                 <property name="image-position">right</property>
                                 <property name="always-show-image">True</property>
@@ -5732,7 +5739,7 @@
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
                                         <child>
-                                          <object class="GtkListBox">
+                                          <object class="GtkListBox" id="LayoutListbox9">
                                             <property name="visible">True</property>
                                             <property name="can-focus">False</property>
                                             <property name="selection-mode">none</property>
