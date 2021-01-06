@@ -1,8 +1,28 @@
+/* extension.js
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 2 of the License, or
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: GPL-2.0-or-later
+ */
+
+/* exported init */
+
 "use strict";
 
 const Lang = imports.lang;
-const {main, iconGrid, appDisplay, panel, altTab, switcherPopup, windowManager} = imports.ui;
-const {GObject, GLib, St, Shell, Clutter, Meta, Graphene} = imports.gi;
+const {altTab, appDisplay, iconGrid, main, panel, switcherPopup, windowManager} = imports.ui;
+const {Clutter, GLib, GObject, Graphene, Meta, Shell, St} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
@@ -612,8 +632,8 @@ function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
 	let workArea = window.get_work_area_for_monitor(monitorNr);
 	let wRect = window.get_frame_rect();
 
-	let onTop = wRect.y < main.panel.height + 15; // mouseY alone is unreliable, so windowRect's y will also be used
-	let onBottom = workArea.height - wRect.y < 75 || mouseY > workArea.height - 25; // mitigation for wrong grabPos when grabbing from topbar, see github issue #2; seems app dependant as well (especially GNOME/GTK apps cause problems)
+	let onTop = mouseY < main.panel.height + 25;
+	let onBottom = workArea.height - wRect.y < 75 || mouseY > workArea.height - 25;
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
