@@ -39,3 +39,7 @@ Activating an icon will tile the corresponding window to fill the free space.
 ## Installation
 
 You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), you can download the `tiling-assistant@leleat-on-github` folder and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`.
+
+## License
+
+This extension is distributed under the terms of the GNU General Public License, version 2 or later. See the license file for details.
