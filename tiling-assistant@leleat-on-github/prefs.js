@@ -1,6 +1,6 @@
 "use strict";
 
-const {GObject, Gdk, Gtk, Gio} = imports.gi;
+const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
 const Gettext = imports.gettext;
@@ -60,29 +60,82 @@ const MyPrefsWidget = new GObject.Class({
 				this.makeShortcutEdit(sc);
 			});
 
-			// draw Layout rects
-			for (let i = 0; i <= 9; i++) {
-				let drawArea = this.builder.get_object("DrawArea" + i);
+			// Layouts gui:
+			// this.layouts is an array of arrays. The inner arrays contain rects in the format {x: NR, y: NR, width: NR, height: NR} 
+			// NR is a float between 0 to 1.
+			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
+			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+			this.layoutFile = Gio.File.new_for_path(path); // TODO need to free this?
+
+			try {
+				this.layoutFile.create(Gio.FileCreateFlags.NONE, null);
+			} catch (e) {
+				log(`Tiling Assistant: ExtensionError ${e}`);
+			}
+						
+			this.layouts = this.loadLayouts();
+
+			for (let i = 0; i < 10; i++) {
+				let drawArea = this.builder.get_object(`DrawArea${i}`);
 				drawArea.connect("draw", (widget, cr) => {
-					let rects = this.getLayoutRects(i);
-					let layoutIsValid = this.isLayoutValid(rects);
-
+					// file couldnt be loaded or empty
+					if (!this.layouts)
+						return;
+					
+					let layout = this.layouts[i];
+					let layoutIsValid = this.layoutIsValid(layout);
 					if (layoutIsValid) {
-						this.drawLayoutRects(widget, cr, rects);
+						// remove "Invalid layout" label from overlay, if it exists
+						let gtkOverlay = widget.get_parent().get_parent();
+						if (gtkOverlay.get_children().length > 1)
+							gtkOverlay.remove(gtkOverlay.get_children()[1]);
 
-					} else { // TODO error message
+						this.drawLayoutsRects(widget, cr, layout);
+					
+					} else {
+						// add "Invalid Layout" label to overlay, if it doesn't exist
+						let gtkOverlay = widget.get_parent().get_parent();
+						if (gtkOverlay.get_children().length <= 1) {
+							let label = new Gtk.Label({
+								label: "Invalid layout",
+								halign:  Gtk.Align.CENTER,
+								valign:  Gtk.Align.CENTER,
+								visible: true
+							});
+							gtkOverlay.add_overlay(label);
+						}
+					}
+				});
+			}
 
+			let drawAreas = [];
+			for (let i = 0; i < 10; i++) {
+				// drawArea
+				drawAreas.push(this.builder.get_object(`DrawArea${i}`));
+
+				this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
+					let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
+
+					// all possible rects in the layout
+					for (let j = 0; j < 8; j++) {
+						let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
+						entry.set_text("");
 					}
 				});
 			}
 
 			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
-				for (let i = 0; i <= 9; i++) {
-					let drawArea = this.builder.get_object("DrawArea" + i);
-					drawArea.queue_draw();
-				}
+				this.layouts = this.loadLayouts();
+				drawAreas.forEach(d => d.queue_draw());
 			});
 
+			this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
+				let success = this.saveLayouts();
+				this.layouts = this.loadLayouts();
+				drawAreas.forEach(d => d.queue_draw());
+			});
+
+			// translations
 			this.setupTranslations();
 		},
 
@@ -140,44 +193,86 @@ const MyPrefsWidget = new GObject.Class({
 			updateShortcutRow(this.settings.get_strv(settingKey)[0]);
 		},
 
-		// format should be: x--y--width--height where the variables range from 0.0 to 1.0
-		// for ex.: 0 -- 0 -- .25 -- 0.75
-		// return null, if wrong format
-		getLayoutRects: function(layoutIndex) {
-			let rects = [];
-			let rectProps = ["x", "y", "width", "height"];
+		// load from layouts.json
+		loadLayouts() {
+			let [success, contents] = this.layoutFile.load_contents(null);	
+			if ((!success || !contents.length)) 
+				return null;
 
-			let layoutListBox = this.builder.get_object("LayoutListbox" + layoutIndex)
-			for (let i = 0; i < 8; i++) {
-				let r = {};
+			// reset entries' text
+			for (let i = 0; i < 10; i++) {
+				let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
 
-				let entry = layoutListBox.get_row_at_index(i).get_child().get_children()[1];
-				if (!entry.get_text_length())
-					continue;
-
-				let text = entry.get_text();
-				let splits = text.split("--");
-				if (splits.length != 4)
-					return null;
-
-				for (let j = 0; j < 4; j++) {
-					let propValue = parseFloat(splits[j].trim());
-					if (Number.isNaN(propValue))
-						return null;			
-
-					r[rectProps[j]] = propValue;
+				// all possible rects
+				for (let j = 0; j < 8; j++) {
+					let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
+					entry.set_text("");
 				}
-
-				rects.push(r);
 			}
 
-			return rects;
+			// set text for Gtk.entries
+			let layouts = JSON.parse(contents);
+			// contents.free(); // TODO free is not a function but freeing needed; see doc website?
+			layouts.forEach((layout, index) => {
+				let layoutListBox = this.builder.get_object(`LayoutListbox${index}`);
+
+				layout.forEach((rect, idx) => {
+					let entry = layoutListBox.get_row_at_index(idx).get_child().get_children()[1];
+					if (!Number.isNaN(rect.x) && !Number.isNaN(rect.y) && !Number.isNaN(rect.width) && !Number.isNaN(rect.height))
+						entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
+				});
+			});
+
+			return layouts;
 		},
 
-		isLayoutValid(rects) {
-			// wrong format for rects in Gtk.Entrys
-			// or no text in entries
-			if (!rects || !rects.length)	
+		// save to layouts.json
+		saveLayouts() {
+			let layouts = [];
+			let rectProps = ["x", "y", "width", "height"];
+
+			// for each possible layout
+			for (let i = 0; i < 10; i++) {
+				let rects = [];
+				let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
+
+				// for each possible rect in the layout
+				for (let j = 0; j < 8; j++) {
+					let r = {};
+	
+					let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
+					if (!entry.get_text_length())
+						continue;
+	
+					let text = entry.get_text();
+					let splits = text.split("--");
+					if (splits.length != 4) {
+						rects.push({x: 0, y: 0, width: 0, height: 0});
+						continue;
+					}
+	
+					for (let j = 0; j < 4; j++) {
+						let propValue = parseFloat(splits[j].trim());
+						if (Number.isNaN(propValue)) {
+							rects.push({x: 0, y: 0, width: 0, height: 0});
+							continue;	
+						}
+	
+						r[rectProps[j]] = propValue;
+					}
+	
+					rects.push(r);
+				}
+
+				layouts.push(rects);
+			}
+
+			let [success] = this.layoutFile.replace_contents(JSON.stringify(layouts), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+			return success;
+		},
+
+		layoutIsValid(layout) {
+			if (!layout)	
 				return false;
 
 			// calculate the surface area of an overlap
@@ -185,15 +280,15 @@ const MyPrefsWidget = new GObject.Class({
 				return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) * Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 			}
 
-			for (let i = 0, len = rects.length; i < len; i++) {
-				let r = rects[i];
+			for (let i = 0, len = layout.length; i < len; i++) {
+				let r = layout[i];
 
 				// rects is/reaches outside of screen (i. e. > 1)
-				if (r.x < 0 || r.y < 0 || r.width < 0 || r.height < 0 || r.x + r.width > 1 || r.y + r.height > 1)
+				if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
 					return false;
 
 				for (let j = i + 1; j < len; j++) {
-					if (rectsOverlap(r, rects[j]))
+					if (rectsOverlap(r, layout[j]))
 						return false;
 				}
 			}
@@ -201,15 +296,15 @@ const MyPrefsWidget = new GObject.Class({
 			return true;
 		},
 
-		drawLayoutRects: function(layoutWidget, cr, rects) {
-			//rects = [{x: 0, y: 0, width: .5, height: .5}]			 
+		// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
+		drawLayoutsRects: function(layoutWidget, cr, layout) {
 			let color = new Gdk.RGBA();
 			let width = layoutWidget.get_allocated_width();
 			let height = layoutWidget.get_allocated_height();
 			
 			cr.setLineWidth(1.0);
 
-			rects.forEach(r => {
+			layout.forEach(r => {
 				// 1px outline for rect in transparent white
 				color.parse("rgba(255, 255, 255, .2)");
 				Gdk.cairo_set_source_rgba(cr, color);

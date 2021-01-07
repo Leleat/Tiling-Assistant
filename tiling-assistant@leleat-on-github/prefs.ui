@@ -184,6 +184,11 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkImage" id="saveIcon">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="stock">gtk-save</property>
+  </object>
   <object class="GtkAdjustment" id="terminalDelay">
     <property name="upper">500</property>
     <property name="step-increment">50</property>
@@ -2040,17 +2045,47 @@
         <property name="can-focus">False</property>
         <property name="orientation">vertical</property>
         <child>
-          <object class="GtkButton" id="reloadLayoutsButton">
-            <property name="label" translatable="yes"> Reload</property>
+          <object class="GtkBox">
             <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <property name="receives-default">True</property>
-            <property name="valign">center</property>
+            <property name="can-focus">False</property>
             <property name="margin-start">20</property>
             <property name="margin-end">20</property>
             <property name="margin-top">12</property>
-            <property name="image">reloadIcon</property>
-            <property name="always-show-image">True</property>
+            <property name="spacing">20</property>
+            <child>
+              <object class="GtkButton" id="saveLayoutsButton">
+                <property name="label" translatable="yes"> Save</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="image">saveIcon</property>
+                <property name="always-show-image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkButton" id="reloadLayoutsButton">
+                <property name="label" translatable="yes"> Reload</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">True</property>
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="image">reloadIcon</property>
+                <property name="always-show-image">True</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
           </object>
           <packing>
             <property name="expand">False</property>
@@ -2091,7 +2126,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton0">
                                 <property name="label" translatable="yes"> 1: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -2117,6 +2152,7 @@
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -2152,8 +2188,20 @@
                                                       <object class="GtkEntry">
                                                         <property name="visible">True</property>
                                                         <property name="can-focus">True</property>
+                                                        <property name="tooltip-text" translatable="yes">In the left column you will enter the dimensions of the rectangles for the layouts. Format is:
+xVal--yVal--widthVal--heightVal
+
+The values can range from 0 to 1. 1  represents your screen's dimensions.
+
+The right column shows a preview of your different layouts. Unsaved changes are not displayed. 
+
+The reload button loads the layouts from your file (i. e. unsaved changes will be lost).
+
+The clear button clears the respective layout. This change is not yet saved.
+</property>
                                                         <property name="margin-left">5</property>
                                                         <property name="margin-start">5</property>
+                                                        <property name="placeholder-text" translatable="yes">This tooltip for help...</property>
                                                       </object>
                                                       <packing>
                                                         <property name="expand">True</property>
@@ -2436,29 +2484,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame" id="FR">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea0">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea0">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -2493,7 +2551,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton1">
                                 <property name="label" translatable="yes"> 2: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -2518,6 +2576,7 @@
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -2837,29 +2896,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea1">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea1">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -2894,7 +2963,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton2">
                                 <property name="label" translatable="yes">3: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -2919,6 +2988,7 @@
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -3238,29 +3308,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea2">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea2">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -3295,7 +3375,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton3">
                                 <property name="label" translatable="yes">4: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -3315,12 +3395,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -3640,29 +3720,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea3">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea3">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -3697,7 +3787,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton4">
                                 <property name="label" translatable="yes">5: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -3717,12 +3807,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -4042,29 +4132,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea4">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea4">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -4099,7 +4199,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton5">
                                 <property name="label" translatable="yes">6: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -4119,12 +4219,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -4444,29 +4544,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea5">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea5">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -4501,7 +4611,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton6">
                                 <property name="label" translatable="yes">7: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -4521,12 +4631,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -4846,29 +4956,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea6">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea6">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -4903,7 +5023,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton7">
                                 <property name="label" translatable="yes">8: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -4923,12 +5043,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -4964,7 +5084,6 @@
                                                       <object class="GtkEntry">
                                                         <property name="visible">True</property>
                                                         <property name="can-focus">True</property>
-                                                        <property name="margin-left">5</property>
                                                         <property name="margin-start">5</property>
                                                       </object>
                                                       <packing>
@@ -5248,29 +5367,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea7">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea7">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -5305,7 +5434,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton8">
                                 <property name="label" translatable="yes">9: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -5325,12 +5454,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -5650,29 +5779,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea8">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea8">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -5707,7 +5846,7 @@
                             <property name="can-focus">False</property>
                             <property name="orientation">vertical</property>
                             <child>
-                              <object class="GtkButton">
+                              <object class="GtkButton" id="deleteLayoutButton9">
                                 <property name="label" translatable="yes">10: </property>
                                 <property name="visible">True</property>
                                 <property name="can-focus">True</property>
@@ -5727,12 +5866,12 @@
                               <object class="GtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
-                                <property name="margin-end">10</property>
                                 <property name="hexpand">True</property>
                                 <child>
                                   <object class="GtkScrolledWindow">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
+                                    <property name="margin-end">5</property>
                                     <property name="vexpand">True</property>
                                     <child>
                                       <object class="GtkViewport">
@@ -6052,29 +6191,39 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkFrame">
+                                  <object class="GtkOverlay">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
-                                    <property name="margin-start">10</property>
+                                    <property name="margin-start">5</property>
                                     <property name="hexpand">True</property>
                                     <property name="vexpand">True</property>
-                                    <property name="label-xalign">0</property>
-                                    <property name="label-yalign">0</property>
-                                    <property name="shadow-type">in</property>
                                     <child>
-                                      <object class="GtkDrawingArea" id="DrawArea9">
+                                      <object class="GtkFrame">
                                         <property name="visible">True</property>
                                         <property name="can-focus">False</property>
-                                        <property name="margin-start">5</property>
-                                        <property name="margin-end">5</property>
-                                        <property name="margin-top">5</property>
-                                        <property name="margin-bottom">5</property>
                                         <property name="hexpand">True</property>
                                         <property name="vexpand">True</property>
+                                        <property name="label-xalign">0</property>
+                                        <property name="label-yalign">0</property>
+                                        <property name="shadow-type">in</property>
+                                        <child>
+                                          <object class="GtkDrawingArea" id="DrawArea9">
+                                            <property name="visible">True</property>
+                                            <property name="can-focus">False</property>
+                                            <property name="margin-start">5</property>
+                                            <property name="margin-top">5</property>
+                                            <property name="margin-bottom">5</property>
+                                            <property name="hexpand">True</property>
+                                            <property name="vexpand">True</property>
+                                          </object>
+                                        </child>
+                                        <child type="label_item">
+                                          <placeholder/>
+                                        </child>
                                       </object>
-                                    </child>
-                                    <child type="label_item">
-                                      <placeholder/>
+                                      <packing>
+                                        <property name="index">-1</property>
+                                      </packing>
                                     </child>
                                   </object>
                                   <packing>
@@ -6102,7 +6251,7 @@
           <packing>
             <property name="expand">True</property>
             <property name="fill">True</property>
-            <property name="position">1</property>
+            <property name="position">2</property>
           </packing>
         </child>
       </object>
