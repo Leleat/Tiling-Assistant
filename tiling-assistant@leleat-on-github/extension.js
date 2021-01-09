@@ -28,7 +28,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 const Funcs = Me.imports.funcs;
 
-let appDash = null;
+var appDash = null;
 let tilePreview = null;
 var settings = null;
 
@@ -103,42 +103,16 @@ function enable() {
 			this.app.open_new_window(-1);
 
 		// main new code
-		} else if ((isShiftPressed || isAltPressed) && this.app.can_open_new_window()) {
-			let winTracker = Shell.WindowTracker.get_default();
-			let ogApp = this.app;
-			let wCreatedId = global.display.connect("window-created", (src, window) => {
-				// here we try to ignore loading screens; different apps use different windows for loading screens:
-				// For ex.: Krita's and GIMP's loading screen returns true for is_skip_taskbar()
-				// Steam's loading screen is a normal window, which doesn't skip the taskbar but doesn't allow_resize()
-				if (window.get_window_type() != Meta.WindowType.NORMAL || window.is_skip_taskbar() || !window.allows_move() || !window.allows_resize())
-					return;
-				
-				global.display.disconnect(wCreatedId);
-
-				// in case window detection above didn't work properly.
-				// this breaks, if the current to-be-tiled app loads (-> load screen) and the user opens another window
-				// ... acceptable downside for me
-				let appOpened = winTracker.get_window_app(window)
-				if (appOpened != ogApp)
-					return;
-
-				let wActor = window.get_compositor_private();
-				let firstFrameID = wActor.connect("first-frame", () => {
-					wActor.disconnect(firstFrameID);
-
-					let workArea = window.get_work_area_current_monitor();
-					let rect = new Meta.Rectangle({
-						x: workArea.x + (isShiftPressed) ? 0 : workArea.width / 2,
-						y: workArea.y,
-						width: workArea.width / 2,
-						height: workArea.height
-					});		
-	
-					Funcs.tileWindow(window, rect);
-				});
+		} else if ((isShiftPressed || isAltPressed)) {
+			let workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
+			let rect = new Meta.Rectangle({
+				x: workArea.x + ((isShiftPressed) ? 0 : workArea.width / 2),
+				y: workArea.y,
+				width: workArea.width / 2,
+				height: workArea.height
 			});
 
-			this.app.open_new_window(-1);
+			Funcs.openAppTiled(this.app, rect);
 
 		} else {
 			this.app.activate();
@@ -229,6 +203,20 @@ function onMyTilingShortcutPressed(shortcutName) {
 			settings.set_boolean("enable-dash", toggleTo);
 
 			main.notify("Tiling Assistant", "Dash " + (toggleTo ? 'enabled' : 'was disabled'));
+			return;
+
+		case "layout1":
+		case "layout2":
+		case "layout3":
+		case "layout4":
+		case "layout5":
+		case "layout6":
+		case "layout7":
+		case "layout8":
+		case "layout9":
+		case "layout10":
+			let idx = Number.parseInt(shortcutName.substring(6)) - 1;
+			Funcs.tileToLayout(idx);
 			return;
 
 		case "tile-maximize":
@@ -775,17 +763,11 @@ function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
 // called when a window is tiled (via tileWindow()).
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function onWindowTiled(tiledWindow) {
-	if (appDash.shown)
+	if (appDash.shown || !settings.get_boolean("enable-dash"))
 		return;
-
+		
 	let openWindows = Funcs.getOpenWindows();
 	let currTileGroup = Funcs.getTopTileGroup(openWindows, false);
-
-	// setup tileGroup to raise tiled windows as a group
-	Funcs.updateTileGroup(currTileGroup);
-
-	if (!settings.get_boolean("enable-dash"))
-		return;
 
 	// remove the tiled windows from openWindows to populate the Dash
 	currTileGroup.forEach(w => {
@@ -905,32 +887,59 @@ var TilingAppDash = GObject.registerClass(
 		}
 
 		// open when a window is tiled and when there is screen space available
-		open(openWindows, tiledWindow, monitorNr, freeScreenRect) {
+		open(openWindows, tiledWindow, monitorNr, freeScreenRect, layout = null) {
 			this.shown = true;
 			this.appContainer.destroy_all_children();
 
 			this.freeScreenRect = freeScreenRect;
+			this.tilingLayout = layout;
+			this.openWindows = openWindows;
 			this.monitor = monitorNr;
 			let monitorScale = global.display.get_monitor_scale(monitorNr);
 			let buttonSize = monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0));
-			let windowCount = openWindows.length;
 
-			this._setupAppContainer(openWindows, windowCount, buttonSize, monitorScale);
-			this._setupDashBg(windowCount, buttonSize, tiledWindow);
+			this._setupAppContainer(buttonSize, monitorScale);
+			this._setupDashBg(buttonSize, tiledWindow);
 			this._shadeBackground(tiledWindow);
 			this._setupMouseCatcher();
+
+			if (Array.isArray(layout)) {
+				this.layoutPreview = new St.Widget({
+					style_class: "tile-preview",
+					x: freeScreenRect.x + freeScreenRect.width / 2,
+					y: freeScreenRect.y + freeScreenRect.height / 2,
+				});
+				global.window_group.add_child(this.layoutPreview);
+
+				this.layoutPreview.ease({
+					x: freeScreenRect.x,
+					y: freeScreenRect.y,
+					width: freeScreenRect.width,
+					height: freeScreenRect.height,
+					duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
+					mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+				});
+			}
 		}
 
-		close() {
+		close(clearTilingLayout = false) {
 			this.shown = false;
 			this.mouseCatcher.hide();
 			this.shadeBG.hide();
+
+			if (clearTilingLayout) {
+				this.tilingLayout = [];
+				this.openWindows = [];
+			}
+			if (this.layoutPreview) {
+				this.layoutPreview.destroy();
+				this.layoutPreview = null;
+			}
 
 			this.windowClones.forEach(clone => {
 				clone.source.show();
 				clone.destroy();
 			});
-
 
 			let finalX = this.dashBG.x + 200 * this.animationDir.x;
 			let finalY = this.dashBG.y + 200 * this.animationDir.y;
@@ -958,19 +967,20 @@ var TilingAppDash = GObject.registerClass(
 			});
 		}
 
-		_setupAppContainer(openWindows, windowCount, buttonSize, monitorScale) {
+		_setupAppContainer(buttonSize, monitorScale) {
+			let windowCount = this.openWindows.length;
 			this.appContainer.set_size(windowCount * buttonSize, buttonSize);
 			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
 
 			for (let idx = 0, posX = 0; idx < windowCount; idx++, posX += buttonSize) {
-				let appIcon = new TilingAppIcon(openWindows[idx], idx, { showLabel: settings.get_boolean("show-label") });
+				let appIcon = new TilingAppIcon(this.openWindows[idx], idx, { showLabel: settings.get_boolean("show-label") });
 				this.appContainer.add_child(appIcon);
 				appIcon.set_position(posX, 0);
 			}
 		}
 
-		_setupDashBg(windowCount, buttonSize, tiledWindow) {
-			this.dashBG.set_size(windowCount * buttonSize, buttonSize);
+		_setupDashBg(buttonSize, tiledWindow) {
+			this.dashBG.set_size(this.openWindows.length * buttonSize, buttonSize);
 			this.dashBG.set_scale(1, 1);
 
 			// scale Dash to fit the freeScreenRect
@@ -1033,11 +1043,12 @@ var TilingAppDash = GObject.registerClass(
 
 			// no tiledWindow on first rect when using layouts
 			} else {
-				global.window_group.insert_child_at_index(this.shadeBG, -1);
+				global.window_group.remove_child(this.shadeBG);
+				global.window_group.add_child(this.shadeBG);
 				this.appContainer.get_child_at_index(0).grab_key_focus();
 			}
 
-			let entireWorkArea = global.get_active_workspace().get_work_area_all_monitors();
+			let entireWorkArea = global.workspace_manager.get_active_workspace().get_work_area_all_monitors();
 			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
 			this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
 			this.shadeBG.show();
@@ -1261,14 +1272,14 @@ var TilingAppIcon = GObject.registerClass(
 			this.set_child(this.iconContainer);
 
 			let winTracker = Shell.WindowTracker.get_default();
-			let app = winTracker.get_window_app(window);
+			this.app = winTracker.get_window_app(window);
 
-			iconParams["createIcon"] = () => app.create_icon_texture(settings.get_int("icon-size"));
+			iconParams["createIcon"] = () => this.app.create_icon_texture(settings.get_int("icon-size"));
 			iconParams["setSizeManually"] = true;
-			this.icon = new iconGrid.BaseIcon(app.get_name(), iconParams);
+			this.icon = new iconGrid.BaseIcon(this.app.get_name(), iconParams);
 			this.iconContainer.add_child(this.icon);
 
-			let tmpWindows = app.get_windows();
+			let tmpWindows = this.app.get_windows();
 			let windowCount = tmpWindows.length
 			if (windowCount <= 1)
 				return;
@@ -1370,7 +1381,7 @@ var TilingAppIcon = GObject.registerClass(
 
 			// close the Dash on all other key inputs
 			if (appDash.shown)
-				appDash.close();
+				appDash.close(true);
 
 			return Clutter.EVENT_PROPAGATE;
 		}
@@ -1393,25 +1404,66 @@ var TilingAppIcon = GObject.registerClass(
 				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
 				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 
-				if (isAltPressed) {
-					if (appDash.freeScreenRect.width >= appDash.freeScreenRect.height * 1.25) { // prefer vertical tiling more (because of horizontal screen orientation)
-						appDash.freeScreenRect.x = appDash.freeScreenRect.x + appDash.freeScreenRect.width / 2;
-						appDash.freeScreenRect.width = appDash.freeScreenRect.width / 2;
+				let tileInLayout = appDash.tilingLayout.length && appDash.tilingLayout.length > 0;
 
-					} else {
-						appDash.freeScreenRect.y = appDash.freeScreenRect.y + appDash.freeScreenRect.height / 2;
-						appDash.freeScreenRect.height = appDash.freeScreenRect.height / 2;
+				if (!tileInLayout) {
+					if (isAltPressed) {
+						if (appDash.freeScreenRect.width >= appDash.freeScreenRect.height * 1.25) { // prefer vertical tiling more (because of horizontal screen orientation)
+							appDash.freeScreenRect.x = appDash.freeScreenRect.x + appDash.freeScreenRect.width / 2;
+							appDash.freeScreenRect.width = appDash.freeScreenRect.width / 2;
+	
+						} else {
+							appDash.freeScreenRect.y = appDash.freeScreenRect.y + appDash.freeScreenRect.height / 2;
+							appDash.freeScreenRect.height = appDash.freeScreenRect.height / 2;
+						}
+	
+					} else if (isShiftPressed) {
+						if (appDash.freeScreenRect.width >= appDash.freeScreenRect.height * 1.25) // prefer vertical tiling more (because of horizontal screen orientation)
+							appDash.freeScreenRect.width = appDash.freeScreenRect.width / 2;
+	
+						else
+							appDash.freeScreenRect.height = appDash.freeScreenRect.height / 2;
 					}
-
-				} else if (isShiftPressed) {
-					if (appDash.freeScreenRect.width >= appDash.freeScreenRect.height * 1.25) // prefer vertical tiling more (because of horizontal screen orientation)
-						appDash.freeScreenRect.width = appDash.freeScreenRect.width / 2;
-
-					else
-						appDash.freeScreenRect.height = appDash.freeScreenRect.height / 2;
 				}
 
-				Funcs.tileWindow(window, appDash.freeScreenRect);
+				Funcs.tileWindow(window, appDash.freeScreenRect, !tileInLayout);
+
+				if (tileInLayout) {
+					// save the windows which were tiled as part of a layout to remove them from the openWindows.
+					// cant use tileGroup here
+					if (!appDash.tiledViaLayout)
+						appDash.tiledViaLayout = [];
+					
+					appDash.tiledViaLayout.push(window);
+
+					// remove windows from openWindows, if they were tiled with the current layout
+					let allWindowsTiledInLayout = true;
+					let idx = appDash.openWindows.indexOf(window);
+					let appWindows = this.app.get_windows().filter(w => w.located_on_workspace(global.workspace_manager.get_active_workspace()));
+					for (let i = 0; i < appWindows.length; i++) {
+						let w = appWindows[i];
+						if (appDash.tiledViaLayout.includes(w))
+							continue;
+
+						allWindowsTiledInLayout = false;
+						appDash.openWindows[idx] = w;
+						break;
+					}
+
+					if (allWindowsTiledInLayout)
+						appDash.openWindows.splice(idx, 1);
+
+					if (!appDash.openWindows.length) {
+						appDash.tiledViaLayout = [];
+						return;
+					}
+
+					let freeScreenRect = appDash.tilingLayout.shift();
+					if (!appDash.tilingLayout.length)
+						appDash.tiledViaLayout = [];
+
+					appDash.open(appDash.openWindows, window, window.get_monitor(), freeScreenRect, appDash.tilingLayout)
+				}
 			}
 		}
 	}

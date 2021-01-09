@@ -1,7 +1,7 @@
 "use strict";
 
 const {main, windowManager} = imports.ui;
-const {Clutter, GLib, Meta, St, Shell} = imports.gi;
+const {Clutter, Gio, GLib, Meta, St, Shell} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const MyExtension = Me.imports.extension
@@ -509,6 +509,10 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	// setting user_op to false helps with issues on terminals
 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
+	// setup tileGroup to raise tiled windows as a group
+	let tileGroup = getTopTileGroup(getOpenWindows(), false);
+	updateTileGroup(tileGroup);
+
 	if (checkToOpenDash)
 		MyExtension.onWindowTiled(window);
 };
@@ -696,6 +700,37 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 	}
 };
 
+function openAppTiled(app, rect) {
+	if (!app.can_open_new_window())
+		return;
+
+	let wCreatedId = global.display.connect("window-created", (src, window) => {
+		// here we try to ignore loading screens; different apps use different windows for loading screens:
+		// For ex.: Krita's and GIMP's loading screen returns true for is_skip_taskbar()
+		// Steam's loading screen is a normal window, which doesn't skip the taskbar but doesn't allow_resize()
+		if (window.get_window_type() != Meta.WindowType.NORMAL || window.is_skip_taskbar() || !window.allows_move() || !window.allows_resize())
+			return;
+		
+		global.display.disconnect(wCreatedId);
+
+		// in case window detection above didn't work properly, we will return here so that no unintended windows suddenly get tiled
+		// this breaks, if the current to-be-tiled app loads (-> load screen) and the user opens another window
+		// ... acceptable downside for me
+		let winTracker = Shell.WindowTracker.get_default();
+		let openedApp = winTracker.get_window_app(window);
+		if (openedApp != app)
+			return;
+
+		let wActor = window.get_compositor_private();
+		let firstFrameID = wActor.connect("first-frame", () => {
+			wActor.disconnect(firstFrameID);
+			tileWindow(window, rect);
+		});
+	});
+
+	app.open_new_window(-1);
+};
+
 // called via keybinding:
 // tile a window to existing layout below it
 function replaceTiledWindow(window) {
@@ -815,4 +850,78 @@ function replaceTiledWindow(window) {
 		
 		destroyAll();
 	});
+};
+
+function tileToLayout(layoutIdx) {
+	let getLayout = function(idx) {
+		let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+		let layoutFile = Gio.File.new_for_path(path); // TODO need to free this?
+
+		try {
+			layoutFile.create(Gio.FileCreateFlags.NONE, null);
+		} catch (e) {
+			
+		}
+
+		let [success, contents] = layoutFile.load_contents(null);
+		if (success) {
+			let layouts = JSON.parse(contents);
+			if (layouts.length && idx < layouts.length)
+				return layouts[idx];
+		}
+
+		return null;
+	};
+
+	let layout = getLayout(layoutIdx);
+	if (!layout || !layout.length)
+		return;
+
+	let openWindows = getOpenWindows();
+	if (!openWindows.length)
+		return;
+
+	// filter the openWindows array, so that no duplicate apps are shown
+	let winTracker = Shell.WindowTracker.get_default();
+	let openApps = [];
+	openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
+	openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);	
+
+	let layoutIsValid = function (l) {
+		// calculate the surface area of an overlap
+		let rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) * Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+
+		for (let i = 0, len = l.length; i < len; i++) {
+			let r = l[i];
+
+			// rects is/reaches outside of screen (i. e. > 1)
+			if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
+				return false;
+
+			for (let j = i + 1; j < len; j++) {
+				if (rectsOverlap(r, l[j]))
+					return false;
+			}
+		}
+
+		return true;
+	};
+
+	if (!layoutIsValid(layout))
+		return;
+
+	// turn layout rects into Meta.Rectangles and scale to display size
+	let rectlayout = [];
+	let workArea = openWindows[0].get_work_area_current_monitor();
+	layout.forEach(r => {
+		rectlayout.push(new Meta.Rectangle({
+			x: workArea.x + r.x * workArea.width,
+			y: workArea.y + r.y * workArea.height,
+			width: r.width * workArea.width,
+			height: r.height * workArea.height,
+		}));
+	});
+
+	let freeScreenRect = rectlayout.shift();
+	MyExtension.appDash.open(openWindows, null, openWindows[0].get_monitor(), freeScreenRect, rectlayout);
 };

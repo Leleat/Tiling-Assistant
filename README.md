@@ -22,6 +22,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - Holding `Ctrl` while DNDing a window over another tiled window will make them share the same space. See the dnd preview below. (Idea from the Shelltile extension). Hovering over empty space while holding `Ctrl` will tile to that space.
 
+- Define up to 10 layouts. On pressing the corresponding keybinding the Dash will open and ask you which window you want in which spot of the layout. (See last preview below)
+
 - Raise/focus tiled windows as a group.
 
 - Resize tiled windows in a group (**horizontal and vertical only**). You can escape the group-resizing by holding `Ctrl` (doesn't work with GTK apps). This way only the windows directly opposed to the resized window will resize along. Combined with the keybindings to fill the available screen space and to tile to existing tiled windows this enables more complex layouts.
@@ -35,6 +37,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 ![Preview_DND](preview_dnd.gif)
 
 ![Preview_SPIRAL](preview_spiral.gif)
+
+![Preview_LAYOUT](preview_layout.gif)
 
 ## Installation
 
