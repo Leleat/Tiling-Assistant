@@ -61,7 +61,7 @@ const MyPrefsWidget = new GObject.Class({
 			});
 
 			// Layouts gui:
-			// this.layouts is an array of arrays. The inner arrays contain rects in the format {x: NR, y: NR, width: NR, height: NR} 
+			// this.layouts is an array of arrays. The inner arrays contain "rects" in the format {x: NR, y: NR, width: NR, height: NR} 
 			// NR is a float between 0 to 1.
 			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
 			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
@@ -75,22 +75,39 @@ const MyPrefsWidget = new GObject.Class({
 						
 			this.layouts = this.loadLayouts();
 
-			for (let i = 0; i < 10; i++) {
+			let drawAreas = [];
+
+			for (let i = 0; i < 10; i++) { // Nr of layouts is hardcoded
+				// connect delete buttons
+				this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
+					let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
+
+					// all possible rects in the layout
+					for (let j = 0; j < 8; j++) {
+						let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
+						entry.set_text("");
+					}
+				});
+
+				// drawAreas
 				let drawArea = this.builder.get_object(`DrawArea${i}`);
+				drawAreas.push(drawArea);
+
+				// draw rects
 				drawArea.connect("draw", (widget, cr) => {
 					// file couldnt be loaded or empty
 					if (!this.layouts)
 						return;
 					
 					let layout = this.layouts[i];
-					let layoutIsValid = this.layoutIsValid(layout);
+					let layoutIsValid = this._layoutIsValid(layout);
 					if (layoutIsValid) {
 						// remove "Invalid layout" label from overlay, if it exists
 						let gtkOverlay = widget.get_parent().get_parent();
 						if (gtkOverlay.get_children().length > 1)
 							gtkOverlay.remove(gtkOverlay.get_children()[1]);
 
-						this.drawLayoutsRects(widget, cr, layout);
+						this._drawLayoutsRects(widget, cr, layout);
 					
 					} else {
 						// add "Invalid Layout" label to overlay, if it doesn't exist
@@ -108,29 +125,13 @@ const MyPrefsWidget = new GObject.Class({
 				});
 			}
 
-			let drawAreas = [];
-			for (let i = 0; i < 10; i++) {
-				// drawArea
-				drawAreas.push(this.builder.get_object(`DrawArea${i}`));
-
-				this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
-					let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-
-					// all possible rects in the layout
-					for (let j = 0; j < 8; j++) {
-						let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
-						entry.set_text("");
-					}
-				});
-			}
-
 			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
 				this.layouts = this.loadLayouts();
 				drawAreas.forEach(d => d.queue_draw());
 			});
 
 			this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
-				let success = this.saveLayouts();
+				this.saveLayouts();
 				this.layouts = this.loadLayouts();
 				drawAreas.forEach(d => d.queue_draw());
 			});
@@ -193,17 +194,15 @@ const MyPrefsWidget = new GObject.Class({
 			updateShortcutRow(this.settings.get_strv(settingKey)[0]);
 		},
 
-		// load from layouts.json
+		// load from ~/.TilingAssistantExtension.layouts.json
 		loadLayouts() {
 			let [success, contents] = this.layoutFile.load_contents(null);	
-			if ((!success || !contents.length)) 
+			if (!success || !contents.length)
 				return null;
 
-			// reset entries' text
+			// reset layout's entries' text
 			for (let i = 0; i < 10; i++) {
 				let layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-
-				// all possible rects
 				for (let j = 0; j < 8; j++) {
 					let entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
 					entry.set_text("");
@@ -218,15 +217,14 @@ const MyPrefsWidget = new GObject.Class({
 
 				layout.forEach((rect, idx) => {
 					let entry = layoutListBox.get_row_at_index(idx).get_child().get_children()[1];
-					if (!Number.isNaN(rect.x) && !Number.isNaN(rect.y) && !Number.isNaN(rect.width) && !Number.isNaN(rect.height))
-						entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
+					entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
 				});
 			});
 
 			return layouts;
 		},
 
-		// save to layouts.json
+		// save to ~/.TilingAssistantExtension.layouts.json
 		saveLayouts() {
 			let layouts = [];
 			let rectProps = ["x", "y", "width", "height"];
@@ -271,7 +269,7 @@ const MyPrefsWidget = new GObject.Class({
 			return success;
 		},
 
-		layoutIsValid(layout) {
+		_layoutIsValid(layout) {
 			if (!layout)	
 				return false;
 
@@ -297,7 +295,7 @@ const MyPrefsWidget = new GObject.Class({
 		},
 
 		// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
-		drawLayoutsRects: function(layoutWidget, cr, layout) {
+		_drawLayoutsRects: function(layoutWidget, cr, layout) {
 			let color = new Gdk.RGBA();
 			let width = layoutWidget.get_allocated_width();
 			let height = layoutWidget.get_allocated_height();

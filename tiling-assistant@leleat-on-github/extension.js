@@ -827,7 +827,7 @@ function onWindowTiled(tiledWindow) {
 	if (freeScreenSpace.width < 200 || freeScreenSpace.height < 200)
 		return;
 
-	appDash.open(openWindows, tiledWindow, freeScreenSpace);
+	appDash.open(openWindows, tiledWindow, tiledWindow.get_monitor(), freeScreenSpace);
 };
 
 ////////////////////////////////////////////////////////////////////
@@ -905,99 +905,20 @@ var TilingAppDash = GObject.registerClass(
 		}
 
 		// open when a window is tiled and when there is screen space available
-		open(openWindows, tiledWindow, freeScreenRect) {
+		open(openWindows, tiledWindow, monitorNr, freeScreenRect) {
 			this.shown = true;
 			this.appContainer.destroy_all_children();
 
 			this.freeScreenRect = freeScreenRect;
-			this.monitor = tiledWindow.get_monitor();
-
-			let entireWorkArea = tiledWindow.get_work_area_all_monitors();
-			let monitorScale = global.display.get_monitor_scale(tiledWindow.get_monitor());
-			let windowCount = openWindows.length;
+			this.monitor = monitorNr;
+			let monitorScale = global.display.get_monitor_scale(monitorNr);
 			let buttonSize = monitorScale * (settings.get_int("icon-size") + 16 + settings.get_int("icon-margin") + ((settings.get_boolean("show-label")) ? 28 : 0));
-			let dashWidth = windowCount * buttonSize;
+			let windowCount = openWindows.length;
 
-			// setup appContainer -> 1 row only
-			// magicNr are margins/paddings from the icon to the full-sized highlighted button
-			this.appContainer.set_size(dashWidth, buttonSize);
-			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
-
-			for (let idx = 0, posX = 0; idx < windowCount; idx++, posX += buttonSize) {
-				let appIcon = new TilingAppIcon(openWindows[idx], idx, { showLabel: settings.get_boolean("show-label") });
-				this.appContainer.add_child(appIcon);
-				appIcon.set_position(posX, 0);
-			}
-
-			// setup dashBG; scale it to fit the freeScreenRect
-			this.dashBG.set_size(dashWidth, buttonSize);
-			this.dashBG.set_scale(1, 1);
-			if (this.dashBG.width > freeScreenRect.width * .95) {
-				let scale = freeScreenRect.width * .95 / this.dashBG.width;
-				this.dashBG.set_scale(scale, scale);
-			}
-			this.dashBG.show();
-			this.dashBG.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.dashBG.width / 2
-				, freeScreenRect.y + freeScreenRect.height / 2 - this.dashBG.height / 2);	
-
-			// move bgContainer FROM final pos to animate to final pos
-			let finalX = this.dashBG.x;
-			let finalY = this.dashBG.y;
-			this.animationDir.x = Math.sign(tiledWindow.tiledRect.x - freeScreenRect.x);
-			this.animationDir.y = Math.sign(tiledWindow.tiledRect.y - freeScreenRect.y);
-			this.dashBG.set_position(finalX + 400 * this.animationDir.x, this.dashBG.y + 400 * this.animationDir.y);
-			this.dashBG.ease({
-				x: finalX,
-				y: finalY,
-				opacity: 255,
-				duration: windowManager.WINDOW_ANIMATION_TIME,
-				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-			});
-
-			// setup shadeBG
-			this.windowClones = [];
-			tiledWindow.tileGroup.forEach(w => {
-				if (w && w != tiledWindow) {
-					let wA = w.get_compositor_private();
-					let clone = new Clutter.Clone({
-						source: wA,
-						x: wA.x,
-						y: wA.y
-					});
-					wA.hide();
-					global.window_group.add_child(clone);
-					this.windowClones.push(clone);
-				}
-			});
-
-			// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
-			// signal used as a workaround; not sure if this is the right/best signal to use
-			let tiledWindowActor = tiledWindow.get_compositor_private();
-			let sID = tiledWindowActor.connect("queue-redraw", () => {
-				global.window_group.set_child_below_sibling(this.shadeBG, tiledWindowActor);
-				this.windowClones.forEach(clone => global.window_group.set_child_below_sibling(clone, tiledWindowActor));
-
-				// first icon grabs key focus
-				// here to prevent focus issues on consecutive tiling
-				this.appContainer.get_child_at_index(0).grab_key_focus();
-
-				tiledWindowActor.disconnect(sID);
-			});
-
-			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
-			this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
-			this.shadeBG.show();
-			this.shadeBG.ease({
-				opacity: 180,
-				duration: windowManager.WINDOW_ANIMATION_TIME,
-				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-			});
-
-			// setup mouseCatcher
-			this.mouseCatcher.show();
-			let monitorRect = global.display.get_monitor_geometry(this.monitor);
-			this.mouseCatcher.set_size(monitorRect.width, monitorRect.height);
-			this.mouseCatcher.set_position(0, 0);
+			this._setupAppContainer(openWindows, windowCount, buttonSize, monitorScale);
+			this._setupDashBg(windowCount, buttonSize, tiledWindow);
+			this._shadeBackground(tiledWindow);
+			this._setupMouseCatcher();
 		}
 
 		close() {
@@ -1035,6 +956,103 @@ var TilingAppDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => this.windowDash.hide()
 			});
+		}
+
+		_setupAppContainer(openWindows, windowCount, buttonSize, monitorScale) {
+			this.appContainer.set_size(windowCount * buttonSize, buttonSize);
+			this.appContainer.set_position(settings.get_int("icon-margin") / 2 * monitorScale, settings.get_int("icon-margin") / 2 * monitorScale);
+
+			for (let idx = 0, posX = 0; idx < windowCount; idx++, posX += buttonSize) {
+				let appIcon = new TilingAppIcon(openWindows[idx], idx, { showLabel: settings.get_boolean("show-label") });
+				this.appContainer.add_child(appIcon);
+				appIcon.set_position(posX, 0);
+			}
+		}
+
+		_setupDashBg(windowCount, buttonSize, tiledWindow) {
+			this.dashBG.set_size(windowCount * buttonSize, buttonSize);
+			this.dashBG.set_scale(1, 1);
+
+			// scale Dash to fit the freeScreenRect
+			if (this.dashBG.width > this.freeScreenRect.width * .95) {
+				let scale = this.freeScreenRect.width * .95 / this.dashBG.width;
+				this.dashBG.set_scale(scale, scale);
+			}
+
+			this.dashBG.show();
+			this.dashBG.set_position(this.freeScreenRect.x + this.freeScreenRect.width / 2 - this.dashBG.width / 2
+					, this.freeScreenRect.y + this.freeScreenRect.height / 2 - this.dashBG.height / 2);
+
+			// move bgContainer FROM final pos to animate TO final pos
+			let finalX = this.dashBG.x;
+			let finalY = this.dashBG.y;
+			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x); // tiledWindow = null on first tiling of layout
+			this.animationDir.y = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
+			this.dashBG.set_position(finalX + 400 * this.animationDir.x, this.dashBG.y + 400 * this.animationDir.y);
+			this.dashBG.ease({
+				x: finalX,
+				y: finalY,
+				opacity: 255,
+				duration: windowManager.WINDOW_ANIMATION_TIME,
+				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+			});
+		}
+
+		_shadeBackground(tiledWindow) {
+			this.windowClones = [];
+
+			if (tiledWindow) {
+				// create clones to show above the shade
+				tiledWindow.tileGroup.forEach(w => {
+					if (w && w != tiledWindow) {
+						let wA = w.get_compositor_private();
+						let clone = new Clutter.Clone({
+							source: wA,
+							x: wA.x,
+							y: wA.y
+						});
+						wA.hide();
+						global.window_group.add_child(clone);
+						this.windowClones.push(clone);
+					}
+				});
+	
+				// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
+				// signal used as a workaround; not sure if this is the right/best signal to use
+				let tiledWindowActor = tiledWindow.get_compositor_private();
+				let sID = tiledWindowActor.connect("queue-redraw", () => {
+					global.window_group.set_child_below_sibling(this.shadeBG, tiledWindowActor);
+					this.windowClones.forEach(clone => global.window_group.set_child_below_sibling(clone, tiledWindowActor));
+	
+					// first icon grabs key focus
+					// here to prevent focus issues on consecutive tiling
+					this.appContainer.get_child_at_index(0).grab_key_focus();
+	
+					tiledWindowActor.disconnect(sID);
+				});
+
+			// no tiledWindow on first rect when using layouts
+			} else {
+				global.window_group.insert_child_at_index(this.shadeBG, -1);
+				this.appContainer.get_child_at_index(0).grab_key_focus();
+			}
+
+			let entireWorkArea = global.get_active_workspace().get_work_area_all_monitors();
+			this.shadeBG.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
+			this.shadeBG.set_position(entireWorkArea.x, entireWorkArea.y);
+			this.shadeBG.show();
+			this.shadeBG.ease({
+				opacity: 180,
+				duration: windowManager.WINDOW_ANIMATION_TIME,
+				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+			});
+		}
+
+		_setupMouseCatcher() {
+			this.mouseCatcher.show();
+			let monitorRect = global.display.get_monitor_geometry(this.monitor);
+			this.mouseCatcher.set_size(monitorRect.width, monitorRect.height);
+			this.mouseCatcher.set_position(0, 0);
 		}
 
 		// called with this.appContainer or this.windowDash as this
