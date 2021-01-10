@@ -1404,7 +1404,7 @@ var TilingAppIcon = GObject.registerClass(
 				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
 				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 
-				let tileInLayout = appDash.tilingLayout.length && appDash.tilingLayout.length > 0;
+				let tileInLayout = appDash.tilingLayout && appDash.tilingLayout.length > 0;
 
 				if (!tileInLayout) {
 					if (isAltPressed) {
