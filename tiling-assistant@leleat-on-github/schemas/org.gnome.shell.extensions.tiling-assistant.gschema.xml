@@ -65,14 +65,6 @@
 			<default>[]</default>
 		</key>
 
-		<key name="half-horizontally" type="as">
-			<default>[]</default>
-		</key>
-
-		<key name="half-vertically" type="as">
-			<default>[]</default>
-		</key>
-
 		<key name="toggle-dash" type="as">
 			<default>[]</default>
 		</key>

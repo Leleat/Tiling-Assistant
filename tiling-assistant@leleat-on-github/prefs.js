@@ -54,7 +54,7 @@ const MyPrefsWidget = new GObject.Class({
 			});
 
 			// bind keybindings
-			let shortcuts = ["toggle-dash", "half-vertically", "half-horizontally", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+			let shortcuts = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 					"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 			shortcuts.forEach((sc) => {
 				this.makeShortcutEdit(sc);

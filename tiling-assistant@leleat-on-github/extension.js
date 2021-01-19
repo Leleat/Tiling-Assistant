@@ -69,7 +69,7 @@ function enable() {
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
 
 	// tiling keybindings
-	this.keyBindings = ["toggle-dash", "half-vertically", "half-horizontally", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+	this.keyBindings = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 			"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(
@@ -196,7 +196,13 @@ function onMyTilingShortcutPressed(shortcutName) {
 		return;
 
 	let rect;
-	let workArea = window.get_work_area_current_monitor();
+    let workArea = window.get_work_area_current_monitor();
+    let currTileGroup = Funcs.getTopTileGroup();
+    let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
+    let screenRects = [];
+    currTileGroup.forEach(w => screenRects.push(w.tiledRect.copy()));
+    screenRects = freeScreenRects.concat(screenRects);
+
 	switch (shortcutName) {
 		case "toggle-dash":
 			let toggleTo = !settings.get_boolean("enable-dash");
@@ -224,41 +230,38 @@ function onMyTilingShortcutPressed(shortcutName) {
 			break;
 			
 		case "tile-top-half":
-			rect = Funcs.getTileRectForSide(Meta.Side.TOP, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.TOP, workArea, screenRects);
 			break;
 
 		case "tile-left-half":
-			rect = Funcs.getTileRectForSide(Meta.Side.LEFT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects);
 			break;
 
 		case "tile-right-half":
-			rect = Funcs.getTileRectForSide(Meta.Side.RIGHT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.RIGHT, workArea, screenRects);
 			break;
 
 		case "tile-bottom-half":
-			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects);
 			break;
 
 		case "tile-topleft-quarter":
-			rect = Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects);
 			break;
 
 		case "tile-topright-quarter":
-			rect = Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects);
 			break;
 
 		case "tile-bottomleft-quarter":
-			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea, screenRects);
 			break;
 
 		case "tile-bottomright-quarter":
-			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea);
+			rect = Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea, screenRects);
 			break;
 
 		case "tile-empty-space":
-			let currTileGroup = Funcs.getTopTileGroup();
-			let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
-
 			if (!freeScreenRects.length) {
 				rect = workArea;
 				
@@ -283,29 +286,6 @@ function onMyTilingShortcutPressed(shortcutName) {
 		case "replace-window":
 			Funcs.replaceTiledWindow(window);
 			return;
-
-		case "half-vertically":
-			if (!window.tiledRect)
-				return;
-
-			rect = new Meta.Rectangle({
-				x: window.tiledRect.x,
-				y: window.tiledRect.y,
-				width: window.tiledRect.width,
-				height: window.tiledRect.height / 2
-			});
-			break;
-		
-		case "half-horizontally":
-			if (!window.tiledRect)
-				return;
-
-			rect = new Meta.Rectangle({
-				x: window.tiledRect.x,
-				y: window.tiledRect.y,
-				width: window.tiledRect.width / 2,
-				height: window.tiledRect.height
-			});
 	}
 
 	if ((window.isTiled && Funcs.rectsAreAboutEqual(rect, window.tiledRect)) || (shortcutName == "tile-maximize" && Funcs.rectsAreAboutEqual(workArea, window.get_frame_rect()))) {
@@ -341,7 +321,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	grabbedWindow.opposingWindows = [];
 
 	let openWindows = Funcs.getOpenWindows()
-	openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
+        openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
 
 	// if ctrl is pressed, tile grabbed window and its directly opposing windows (instead of whole group)
 	let event = Clutter.get_current_event();
@@ -351,10 +331,15 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
-			let [x, y] = global.get_pointer();
-			let tileGroup = Funcs.getTopTileGroup();
-			let freeScreenRects = Funcs.getFreeScreenRects(tileGroup);
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], tileGroup, freeScreenRects)));
+            let [x, y] = global.get_pointer();
+            // rectangles of tileGroup and freeScreenRects; so together they represent the entire screen
+            let rects = [];
+            let currTileGroup = Funcs.getTopTileGroup();
+            let freeScreenRects = Funcs.getFreeScreenRects(currTileGroup);
+            currTileGroup.forEach(w => rects.push(w.tiledRect.copy()));
+            rects = freeScreenRects.concat(rects);
+
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], currTileGroup, rects, freeScreenRects)));
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
@@ -580,7 +565,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 };
 
 // tile previewing via DND and restore window size, if window is already tiled
-function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
+function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeScreenRects) {
 	let [mouseX, mouseY] = global.get_pointer();
 
 	// restore the window size of tiled windows after DND distance of at least 1px
@@ -646,109 +631,148 @@ function onWindowMoving(window, grabStartPos, currTileGroup, freeScreenRects) {
 	let isHoveringRect = false;
 	let mousePoint = {x: mouseX, y: mouseY};
 
+    // default sizes or halving tiled windows
 	if (isCtrlPressed) {
-		// tile to half of a tiled window
-		for (let i = 0; i < currTileGroup.length; i++) {
-			let w = currTileGroup[i];
-			let wRect = w.get_frame_rect();
+        if (tileTopLeftQuarter) {  
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y,
+                width: workArea.width / 2,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileTopRightQuarter) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x + workArea.width / 2,
+                y: workArea.y,
+                width: workArea.width / 2,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileBottomLeftQuarter) {
+           tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y + workArea.height / 2,
+                width: workArea.width / 2,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileBottomRightQuarter) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x + workArea.width / 2,
+                y: workArea.y + workArea.height / 2,
+                width: workArea.width / 2,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileRightHalf) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x + workArea.width / 2,
+                y: workArea.y,
+                width: workArea.width / 2,
+                height: workArea.height,
+            }), monitorNr);
+    
+        } else if (tileLeftHalf) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y,
+                width: workArea.width / 2,
+                height: workArea.height,
+            }), monitorNr);
+    
+        } else if (tileTopHalf) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y,
+                width: workArea.width,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileBottomHalf) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y + workArea.height / 2,
+                width: workArea.width,
+                height: workArea.height / 2,
+            }), monitorNr);
+    
+        } else if (tileMaximized) {
+            tilePreview.open(window, new Meta.Rectangle({
+                x: workArea.x,
+                y: workArea.y,
+                width: workArea.width,
+                height: workArea.height,
+            }), monitorNr);
 
-			if (!Funcs.rectHasPoint(wRect, mousePoint))
-				continue;
-
-			isHoveringRect = true;
-
-			let top = mouseY < wRect.y + wRect.height * .2;
-			let bottom = mouseY > wRect.y + wRect.height * .8;
-			let vertical = top || bottom;
-			let right = mouseX > wRect.x + wRect.width / 2;
-
-			wRect = w.tiledRect;
-			let r = new Meta.Rectangle({
-				x: wRect.x + (right && !vertical ? wRect.width / 2 : 0),
-				y: wRect.y + (bottom ? wRect.height / 2 : 0),
-				width: wRect.width / (vertical ? 1 : 2),
-				height: wRect.height / (vertical ? 2 : 1)
-			});
-		
-			tilePreview.open(window, 0, r, monitorNr, w);
-		}
-
-		if (!isHoveringRect) {
-			// tile to freeScreenRect
-			for (let i = 0; i < freeScreenRects.length; i++) {
-				let r = freeScreenRects[i];
-				if (!Funcs.rectHasPoint(r, mousePoint))
-					continue;
-
-				tilePreview.open(window, 0, r, monitorNr);
-				return;
-			}
-			
-			tilePreview.close();
-		}
+        } else {
+            // tile to half of a tiled window
+            for (let i = 0; i < currTileGroup.length; i++) {
+                let w = currTileGroup[i];
+                let wRect = w.get_frame_rect();
+    
+                if (!Funcs.rectHasPoint(wRect, mousePoint))
+                    continue;
+    
+                isHoveringRect = true;
+    
+                let top = mouseY < wRect.y + wRect.height * .2;
+                let bottom = mouseY > wRect.y + wRect.height * .8;
+                let vertical = top || bottom;
+                let right = mouseX > wRect.x + wRect.width / 2;
+    
+                wRect = w.tiledRect;
+                let r = new Meta.Rectangle({
+                    x: wRect.x + (right && !vertical ? wRect.width / 2 : 0),
+                    y: wRect.y + (bottom ? wRect.height / 2 : 0),
+                    width: wRect.width / (vertical ? 1 : 2),
+                    height: wRect.height / (vertical ? 2 : 1)
+                });
+            
+                tilePreview.open(window, r, monitorNr, w);
+            }
+    
+            if (!isHoveringRect) {
+                // tile to freeScreenRect
+                for (let i = 0; i < freeScreenRects.length; i++) {
+                    let r = freeScreenRects[i];
+                    if (!Funcs.rectHasPoint(r, mousePoint))
+                        continue;
+    
+                    tilePreview.open(window, r, monitorNr);
+                    return;
+                }
+                
+                tilePreview.close();
+            }
+        }
 
 	} else if (tileTopLeftQuarter) {
-		pos = Meta.Side.TOP + Meta.Side.LEFT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
 	} else if (tileTopRightQuarter) {
-		pos = Meta.Side.TOP + Meta.Side.RIGHT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects), monitorNr);
 
 	} else if (tileBottomLeftQuarter) {
-		pos = Meta.Side.BOTTOM + Meta.Side.LEFT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
 	} else if (tileBottomRightQuarter) {
-		pos = Meta.Side.BOTTOM + Meta.Side.RIGHT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea, screenRects), monitorNr);
 
 	} else if (tileRightHalf) {
-		pos = Meta.Side.RIGHT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.RIGHT, workArea, screenRects), monitorNr);
 
 	} else if (tileLeftHalf) {
-		pos = Meta.Side.LEFT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
 	} else if (tileTopHalf) {
-		pos = Meta.Side.TOP;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
 
 	} else if (tileBottomHalf) {
-		pos = Meta.Side.BOTTOM;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, Funcs.getTileRectForSide(pos, workArea), monitorNr);
+		tilePreview.open(window, Funcs.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects), monitorNr);
 
 	} else if (tileMaximized) {
-		pos = Meta.Side.TOP + Meta.Side.BOTTOM + Meta.Side.LEFT + Meta.Side.RIGHT;
-		if (tilePreview.currPos == pos)
-			return;
-
-		tilePreview.open(window, pos, new Meta.Rectangle({
+		tilePreview.open(window, new Meta.Rectangle({
 			x: workArea.x,
 			y: workArea.y,
 			width: workArea.width,
@@ -778,7 +802,7 @@ function onWindowTiled(tiledWindow) {
 
 	// filter for non-normal windows (like Desktop windows e.g. conky...)
 	let winTracker = Shell.WindowTracker.get_default();
-	openWindows = openWindows.filter((w, idx) => w.get_window_type() == Meta.WindowType.NORMAL && winTracker.get_window_app(w));
+	openWindows = openWindows.filter((w, idx) => w.get_window_type() == Meta.WindowType.NORMAL);
 	
 	if (openWindows.length == 0)
 		return;
@@ -889,8 +913,8 @@ var TilingAppDash = GObject.registerClass(
 		// open when a window is tiled and when there is screen space available
 		open(openWindows, tiledWindow, monitorNr, freeScreenRect, layout = null) {
 			this.shown = true;
-			this.appContainer.destroy_all_children();
-
+            this.appContainer.destroy_all_children();
+            
 			this.freeScreenRect = freeScreenRect;
 			this.tilingLayout = layout;
 			this.openWindows = openWindows;
@@ -951,7 +975,6 @@ var TilingAppDash = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => {
 					this.dashBG.hide();
-					//this.appContainer.destroy_all_children();
 				}
 			});
 
@@ -1168,10 +1191,9 @@ var TilingTilePreview = GObject.registerClass(
 
 			this.reset();
 			this.showing = false;
-			this.currPos = 0; // Meta.Side
 		}
 
-		open(window, pos, tileRect, monitorIndex, tiledWindow = null) {
+		open(window, tileRect, monitorIndex, tiledWindow = null) {
 			let windowActor = window.get_compositor_private();
 			if (!windowActor)
 				return;
@@ -1184,7 +1206,6 @@ var TilingTilePreview = GObject.registerClass(
 
 			this.monitorIndex = monitorIndex;
 			this.rect = tileRect;
-			this.currPos = pos;
 			this.tiledWindow = tiledWindow; // preview over tiled window when holding ctrl
 
 			let monitor = main.layoutManager.monitors[monitorIndex];
@@ -1231,7 +1252,6 @@ var TilingTilePreview = GObject.registerClass(
 
 			this.showing = false;
 			this.tiledWindow = null;
-			this.currPos = 0;
 			this.ease({
 				opacity: 0,
 				duration: 200,
