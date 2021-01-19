@@ -606,7 +606,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	let wRect = window.get_frame_rect();
 
 	let onTop = mouseY < main.panel.height + 25;
-	let onBottom = workArea.height - wRect.y < 75 || mouseY > workArea.height - 25;
+	let onBottom = workArea.y + workArea.height - wRect.y < 40 || mouseY > workArea.y + workArea.height - 25;
 	let onLeft = mouseX <= workArea.x + 25;
 	let onRight = mouseX >= workArea.x + workArea.width - 25;
 
@@ -873,7 +873,7 @@ var TilingAppDash = GObject.registerClass(
 			this.mouseCatcher.hide();
 			this.mouseCatcher.connect("button-press-event", () => {
 				if (this.shown)
-					this.close();
+					this.close(true);
 			});
 
 			// visual BG for the windows if an app has multiple open windows
@@ -1035,20 +1035,24 @@ var TilingAppDash = GObject.registerClass(
 			this.windowClones = [];
 
 			if (tiledWindow) {
-				// create clones to show above the shade
-				tiledWindow.tileGroup.forEach(w => {
-					if (w && w != tiledWindow) {
-						let wA = w.get_compositor_private();
-						let clone = new Clutter.Clone({
-							source: wA,
-							x: wA.x,
-							y: wA.y
-						});
-						wA.hide();
-						global.window_group.add_child(clone);
-						this.windowClones.push(clone);
-					}
-				});
+                // create clones to show above the shade (only when not using layouts)
+                for (let w of tiledWindow.tileGroup) {
+                    // tiling via layout ignores tilegroup and only checks if it was tiled via the layout
+                    if (this.tilingLayout && this.tilingLayout.length > 0 && this.tiledViaLayout && !this.tiledViaLayout.includes(w))
+                        continue;
+
+                    if (w && w != tiledWindow) {
+                        let wA = w.get_compositor_private();
+                        let clone = new Clutter.Clone({
+                            source: wA,
+                            x: wA.x,
+                            y: wA.y
+                        });
+                        wA.hide();
+                        global.window_group.add_child(clone);
+                        this.windowClones.push(clone);
+                    }
+                }
 	
 				// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
 				// signal used as a workaround; not sure if this is the right/best signal to use
@@ -1310,23 +1314,33 @@ var TilingAppIcon = GObject.registerClass(
 			this.windows = [];
 
 			for (let i = 0; i < windowCount; i++) {
-				if (!tmpWindows[i].located_on_workspace(activeWS))
-					break;
+                let w = tmpWindows[i];
+				if (!w.located_on_workspace(activeWS))
+                    break;
+                
+                // tiling via layout
+                if (appDash.tilingLayout && appDash.tilingLayout.length > 0 && appDash.tiledViaLayout) {
+                    // dont add window if it is tiled 
+                    if (appDash.tiledViaLayout.includes(w))
+                        continue;
+                    
+                } else {
+                    // dont add the windows to the preview, if they are part of the current tileGroup
+                    if (tiledWindow.tileGroup) {
+                        let _continue = false;
+                        for (let pos in tiledWindow.tileGroup)
+                            if (tiledWindow.tileGroup[pos] == w) {
+                                _continue = true;
+                                break;
+                            }
+    
+                        if (_continue)
+                            continue;
+                    }
 
-				// dont add the windows to the preview, if they are part of the current tileGroup
-				if (tiledWindow.tileGroup) {
-					let _continue = false;
-					for (let pos in tiledWindow.tileGroup)
-						if (tiledWindow.tileGroup[pos] == tmpWindows[i]) {
-							_continue = true;
-							break;
-						}
-
-					if (_continue)
-						continue;
 				}
 
-				this.windows.push(tmpWindows[i]);
+				this.windows.push(w);
 			}
 
 			if (this.windows.length > 1) {
