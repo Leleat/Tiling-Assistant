@@ -13,10 +13,6 @@
 			<default>25</default>
 		</key>
 
-		<key name="show-label" type="b">
-			<default>false</default>
-		</key>
-
 		<key name="use-anim" type="b">
 			<default>true</default>
 		</key>

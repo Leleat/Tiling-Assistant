@@ -5,8 +5,8 @@ const {Clutter, GObject, Meta, St} = imports.gi;
 // mostly from windowManager.js except:
 // show preview above all windows, because big windows may obscure small previews (e. g. quarter previews),
 // save the tiledWindow (until closing the preview) to tile over another tiled window when holding Ctrl
-var MyTilePreviewRect = GObject.registerClass(
-	class MyTilePreviewRect extends St.Widget {
+var MyTilingPreviewRect = GObject.registerClass(
+	class MyTilingPreviewRect extends St.Widget {
 		_init() {
 			super._init();
 			main.uiGroup.add_child(this);

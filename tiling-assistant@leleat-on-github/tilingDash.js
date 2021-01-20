@@ -1,20 +1,16 @@
 const {altTab, appDisplay, iconGrid, main, panel, switcherPopup, windowManager} = imports.ui;
-const {Clutter, GLib, GObject, Graphene, Shell, St} = imports.gi;
+const {Clutter, GLib, GObject, Graphene, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const MyExtension = Me.imports.extension
-const Funcs = Me.imports.funcs;
+const MyExtension = Me.imports.extension;
+const Util = Me.imports.util;
 
-// the Dash which contains the TilingAppIcons to auto-fill the empty screen space
-var TilingAppSwitcherPopup = GObject.registerClass(
-	class TilingAppSwitcherPopup extends St.Widget {
-		_init(iconSize, iconMargin, showIconLabel) {
+// the Dash which contains the MyTilingAppIcons to auto-fill the empty screen space
+var MyTilingDash = GObject.registerClass(
+	class MyTilingDash extends St.Widget {
+		_init() {
 			super._init();
-
-            this.iconSize = iconSize;
-            this.iconMargin = iconMargin;
-            this.showIconLabel = showIconLabel;
 			this.shown = false;
 
 			// for animation move direction of the Dash.
@@ -38,7 +34,7 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 				reactive: true,
 				x: 0, y: 0,
 			});
-			main.layoutManager.addChrome(this.mouseCatcher);
+			main.uiGroup.add_child(this.mouseCatcher);
 			this.mouseCatcher.hide();
 			this.mouseCatcher.connect("button-press-event", () => {
 				if (this.shown)
@@ -50,8 +46,8 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 				style_class: "my-open-windows-dash",
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 }),
 			});
-			main.layoutManager.addChrome(this.windowDash);
-			this.windowDash.focusItemAtIndex = this.focusItemAtIndex;
+			main.uiGroup.add_child(this.windowDash);
+			this.windowDash._focusItemAtIndex = this._focusItemAtIndex;
 			this.windowDash.set_opacity(0);
 			this.windowDash.hide();
 
@@ -60,14 +56,14 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 				style_class: "my-open-windows-dash",
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
 			});
-			main.layoutManager.addChrome(this.dashBG);
+			main.uiGroup.add_child(this.dashBG);
 			this.dashBG.hide();
 
 			// container for appIcons, centered in dashBG
 			this.appContainer = new St.Widget({
 				pivot_point: new Graphene.Point({ x: 0.5, y: 0.5 })
 			});
-			this.appContainer.focusItemAtIndex = this.focusItemAtIndex;
+			this.appContainer._focusItemAtIndex = this._focusItemAtIndex;
 			this.dashBG.add_child(this.appContainer);
 		}
 
@@ -82,52 +78,33 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 		// open when a window is tiled and when there is screen space available
 		open(openWindows, tiledWindow, monitorNr, freeScreenRect, layout = null) {
 			this.shown = true;
-            this.appContainer.destroy_all_children();
-            
+			this.appContainer.destroy_all_children();
+
+			// filter the openWindows array, so that no duplicate apps are shown
+			let winTracker = Shell.WindowTracker.get_default();
+			let openApps = [];
+			openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
+			openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);
+
 			this.freeScreenRect = freeScreenRect;
-			this.tilingLayout = layout;
 			this.openWindows = openWindows;
 			this.monitor = monitorNr;
 			let monitorScale = global.display.get_monitor_scale(monitorNr);
-			let buttonSize = monitorScale * (this.iconSize + 16 + this.iconMargin + ((this.showIconLabel) ? 28 : 0));
-
+            let buttonSize = monitorScale * (MyExtension.settings.get_int("icon-size") + 16 + MyExtension.settings.get_int("icon-margin"));
+			
 			this._setupAppContainer(buttonSize, monitorScale);
 			this._setupDashBg(buttonSize, tiledWindow);
 			this._shadeBackground(tiledWindow);
 			this._setupMouseCatcher();
+        }
 
-			if (Array.isArray(layout)) {
-				this.layoutPreview = new St.Widget({
-					style_class: "tile-preview",
-					x: freeScreenRect.x + freeScreenRect.width / 2,
-					y: freeScreenRect.y + freeScreenRect.height / 2,
-				});
-				global.window_group.add_child(this.layoutPreview);
-
-				this.layoutPreview.ease({
-					x: freeScreenRect.x,
-					y: freeScreenRect.y,
-					width: freeScreenRect.width,
-					height: freeScreenRect.height,
-					duration: windowManager.MINIMIZE_WINDOW_ANIMATION_TIME,
-					mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-				});
-			}
-		}
-
-		close(clearTilingLayout = false) {
+		close(cancelTilingWithLayout = false) {
 			this.shown = false;
 			this.mouseCatcher.hide();
-			this.shadeBG.hide();
-
-			if (clearTilingLayout) {
-				this.tilingLayout = [];
-				this.openWindows = [];
-			}
-			if (this.layoutPreview) {
-				this.layoutPreview.destroy();
-				this.layoutPreview = null;
-			}
+            this.shadeBG.hide();
+            
+			if (cancelTilingWithLayout)
+				MyExtension.tilingLayoutManager.endTilingViaLayout();
 
 			this.windowClones.forEach(clone => {
 				clone.source.show();
@@ -162,10 +139,10 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 		_setupAppContainer(buttonSize, monitorScale) {
 			let windowCount = this.openWindows.length;
 			this.appContainer.set_size(windowCount * buttonSize, buttonSize);
-			this.appContainer.set_position(this.iconMargin / 2 * monitorScale, this.iconMargin / 2 * monitorScale);
+			this.appContainer.set_position(MyExtension.settings.get_int("icon-margin") / 2 * monitorScale, MyExtension.settings.get_int("icon-margin") / 2 * monitorScale);
 
 			for (let idx = 0, posX = 0; idx < windowCount; idx++, posX += buttonSize) {
-				let appIcon = new TilingAppIcon(this.iconSize, this.openWindows[idx], idx, { showLabel: this.showIconLabel });
+				let appIcon = new MyTilingAppIcon(MyExtension.settings.get_int("icon-size"), this.openWindows[idx], idx, {showLabel: false});
 				this.appContainer.add_child(appIcon);
 				appIcon.set_position(posX, 0);
 			}
@@ -188,7 +165,7 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 			// move bgContainer FROM final pos to animate TO final pos
 			let finalX = this.dashBG.x;
 			let finalY = this.dashBG.y;
-			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x); // tiledWindow = null on first tiling of layout
+			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x);
 			this.animationDir.y = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
 			this.dashBG.set_position(finalX + 400 * this.animationDir.x, this.dashBG.y + 400 * this.animationDir.y);
 			this.dashBG.ease({
@@ -204,24 +181,24 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 			this.windowClones = [];
 
 			if (tiledWindow) {
-                // create clones to show above the shade (only when not using layouts)
-                for (let w of tiledWindow.tileGroup) {
-                    // tiling via layout ignores tilegroup and only checks if it was tiled via the layout
-                    if (this.tilingLayout && this.tilingLayout.length > 0 && this.tiledViaLayout && !this.tiledViaLayout.includes(w))
-                        continue;
+				// create clones to show above the shade (only when not using layouts)
+				for (let w of tiledWindow.tileGroup) {
+					// tiling via layout ignores tilegroup and only checks if it was tiled via the layout
+					if (MyExtension.tilingLayoutManager.isTilingViaLayout() && MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
+						continue;
 
-                    if (w && w != tiledWindow) {
-                        let wA = w.get_compositor_private();
-                        let clone = new Clutter.Clone({
-                            source: wA,
-                            x: wA.x,
-                            y: wA.y
-                        });
-                        wA.hide();
-                        global.window_group.add_child(clone);
-                        this.windowClones.push(clone);
-                    }
-                }
+					if (w && w != tiledWindow) {
+						let wA = w.get_compositor_private();
+						let clone = new Clutter.Clone({
+							source: wA,
+							x: wA.x,
+							y: wA.y
+						});
+						wA.hide();
+						global.window_group.add_child(clone);
+						this.windowClones.push(clone);
+					}
+				}
 	
 				// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
 				// signal used as a workaround; not sure if this is the right/best signal to use
@@ -263,17 +240,17 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 		}
 
 		// called with this.appContainer or this.windowDash as this
-		focusItemAtIndex(index, maxCount) {
+		_focusItemAtIndex(index, maxCount) {
 			index = (index < 0) ? maxCount - 1 : index;
 			index = (index >= maxCount) ? 0 : index;
 			this.get_child_at_index(index).grab_key_focus();
 		}
 
-		getAppCount() {
+		_getAppCount() {
 			return this.appContainer.get_n_children();
 		}
 
-		openWindowPreview(appIcon) {
+		_openWindowPreview(appIcon) {
 			if (!appIcon.hasMultipleWindows())
 				return;
 
@@ -291,7 +268,7 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 
 			// create window previews
 			for (let idx = 0, posX = 0; idx < windowCount; idx++) {
-				let preview = new TilingWindowPreview(appIcon, windows[idx], idx, size);
+				let preview = new MyTilingWindowPreview(appIcon, windows[idx], idx, size);
 				this.windowDash.add_child(preview);
 				preview.set_position(posX, 0);
 				posX += preview.width;
@@ -322,28 +299,28 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 				width: finalWidth,
 				height: finalHeight,
 				opacity: 255,
-				duration: 250,
+				duration: 300,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
 			this.windowDash.get_child_at_index(0).grab_key_focus();
 		}
 
-		closeWindowPreview() {
+		_closeWindowPreview() {
 			let currAppIcon = this.windowDash.previewedAppIcon;
 			currAppIcon.grab_key_focus();
 			this.windowDash.previewedAppIcon = null;
 
 			// scale in to the appIcon
 			let finalX = currAppIcon.get_transformed_position()[0] - this.windowDash.width / 2 + currAppIcon.width / 2;
-			let finalY = currAppIcon.get_transformed_position()[1] - this.windowDash.height / 2 + currAppIcon.height / 2
+			let finalY = currAppIcon.get_transformed_position()[1] - this.windowDash.height / 2 + currAppIcon.height / 2;
 			this.windowDash.ease({
 				x: finalX,
 				y: finalY,
 				scale_x: 0,
 				scale_y: 0,
 				opacity: 0,
-				duration: 250,
+				duration: 300,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => {
 					this.windowDash.hide();
@@ -356,8 +333,8 @@ var TilingAppSwitcherPopup = GObject.registerClass(
 
 // some stuff from appDisplay.js
 // app icons which populate TilingDash
-var TilingAppIcon = GObject.registerClass(
-	class TilingAppIcon extends St.Button {
+var MyTilingAppIcon = GObject.registerClass(
+	class MyTilingAppIcon extends St.Button {
 		_init(iconSize, window, idx, iconParams = {}) {
 			super._init({
 				style_class: "app-well-app",
@@ -396,30 +373,28 @@ var TilingAppIcon = GObject.registerClass(
 			this.windows = [];
 
 			for (let i = 0; i < windowCount; i++) {
-                let w = tmpWindows[i];
+				let w = tmpWindows[i];
 				if (!w.located_on_workspace(activeWS))
-                    break;
-                
-                // tiling via layout
-                if (MyExtension.appDash.tilingLayout && MyExtension.appDash.tilingLayout.length > 0 && MyExtension.appDash.tiledViaLayout) {
-                    // dont add window if it is tiled via layouts
-                    if (MyExtension.appDash.tiledViaLayout.includes(w))
-                        continue;
-                    
-                } else {
-                    // dont add the windows to the preview, if they are part of the current tileGroup
-                    if (tiledWindow.tileGroup) {
-                        let _continue = false;
-                        for (let pos in tiledWindow.tileGroup)
-                            if (tiledWindow.tileGroup[pos] == w) {
-                                _continue = true;
-                                break;
-                            }
-    
-                        if (_continue)
-                            continue;
-                    }
-
+					break;
+				
+				if (MyExtension.tilingLayoutManager.isTilingViaLayout()) {
+					// dont add window if it is tiled via layouts
+					if (!MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
+						continue;
+					
+				} else {
+					// dont add the windows to the preview, if they are part of the current tileGroup
+					if (tiledWindow.tileGroup) {
+						let _continue = false;
+						for (let pos in tiledWindow.tileGroup)
+							if (tiledWindow.tileGroup[pos] == w) {
+								_continue = true;
+								break;
+							}
+	
+						if (_continue)
+							continue;
+					}
 				}
 
 				this.windows.push(w);
@@ -449,11 +424,11 @@ var TilingAppIcon = GObject.registerClass(
 				this.isHovered = true;
 
 				if (MyExtension.appDash.windowDash.visible && MyExtension.appDash.windowDash.previewedAppIcon != this)
-					MyExtension.appDash.closeWindowPreview()
+					MyExtension.appDash._closeWindowPreview()
 
 				GLib.timeout_add(GLib.PRIORITY_DEFAULT, 400, () => {
 					if (this.isHovered && MyExtension.appDash.shown && MyExtension.appDash.windowDash.previewedAppIcon != this)
-						MyExtension.appDash.openWindowPreview(this);
+						MyExtension.appDash._openWindowPreview(this);
 					
 					return GLib.SOURCE_REMOVE;
 				});
@@ -471,16 +446,16 @@ var TilingAppIcon = GObject.registerClass(
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					MyExtension.appDash.appContainer.focusItemAtIndex(this.index + 1, MyExtension.appDash.getAppCount());
+					MyExtension.appDash.appContainer._focusItemAtIndex(this.index + 1, MyExtension.appDash._getAppCount());
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					MyExtension.appDash.appContainer.focusItemAtIndex(this.index - 1, MyExtension.appDash.getAppCount());
+					MyExtension.appDash.appContainer._focusItemAtIndex(this.index - 1, MyExtension.appDash._getAppCount());
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
 				case Clutter.KEY_Down:
-					MyExtension.appDash.openWindowPreview(this);
+					MyExtension.appDash._openWindowPreview(this);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:
@@ -515,14 +490,15 @@ var TilingAppIcon = GObject.registerClass(
 				window.move_to_monitor(MyExtension.appDash.monitor);
 				window.activate(global.get_current_time());
 
-				let event = Clutter.get_current_event();
-				let modifiers = event ? event.get_state() : 0;
-				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+				const isTilingViaLayout = MyExtension.tilingLayoutManager.isTilingViaLayout()
 
-				let tileInLayout = MyExtension.appDash.tilingLayout && MyExtension.appDash.tilingLayout.length > 0;
+				// halve the freeScreenRect when holding Shift or Alt
+				if (!isTilingViaLayout) {
+                    let event = Clutter.get_current_event();
+                    let modifiers = event ? event.get_state() : 0;
+                    let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+                    let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 
-				if (!tileInLayout) {
 					if (isAltPressed) {
 						if (MyExtension.appDash.freeScreenRect.width >= MyExtension.appDash.freeScreenRect.height * 1.25) { // prefer vertical tiling more (because of horizontal screen orientation)
 							MyExtension.appDash.freeScreenRect.x = MyExtension.appDash.freeScreenRect.x + MyExtension.appDash.freeScreenRect.width / 2;
@@ -542,53 +518,17 @@ var TilingAppIcon = GObject.registerClass(
 					}
 				}
 
-				Funcs.tileWindow(window, MyExtension.appDash.freeScreenRect, !tileInLayout);
-
-				if (tileInLayout) {
-					// save the windows which were tiled as part of a layout to remove them from the openWindows.
-					// cant use tileGroup here
-					if (!MyExtension.appDash.tiledViaLayout)
-						MyExtension.appDash.tiledViaLayout = [];
-					
-					MyExtension.appDash.tiledViaLayout.push(window);
-
-					// remove windows from openWindows, if they were tiled with the current layout
-					let allWindowsTiledInLayout = true;
-					let idx = MyExtension.appDash.openWindows.indexOf(window);
-					let appWindows = this.app.get_windows().filter(w => w.located_on_workspace(global.workspace_manager.get_active_workspace()));
-					for (let i = 0; i < appWindows.length; i++) {
-						let w = appWindows[i];
-						if (MyExtension.appDash.tiledViaLayout.includes(w))
-							continue;
-
-						allWindowsTiledInLayout = false;
-						MyExtension.appDash.openWindows[idx] = w;
-						break;
-					}
-
-					if (allWindowsTiledInLayout)
-						MyExtension.appDash.openWindows.splice(idx, 1);
-
-					if (!MyExtension.appDash.openWindows.length) {
-						MyExtension.appDash.tiledViaLayout = [];
-						return;
-					}
-
-					let freeScreenRect = MyExtension.appDash.tilingLayout.shift();
-					if (!MyExtension.appDash.tilingLayout.length)
-						MyExtension.appDash.tiledViaLayout = [];
-
-					MyExtension.appDash.open(MyExtension.appDash.openWindows, window, window.get_monitor(), freeScreenRect, MyExtension.appDash.tilingLayout)
-				}
+				Util.tileWindow(window, MyExtension.appDash.freeScreenRect, !isTilingViaLayout);
+				MyExtension.tilingLayoutManager.onWindowTiled(window);
 			}
 		}
 	}
 );
 
 // some stuff from altTab.WindowIcon
-// the window preview, if a TilingAppIcon has multiple windows open on the current workspace
-var TilingWindowPreview = GObject.registerClass(
-	class TilingWindowPreview extends St.Button {
+// the window preview, if a MyTilingAppIcon has multiple windows open on the current workspace
+var MyTilingWindowPreview = GObject.registerClass(
+	class MyTilingWindowPreview extends St.Button {
 		_init(appIcon, window, index, fullSize) {
 			super._init({
 				style_class: "tiling-window-unfocused",
@@ -630,7 +570,8 @@ var TilingWindowPreview = GObject.registerClass(
 
 		vfunc_key_focus_in() {
 			if (MyExtension.appDash.windowDash.focusedWindow)
-				MyExtension.appDash.windowDash.focusedWindow.set_style_class_name("tiling-window-unfocused");
+                MyExtension.appDash.windowDash.focusedWindow.set_style_class_name("tiling-window-unfocused");
+                
 			MyExtension.appDash.windowDash.focusedWindow = this;
 			this.set_style_class_name("tiling-window-focused");
 		}
@@ -638,16 +579,16 @@ var TilingWindowPreview = GObject.registerClass(
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
 				case Clutter.KEY_Right:
-					MyExtension.appDash.windowDash.focusItemAtIndex(this.index + 1, MyExtension.appDash.windowDash.previewedAppIcon.windows.length);
+					MyExtension.appDash.windowDash._focusItemAtIndex(this.index + 1, MyExtension.appDash.windowDash.previewedAppIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
-					MyExtension.appDash.windowDash.focusItemAtIndex(this.index - 1, MyExtension.appDash.windowDash.previewedAppIcon.windows.length);
+					MyExtension.appDash.windowDash._focusItemAtIndex(this.index - 1, MyExtension.appDash.windowDash.previewedAppIcon.windows.length);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
 				case Clutter.KEY_Down:
-					MyExtension.appDash.closeWindowPreview();
+					MyExtension.appDash._closeWindowPreview();
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Return:

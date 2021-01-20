@@ -143,7 +143,7 @@ const MyPrefsWidget = new GObject.Class({
 		// manually add the keys to the arrays in this function
 		getBindProperty: function(key) {
 			let ints = ["icon-size", "icon-margin", "window-gaps"];
-			let bools = ["enable-dash", "show-label", "use-anim"];
+			let bools = ["enable-dash", "use-anim"];
 
 			if (ints.includes(key)) 
 				return "value"; // spinbox.value
@@ -334,7 +334,6 @@ const MyPrefsWidget = new GObject.Class({
 			// other settings labels
 			this.builder.get_object("label12").set_text(_("Dash icon size"));
 			this.builder.get_object("label13").set_text(_("Dash icon margin"));
-			this.builder.get_object("label14").set_text(_("Show app name"));
 			this.builder.get_object("label15").set_text(_("Enable animations"));
 			this.builder.get_object("label2").set_text(_("Gap between tiled windows"));
 			this.builder.get_object("label3").set_text(_("Toggle maximization"));
@@ -352,7 +351,6 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
 
 			// tooltips
-			this.builder.get_object("listboxrow14").set_tooltip_text(_("Show app names in the dash. Make sure the icons have a sufficient size, if you want to use this setting."));
 			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
 
 			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
