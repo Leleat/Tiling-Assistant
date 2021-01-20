@@ -65,7 +65,7 @@ const MyPrefsWidget = new GObject.Class({
 			// NR is a float between 0 to 1.
 			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
 			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
-			this.layoutFile = Gio.File.new_for_path(path); // TODO need to free this?
+			this.layoutFile = Gio.File.new_for_path(path); // TODO need to free this? Or is it better to create new file whenever access is needed?
 
 			try {
 				this.layoutFile.create(Gio.FileCreateFlags.NONE, null);
