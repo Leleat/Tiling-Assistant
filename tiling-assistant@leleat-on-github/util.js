@@ -472,7 +472,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 
 	// sometimes, because of the group-focusing (raising),
 	// the focused window will be below another window.
-	// so we raise the focused window to prevent unexpected behaviour and bugs
+	// so we raise the focused window to prevent unexpected behaviour
 	window.raise();
 
 	let oldRect = window.get_frame_rect();
@@ -543,7 +543,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 };
 
 function maximizeBoth(window) {
-	if (!window || !window.allows_move || !window.allows_resize)
+	if (!window || !window.allows_move() || !window.allows_resize())
 		return;
 	
 	removeTileGroup(window);

@@ -1,7 +1,7 @@
 "use strict";
 
 const {altTab, main, switcherPopup} = imports.ui;
-const {Clutter, GLib, GObject, Graphene, Meta, Shell, St} = imports.gi;
+const {Clutter, GLib, GObject, Graphene, Shell, St} = imports.gi;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const MyExtension = Me.imports.extension;
@@ -26,17 +26,19 @@ var MyTilingDashManager = GObject.registerClass(
 			}
 
 			this.systemModalOpenedId = main.layoutManager.connect('system-modal-opened', () => this._destroy(true));
-
+			
+			this.tiledWindow = tiledWindow;
+			this.monitorNr = monitorNr;
+			this.monitorScale = global.display.get_monitor_scale(monitorNr);
+			this.freeScreenRect = freeScreenRect;
+			this.openWindows = [];
+			this.windowClones = [];
+			
 			this.highlightedApp = -1;
 			this.highlightedWindow = -1;
 			this.animationDir = {x: 0, y: 0};
 			this.thumbnailsAreFocused = false;
-			this.windowPreviewSize = 256;
-			
-			this.tiledWindow = tiledWindow;
-			this.monitorNr = monitorNr;
-			this.freeScreenRect = freeScreenRect;
-			this.openWindows = [];
+			this.windowPreviewSize = 256 * this.monitorScale;
 
 			this.appDash = null;
 			this.windowDash = null;
@@ -50,6 +52,7 @@ var MyTilingDashManager = GObject.registerClass(
 			let activeWS = global.workspace_manager.get_active_workspace();
 			let entireWorkArea = activeWS.get_work_area_all_monitors();
 
+			this.set_position(entireWorkArea.x, entireWorkArea.y - main.panel.height);
 			this.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
 
 			// shade background for easier visibility
@@ -82,8 +85,12 @@ var MyTilingDashManager = GObject.registerClass(
 		}
 
 		_destroy(cancelTilingWithLayout = false) {
-			main.popModal(this);
+            if (this.alreadyDestroying)
+                return;
+
+            this.alreadyDestroying = true;
 			main.layoutManager.disconnect(this.systemModalOpenedId);
+			main.popModal(this);
 
 			this.windowClones.forEach(clone => {
 				clone.source.show();
@@ -127,7 +134,6 @@ var MyTilingDashManager = GObject.registerClass(
 		// shade BG when the Dash is open for easier visibility
 		shadeBackground(tiledWindow, entireWorkArea) {
 			// clones to show above the shadeBG (which is just below the tiledWindow)
-			this.windowClones = [];
 			this.shadeBG = new St.Widget({
 				style: "background-color : black",
 				width: entireWorkArea.width,
@@ -170,7 +176,7 @@ var MyTilingDashManager = GObject.registerClass(
 		highlightItem(idx, forceAppFocus = false) {
 			let focusWindows = this.thumbnailsAreFocused && !forceAppFocus;
 			let items = focusWindows ? this.windowDash.get_children() : this.appDash.get_children();
-			let oldIdx = focusWindows ? this.highlightedWindow : this.highlightedApp;
+			let oldIdx = focusWindows ? this.highlightedWindow : this.highlightedApp; 
 			idx = (idx + items.length) % items.length;
 			items[Math.max(0, oldIdx)].setHighlight(false);
 			items[idx].setHighlight(true);
@@ -189,12 +195,18 @@ var MyTilingDashManager = GObject.registerClass(
 		}
 
 		openWindowDash() {
-			if (this.thumbnailsAreFocused || this.highlightedApp == -1)
+			let icons = this.appDash.get_children();
+			if (this.thumbnailsAreFocused || this.highlightedApp == -1 || this.highlightedApp >= icons.length)
 				return;
+				
+			if (this.windowDash) {
+				this.windowDash.destroy();
+				this.highlightedWindow = -1;   
+			}
 
 			this.thumbnailsAreFocused = true;
 
-			let appIcon = this.appDash.get_children()[this.highlightedApp];
+			let appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length == 1)
 				appIcon.setArrowVisibility(true);
 
@@ -225,17 +237,20 @@ var MyTilingDashManager = GObject.registerClass(
 		}
 
 		closeWindowDash() {
-			if (!this.thumbnailsAreFocused)
+			if (!this.thumbnailsAreFocused || !this.windowDash)
 				return;
 
 			this.thumbnailsAreFocused = false;
 
-			let appIcon = this.appDash.get_children()[this.highlightedApp];
+			let icons = this.appDash.get_children();
+			if (this.highlightedApp >= icons.length)
+				return;
+
+			let appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length == 1)
 				appIcon.setArrowVisibility(false);
 
 			// animate closing
-			// windowDash will only be closed (destroyed) after anim is finished!
 			this.windowDash.ease({
 				opacity: 0,
 				duration: 150,
@@ -249,6 +264,9 @@ var MyTilingDashManager = GObject.registerClass(
 		}
 		
 		activate(window) {
+			if (!window)
+				return;
+
 			window.move_to_monitor(this.monitorNr);
 			window.activate(global.get_current_time());
 
@@ -262,7 +280,8 @@ var MyTilingDashManager = GObject.registerClass(
 				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 
 				if (isAltPressed) {
-					if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25) { // prefer vertical tiling more (because of horizontal screen orientation)
+					// prefer vertical tiling more (because of horizontal screen orientation)
+					if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25) {
 						this.freeScreenRect.x = this.freeScreenRect.x + this.freeScreenRect.width / 2;
 						this.freeScreenRect.width = this.freeScreenRect.width / 2;
 
@@ -272,7 +291,8 @@ var MyTilingDashManager = GObject.registerClass(
 					}
 
 				} else if (isShiftPressed) {
-					if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25) // prefer vertical tiling more (because of horizontal screen orientation)
+					// prefer vertical tiling more (because of horizontal screen orientation)
+					if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25)
 						this.freeScreenRect.width = this.freeScreenRect.width / 2;
 
 					else
@@ -284,7 +304,7 @@ var MyTilingDashManager = GObject.registerClass(
 			MyExtension.tilingLayoutManager.onWindowTiled(window);
 			
 			this._destroy();
-        }
+		}
 		
 		vfunc_key_press_event(keyEvent) {
 			switch (keyEvent.keyval) {
@@ -329,27 +349,28 @@ var MyTilingDashManager = GObject.registerClass(
 			this._destroy(true);
 
 			return Clutter.EVENT_STOP;
-        }
+		}
 
-        vfunc_button_press_event(buttonEvent) {
-            if (buttonEvent.button == Clutter.BUTTON_MIDDLE) {
-                let appIcon = this.appDash.get_children()[this.highlightedApp];
-                this.activate(appIcon.cachedWindows[this.thumbnailsAreFocused ? this.highlightedWindow : 0]);
-            } else {
-                this._destroy(true);
-            }
-        }
+		vfunc_button_press_event(buttonEvent) {
+			if (buttonEvent.button == Clutter.BUTTON_MIDDLE) {
+				let appIcon = this.appDash.get_children()[this.highlightedApp];
+				this.activate(appIcon.cachedWindows[this.thumbnailsAreFocused ? this.highlightedWindow : 0]);
+			} else {
+				this._destroy(true);
+			}
+		}
 
-        vfunc_scroll_event(scrollEvent) {
-            let direction = scrollEvent.direction;
-            if (direction == Clutter.ScrollDirection.UP || direction == Clutter.ScrollDirection.LEFT)
-                this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1);
-            else if (direction == Clutter.ScrollDirection.DOWN || direction == Clutter.ScrollDirection.RIGHT)
-                this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1);
-        }
+		vfunc_scroll_event(scrollEvent) {
+			let direction = scrollEvent.direction;
+			if (direction == Clutter.ScrollDirection.UP || direction == Clutter.ScrollDirection.LEFT)
+				this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1);
+			else if (direction == Clutter.ScrollDirection.DOWN || direction == Clutter.ScrollDirection.RIGHT)
+				this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1);
+		}
 	}
 );
 
+// used for appDash and windowDash
 var MyTilingDash = GObject.registerClass(
 	class MyTilingDash extends St.BoxLayout {
 		_init(dashManager, allItems, itemIconConstructor) {
@@ -373,8 +394,8 @@ var MyTilingAppIcon = GObject.registerClass(
 	class MyTilingAppIcon extends St.BoxLayout {
 		_init(dash, app, idx) {
 			super._init({
-                style_class: "alt-tab-app",
-                style: "padding: 4px",
+				style_class: "alt-tab-app",
+				style: "padding: 4px",
 				vertical: true,
 				reactive: true
 			});
@@ -386,13 +407,13 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.arrowIsAbove = false;
 			this.isHovered = false;
 			
-			this.connect("button-press-event", () => this.dash.dashManager.activate(this.cachedWindows[0]));
+			this.connect("button-press-event", () => dash.dashManager.activate(this.cachedWindows[0]));
 			this.connect("enter-event", this.onItemEnter.bind(this));
 			this.connect("leave-event", () => this.isHovered = false);
 
 			let allWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
 			let appWindows = allWindows.filter(w => Shell.WindowTracker.get_default().get_window_app(w) == app);
-			let tiledWindow = this.dash.dashManager.tiledWindow;
+			let tiledWindow = dash.dashManager.tiledWindow;
 			this.cachedWindows = appWindows.filter(w => {
 				if (MyExtension.tilingLayoutManager.isTilingViaLayout) {
 					if (!MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
@@ -405,12 +426,13 @@ var MyTilingAppIcon = GObject.registerClass(
 				return true;
 			});
 			
-			let buttonSize = MyExtension.settings.get_int("icon-size") + MyExtension.settings.get_int("icon-margin");		
+			let monitorScale = dash.dashManager.monitorScale;
+			let buttonSize = (MyExtension.settings.get_int("icon-size") + MyExtension.settings.get_int("icon-margin")) * monitorScale;
 			this.set_size(buttonSize, buttonSize);
 
-			let monitorRect = global.display.get_monitor_geometry(this.dash.dashManager.monitorNr);
-			let previewSize = this.dash.dashManager.windowPreviewSize;
-			let freeScreenRect = this.dash.dashManager.freeScreenRect;
+			let monitorRect = global.display.get_monitor_geometry(dash.dashManager.monitorNr);
+			let previewSize = dash.dashManager.windowPreviewSize;
+			let freeScreenRect = dash.dashManager.freeScreenRect;
 			this.arrowIsAbove = freeScreenRect.y + freeScreenRect.height / 2 + previewSize >= monitorRect.height - previewSize;
 			
 			// add a top and bottom arrow to the appIcon.
@@ -420,7 +442,7 @@ var MyTilingAppIcon = GObject.registerClass(
 			let topContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
 			this.topArrow = new St.DrawingArea({
 				style: "color: white",
-				width: 8, height: 4,
+				width: 8 * monitorScale, height: 4 * monitorScale,
 			});
 			this.topArrow.set_opacity(0);
 			this.topArrow.connect("repaint", () => switcherPopup.drawArrow(this.topArrow, St.Side.TOP));
@@ -428,7 +450,7 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.add_child(topContainer);
 
 			// app icon
-            this.iconBin = new St.Bin({y_expand: true});
+			this.iconBin = new St.Bin({y_expand: true});
 			this.icon = app.create_icon_texture(MyExtension.settings.get_int("icon-size"));
 			this.add_child(this.iconBin);
 			this.iconBin.set_child(this.icon);
@@ -437,7 +459,7 @@ var MyTilingAppIcon = GObject.registerClass(
 			let bottomContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
 			this.bottomArrow = new St.DrawingArea({
 				style: "color: white",
-				width: 8, height: 4,
+				width: 8 * monitorScale, height: 4 * monitorScale,
 			});
 			this.bottomArrow.set_opacity(0);
 			this.bottomArrow.connect("repaint", () => switcherPopup.drawArrow(this.bottomArrow, St.Side.BOTTOM));
@@ -494,12 +516,12 @@ var MyTilingWindowIcon = GObject.registerClass(
 			this.window = window;
 			this.idx = idx;
 
-			this.connect("button-press-event", () => this.dash.dashManager.activate(this.window));
-			this.connect("enter-event", () => this.dash.dashManager.highlightItem(this.idx));
+			this.connect("button-press-event", () => dash.dashManager.activate(window));
+			this.connect("enter-event", () => dash.dashManager.highlightItem(idx));
 	
-			let previewSize = this.dash.dashManager.windowPreviewSize;
+			let previewSize = dash.dashManager.windowPreviewSize;
 			this.icon = new St.Widget({layout_manager: new Clutter.BinLayout()});
-			this.icon.add_actor(altTab._createWindowClone(this.window.get_compositor_private(), previewSize));
+			this.icon.add_actor(altTab._createWindowClone(window.get_compositor_private(), previewSize));
 			this.icon.set_size(previewSize, previewSize);
 			this.add_child(this.icon);
 		}
