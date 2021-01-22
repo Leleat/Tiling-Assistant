@@ -34,9 +34,15 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 ![Preview](preview.gif)
 
+### DNDing
+
 ![Preview_DND](preview_dnd.gif)
 
+### Spiral tiling
+
 ![Preview_SPIRAL](preview_spiral.gif)
+
+### Layouts
 
 ![Preview_LAYOUT](preview_layout.gif)
 
