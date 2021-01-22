@@ -1072,7 +1072,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="FixedTiling">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Fixed Tiling    &lt;/b&gt;</property>
@@ -1208,7 +1208,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="DynamicTiling">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Dynamic Tiling    &lt;/b&gt;</property>
@@ -1296,7 +1296,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="Other">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Other    &lt;/b&gt;</property>
@@ -1865,7 +1865,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel">
+                          <object class="GtkLabel" id="Layouts">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Layouts    &lt;/b&gt;</property>

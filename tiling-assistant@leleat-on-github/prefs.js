@@ -332,6 +332,7 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder.get_object("helpLabel").set_text(_("Help"));
 
 			// other settings labels
+			this.builder.get_object("label29").set_text(_("Enable Dash"));
 			this.builder.get_object("label12").set_text(_("Dash icon size"));
 			this.builder.get_object("label13").set_text(_("Dash icon margin"));
 			this.builder.get_object("label15").set_text(_("Enable animations"));
@@ -342,17 +343,33 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder.get_object("label26").set_text(_("Tile to right half"));
 			this.builder.get_object("label27").set_text(_("Tile to left half"));
 			this.builder.get_object("label22").set_text(_("Tile to top left quarter"));
-			this.builder.get_object("label23").set_text(_("Tile to  top right quarter"));
+			this.builder.get_object("label23").set_text(_("Tile to top right quarter"));
 			this.builder.get_object("label24").set_text(_("Tile to bottom left quarter"));
 			this.builder.get_object("label25").set_text(_("Tile to bottom right quarter"));
 			this.builder.get_object("label1").set_text(_("Tile to empty space"));
-			this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
+            this.builder.get_object("label4").set_text(_("Tile to other tiled window"));
+            this.builder.get_object("label30").set_text(_("Toggle Dash"));
+			this.builder.get_object("label5").set_text(_("Layout 1"));
+			this.builder.get_object("label6").set_text(_("Layout 2"));
+			this.builder.get_object("label7").set_text(_("Layout 3"));
+			this.builder.get_object("label8").set_text(_("Layout 4"));
+			this.builder.get_object("label9").set_text(_("Layout 5"));
+			this.builder.get_object("label10").set_text(_("Layout 6"));
+			this.builder.get_object("label11").set_text(_("Layout 7"));
+			this.builder.get_object("label16").set_text(_("Layout 8"));
+			this.builder.get_object("label17").set_text(_("Layout 9"));
+			this.builder.get_object("label18").set_text(_("Layout 10"));
+            this.builder.get_object("FixedTiling").set_markup(_("<b>    Fixed Tiling    </b>"));
+            this.builder.get_object("DynamicTiling").set_markup(_("<b>    Dynamic Tiling    </b>"));
+            this.builder.get_object("Other").set_markup(_("<b>    Other    </b>"));
+            this.builder.get_object("Layouts").set_markup(_("<b>    Layouts    </b>"));            
 			this.builder.get_object("issueLabel").set_text(_("If you want to report a bug or make a feature request, please open an issue on Github."));
 			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
 
 			// tooltips
 			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
 
+			this.builder.get_object("saveLayoutsButton").set_label(_("Save"));
 			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
 		},
 });
