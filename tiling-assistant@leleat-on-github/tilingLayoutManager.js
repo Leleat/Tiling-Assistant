@@ -27,8 +27,8 @@ var MyTilingLayoutManager = GObject.registerClass(
 			if (!openWindows.length)
 				return;
 			
-			let layout = this._getLayout(layoutIdx);
-			if (!layout || !layout.length || !this._layoutIsValid(layout))
+			let layout = this.getLayout(layoutIdx);
+			if (!layout || !layout.length || !this.layoutIsValid(layout))
 				return;
 				
 			this.isTilingViaLayout = true;
@@ -48,7 +48,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			});
 
 			let currentLayoutRect = this.currentLayout.shift();
-			this._createTilingPreview(currentLayoutRect);
+			this.createTilingPreview(currentLayoutRect);
 	
 			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
 		}
@@ -72,7 +72,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			}
 
 			let currentLayoutRect = this.currentLayout.shift();
-			this._createTilingPreview(currentLayoutRect);
+			this.createTilingPreview(currentLayoutRect);
 
 			TilingDash.openDash(this.cachedOpenWindows, tiledWindow, this.monitorNr, currentLayoutRect);
 		}
@@ -88,7 +88,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			}
 		}
 
-		_createTilingPreview(rect) {
+		createTilingPreview(rect) {
 			if (this.layoutRectPreview)
 				this.layoutRectPreview.destroy();
 
@@ -109,9 +109,9 @@ var MyTilingLayoutManager = GObject.registerClass(
 			});
 		}
 
-		_getLayout(idx) {
+		getLayout(idx) {
 			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
-			let layoutFile = Gio.File.new_for_path(path); // TODO need to free this?
+			let layoutFile = Gio.File.new_for_path(path);
 	
 			try {
 				layoutFile.create(Gio.FileCreateFlags.NONE, null);
@@ -129,7 +129,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			return null;
 		}
 
-		_layoutIsValid(layout) {
+		layoutIsValid(layout) {
 			// calculate the surface area of an overlap
 			// 0 means no overlap
 			let rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) 

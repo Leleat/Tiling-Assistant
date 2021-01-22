@@ -63,18 +63,8 @@ const MyPrefsWidget = new GObject.Class({
 			// Layouts gui:
 			// this.layouts is an array of arrays. The inner arrays contain "rects" in the format {x: NR, y: NR, width: NR, height: NR} 
 			// NR is a float between 0 to 1.
-			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
-			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
-			this.layoutFile = Gio.File.new_for_path(path); // TODO need to free this? Or is it better to create new file whenever access is needed?
-
-			try {
-				this.layoutFile.create(Gio.FileCreateFlags.NONE, null);
-			} catch (e) {
-				log(`Tiling Assistant: ExtensionError ${e}`);
-			}
-						
+			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.			
 			this.layouts = this.loadLayouts();
-
 			let drawAreas = [];
 
 			for (let i = 0; i < 10; i++) { // Nr of layouts is hardcoded
@@ -90,24 +80,22 @@ const MyPrefsWidget = new GObject.Class({
 				});
 
 				// drawAreas
-				let drawArea = this.builder.get_object(`DrawArea${i}`);
-				drawAreas.push(drawArea);
-
 				// draw rects
+				let drawArea = this.builder.get_object(`DrawArea${i}`);
 				drawArea.connect("draw", (widget, cr) => {
 					// file couldnt be loaded or empty
 					if (!this.layouts)
 						return;
 					
 					let layout = this.layouts[i];
-					let layoutIsValid = this._layoutIsValid(layout);
+					let layoutIsValid = this.layoutIsValid(layout);
 					if (layoutIsValid) {
 						// remove "Invalid layout" label from overlay, if it exists
 						let gtkOverlay = widget.get_parent().get_parent();
 						if (gtkOverlay.get_children().length > 1)
 							gtkOverlay.remove(gtkOverlay.get_children()[1]);
 
-						this._drawLayoutsRects(widget, cr, layout);
+						this.drawLayoutsRects(widget, cr, layout);
 					
 					} else {
 						// add "Invalid Layout" label to overlay, if it doesn't exist
@@ -122,7 +110,8 @@ const MyPrefsWidget = new GObject.Class({
 							gtkOverlay.add_overlay(label);
 						}
 					}
-				});
+                });
+                drawAreas.push(drawArea);
 			}
 
 			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
@@ -196,7 +185,16 @@ const MyPrefsWidget = new GObject.Class({
 
 		// load from ~/.TilingAssistantExtension.layouts.json
 		loadLayouts() {
-			let [success, contents] = this.layoutFile.load_contents(null);	
+            let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+			let file = Gio.File.new_for_path(path);
+
+			try {
+				file.create(Gio.FileCreateFlags.NONE, null);
+			} catch (e) {
+            
+            }
+            
+			let [success, contents] = file.load_contents(null);	
 			if (!success || !contents.length)
 				return null;
 
@@ -211,7 +209,6 @@ const MyPrefsWidget = new GObject.Class({
 
 			// set text for Gtk.entries
 			let layouts = JSON.parse(contents);
-			// contents.free(); // TODO free is not a function but freeing needed; see doc website?
 			layouts.forEach((layout, index) => {
 				let layoutListBox = this.builder.get_object(`LayoutListbox${index}`);
 
@@ -219,7 +216,9 @@ const MyPrefsWidget = new GObject.Class({
 					let entry = layoutListBox.get_row_at_index(idx).get_child().get_children()[1];
 					entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
 				});
-			});
+            });
+            
+            GLib.free(contents);
 
 			return layouts;
 		},
@@ -263,13 +262,22 @@ const MyPrefsWidget = new GObject.Class({
 				}
 
 				layouts.push(rects);
+            }
+            
+            let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+			let file = Gio.File.new_for_path(path);
+
+			try {
+				file.create(Gio.FileCreateFlags.NONE, null);
+			} catch (e) {
+
 			}
 
-			let [success] = this.layoutFile.replace_contents(JSON.stringify(layouts), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+			let [success] = file.replace_contents(JSON.stringify(layouts), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 			return success;
 		},
 
-		_layoutIsValid(layout) {
+		layoutIsValid(layout) {
 			if (!layout)	
 				return false;
 
@@ -295,7 +303,7 @@ const MyPrefsWidget = new GObject.Class({
 		},
 
 		// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
-		_drawLayoutsRects: function(layoutWidget, cr, layout) {
+		drawLayoutsRects: function(layoutWidget, cr, layout) {
 			let color = new Gdk.RGBA();
 			let width = layoutWidget.get_allocated_width();
 			let height = layoutWidget.get_allocated_height();
@@ -321,7 +329,7 @@ const MyPrefsWidget = new GObject.Class({
 				cr.fill();
 			});
 			
-			cr.$dispose(); // TODO neccessary?
+			cr.$dispose();
 		},
 
 		setupTranslations: function() {
