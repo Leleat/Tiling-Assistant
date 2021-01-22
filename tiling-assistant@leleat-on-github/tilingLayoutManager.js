@@ -1,17 +1,20 @@
+"use strict";
+
 const {altTab, main} = imports.ui;
-const {Clutter, Gio, GLib, GObject, Meta, Shell, St} = imports.gi;
+const {Clutter, Gio, GLib, GObject, Meta, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const MyExtension = Me.imports.extension;
+const TilingDash = Me.imports.tilingDash;
 
 var MyTilingLayoutManager = GObject.registerClass(
 	class MyTilingLayoutManager extends GObject.Object {
 		_init() {
-			this.currentLayout = [];
-			this.layoutRectPreview = null;
-			this.cachedOpenWindows = [];
+			this.currentLayout = []; // array of objects: {x: F, y: F, width: F, height: F} where F is a float between 0 and 1
+			this.layoutRectPreview = null; // preview for the current rect of the currentLayout
+			this.cachedOpenWindows = []; // the open windows, which havent been tiled with the current layout yet
 			this.monitorNr = 0;
+			this.isTilingViaLayout = false;
 		}
 
 		_destroy() {
@@ -19,7 +22,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 		}
 
 		// called via keybinding of the respective layout
-		tileToLayout(layoutIdx, monitorNr) {
+		startTilingToLayout(layoutIdx, monitorNr) {
 			let openWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
 			if (!openWindows.length)
 				return;
@@ -28,6 +31,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			if (!layout || !layout.length || !this._layoutIsValid(layout))
 				return;
 				
+			this.isTilingViaLayout = true;
 			this.cachedOpenWindows = openWindows;
 			this.monitorNr = monitorNr;
 
@@ -46,15 +50,16 @@ var MyTilingLayoutManager = GObject.registerClass(
 			let currentLayoutRect = this.currentLayout.shift();
 			this._createTilingPreview(currentLayoutRect);
 	
-			MyExtension.appDash.open(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect, this.currentLayout);
+			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
 		}
 
-		// called after a window was tiled
+		// called after a window was tiled with an appIcon from tilingDash.js
 		onWindowTiled(tiledWindow) {
-            if (this.layoutRectPreview)
-                this.layoutRectPreview.destroy();
-                
-			if (!this.isTilingViaLayout()) {
+			if (!this.isTilingViaLayout)
+				return;
+			
+			// finish after final layout rect
+			if (!this.currentLayout.length) {
 				this.endTilingViaLayout();
 				return;
 			}
@@ -69,14 +74,11 @@ var MyTilingLayoutManager = GObject.registerClass(
 			let currentLayoutRect = this.currentLayout.shift();
 			this._createTilingPreview(currentLayoutRect);
 
-			MyExtension.appDash.open(this.cachedOpenWindows, tiledWindow, this.monitorNr, currentLayoutRect, this.currentLayout);
-		}
-
-		isTilingViaLayout() {
-			return this.currentLayout.length > 0;
+			TilingDash.openDash(this.cachedOpenWindows, tiledWindow, this.monitorNr, currentLayoutRect);
 		}
 
 		endTilingViaLayout() {
+			this.isTilingViaLayout = false;
 			this.currentLayout = [];
 			this.cachedOpenWindows = [];
 			this.monitorNr = 0;
@@ -87,6 +89,9 @@ var MyTilingLayoutManager = GObject.registerClass(
 		}
 
 		_createTilingPreview(rect) {
+			if (this.layoutRectPreview)
+				this.layoutRectPreview.destroy();
+
 			this.layoutRectPreview = new St.Widget({
 				style_class: "tile-preview",
 				x: rect.x + rect.width / 2,

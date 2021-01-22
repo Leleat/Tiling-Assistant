@@ -1,23 +1,5 @@
-.my-open-windows-dash {
-  background-color: rgb(22, 22, 22);
-  border-radius: 15px;
-  border: 1px solid rgba(65, 66, 68, 0.85);
-}
-
-.tiling-window-focused {
-  background-color: rgba(238, 238, 236, 0.3);
-  margin: 15px 15px 15px;
-  border-radius: 10px;
-}
-
-.tiling-window-hovered {
-  background-color: rgba(238, 238, 236, 0.1);
-  margin: 15px 15px 15px;
-  border-radius: 10px;
-}
-
-.tiling-window-unfocused {
-  margin: 15px 15px 15px;
-  border-radius: 10px;
+.tiling-highlighted-appicon {
+    background-color: rgba(238, 238, 236, 0.3);
+    border-radius: 8px;
 }
 

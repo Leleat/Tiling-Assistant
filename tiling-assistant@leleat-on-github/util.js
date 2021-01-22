@@ -3,9 +3,7 @@
 const {altTab, main, windowManager} = imports.ui;
 const {Clutter, Gio, GLib, Meta, St, Shell} = imports.gi;
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-const MyExtension = Me.imports.extension;
+const MyExtension = imports.misc.extensionUtils.getCurrentExtension().imports.extension;
 
 function equalApprox(value, value2, margin) {
 	if (value >= value2 - margin && value <= value2 + margin)

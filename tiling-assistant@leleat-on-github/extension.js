@@ -18,17 +18,16 @@
 
 "use strict";
 
-const {altTab, appDisplay, iconGrid, main, panel, switcherPopup, windowManager} = imports.ui;
-const {Clutter, GLib, GObject, Graphene, Meta, Shell, St} = imports.gi;
+const {altTab, appDisplay, main, panel} = imports.ui;
+const {Clutter, GLib, Meta, Shell} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.util;
-const TilingPreviewRect = Me.imports.tilingPreviewRect;
 const TilingDash = Me.imports.tilingDash;
+const TilingPreviewRect = Me.imports.tilingPreviewRect;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 
-var appDash = null;
 var tilingPreviewRect = null;
 var tilingLayoutManager = null;
 var settings = null;
@@ -46,19 +45,7 @@ function enable() {
 	// signal connections
 	this.windowGrabBegin = global.display.connect("grab-op-begin", onGrabBegin.bind(this));
 	this.windowGrabEnd = global.display.connect("grab-op-end", onGrabEnd.bind(this));
-	this.overviewShown = main.overview.connect("showing", () => { 
-		if (appDash.shown) 
-			appDash.close(); 
-	});
-	this.shortcutPressed = global.window_manager.connect("filter-keybinding", (shellWM, keyBinding) => {
-		if (appDash.shown) {
-			appDash.close();
-			return true;
-		}
-		return false;
-	});
 
-    appDash = new TilingDash.MyTilingDash();
     tilingLayoutManager = new TilingLayoutManager.MyTilingLayoutManager();
     tilingPreviewRect = new TilingPreviewRect.MyTilingPreviewRect();
 
@@ -147,13 +134,9 @@ function disable() {
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
 	global.display.disconnect(this.windowGrabEnd);
-	main.overview.disconnect(this.overviewShown);
-	global.window_manager.disconnect(this.shortcutPressed);
 
 	tilingPreviewRect.destroy();
 	tilingPreviewRect = null;
-	appDash._destroy();
-    appDash = null;
     tilingLayoutManager._destroy();
     tilingLayoutManager = null;
 
@@ -226,7 +209,7 @@ function onMyTilingShortcutPressed(shortcutName) {
 		case "layout9":
 		case "layout10":
 			let idx = Number.parseInt(shortcutName.substring(6)) - 1;
-			tilingLayoutManager.tileToLayout(idx, window.get_monitor());
+			tilingLayoutManager.startTilingToLayout(idx, window.get_monitor());
 			return;
 
 		case "tile-maximize":
@@ -791,7 +774,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 // called when a window is tiled (via tileWindow()).
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function onWindowTiled(tiledWindow) {
-	if (appDash.shown || !settings.get_boolean("enable-dash"))
+	if (!settings.get_boolean("enable-dash"))
 		return;
 		
 	let openWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
@@ -823,5 +806,5 @@ function onWindowTiled(tiledWindow) {
 	if (freeScreenSpace.width < 350 || freeScreenSpace.height < 350)
 		return;
 
-	appDash.open(openWindows, tiledWindow, tiledWindow.get_monitor(), freeScreenSpace);
+    TilingDash.openDash(openWindows, tiledWindow, tiledWindow.get_monitor(), freeScreenSpace);
 };
