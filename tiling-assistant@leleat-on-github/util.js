@@ -1,6 +1,6 @@
 "use strict";
 
-const {altTab, main, windowManager} = imports.ui;
+const {main, windowManager} = imports.ui;
 const {Clutter, Gio, GLib, Meta, St, Shell} = imports.gi;
 
 const MyExtension = imports.misc.extensionUtils.getCurrentExtension().imports.extension;
@@ -15,9 +15,9 @@ function rectsAreAboutEqual (r1, r2) {
 	if (!r1 || !r2)
 		return false;
 
-    let samePos = equalApprox(r1.x, r2.x, 15) && equalApprox(r1.y, r2.y, 15);
-    let sameSize = equalApprox(r1.width, r2.width, 15) && equalApprox(r1.height, r2.height, 15);
-    return samePos && sameSize;
+	let samePos = equalApprox(r1.x, r2.x, 15) && equalApprox(r1.y, r2.y, 15);
+	let sameSize = equalApprox(r1.width, r2.width, 15) && equalApprox(r1.height, r2.height, 15);
+	return samePos && sameSize;
 };
 
 function rectHasPoint(rect, point) {
@@ -98,13 +98,19 @@ function rectDiff (rectA, rectB, ignoreMargin = 35) {
 			resultRects.push(new Meta.Rectangle({x: rectB_x2, y: sideRects_y, width: rightRect_width, height: sideRects_height}));	
 	}
 
-    return resultRects;
+	return resultRects;
 };
+
+function getOpenWindows() {
+	const openWindows = global.workspace_manager.get_active_workspace().list_windows();
+	const orderedOpenWindows = global.display.sort_windows_by_stacking(openWindows).reverse();
+	return orderedOpenWindows.filter(w => w.get_window_type() === Meta.WindowType.NORMAL && !w.is_skip_taskbar() && ((w.allows_move() && w.allows_resize()) || w.get_maximized()));
+}
 
 // get the top most tiled windows which are in a group (window list by stack order: top -> bottom)
 function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 	if (openWindows == null)
-		openWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
+		openWindows = getOpenWindows();
 
 	let groupedWindows = []; // tiled windows which are considered in a group
 	let notGroupedWindows = []; // normal and tiled windows which appear between grouped windows in the stack order
@@ -160,7 +166,7 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 			notGroupedWindows.push(window);
 		}
 	}
-
+	
 	return groupedWindows;
 };
 
@@ -207,44 +213,44 @@ function getFreeScreenRects(tileGroup) {
 // i. e. together they span the entire monitor
 function getTileRectForSide(side, workArea, screenRects) {
 	let width = 0;
-    let height = 0;
+	let height = 0;
 
-    // sort left -> right + top -> bottom
-    screenRects = screenRects.sort((r1, r2) => {
-        let xPos = r1.x - r2.x;
-        if (xPos)
-            return xPos;
+	// sort left -> right + top -> bottom
+	screenRects = screenRects.sort((r1, r2) => {
+		let xPos = r1.x - r2.x;
+		if (xPos)
+			return xPos;
 
-        return r1.y - r2.y;
-    });
+		return r1.y - r2.y;
+	});
 
-    let gaps = MyExtension.settings.get_int("window-gaps");
+	let gaps = MyExtension.settings.get_int("window-gaps");
 
 	switch (side) {
 		case Meta.Side.LEFT:
-            // find the rectangles, which line up vertically
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    let linedUpRects = [r];
-                    
-                    for (let j = i + 1; j < len; j++) {
-                        let r2 = screenRects[j];
-                        if (equalApprox(r.x + r.width, r2.x + r2.width, gaps))
-                            linedUpRects.push(r2);
-                    }
-    
-                    let h = 0;
-                    linedUpRects.forEach(r => h += r.height);
-                    if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
-                        width = r.x + r.width - workArea.x;
-                        break;
-                    }
-                }
-            }
+			// find the rectangles, which line up vertically
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					let linedUpRects = [r];
+					
+					for (let j = i + 1; j < len; j++) {
+						let r2 = screenRects[j];
+						if (equalApprox(r.x + r.width, r2.x + r2.width, gaps))
+							linedUpRects.push(r2);
+					}
+	
+					let h = 0;
+					linedUpRects.forEach(r => h += r.height);
+					if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
+						width = r.x + r.width - workArea.x;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -253,32 +259,32 @@ function getTileRectForSide(side, workArea, screenRects) {
 				height: workArea.height,
 			});
 
-        case Meta.Side.RIGHT:	
-            // find the rectangles, which line up vertically
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                let scr = [...screenRects];
-                scr.reverse();
-                for (let i = 0, len = scr.length; i < len; i++) {
-                    let r = scr[i];
-                    let linedUpRects = [r];
-                    
-                    for (let j = i + 1; j < len; j++) {
-                        let r2 = scr[j];
-                        if (equalApprox(r.x, r2.x, gaps))
-                            linedUpRects.push(r2);
-                    }
-    
-                    let h = 0;
-                    linedUpRects.forEach(r => h += r.height);
-                    if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
-                        width = workArea.x + workArea.width - r.x;
-                        break;
-                    }
-                }
-            }
+		case Meta.Side.RIGHT:	
+			// find the rectangles, which line up vertically
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				let scr = [...screenRects];
+				scr.reverse();
+				for (let i = 0, len = scr.length; i < len; i++) {
+					let r = scr[i];
+					let linedUpRects = [r];
+					
+					for (let j = i + 1; j < len; j++) {
+						let r2 = scr[j];
+						if (equalApprox(r.x, r2.x, gaps))
+							linedUpRects.push(r2);
+					}
+	
+					let h = 0;
+					linedUpRects.forEach(r => h += r.height);
+					if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
+						width = workArea.x + workArea.width - r.x;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
@@ -288,29 +294,29 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.TOP:
-            // find the rectangles, which line up horizontally
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    let linedUpRects = [r];
-                    
-                    for (let j = i + 1; j < len; j++) {
-                        let r2 = screenRects[j];
-                        if (equalApprox(r.y + r.height, r2.y + r2.height, gaps))
-                            linedUpRects.push(r2);
-                    }
-    
-                    let w = 0;
-                    linedUpRects.forEach(r => w += r.width);
-                    if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
-                        height = r.y + r.height - workArea.y;
-                        break;
-                    }
-                }
-            }
+			// find the rectangles, which line up horizontally
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					let linedUpRects = [r];
+					
+					for (let j = i + 1; j < len; j++) {
+						let r2 = screenRects[j];
+						if (equalApprox(r.y + r.height, r2.y + r2.height, gaps))
+							linedUpRects.push(r2);
+					}
+	
+					let w = 0;
+					linedUpRects.forEach(r => w += r.width);
+					if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
+						height = r.y + r.height - workArea.y;
+						break;
+					}
+				}
+			}
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -320,31 +326,31 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.BOTTOM:
-            // find the rectangles, which line up horizontally
-            let scr = [...screenRects];
-            scr.reverse();
-            if (scr.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = scr.length; i < len; i++) {
-                    let r = scr[i];
-                    let linedUpRects = [r];
-                    
-                    for (let j = i + 1; j < len; j++) {
-                        let r2 = scr[j];
-                        if (equalApprox(r.y + r.height, r2.y + r2.height, gaps) && !equalApprox(r2.y + r2.height, workArea.y + workArea.height, gaps))
-                            linedUpRects.push(r2);
-                    }
-    
-                    let w = 0;
-                    linedUpRects.forEach(r => w += r.width);
-                    if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
-                        height = workArea.y + workArea.height - (r.y + r.height);
-                        break;
-                    }
-                }
-            }
+			// find the rectangles, which line up horizontally
+			let scr = [...screenRects];
+			scr.reverse();
+			if (scr.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = scr.length; i < len; i++) {
+					let r = scr[i];
+					let linedUpRects = [r];
+					
+					for (let j = i + 1; j < len; j++) {
+						let r2 = scr[j];
+						if (equalApprox(r.y + r.height, r2.y + r2.height, gaps) && !equalApprox(r2.y + r2.height, workArea.y + workArea.height, gaps))
+							linedUpRects.push(r2);
+					}
+	
+					let w = 0;
+					linedUpRects.forEach(r => w += r.width);
+					if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
+						height = workArea.y + workArea.height - (r.y + r.height);
+						break;
+					}
+				}
+			}
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -354,24 +360,24 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.TOP + Meta.Side.LEFT:
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    
-                    if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y, workArea.y, gaps)) {
-                        width = r.width;
-                        height = r.height;
-                        break;
-                    }
-                }
-            }
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					
+					if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y, workArea.y, gaps)) {
+						width = r.width;
+						height = r.height;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
-        
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
+		
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
@@ -380,23 +386,23 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.TOP + Meta.Side.RIGHT:
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    
-                    if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y, workArea.y, gaps)) {
-                        width = r.width;
-                        height = r.height;
-                        break;
-                    }
-                }
-            }
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					
+					if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y, workArea.y, gaps)) {
+						width = r.width;
+						height = r.height;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
@@ -406,23 +412,23 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.LEFT:
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    
-                    if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
-                        width = r.width;
-                        height = r.height;
-                        break;
-                    }
-                }
-            }
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					
+					if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
+						width = r.width;
+						height = r.height;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x,
@@ -432,23 +438,23 @@ function getTileRectForSide(side, workArea, screenRects) {
 			});
 
 		case Meta.Side.BOTTOM + Meta.Side.RIGHT:
-            if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
-                for (let i = 0, len = screenRects.length; i < len; i++) {
-                    let r = screenRects[i];
-                    
-                    if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
-                        width = r.width;
-                        height = r.height;
-                        break;
-                    }
-                }
-            }
+			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
+				for (let i = 0, len = screenRects.length; i < len; i++) {
+					let r = screenRects[i];
+					
+					if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
+						width = r.width;
+						height = r.height;
+						break;
+					}
+				}
+			}
 
-            if (!width || equalApprox(width, workArea.width, gaps))
-                width = workArea.width / 2;
+			if (!width || equalApprox(width, workArea.width, gaps))
+				width = workArea.width / 2;
 
-            if (!height || equalApprox(height, workArea.height, gaps))
-                height = workArea.height / 2;
+			if (!height || equalApprox(height, workArea.height, gaps))
+				height = workArea.height / 2;
 			
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
@@ -535,7 +541,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
 	// setup tileGroup to raise tiled windows as a group
-	let tileGroup = getTopTileGroup(altTab.getWindows(global.workspace_manager.get_active_workspace()), false);
+	let tileGroup = getTopTileGroup(getOpenWindows(), false);
 	updateTileGroup(tileGroup);
 
 	if (checkToOpenDash)
@@ -759,7 +765,7 @@ function openAppTiled(app, rect) {
 // called via keybinding:
 // tile a window to the layout below it
 function replaceTiledWindow(window) {
-	let openWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
+	let openWindows = getOpenWindows();
 	let currTileGroup = getTopTileGroup(openWindows, (openWindows[0].isTiled) ? false : true);
 	if (!currTileGroup.length)
 		return;

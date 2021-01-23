@@ -18,7 +18,7 @@ var MyTilingDashManager = GObject.registerClass(
 	class MyTilingDashManager extends St.Widget {
 		_init(openWindows, tiledWindow, monitorNr, freeScreenRect) {
 			super._init({reactive: true});
-
+			
 			main.uiGroup.add_child(this);
 			if (!main.pushModal(this)) {
 				this.destroy();
@@ -45,8 +45,7 @@ var MyTilingDashManager = GObject.registerClass(
 
 			// filter the openWindows array, so that no duplicate apps are shown
 			let winTracker = Shell.WindowTracker.get_default();
-			let openApps = [];
-			openWindows.forEach(w => openApps.push(winTracker.get_window_app(w)));
+			let openApps = openWindows.map(w => winTracker.get_window_app(w));
 			this.openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) == pos);
 
 			let activeWS = global.workspace_manager.get_active_workspace();
@@ -85,10 +84,10 @@ var MyTilingDashManager = GObject.registerClass(
 		}
 
 		_destroy(cancelTilingWithLayout = false) {
-            if (this.alreadyDestroying)
-                return;
+			if (this.alreadyDestroying)
+				return;
 
-            this.alreadyDestroying = true;
+			this.alreadyDestroying = true;
 			main.layoutManager.disconnect(this.systemModalOpenedId);
 			main.popModal(this);
 
@@ -411,7 +410,7 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.connect("enter-event", this.onItemEnter.bind(this));
 			this.connect("leave-event", () => this.isHovered = false);
 
-			let allWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
+			let allWindows = Util.getOpenWindows();
 			let appWindows = allWindows.filter(w => Shell.WindowTracker.get_default().get_window_app(w) == app);
 			let tiledWindow = dash.dashManager.tiledWindow;
 			this.cachedWindows = appWindows.filter(w => {

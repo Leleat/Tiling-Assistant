@@ -1,11 +1,12 @@
 "use strict";
 
-const {altTab, main} = imports.ui;
+const {main} = imports.ui;
 const {Clutter, Gio, GLib, GObject, Meta, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const TilingDash = Me.imports.tilingDash;
+const Util = Me.imports.util;
 
 var MyTilingLayoutManager = GObject.registerClass(
 	class MyTilingLayoutManager extends GObject.Object {
@@ -23,7 +24,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 
 		// called via keybinding of the respective layout
 		startTilingToLayout(layoutIdx, monitorNr) {
-			let openWindows = altTab.getWindows(global.workspace_manager.get_active_workspace());
+			let openWindows = Util.getOpenWindows();
 			if (!openWindows.length)
 				return;
 			
