@@ -28,6 +28,8 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - Resize tiled windows in a group (**horizontal and vertical only**). You can escape the group-resizing by holding `Ctrl` (doesn't work with GTK apps). This way only the windows directly opposed to the resized window will resize along.
 
+- When using the "tile to other tiled window" keybinding, pressing `Ctrl` will halve the rectangles vertically. Another `Ctrl` press will halve the rectangles horizontally.
+
 ## Previews
 
 ![Preview](preview.gif)

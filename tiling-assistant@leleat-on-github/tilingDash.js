@@ -14,7 +14,7 @@ function openDash(openWindows, tiledWindow, monitorNr, freeScreenSpace) {
 	new MyTilingDashManager(openWindows, tiledWindow, monitorNr, freeScreenSpace);
 }
 
-var MyTilingDashManager = GObject.registerClass(
+const MyTilingDashManager = GObject.registerClass(
 	class MyTilingDashManager extends St.Widget {
 		_init(openWindows, tiledWindow, monitorNr, freeScreenRect) {
 			super._init({reactive: true});

@@ -27,6 +27,7 @@ const Util = Me.imports.util;
 const TilingDash = Me.imports.tilingDash;
 const TilingPreviewRect = Me.imports.tilingPreviewRect;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
+const TilingReplacer = Me.imports.tilingReplacer;
 
 var tilingPreviewRect = null;
 var tilingLayoutManager = null;
@@ -271,7 +272,7 @@ function onMyTilingShortcutPressed(shortcutName) {
 			break;
 		
 		case "replace-window":
-			Util.replaceTiledWindow(window);
+			TilingReplacer.replaceTiledWindow(window);
 			return;
 	}
 

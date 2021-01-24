@@ -1,6 +1,6 @@
 "use strict";
 
-const {main, windowManager} = imports.ui;
+const {main} = imports.ui;
 const {Clutter, Gio, GLib, Meta, St, Shell} = imports.gi;
 
 const MyExtension = imports.misc.extensionUtils.getCurrentExtension().imports.extension;
@@ -31,8 +31,10 @@ function rectHasPoint(rect, point) {
 // I've simplified it a bit and added the option to do it the other way around depending on the monitor orientation.
 // additionally, ignore small rects since some windows (some Terminals) dont freely resize
 function rectDiff (rectA, rectB, ignoreMargin = 35) {
-	let resultRects = [];
+	if (!rectA || !rectB)
+		return [];
 
+	let resultRects = [];
 	let displayRect = global.display.get_monitor_geometry(global.display.get_current_monitor());
 	let wideScreen = displayRect.width > displayRect.height * .9; // put more weight on width
 
@@ -521,7 +523,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 				y: rect.y,
 				width: rect.width,
 				height: rect.height,
-				duration: windowManager.WINDOW_ANIMATION_TIME,
+				duration: 250,
 				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
 				onComplete: () => {
 					wActor.show();
@@ -760,125 +762,4 @@ function openAppTiled(app, rect) {
 	});
 
 	app.open_new_window(-1);
-};
-
-// called via keybinding:
-// tile a window to the layout below it
-function replaceTiledWindow(window) {
-	let openWindows = getOpenWindows();
-	let currTileGroup = getTopTileGroup(openWindows, (openWindows[0].isTiled) ? false : true);
-	if (!currTileGroup.length)
-		return;
-
-	let rects = [];
-	currTileGroup.forEach(w => rects.push(w.tiledRect.copy()));
-	let freeScreenRects = getFreeScreenRects(currTileGroup);
-
-	// rects from tileGroup and and freeScreenRects sorted from left -> right and top -> bottom
-	rects = rects.concat(freeScreenRects).sort((r1, r2) => {
-		let xPos = r1.x - r2.x;
-		if (xPos)
-			return xPos;
-
-		return r1.y - r2.y;
-	});
-	
-	// to later destroy all the actors
-	let actors = [];
-	let previewRects = [];
-
-	// dim background
-	let entireWorkArea = window.get_work_area_all_monitors();
-	let shadeBG = new St.Widget({
-		style: ("background-color : black"),
-		can_focus: true,
-		reactive: true,
-		x: 0, 
-		y: main.panel.height,
-		opacity: 0,
-		width: entireWorkArea.width, 
-		height: entireWorkArea.height
-	});
-	global.window_group.add_child(shadeBG);
-	actors.push(shadeBG);
-
-	shadeBG.ease({
-		opacity: 200,
-		duration: windowManager.WINDOW_ANIMATION_TIME,
-		mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-	});
-
-	// create rectangles and Nr labels to display over the tiled windows and freeScreenRects
-	let counter = 1;
-	rects.forEach(rect => {
-		// preview is slightly smaller than the Rect rect for visibility 
-		let previewRect = new St.Widget({
-			style_class: "tile-preview",
-			x: rect.x + 10, 
-			y: rect.y + 10,
-			opacity: 0,
-			width: rect.width - 2 * 10,
-			height: rect.height - 2 * 10,
-		});
-		global.window_group.add_child(previewRect);
-		previewRects.push(previewRect);
-
-		previewRect.ease({
-			opacity: 255,
-			duration: windowManager.WINDOW_ANIMATION_TIME,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD
-		});
-
-		let label = new St.Label({
-			x: rect.x + rect.width / 2,
-			y: rect.y + rect.height / 2,
-			text: (counter++).toString(),
-			style: "font-size: 50px"
-		});
-		global.window_group.add_child(label);
-		actors.push(label);
-	});
-
-	// add a widget to catch the key inputs and mouse clicks
-	let catcher = new St.Widget({
-		x: 0, 
-		y: 0,
-		opacity: 0,
-		width: entireWorkArea.width, 
-		height: entireWorkArea.height + main.panel.height,
-		can_focus: true,
-		reactive: true
-	});
-	main.layoutManager.addChrome(catcher);
-	actors.push(catcher);
-
-	let destroyAll = function () {
-		previewRects.forEach(r => r.destroy());
-		actors.forEach(a => a.destroy());
-	}
-
-	// tile via nr keyboard input
-	catcher.grab_key_focus();
-	catcher.connect("key-press-event", (src, event) => {
-		let key = parseInt(event.get_key_unicode());
-		if (Number.isInteger(key) && key > 0 && key - 1 < rects.length)
-			tileWindow(window, rects[key - 1]);
-
-		destroyAll();
-	});
-
-	// tile via mouse click
-	catcher.connect("button-press-event", (src, event) => {
-		let [mX, mY] = event.get_coords();
-		for(let i = 0; i < rects.length; i++) {
-			let r = rects[i]
-			if (rectHasPoint(r, {x: mX, y: mY})) {
-				tileWindow(window, r);
-				
-				break;
-			}
-		}
-		
-		destroyAll();
-	});
 };
