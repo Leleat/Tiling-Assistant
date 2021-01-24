@@ -2044,7 +2044,7 @@
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkEntry">
+                                                      <object class="GtkEntry" id="tooltipLayoutsEntry">
                                                         <property name="visible">True</property>
                                                         <property name="can-focus">True</property>
                                                         <property name="tooltip-text" translatable="yes">In the left column you will enter the dimensions of the rectangles for the layouts. Format is:

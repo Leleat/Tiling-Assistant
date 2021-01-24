@@ -8,162 +8,172 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-01-22 18:10+0100\n"
+"POT-Creation-Date: 2021-01-24 01:19+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "Language: \n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:329
-msgid "General"
+#: prefs.js:298
+#, javascript-format
+msgid "Rectangle %d is (partly) outside of the screen."
 msgstr ""
 
-#: prefs.js:330
-msgid "Keybindings"
-msgstr ""
-
-#: prefs.js:331
-msgid "Layouts"
-msgstr ""
-
-#: prefs.js:332
-msgid "Help"
-msgstr ""
-
-#: prefs.js:335
-msgid "Enable Dash"
-msgstr ""
-
-#: prefs.js:336
-msgid "Dash icon size"
-msgstr ""
-
-#: prefs.js:337
-msgid "Dash icon margin"
-msgstr ""
-
-#: prefs.js:338
-msgid "Enable animations"
-msgstr ""
-
-#: prefs.js:339
-msgid "Gap between tiled windows"
+#: prefs.js:302
+#, javascript-format
+msgid "Rectangles %d and %d overlap."
 msgstr ""
 
 #: prefs.js:340
-msgid "Toggle maximization"
+msgid "General"
 msgstr ""
 
 #: prefs.js:341
-msgid "Tile to top half"
+msgid "Keybindings"
 msgstr ""
 
 #: prefs.js:342
-msgid "Tile to bottom half"
+msgid "Layouts"
 msgstr ""
 
 #: prefs.js:343
-msgid "Tile to right half"
-msgstr ""
-
-#: prefs.js:344
-msgid "Tile to left half"
+msgid "Help"
 msgstr ""
 
 #: prefs.js:345
-msgid "Tile to top left quarter"
+msgid "Enable Dash"
 msgstr ""
 
 #: prefs.js:346
-msgid "Tile to top right quarter"
+msgid "Dash icon size"
 msgstr ""
 
 #: prefs.js:347
-msgid "Tile to bottom left quarter"
+msgid "Dash icon margin"
 msgstr ""
 
 #: prefs.js:348
-msgid "Tile to bottom right quarter"
+msgid "Enable animations"
 msgstr ""
 
 #: prefs.js:349
-msgid "Tile to empty space"
+msgid "Gap between tiled windows"
 msgstr ""
 
 #: prefs.js:350
-msgid "Tile to other tiled window"
+msgid "Toggle maximization"
 msgstr ""
 
 #: prefs.js:351
-msgid "Toggle Dash"
+msgid "Tile to top half"
 msgstr ""
 
 #: prefs.js:352
-msgid "Layout 1"
+msgid "Tile to bottom half"
 msgstr ""
 
 #: prefs.js:353
-msgid "Layout 2"
+msgid "Tile to right half"
 msgstr ""
 
 #: prefs.js:354
-msgid "Layout 3"
+msgid "Tile to left half"
 msgstr ""
 
 #: prefs.js:355
-msgid "Layout 4"
+msgid "Tile to top left quarter"
 msgstr ""
 
 #: prefs.js:356
-msgid "Layout 5"
+msgid "Tile to top right quarter"
 msgstr ""
 
 #: prefs.js:357
-msgid "Layout 6"
+msgid "Tile to bottom left quarter"
 msgstr ""
 
 #: prefs.js:358
-msgid "Layout 7"
+msgid "Tile to bottom right quarter"
 msgstr ""
 
 #: prefs.js:359
-msgid "Layout 8"
+msgid "Tile to empty space"
 msgstr ""
 
 #: prefs.js:360
-msgid "Layout 9"
+msgid "Tile to other tiled window"
 msgstr ""
 
 #: prefs.js:361
-msgid "Layout 10"
+msgid "Toggle Dash"
 msgstr ""
 
 #: prefs.js:362
-msgid "<b>    Fixed Tiling    </b>"
+msgid "Layout 1"
 msgstr ""
 
 #: prefs.js:363
-msgid "<b>    Dynamic Tiling    </b>"
+msgid "Layout 2"
 msgstr ""
 
 #: prefs.js:364
-msgid "<b>    Other    </b>"
+msgid "Layout 3"
 msgstr ""
 
 #: prefs.js:365
-msgid "<b>    Layouts    </b>"
+msgid "Layout 4"
 msgstr ""
 
 #: prefs.js:366
+msgid "Layout 5"
+msgstr ""
+
+#: prefs.js:367
+msgid "Layout 6"
+msgstr ""
+
+#: prefs.js:368
+msgid "Layout 7"
+msgstr ""
+
+#: prefs.js:369
+msgid "Layout 8"
+msgstr ""
+
+#: prefs.js:370
+msgid "Layout 9"
+msgstr ""
+
+#: prefs.js:371
+msgid "Layout 10"
+msgstr ""
+
+#: prefs.js:372
+msgid "<b>    Fixed Tiling    </b>"
+msgstr ""
+
+#: prefs.js:373
+msgid "<b>    Dynamic Tiling    </b>"
+msgstr ""
+
+#: prefs.js:374
+msgid "<b>    Other    </b>"
+msgstr ""
+
+#: prefs.js:375
+msgid "<b>    Layouts    </b>"
+msgstr ""
+
+#: prefs.js:376
 msgid ""
 "If you want to report a bug or make a feature request, please open an issue "
 "on Github."
 msgstr ""
 
-#: prefs.js:367
+#: prefs.js:377
 msgid ""
 "<span size='small'>This extension is licensed under the <a href='https://www."
 "gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, "
@@ -171,16 +181,40 @@ msgid ""
 "this license can be found in the Github repository.</span>"
 msgstr ""
 
-#: prefs.js:370
+#: prefs.js:379
 msgid ""
 "Even if this setting is turned off, not all move/resize animations will be "
 "disabled. Some are native to GNOME and thus unaffected by this setting."
 msgstr ""
 
-#: prefs.js:372
+#: prefs.js:381
 msgid "Save"
 msgstr ""
 
-#: prefs.js:373
+#: prefs.js:382
 msgid "Reload"
+msgstr ""
+
+#: prefs.js:384
+msgid "This tooltip for help..."
+msgstr ""
+
+#: prefs.js:385
+msgid ""
+"In the left column you will enter the dimensions of the rectangles for the "
+"layouts. Format is:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal\n"
+"\n"
+"The values can range from 0 to 1. 1 represents your full screen's "
+"dimensions. For ex.: 0.5--0--.5--1\n"
+"\n"
+"The right column shows a preview of your different layouts. Unsaved changes "
+"are not displayed. \n"
+"The reload button loads the layouts from your file (i. e. unsaved changes "
+"will be lost).\n"
+"The clear button clears the respective layout. This change is not yet "
+"saved.\n"
+"\n"
+" Layouts are saved in ~/.TilingAssistantExtension.layouts.json"
 msgstr ""

@@ -88,9 +88,9 @@ const MyPrefsWidget = new GObject.Class({
 						return;
 					
 					let layout = this.layouts[i];
-					let layoutIsValid = this.layoutIsValid(layout);
+					let [layoutIsValid, errMsg] = this.layoutIsValid(layout);
 					if (layoutIsValid) {
-						// remove "Invalid layout" label from overlay, if it exists
+						// remove error label from overlay, if it exists
 						let gtkOverlay = widget.get_parent().get_parent();
 						if (gtkOverlay.get_children().length > 1)
 							gtkOverlay.remove(gtkOverlay.get_children()[1]);
@@ -98,17 +98,21 @@ const MyPrefsWidget = new GObject.Class({
 						this.drawLayoutsRects(widget, cr, layout);
 					
 					} else {
-						// add "Invalid Layout" label to overlay, if it doesn't exist
-						let gtkOverlay = widget.get_parent().get_parent();
-						if (gtkOverlay.get_children().length <= 1) {
-							let label = new Gtk.Label({
-								label: "Invalid layout",
-								halign:  Gtk.Align.CENTER,
-								valign:  Gtk.Align.CENTER,
-								visible: true
-							});
-							gtkOverlay.add_overlay(label);
-						}
+						// add error label to overlay;
+                        // only change old label text, if it already exists
+                        let gtkOverlay = widget.get_parent().get_parent();
+						if (gtkOverlay.get_children().length > 1) {
+                            gtkOverlay.get_children()[1].set_text(errMsg);
+                        } else {
+                            let label = new Gtk.Label({
+                                label: errMsg,
+                                halign:  Gtk.Align.CENTER,
+                                valign:  Gtk.Align.CENTER,
+                                visible: true,
+                                wrap: true
+                            });
+                            gtkOverlay.add_overlay(label);
+                        }
 					}
                 });
                 drawAreas.push(drawArea);
@@ -279,7 +283,7 @@ const MyPrefsWidget = new GObject.Class({
 
 		layoutIsValid(layout) {
 			if (!layout)	
-				return false;
+				return [false, "No layout."];
 
 			// calculate the surface area of an overlap
 			let rectsOverlap = function(r1, r2) {
@@ -291,15 +295,15 @@ const MyPrefsWidget = new GObject.Class({
 
 				// rects is/reaches outside of screen (i. e. > 1)
 				if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
-					return false;
+					return [false, _("Rectangle %d is (partly) outside of the screen.").format(i + 1)];
 
 				for (let j = i + 1; j < len; j++) {
 					if (rectsOverlap(r, layout[j]))
-						return false;
+						return [false, _("Rectangles %d and %d overlap.").format(i + 1, j + 1)];
 				}
 			}
 
-			return true;
+			return [true, ""];
 		},
 
 		// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
@@ -333,13 +337,11 @@ const MyPrefsWidget = new GObject.Class({
 		},
 
 		setupTranslations: function() {
-			// tab labels
 			this.builder.get_object("generalLabel").set_text(_("General"));
 			this.builder.get_object("keybindingsLabel").set_text(_("Keybindings"));
 			this.builder.get_object("layoutsLabel").set_text(_("Layouts"));
 			this.builder.get_object("helpLabel").set_text(_("Help"));
 
-			// other settings labels
 			this.builder.get_object("label29").set_text(_("Enable Dash"));
 			this.builder.get_object("label12").set_text(_("Dash icon size"));
 			this.builder.get_object("label13").set_text(_("Dash icon margin"));
@@ -374,10 +376,12 @@ const MyPrefsWidget = new GObject.Class({
 			this.builder.get_object("issueLabel").set_text(_("If you want to report a bug or make a feature request, please open an issue on Github."));
 			this.builder.get_object("licenseLabel").set_markup(_("<span size='small'>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</span>"));
 
-			// tooltips
 			this.builder.get_object("listboxrow15").set_tooltip_text(_("Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting."));
 
 			this.builder.get_object("saveLayoutsButton").set_label(_("Save"));
-			this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
+            this.builder.get_object("reloadLayoutsButton").set_label(_("Reload"));
+            
+            this.builder.get_object("tooltipLayoutsEntry").set_placeholder_text(_("This tooltip for help..."));
+            this.builder.get_object("tooltipLayoutsEntry").set_tooltip_text(_("In the left column you will enter the dimensions of the rectangles for the layouts. Format is:\n\nxVal--yVal--widthVal--heightVal\n\nThe values can range from 0 to 1. 1 represents your full screen's dimensions. For ex.: 0.5--0--.5--1\n\nThe right column shows a preview of your different layouts. Unsaved changes are not displayed. \nThe reload button loads the layouts from your file (i. e. unsaved changes will be lost).\nThe clear button clears the respective layout. This change is not yet saved.\n\n Layouts are saved in ~/.TilingAssistantExtension.layouts.json"));
 		},
 });

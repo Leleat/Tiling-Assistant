@@ -17,6 +17,16 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: prefs.js:298
+#, javascript-format
+msgid "Rectangle %d is (partly) outside of the screen."
+msgstr "Rechteck %d befindet sich (teilweise) außerhalb des Bildschirms."
+
+#: prefs.js:302
+#, javascript-format
+msgid "Rectangles %d and %d overlap."
+msgstr "Rechteck %d und %d überlappen sich."
+
 #: prefs.js:329
 msgid "General"
 msgstr "Allgemein"
@@ -187,3 +197,37 @@ msgstr "Speichern"
 #: prefs.js:373
 msgid "Reload"
 msgstr "Neu laden"
+
+#: prefs.js:380
+msgid "This tooltip for help..."
+msgstr "Dieser Tooltip für Hilfe..."
+
+#: prefs.js:381
+msgid ""
+"In the left column you will enter the dimensions of the rectangles for the "
+"layouts. Format is:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal\n"
+"\n"
+"The values can range from 0 to 1. 1 represents your full screen's "
+"dimensions. For ex.: 0.5--0--.5--1\n"
+"\n"
+"The right column shows a preview of your different layouts. Unsaved changes "
+"are not displayed. \n"
+"The reload button loads the layouts from your file (i. e. unsaved changes "
+"will be lost).\n"
+"The clear button clears the respective layout. This change is not yet "
+"saved.\n"
+"\n"
+" Layouts are saved in ~/.TilingAssistantExtension.layouts.json"
+msgstr "In die linke Spalte kommen die Dimensionen der Rechtecke für die Layouts. Formatierung sieht wie folgt aus:\n"
+"\n"
+"xWert--yWert--breitenWert--höhenWert\n"
+"\n"
+"Die Werte liegen zwischen 0 und 1. 1 entspricht deiner gesamten Bildschirmseite. Z. B.: 0.5--0--.5--1\n"
+"\n"
+"Die rechte Spalte zeigt dir eine Vorschau deiner Layouts. Nicht gespeicherte Veränderungen werden nicht angezeigt.\n"
+"Der Neu-laden-Button lädt die Layouts aus der Datei (d . h. nicht gespeicherte Veränderungen gehen verloren).\n"
+"Der jeweilige Lösch-Button löscht die Werte aus dem entsprechendem Layout. Diese Veränderung wird nicht automatisch gespeichert.\n"
+"\n"
+" Layouts werden in ~/.TilingAssistantExtension.layouts.json gespeichert."
