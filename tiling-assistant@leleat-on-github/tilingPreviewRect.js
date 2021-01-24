@@ -17,7 +17,7 @@ var MyTilingPreviewRect = GObject.registerClass(
 			this.showing = false;
 		}
 
-		open(window, tileRect, monitorIndex, tiledWindow = null) {
+		open(window, tileRect, monitorIndex, windowToSplit = null) {
 			let windowActor = window.get_compositor_private();
 			if (!windowActor)
 				return;
@@ -28,7 +28,7 @@ var MyTilingPreviewRect = GObject.registerClass(
 			let changeMonitor = this.monitorIndex == -1 || this.monitorIndex != monitorIndex;
 			this.monitorIndex = monitorIndex;
 			this.rect = tileRect;
-			this.tiledWindow = tiledWindow; // tiledWindow, which is being hovered while holding ctrl
+			this.windowToSplit = windowToSplit; // window which is being hovered when holding ctrl while DNDing
 
 			let monitor = main.layoutManager.monitors[monitorIndex];
 
@@ -73,7 +73,7 @@ var MyTilingPreviewRect = GObject.registerClass(
 				return;
 
 			this.showing = false;
-			this.tiledWindow = null;
+			this.windowToSplit = null;
 			this.ease({
 				opacity: 0,
 				duration: 200,

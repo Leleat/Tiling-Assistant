@@ -275,7 +275,7 @@ function onMyTilingShortcutPressed(shortcutName) {
 			return;
 	}
 
-	if ((window.isTiled && Util.rectsAreAboutEqual(rect, window.tiledRect)) || (shortcutName == "tile-maximize" && Util.rectsAreAboutEqual(workArea, window.get_frame_rect()))) {
+	if ((window.isTiled && Util.rectsAreAboutEqual(rect, window.tiledRect)) || (Util.rectsAreAboutEqual(rect, workArea) && window.get_maximized())) {
 		Util.restoreWindowSize(window, true);
 
 	} else {
@@ -477,9 +477,9 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 		
 		case Meta.GrabOp.MOVING:
 			if (tilingPreviewRect.showing) {
-				// halving already tiled window
-				if (tilingPreviewRect.tiledWindow)
-					Util.tileWindow(tilingPreviewRect.tiledWindow, Util.rectDiff(tilingPreviewRect.tiledWindow.tiledRect, tilingPreviewRect.rect)[0], false);
+				// halving already tiled window, if we dont tile over it completely
+				if (tilingPreviewRect.windowToSplit)
+					Util.tileWindow(tilingPreviewRect.windowToSplit, Util.rectDiff(tilingPreviewRect.windowToSplit.tiledRect, tilingPreviewRect.rect)[0], false);
 		
 				let workArea = window.get_work_area_current_monitor();
 				if (workArea.equal(tilingPreviewRect.rect))
@@ -613,7 +613,6 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	let event = Clutter.get_current_event();
 	let modifiers = event ? event.get_state() : 0;
 	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-	let isHoveringRect = false;
 	let mousePoint = {x: mouseX, y: mouseY};
 
 	// default sizes or halving tiled windows
@@ -691,44 +690,39 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 			}), monitorNr);
 
 		} else {
-			// tile to half of a tiled window
-			for (let i = 0; i < currTileGroup.length; i++) {
-				let w = currTileGroup[i];
-				let wRect = w.get_frame_rect();
-	
-				if (!Util.rectHasPoint(wRect, mousePoint))
+			for (let i = 0; i < screenRects.length; i++) {
+				const rect = screenRects[i];
+				if (!Util.rectHasPoint(rect, mousePoint))
 					continue;
-	
-				isHoveringRect = true;
-	
-				let top = mouseY < wRect.y + wRect.height * .2;
-				let bottom = mouseY > wRect.y + wRect.height * .8;
-				let vertical = top || bottom;
-				let right = mouseX > wRect.x + wRect.width / 2;
-	
-				wRect = w.tiledRect;
+
+				const top = mouseY < rect.y + rect.height * .2;
+				const bottom = mouseY > rect.y + rect.height * .8;
+				const right = mouseX > rect.x + rect.width * .8;
+				const left = mouseX < rect.x + rect.width * .2;
+				const vertical = top || bottom;
+				const horizontal = left || right;
+
+				let _x = rect.x;
+				let _y = rect.y;
+				let _width = rect.width;
+				let _height = rect.height;
+
+				if (horizontal || vertical) {
+					_x = rect.x + (right && !vertical ? rect.width / 2 : 0);
+					_y = rect.y + (bottom ? rect.height / 2 : 0);
+					_width = rect.width / (vertical ? 1 : 2);
+					_height = rect.height / (vertical ? 2 : 1);
+				}
+
 				let r = new Meta.Rectangle({
-					x: wRect.x + (right && !vertical ? wRect.width / 2 : 0),
-					y: wRect.y + (bottom ? wRect.height / 2 : 0),
-					width: wRect.width / (vertical ? 1 : 2),
-					height: wRect.height / (vertical ? 2 : 1)
+					x: _x,
+					y: _y,
+					width: _width,
+					height: _height
 				});
 			
-				tilingPreviewRect.open(window, r, monitorNr, w);
-			}
-	
-			if (!isHoveringRect) {
-				// tile to freeScreenRect
-				for (let i = 0; i < freeScreenRects.length; i++) {
-					let r = freeScreenRects[i];
-					if (!Util.rectHasPoint(r, mousePoint))
-						continue;
-	
-					tilingPreviewRect.open(window, r, monitorNr);
-					return;
-				}
-				
-				tilingPreviewRect.close();
+				tilingPreviewRect.open(window, r, monitorNr, ((horizontal || vertical) && i >= freeScreenRects.length) ? currTileGroup[i - freeScreenRects.length] : null);
+				return;
 			}
 		}
 
