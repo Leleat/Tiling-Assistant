@@ -539,6 +539,10 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 		}
 	}
 
+	// Wayland workaround because some apps dont work properly (e. g. tiling Nautilius and then choosing firefox from the Dash)
+	if (Meta.is_wayland_compositor())
+		window.move_frame(false, rect.x, rect.y);
+		
 	// setting user_op to false helps with issues on terminals
 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
