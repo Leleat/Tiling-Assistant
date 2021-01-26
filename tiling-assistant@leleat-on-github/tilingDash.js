@@ -33,6 +33,7 @@ const MyTilingDashManager = GObject.registerClass(
 			this.freeScreenRect = freeScreenRect;
 			this.openWindows = [];
 			this.windowClones = [];
+			this.windowDashAlreadyDestroyed = false;
 			
 			this.highlightedApp = -1;
 			this.highlightedWindow = -1;
@@ -72,6 +73,7 @@ const MyTilingDashManager = GObject.registerClass(
 			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x);
 			this.animationDir.y = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
 			this.appDash.set_position(finalX + 400 * this.animationDir.x, this.appDash.y + 400 * this.animationDir.y);
+			this.appDash.set_opacity(0);
 			this.appDash.ease({
 				x: finalX,
 				y: finalY,
@@ -80,14 +82,14 @@ const MyTilingDashManager = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
-			this.highlightItem(0, false, false);
+			this.highlightItem(0, false, true);
 		}
 
 		_destroy(cancelTilingWithLayout = false) {
-			if (this.alreadyDestroying)
+			if (this.alreadyDestroyed)
 				return;
 
-			this.alreadyDestroying = true;
+			this.alreadyDestroyed = true;
 			main.layoutManager.disconnect(this.systemModalOpenedId);
 			main.popModal(this);
 
@@ -132,7 +134,6 @@ const MyTilingDashManager = GObject.registerClass(
 
 		// shade BG when the Dash is open for easier visibility
 		shadeBackground(tiledWindow, entireWorkArea) {
-			// clones to show above the shadeBG (which is just below the tiledWindow)
 			this.shadeBG = new St.Widget({
 				style: "background-color : black",
 				width: entireWorkArea.width,
@@ -172,22 +173,25 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 		}
 
-		highlightItem(idx, forceAppFocus = false, focusViaMouse = true) {
-			let focusWindows = this.thumbnailsAreFocused && !forceAppFocus;
-			let items = focusWindows ? this.windowDash.get_children() : this.appDash.get_children();
-			let oldIdx = focusWindows ? this.highlightedWindow : this.highlightedApp; 
+		highlightItem(idx, forceAppFocus = false, focusViaHover = false) {
+			if (this.thumbnailsAreFocused && forceAppFocus)
+				this.closeWindowDash();
+
+			let items = (this.thumbnailsAreFocused) ? this.windowDash.get_children() : this.appDash.get_children();
+			let oldIdx = (this.thumbnailsAreFocused) ? this.highlightedWindow : this.highlightedApp; 
 			idx = (idx + items.length) % items.length;
 			items[Math.max(0, oldIdx)].setHighlight(false);
 			items[idx].setHighlight(true);
 
-			if (focusWindows) {
+			if (this.thumbnailsAreFocused) {
 				this.highlightedWindow = idx;
+
 			} else {
 				this.highlightedApp = idx;
 				
-				if (focusViaMouse)
-					GLib.timeout_add(GLib.PRIORITY_DEFAULT, 800, () => {
-						if (idx == this.highlightedApp && items[idx].cachedWindows.length > 1)
+				if (focusViaHover)
+					GLib.timeout_add(GLib.PRIORITY_DEFAULT, 650, () => {
+						if (idx == this.highlightedApp && items[idx].cachedWindows.length > 1 && !this.alreadyDestroyed)
 							this.openWindowDash();
 
 						return GLib.SOURCE_REMOVE;
@@ -195,14 +199,15 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 		}
 
-		openWindowDash() {
+		openWindowDash(focusBackwards = false) {
 			let icons = this.appDash.get_children();
 			if (this.thumbnailsAreFocused || this.highlightedApp == -1 || this.highlightedApp >= icons.length)
 				return;
 				
 			if (this.windowDash) {
 				this.windowDash.destroy();
-				this.highlightedWindow = -1;   
+				this.highlightedWindow = -1;
+				this.windowDashAlreadyDestroyed = true;   
 			}
 
 			this.thumbnailsAreFocused = true;
@@ -227,7 +232,7 @@ const MyTilingDashManager = GObject.registerClass(
 				x = monitorRect.x + 20;
 
 			this.windowDash.set_position(x, y);
-			this.highlightItem(0);
+			this.highlightItem((focusBackwards) ? appIcon.cachedWindows.length - 1 : 0);
 
 			// animate opening
 			this.windowDash.set_opacity(0);
@@ -253,14 +258,17 @@ const MyTilingDashManager = GObject.registerClass(
 				appIcon.setArrowVisibility(false);
 
 			// animate closing
+			this.windowDashAlreadyDestroyed = false;
 			this.windowDash.ease({
 				opacity: 0,
 				duration: 150,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 				onComplete: () => {
-					this.highlightedWindow = -1;
-					this.windowDash.destroy();
-					this.windowDash = null;
+					if (this.windowDash && !this.windowDashAlreadyDestroyed) {
+						this.highlightedWindow = -1;
+						this.windowDash.destroy();
+						this.windowDash = null;
+					}
 				}
 			});
 		}
@@ -313,13 +321,13 @@ const MyTilingDashManager = GObject.registerClass(
 				case Clutter.KEY_Right:
 				case Clutter.KEY_d:
 				case Clutter.KEY_D:
-					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1, false, false);
+					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
 				case Clutter.KEY_a:
 				case Clutter.KEY_A:
-					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1, false, false);
+					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
@@ -364,10 +372,48 @@ const MyTilingDashManager = GObject.registerClass(
 
 		vfunc_scroll_event(scrollEvent) {
 			let direction = scrollEvent.direction;
-			if (direction == Clutter.ScrollDirection.UP || direction == Clutter.ScrollDirection.LEFT)
-				this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1);
-			else if (direction == Clutter.ScrollDirection.DOWN || direction == Clutter.ScrollDirection.RIGHT)
-				this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1);
+			// backward scroll through the appDash and windowDash
+			if (direction == Clutter.ScrollDirection.UP || direction == Clutter.ScrollDirection.LEFT) {
+				if (this.thumbnailsAreFocused) {
+					// scroll through window list
+					if (this.highlightedWindow > 0) {
+						this.highlightItem(this.highlightedWindow - 1);
+					
+					// beginning of windowDash reached -> switch to appDash
+					} else {
+						this.highlightItem(this.highlightedApp - 1, true);
+						if (this.appDash.get_children()[this.highlightedApp].cachedWindows.length > 1)
+							this.openWindowDash(true);
+					}
+				
+				} else {
+					// scroll through appDash; open windowDash, if necessary
+					this.highlightItem(this.highlightedApp - 1);
+					if (this.appDash.get_children()[this.highlightedApp].cachedWindows.length > 1)
+						this.openWindowDash(true);
+				}
+			
+			// forward scroll through the appDash and windowDash
+			} else if (direction == Clutter.ScrollDirection.DOWN || direction == Clutter.ScrollDirection.RIGHT) {
+				if (this.thumbnailsAreFocused) {
+					// end of windowDash reached -> switch to appDash
+					if (this.highlightedWindow == this.windowDash.get_children().length - 1) {
+						this.highlightItem(this.highlightedApp + 1, true);
+						if (this.appDash.get_children()[this.highlightedApp].cachedWindows.length > 1)
+							this.openWindowDash();
+					
+					// scroll windowDash
+					} else {
+						this.highlightItem(this.highlightedWindow + 1);
+					}
+				
+				// scroll through appDash; open windowDash, if necessary
+				} else {
+					this.highlightItem(this.highlightedApp + 1);
+					if (this.appDash.get_children()[this.highlightedApp].cachedWindows.length > 1)
+						this.openWindowDash();
+				}
+			}
 		}
 	}
 );
@@ -490,17 +536,14 @@ var MyTilingAppIcon = GObject.registerClass(
 			let prevHighlighted = dashManager.highlightedApp;
 
 			if (dashManager.thumbnailsAreFocused)
-				GLib.timeout_add(GLib.PRIORITY_DEFAULT, 300, () => {
-					if (prevHighlighted == this.idx || !this.isHovered)
-						return GLib.SOURCE_REMOVE;
-	
-					dashManager.closeWindowDash();
-					dashManager.highlightItem(this.idx, true);
+				GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
+					if (prevHighlighted != this.idx && this.isHovered)
+						dashManager.highlightItem(this.idx, true, true);
 
 					return GLib.SOURCE_REMOVE;
 				});
 			else
-				dashManager.highlightItem(this.idx);
+				dashManager.highlightItem(this.idx, false, true);
 		}
 	}
 );
