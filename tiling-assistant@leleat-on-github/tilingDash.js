@@ -80,7 +80,7 @@ const MyTilingDashManager = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
-			this.highlightItem(0);
+			this.highlightItem(0, false, false);
 		}
 
 		_destroy(cancelTilingWithLayout = false) {
@@ -172,7 +172,7 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 		}
 
-		highlightItem(idx, forceAppFocus = false) {
+		highlightItem(idx, forceAppFocus = false, focusViaMouse = true) {
 			let focusWindows = this.thumbnailsAreFocused && !forceAppFocus;
 			let items = focusWindows ? this.windowDash.get_children() : this.appDash.get_children();
 			let oldIdx = focusWindows ? this.highlightedWindow : this.highlightedApp; 
@@ -184,12 +184,14 @@ const MyTilingDashManager = GObject.registerClass(
 				this.highlightedWindow = idx;
 			} else {
 				this.highlightedApp = idx;
-				GLib.timeout_add(GLib.PRIORITY_DEFAULT, 800, () => {
-					if (idx == this.highlightedApp && items[idx].cachedWindows.length > 1)
-						this.openWindowDash();
+				
+				if (focusViaMouse)
+					GLib.timeout_add(GLib.PRIORITY_DEFAULT, 800, () => {
+						if (idx == this.highlightedApp && items[idx].cachedWindows.length > 1)
+							this.openWindowDash();
 
-					return GLib.SOURCE_REMOVE;
-				});
+						return GLib.SOURCE_REMOVE;
+					});
 			}
 		}
 
@@ -311,13 +313,13 @@ const MyTilingDashManager = GObject.registerClass(
 				case Clutter.KEY_Right:
 				case Clutter.KEY_d:
 				case Clutter.KEY_D:
-					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1);
+					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) + 1, false, false);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Left:
 				case Clutter.KEY_a:
 				case Clutter.KEY_A:
-					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1);
+					this.highlightItem((this.thumbnailsAreFocused ? this.highlightedWindow : this.highlightedApp) - 1, false, false);
 					return Clutter.EVENT_STOP;
 
 				case Clutter.KEY_Up:
