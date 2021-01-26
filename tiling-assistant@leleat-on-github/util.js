@@ -30,16 +30,17 @@ function rectHasPoint(rect, point) {
 // they implemented it in a way, which gives the top and bottom rect dimensions higher priority than the left and right rect.
 // I've simplified it a bit and added the option to do it the other way around depending on the monitor orientation.
 // additionally, ignore small rects since some windows (some Terminals) dont freely resize
-function rectDiff (rectA, rectB, ignoreMargin = 35) {
-	if (!rectA || !rectB)
-		return [];
-
+function rectDiff (rectA, rectB, ignoreMargin = 35, preferVertical = null) {
 	let resultRects = [];
+	if (!rectA || !rectB)
+		return resultRects;
+
 	let displayRect = global.display.get_monitor_geometry(global.display.get_current_monitor());
-	let wideScreen = displayRect.width > displayRect.height * .9; // put more weight on width
+	if (preferVertical === null)
+		preferVertical = displayRect.width > displayRect.height * .9; // put more weight on width
 
 	// prioritize side rects
-	if (wideScreen) {
+	if (preferVertical) {
 		// left rect
 		let leftRect_width = rectB.x - rectA.x;
 		if (leftRect_width > ignoreMargin && rectA.height > ignoreMargin)

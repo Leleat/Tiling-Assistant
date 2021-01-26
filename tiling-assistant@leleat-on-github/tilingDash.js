@@ -213,13 +213,14 @@ const MyTilingDashManager = GObject.registerClass(
 			this.add_child(this.windowDash);
 
 			// center under/above the highlighted appIcon
-			let x = appIcon.get_transformed_position()[0] + appIcon.width / 2 - this.windowDash.width / 2;
+			let x = this.appDash.x + appIcon.x + appIcon.width / 2 - this.windowDash.width / 2;
 			let y = (appIcon.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
-
+			
 			// move windowDash into the monitor (with a 20px margin), if it's (partly) outside
 			let monitorRect = global.display.get_monitor_geometry(this.monitorNr);
-			if (x + this.windowDash.width + 20 > monitorRect.width)
-				x = monitorRect.width - 20 - this.windowDash.width;
+			if (x + this.windowDash.width + 20 > monitorRect.x + monitorRect.width) 
+				x = monitorRect.x + monitorRect.width - 20 - this.windowDash.width;
+			
 			if (x + 20 < monitorRect.x)
 				x = monitorRect.x + 20;
 
