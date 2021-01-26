@@ -199,8 +199,13 @@ const MyPrefsWidget = new GObject.Class({
             }
             
 			let [success, contents] = file.load_contents(null);	
-			if (!success || !contents.length)
+			if (!success)
 				return null;
+
+			if (!contents.length) {
+				GLib.free(contents);
+				return null;
+			}
 
 			// reset layout's entries' text
 			for (let i = 0; i < 10; i++) {

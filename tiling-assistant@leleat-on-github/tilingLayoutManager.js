@@ -123,6 +123,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			let [success, contents] = layoutFile.load_contents(null);
 			if (success) {
 				let layouts = JSON.parse(contents);
+				GLib.free(contents);
 				if (layouts.length && idx < layouts.length)
 					return layouts[idx];
 			}

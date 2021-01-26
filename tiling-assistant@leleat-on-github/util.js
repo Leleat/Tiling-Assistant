@@ -1,7 +1,7 @@
 "use strict";
 
 const {main} = imports.ui;
-const {Clutter, Gio, GLib, Meta, St, Shell} = imports.gi;
+const {Clutter, Meta, Shell, St} = imports.gi;
 
 const MyExtension = imports.misc.extensionUtils.getCurrentExtension().imports.extension;
 

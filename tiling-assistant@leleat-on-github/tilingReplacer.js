@@ -1,3 +1,5 @@
+"use strict";
+
 const {main} = imports.ui;
 const {Clutter, GObject, Meta, St} = imports.gi;
 
