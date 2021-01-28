@@ -45,12 +45,12 @@ const MyTilingDashManager = GObject.registerClass(
 			this.windowDash = null;
 
 			// filter the openWindows array, so that no duplicate apps are shown
-			let winTracker = Shell.WindowTracker.get_default();
-			let openApps = openWindows.map(w => winTracker.get_window_app(w));
+			const winTracker = Shell.WindowTracker.get_default();
+			const openApps = openWindows.map(w => winTracker.get_window_app(w));
 			this.openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) === pos);
 
-			let activeWS = global.workspace_manager.get_active_workspace();
-			let entireWorkArea = activeWS.get_work_area_all_monitors();
+			const activeWS = global.workspace_manager.get_active_workspace();
+			const entireWorkArea = activeWS.get_work_area_all_monitors();
 
 			this.set_position(entireWorkArea.x, entireWorkArea.y - main.panel.height);
 			this.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
@@ -62,14 +62,14 @@ const MyTilingDashManager = GObject.registerClass(
 			this.appDash = new MyTilingDash(this, openApps.filter((val, idx) => openApps.indexOf(val) === idx), MyTilingAppIcon);
 			this.add_child(this.appDash);
 			// scale Dash, if it's too big to fit the free screen space
-			let finalScale = (this.appDash.width > freeScreenRect.width - 50) ? (freeScreenRect.width - 50) / this.appDash.width : 1;
+			const finalScale = (this.appDash.width > freeScreenRect.width - 50) ? (freeScreenRect.width - 50) / this.appDash.width : 1;
 			this.appDash.set_scale(finalScale, finalScale);
 			this.appDash.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.appDash.width * finalScale / 2,
 					freeScreenRect.y + freeScreenRect.height / 2 - this.appDash.height * finalScale / 2);
 
 			// animate opening of appDash
-			let finalX = this.appDash.x;
-			let finalY = this.appDash.y;
+			const finalX = this.appDash.x;
+			const finalY = this.appDash.y;
 			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x);
 			this.animationDir.y = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
 			this.appDash.set_position(finalX + 400 * this.animationDir.x, this.appDash.y + 400 * this.animationDir.y);
@@ -109,8 +109,8 @@ const MyTilingDashManager = GObject.registerClass(
 			});
 
 			if (this.thumbnailsAreFocused) {
-				let finalX = this.windowDash.x + 200 * this.animationDir.x;
-				let finalY = this.windowDash.y + 200 * this.animationDir.y;
+				const finalX = this.windowDash.x + 200 * this.animationDir.x;
+				const finalY = this.windowDash.y + 200 * this.animationDir.y;
 				this.windowDash.ease({
 					x: finalX,
 					y: finalY,
@@ -120,8 +120,8 @@ const MyTilingDashManager = GObject.registerClass(
 				});
 			}
 
-			let finalX2 = this.appDash.x + 200 * this.animationDir.x;
-			let finalY2 = this.appDash.y + 200 * this.animationDir.y;
+			const finalX2 = this.appDash.x + 200 * this.animationDir.x;
+			const finalY2 = this.appDash.y + 200 * this.animationDir.y;
 			this.appDash.ease({
 				x: finalX2,
 				y: finalY2,
@@ -148,8 +148,8 @@ const MyTilingDashManager = GObject.registerClass(
 						continue;
 
 					if (w !== tiledWindow) {
-						let wA = w.get_compositor_private();
-						let clone = new Clutter.Clone({
+						const wA = w.get_compositor_private();
+						const clone = new Clutter.Clone({
 							source: wA,
 							x: wA.x, y: wA.y
 						});
@@ -161,8 +161,8 @@ const MyTilingDashManager = GObject.registerClass(
 
 				// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
 				// signal used as a workaround; not sure if this is the right/best signal to use
-				let tiledWindowActor = tiledWindow.get_compositor_private();
-				let sID = tiledWindowActor.connect("queue-redraw", () => {
+				const tiledWindowActor = tiledWindow.get_compositor_private();
+				const sID = tiledWindowActor.connect("queue-redraw", () => {
 					global.window_group.insert_child_below(this.shadeBG, tiledWindowActor);
 					tiledWindowActor.disconnect(sID);
 				});
@@ -177,8 +177,8 @@ const MyTilingDashManager = GObject.registerClass(
 			if (this.thumbnailsAreFocused && forceAppFocus)
 				this.closeWindowDash();
 
-			let items = (this.thumbnailsAreFocused) ? this.windowDash.get_children() : this.appDash.get_children();
-			let oldIdx = (this.thumbnailsAreFocused) ? this.highlightedWindow : this.highlightedApp;
+			const items = (this.thumbnailsAreFocused) ? this.windowDash.get_children() : this.appDash.get_children();
+			const oldIdx = (this.thumbnailsAreFocused) ? this.highlightedWindow : this.highlightedApp;
 			idx = (idx + items.length) % items.length;
 			items[Math.max(0, oldIdx)].setHighlight(false);
 			items[idx].setHighlight(true);
@@ -200,7 +200,7 @@ const MyTilingDashManager = GObject.registerClass(
 		}
 
 		openWindowDash(focusBackwards = false) {
-			let icons = this.appDash.get_children();
+			const icons = this.appDash.get_children();
 			if (this.thumbnailsAreFocused || this.highlightedApp === -1 || this.highlightedApp >= icons.length)
 				return;
 
@@ -212,7 +212,7 @@ const MyTilingDashManager = GObject.registerClass(
 
 			this.thumbnailsAreFocused = true;
 
-			let appIcon = icons[this.highlightedApp];
+			const appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length === 1)
 				appIcon.setArrowVisibility(true);
 
@@ -224,7 +224,7 @@ const MyTilingDashManager = GObject.registerClass(
 			let y = (appIcon.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
 
 			// move windowDash into the monitor (with a 20px margin), if it's (partly) outside
-			let monitorRect = global.display.get_monitor_geometry(this.monitorNr);
+			const monitorRect = global.display.get_monitor_geometry(this.monitorNr);
 			if (x + this.windowDash.width + 20 > monitorRect.x + monitorRect.width)
 				x = monitorRect.x + monitorRect.width - 20 - this.windowDash.width;
 
@@ -249,11 +249,11 @@ const MyTilingDashManager = GObject.registerClass(
 
 			this.thumbnailsAreFocused = false;
 
-			let icons = this.appDash.get_children();
+			const icons = this.appDash.get_children();
 			if (this.highlightedApp >= icons.length)
 				return;
 
-			let appIcon = icons[this.highlightedApp];
+			const appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length === 1)
 				appIcon.setArrowVisibility(false);
 
@@ -284,10 +284,10 @@ const MyTilingDashManager = GObject.registerClass(
 
 			// halve the freeScreenRect when holding Shift or Alt
 			if (!isTilingViaLayout) {
-				let event = Clutter.get_current_event();
-				let modifiers = event ? event.get_state() : 0;
-				let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-				let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+				const event = Clutter.get_current_event();
+				const modifiers = event ? event.get_state() : 0;
+				const isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+				const isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 
 				if (isAltPressed) {
 					// prefer vertical tiling more (because of horizontal screen orientation)
@@ -346,7 +346,7 @@ const MyTilingDashManager = GObject.registerClass(
 				case Clutter.KEY_KP_Enter:
 				case Clutter.KEY_ISO_Enter:
 				case Clutter.KEY_space:
-					let appIcon = this.appDash.get_children()[this.highlightedApp];
+					const appIcon = this.appDash.get_children()[this.highlightedApp];
 					this.activate(appIcon.cachedWindows[this.thumbnailsAreFocused ? this.highlightedWindow : 0]);
 					return Clutter.EVENT_STOP;
 
@@ -365,7 +365,7 @@ const MyTilingDashManager = GObject.registerClass(
 
 		vfunc_button_press_event(buttonEvent) {
 			if (buttonEvent.button === Clutter.BUTTON_MIDDLE) {
-				let appIcon = this.appDash.get_children()[this.highlightedApp];
+				const appIcon = this.appDash.get_children()[this.highlightedApp];
 				this.activate(appIcon.cachedWindows[this.thumbnailsAreFocused ? this.highlightedWindow : 0]);
 			} else {
 				this._destroy(true);
@@ -373,7 +373,7 @@ const MyTilingDashManager = GObject.registerClass(
 		}
 
 		vfunc_scroll_event(scrollEvent) {
-			let direction = scrollEvent.direction;
+			const direction = scrollEvent.direction;
 			// backward scroll through the appDash and windowDash
 			if (direction === Clutter.ScrollDirection.UP || direction === Clutter.ScrollDirection.LEFT) {
 				if (this.thumbnailsAreFocused) {
@@ -432,7 +432,7 @@ var MyTilingDash = GObject.registerClass(
 			this.dashManager = dashManager;
 
 			allItems.forEach((item, idx) => {
-				let itemIcon = new itemIconConstructor(this, item, idx);
+				const itemIcon = new itemIconConstructor(this, item, idx);
 				this.add_child(itemIcon);
 			});
 		}
@@ -460,9 +460,9 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.connect("enter-event", this.onItemEnter.bind(this));
 			this.connect("leave-event", () => this.isHovered = false);
 
-			let allWindows = Util.getOpenWindows();
-			let appWindows = allWindows.filter(w => Shell.WindowTracker.get_default().get_window_app(w) === app);
-			let tiledWindow = dash.dashManager.tiledWindow;
+			const allWindows = Util.getOpenWindows();
+			const appWindows = allWindows.filter(w => Shell.WindowTracker.get_default().get_window_app(w) === app);
+			const tiledWindow = dash.dashManager.tiledWindow;
 			this.cachedWindows = appWindows.filter(w => {
 				if (MyExtension.tilingLayoutManager.isTilingViaLayout) {
 					if (!MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
@@ -475,20 +475,20 @@ var MyTilingAppIcon = GObject.registerClass(
 				return true;
 			});
 
-			let monitorScale = dash.dashManager.monitorScale;
-			let buttonSize = (MyExtension.settings.get_int("icon-size") + MyExtension.settings.get_int("icon-margin")) * monitorScale;
+			const monitorScale = dash.dashManager.monitorScale;
+			const buttonSize = (MyExtension.settings.get_int("icon-size") + MyExtension.settings.get_int("icon-margin")) * monitorScale;
 			this.set_size(buttonSize, buttonSize);
 
-			let monitorRect = global.display.get_monitor_geometry(dash.dashManager.monitorNr);
-			let previewSize = dash.dashManager.windowPreviewSize;
-			let freeScreenRect = dash.dashManager.freeScreenRect;
+			const monitorRect = global.display.get_monitor_geometry(dash.dashManager.monitorNr);
+			const previewSize = dash.dashManager.windowPreviewSize;
+			const freeScreenRect = dash.dashManager.freeScreenRect;
 			this.arrowIsAbove = freeScreenRect.y + freeScreenRect.height / 2 + previewSize >= monitorRect.height - previewSize;
 
 			// add a top and bottom arrow to the appIcon.
 			// one of them will be shown depending on the Dash pos
 			//////////////////////
 			// top arrow
-			let topContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
+			const topContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
 			this.topArrow = new St.DrawingArea({
 				style: "color: white",
 				width: 8 * monitorScale, height: 4 * monitorScale,
@@ -505,7 +505,7 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.iconBin.set_child(this.icon);
 
 			// bottom arrow
-			let bottomContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
+			const bottomContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
 			this.bottomArrow = new St.DrawingArea({
 				style: "color: white",
 				width: 8 * monitorScale, height: 4 * monitorScale,
@@ -520,7 +520,7 @@ var MyTilingAppIcon = GObject.registerClass(
 		}
 
 		setArrowVisibility(visible) {
-			let arrow = this.arrowIsAbove ? this.topArrow : this.bottomArrow;
+			const arrow = this.arrowIsAbove ? this.topArrow : this.bottomArrow;
 			arrow.set_opacity(visible ? 255 : 0);
 		}
 
@@ -533,8 +533,8 @@ var MyTilingAppIcon = GObject.registerClass(
 
 		onItemEnter() {
 			this.isHovered = true;
-			let dashManager = this.dash.dashManager;
-			let prevHighlighted = dashManager.highlightedApp;
+			const dashManager = this.dash.dashManager;
+			const prevHighlighted = dashManager.highlightedApp;
 
 			if (dashManager.thumbnailsAreFocused)
 				GLib.timeout_add(GLib.PRIORITY_DEFAULT, 250, () => {
@@ -565,7 +565,7 @@ var MyTilingWindowIcon = GObject.registerClass(
 			this.connect("button-press-event", () => dash.dashManager.activate(window));
 			this.connect("enter-event", () => dash.dashManager.highlightItem(idx));
 
-			let previewSize = dash.dashManager.windowPreviewSize;
+			const previewSize = dash.dashManager.windowPreviewSize;
 			this.icon = new St.Widget({layout_manager: new Clutter.BinLayout()});
 			this.icon.add_actor(altTab._createWindowClone(window.get_compositor_private(), previewSize));
 			this.icon.set_size(previewSize, previewSize);

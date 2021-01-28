@@ -22,8 +22,8 @@ function replaceTiledWindow(window) {
 const MyTilingReplacer = GObject.registerClass(
 	class MyTilingReplacer extends St.Widget {
 		_init(window) {
-			let activeWS = global.workspace_manager.get_active_workspace();
-			let entireWorkArea = activeWS.get_work_area_all_monitors();
+			const activeWS = global.workspace_manager.get_active_workspace();
+			const entireWorkArea = activeWS.get_work_area_all_monitors();
 			
 			super._init({
 				reactive: true,
@@ -123,8 +123,8 @@ const MyTilingReplacer = GObject.registerClass(
 			const openWindows = Util.getOpenWindows();
 			const currTileGroup = Util.getTopTileGroup(openWindows, (openWindows[0].isTiled) ? false : true);
 			const freeScreenRects = Util.getFreeScreenRects(currTileGroup);
+			const windowCount = currTileGroup.length;
 			this.rects = currTileGroup.map(w => w.tiledRect.copy()).concat(freeScreenRects);
-			let windowCount = currTileGroup.length;
 			let tmpRects = [];
 			
 			switch (this.currMode) {
@@ -135,8 +135,8 @@ const MyTilingReplacer = GObject.registerClass(
 				// split rects vertically
 				case MODE.VERTICAL:
 					for (let i = 0; i < this.rects.length; i++) {
-						let r = this.rects[i];
-						let r1 = new Meta.Rectangle({
+						const r = this.rects[i];
+						const r1 = new Meta.Rectangle({
 							x: r.x,
 							y: r.y,
 							width: r.width,
@@ -144,7 +144,7 @@ const MyTilingReplacer = GObject.registerClass(
 						});
 						tmpRects.push(r1);
 
-						let r2 = new Meta.Rectangle({
+						const r2 = new Meta.Rectangle({
 							x: r.x,
 							y: r.y + r.height / 2,
 							width: r.width,
@@ -163,8 +163,8 @@ const MyTilingReplacer = GObject.registerClass(
 				// split rects horizontally
 				case MODE.HORIZONTAL:
 					for (let i = 0; i < this.rects.length; i++) {
-						let r = this.rects[i];
-						let r1 = new Meta.Rectangle({
+						const r = this.rects[i];
+						const r1 = new Meta.Rectangle({
 							x: r.x,
 							y: r.y,
 							width: r.width / 2,
@@ -172,7 +172,7 @@ const MyTilingReplacer = GObject.registerClass(
 						});
 						tmpRects.push(r1);
 
-						let r2 = new Meta.Rectangle({
+						const r2 = new Meta.Rectangle({
 							x: r.x + r.width / 2,
 							y: r.y,
 							width: r.width / 2,
@@ -191,7 +191,7 @@ const MyTilingReplacer = GObject.registerClass(
 
 			// sort left -> right and top -> bottom
 			this.rects = tmpRects.sort((r1, r2) => {
-				let xPos = r1.x - r2.x;
+				const xPos = r1.x - r2.x;
 				if (xPos)
 					return xPos;
 
@@ -215,7 +215,7 @@ const MyTilingReplacer = GObject.registerClass(
 		}
 
 		vfunc_key_press_event(keyEvent) {
-			if (keyEvent.keyval ===  65507 || keyEvent.keyval === 65508) { // ctrl
+			if (keyEvent.keyval ===  65507 || keyEvent.keyval === 65508) { // left and right ctrl
 				if (this.currMode === MODE.FULL)
 					this.currMode = MODE.VERTICAL;
 				else if (this.currMode === MODE.VERTICAL)
@@ -226,8 +226,8 @@ const MyTilingReplacer = GObject.registerClass(
 				this.createRectPreviews();
 
 			} else {
-				let idx = this.labelText.indexOf(keyEvent.unicode_value);
-				let rect = this.rects[idx];
+				const idx = this.labelText.indexOf(keyEvent.unicode_value);
+				const rect = this.rects[idx];
 				if (idx !== -1 && idx < this.rects.length) {
 					if (rect.window && rect.window !== this.window) // halve old window
 						Util.tileWindow(rect.window, Util.rectDiff(rect.window.tiledRect, rect)[0], false);

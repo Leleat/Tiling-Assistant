@@ -18,38 +18,38 @@ var MyTilingPreviewRect = GObject.registerClass(
 		}
 
 		open(window, tileRect, monitorIndex, windowToSplit = null) {
-			let windowActor = window.get_compositor_private();
+			const windowActor = window.get_compositor_private();
 			if (!windowActor)
 				return;
 
 			if (this.rect && this.rect.equal(tileRect))
 				return;
 
-			let changeMonitor = this.monitorIndex == -1 || this.monitorIndex != monitorIndex;
+			const changeMonitor = this.monitorIndex === -1 || this.monitorIndex !== monitorIndex;
 			this.monitorIndex = monitorIndex;
 			this.rect = tileRect;
 			this.windowToSplit = windowToSplit; // window which is being hovered when holding ctrl while DNDing
 
-			let monitor = main.layoutManager.monitors[monitorIndex];
+			const monitor = main.layoutManager.monitors[monitorIndex];
 
 			// update style class
-			let styles = ["tile-preview"];
-			if (this.monitorIndex == main.layoutManager.primaryIndex)
+			const styles = ["tile-preview"];
+			if (this.monitorIndex === main.layoutManager.primaryIndex)
 				styles.push("on-primary");
-			if (this.rect.x == monitor.x)
+			if (this.rect.x === monitor.x)
 				styles.push("tile-preview-left");
-			if (this.rect.x + this.rect.width == monitor.x + monitor.width)
+			if (this.rect.x + this.rect.width === monitor.x + monitor.width)
 				styles.push("tile-preview-right");
 			this.style_class = styles.join(" ");
 
 			if (!this.showing || changeMonitor) {
-				let monitorRect = new Meta.Rectangle({
+				const monitorRect = new Meta.Rectangle({
 					x: monitor.x,
 					y: monitor.y,
 					width: monitor.width,
 					height: monitor.height
 				});
-				let [, rect] = window.get_frame_rect().intersect(monitorRect);
+				const [, rect] = window.get_frame_rect().intersect(monitorRect);
 				this.set_size(rect.width, rect.height);
 				this.set_position(rect.x, rect.y);
 				this.opacity = 0;
