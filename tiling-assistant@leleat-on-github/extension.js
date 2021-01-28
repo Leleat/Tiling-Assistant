@@ -179,6 +179,11 @@ function disable() {
 };
 
 function onMyTilingShortcutPressed(shortcutName) {
+	if (["layout8", "layout9", "layout10"].includes(shortcutName)) { // open apps in a tiled layout
+		tilingLayoutManager.openAppsInLayout(Number.parseInt(shortcutName.substring(6)) - 1);
+		return; 
+	}
+
 	let window = global.display.focus_window;
 	if (!window)
 		return;
@@ -206,9 +211,6 @@ function onMyTilingShortcutPressed(shortcutName) {
 		case "layout5":
 		case "layout6":
 		case "layout7":
-		case "layout8":
-		case "layout9":
-		case "layout10":
 			let idx = Number.parseInt(shortcutName.substring(6)) - 1;
 			tilingLayoutManager.startTilingToLayout(idx, window.get_monitor());
 			return;

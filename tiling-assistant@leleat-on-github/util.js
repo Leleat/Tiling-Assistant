@@ -738,9 +738,12 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 	}
 };
 
-function openAppTiled(app, rect) {
+function openAppTiled(app, rect, appsForLayouting = [], rectsForLayouting = []) {
+	if (!app) // when layouting
+		return main.notify("Tiling Assistant Extension", "App-to-tile isn't installed.");
+
 	if (!app.can_open_new_window())
-		return;
+		return main.notify("Tiling Assistant Extension", `${app.get_name()} can't open a new window.`);
 
 	let wCreatedId = global.display.connect("window-created", (src, window) => {
 		// here we try to ignore loading screens; different apps use different windows for loading screens:
@@ -762,7 +765,11 @@ function openAppTiled(app, rect) {
 		let wActor = window.get_compositor_private();
 		let firstFrameID = wActor.connect("first-frame", () => {
 			wActor.disconnect(firstFrameID);
-			tileWindow(window, rect);
+
+			let isLayouting = appsForLayouting.length && rectsForLayouting.length;
+			tileWindow(window, rect, !isLayouting);
+			if (isLayouting)
+				openAppTiled(appsForLayouting.shift(), rectsForLayouting.shift(), appsForLayouting, rectsForLayouting);
 		});
 	});
 

@@ -1,7 +1,7 @@
 "use strict";
 
 const {main} = imports.ui;
-const {Clutter, Gio, GLib, GObject, Meta, St} = imports.gi;
+const {Clutter, Gio, GLib, GObject, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -23,23 +23,25 @@ var MyTilingLayoutManager = GObject.registerClass(
 		}
 
 		// called via keybinding of the respective layout
+		// opens appDash to tile apps in a layout
 		startTilingToLayout(layoutIdx, monitorNr) {
-			let openWindows = Util.getOpenWindows();
+			const openWindows = Util.getOpenWindows();
 			if (!openWindows.length)
 				return;
-			
-			let layout = this.getLayout(layoutIdx);
-			if (!layout || !layout.length || !this.layoutIsValid(layout))
+
+			const [rectLayout, ] = this.getLayout(layoutIdx, false);
+			if (!rectLayout || !rectLayout.length || !this.layoutIsValid(rectLayout))
 				return;
-				
+
 			this.isTilingViaLayout = true;
 			this.cachedOpenWindows = openWindows;
 			this.monitorNr = monitorNr;
+			this.currentLayout = [];
 
 			// turn rect objects (gotten from .json) into Meta.Rectangles
 			// and scale rects to workArea size
-			let workArea = this.cachedOpenWindows[0].get_work_area_current_monitor();
-			layout.forEach(r => {
+			const workArea = this.cachedOpenWindows[0].get_work_area_current_monitor();
+			rectLayout.forEach(r => {
 				this.currentLayout.push(new Meta.Rectangle({
 					x: workArea.x + r.x * workArea.width,
 					y: workArea.y + r.y * workArea.height,
@@ -48,17 +50,41 @@ var MyTilingLayoutManager = GObject.registerClass(
 				}));
 			});
 
-			let currentLayoutRect = this.currentLayout.shift();
+			const currentLayoutRect = this.currentLayout.shift();
 			this.createTilingPreview(currentLayoutRect);
-	
 			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
+		}
+
+		// called via keybinding of the respective layout (last layout)
+		// automatically opens a predefined list of apps in a layout
+		openAppsInLayout(layoutIdx) {
+			const [rectLayout, appList] = this.getLayout(layoutIdx, true);
+			if (!rectLayout || !rectLayout.length || !this.layoutIsValid(rectLayout))
+				return;
+
+			this.currentLayout = [];
+
+			// turn rect objects (gotten from .json) into Meta.Rectangles
+			// and scale rects to workArea size
+			const workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
+			rectLayout.forEach(r => {
+				this.currentLayout.push(new Meta.Rectangle({
+					x: workArea.x + r.x * workArea.width,
+					y: workArea.y + r.y * workArea.height,
+					width: r.width * workArea.width,
+					height: r.height * workArea.height,
+				}));
+			});
+
+			const currentLayoutRect = this.currentLayout.shift();
+			Util.openAppTiled(appList.shift(), currentLayoutRect, appList, this.currentLayout);
 		}
 
 		// called after a window was tiled with an appIcon from tilingDash.js
 		onWindowTiled(tiledWindow) {
 			if (!this.isTilingViaLayout)
 				return;
-			
+
 			// finish after final layout rect
 			if (!this.currentLayout.length) {
 				this.endTilingViaLayout();
@@ -72,7 +98,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 				return;
 			}
 
-			let currentLayoutRect = this.currentLayout.shift();
+			const currentLayoutRect = this.currentLayout.shift();
 			this.createTilingPreview(currentLayoutRect);
 
 			TilingDash.openDash(this.cachedOpenWindows, tiledWindow, this.monitorNr, currentLayoutRect);
@@ -110,46 +136,54 @@ var MyTilingLayoutManager = GObject.registerClass(
 			});
 		}
 
-		getLayout(idx) {
-			let path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
-			let layoutFile = Gio.File.new_for_path(path);
-	
+		getLayout(idx, tileWithAppList) {
+			const path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+			const layoutFile = Gio.File.new_for_path(path);
+
 			try {
 				layoutFile.create(Gio.FileCreateFlags.NONE, null);
 			} catch (e) {
 
 			}
-	
-			let [success, contents] = layoutFile.load_contents(null);
+
+			const [success, contents] = layoutFile.load_contents(null);
 			if (success) {
-				let layouts = JSON.parse(contents);
+				const layouts = JSON.parse(contents);
 				GLib.free(contents);
+
+				const appSystem = Shell.AppSystem.get_default();
+				const rectLayout = (tileWithAppList) ? layouts[idx].map(element => element[0]) : layouts[idx];
+				const appList = (tileWithAppList) ? layouts[idx].map(element => {
+					let desktopAppInfo = appSystem.get_installed().find(appInfo => appInfo.get_name() === element[1]);
+					return appSystem.lookup_app(desktopAppInfo.get_id());
+				}) : null;
+
 				if (layouts.length && idx < layouts.length)
-					return layouts[idx];
+					return [rectLayout, appList];
 			}
-	
-			return null;
+
+			return [];
 		}
 
-		layoutIsValid(layout) {
+		layoutIsValid(layout, tileWithAppList) {
 			// calculate the surface area of an overlap
 			// 0 means no overlap
-			let rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) 
+			const rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
 					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
-	
+
 			for (let i = 0, len = layout.length; i < len; i++) {
-				let r = layout[i];
-	
+				const r = (!tileWithAppList) ? layout[i] : layout[i][0];
+
 				// a rect is/reaches outside of screen (i. e. > 1)
 				if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
 					return false;
-	
+
 				for (let j = i + 1; j < len; j++) {
 					if (rectsOverlap(r, layout[j]))
 						return false;
 				}
 			}
-	
+
 			return true;
 		}
 	}
