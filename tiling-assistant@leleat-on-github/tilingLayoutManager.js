@@ -24,7 +24,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 
 		// called via keybinding of the respective layout
 		// opens appDash to tile apps in a layout
-		startTilingToLayout(layoutIdx, monitorNr) {
+		startTilingToLayout(layoutIdx) {
 			const openWindows = Util.getOpenWindows();
 			if (!openWindows.length)
 				return;
@@ -35,7 +35,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 
 			this.isTilingViaLayout = true;
 			this.cachedOpenWindows = openWindows;
-			this.monitorNr = monitorNr;
+			this.monitorNr = openWindows[0].get_monitor();
 			this.currentLayout = [];
 
 			// turn rect objects (gotten from .json) into Meta.Rectangles
@@ -55,7 +55,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
 		}
 
-		// called via keybinding of the respective layout (last layout)
+		// called via keybinding of the respective layout (last few layouts)
 		// automatically opens a predefined list of apps in a layout
 		openAppsInLayout(layoutIdx) {
 			const [rectLayout, appList] = this.getLayout(layoutIdx, true);
@@ -154,7 +154,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 				const appSystem = Shell.AppSystem.get_default();
 				const rectLayout = (tileWithAppList) ? layouts[idx].map(element => element[0]) : layouts[idx];
 				const appList = (tileWithAppList) ? layouts[idx].map(element => {
-					let desktopAppInfo = appSystem.get_installed().find(appInfo => appInfo.get_name() === element[1]);
+					const desktopAppInfo = appSystem.get_installed().find(appInfo => appInfo.get_name() === element[1]);
 					return appSystem.lookup_app(desktopAppInfo.get_id());
 				}) : null;
 
@@ -165,14 +165,14 @@ var MyTilingLayoutManager = GObject.registerClass(
 			return [];
 		}
 
-		layoutIsValid(layout, tileWithAppList) {
+		layoutIsValid(layout) {
 			// calculate the surface area of an overlap
 			// 0 means no overlap
 			const rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
 					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 
 			for (let i = 0, len = layout.length; i < len; i++) {
-				const r = (!tileWithAppList) ? layout[i] : layout[i][0];
+				const r = layout[i];
 
 				// a rect is/reaches outside of screen (i. e. > 1)
 				if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)

@@ -59,8 +59,11 @@ function enable() {
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
 
 	// tiling keybindings
-	this.keyBindings = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
-			"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
+	this.keyBindings = ["toggle-dash", "replace-window", "tile-maximize",
+			"tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half",
+			"tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+			"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"
+	];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(
 			key,
@@ -179,113 +182,96 @@ function disable() {
 };
 
 function onMyTilingShortcutPressed(shortcutName) {
-	if (["layout8", "layout9", "layout10"].includes(shortcutName)) { // open apps in a tiled layout
+	// toggle wether appDash will be opened when a window is tiled and there is free screen space
+	if (shortcutName === "toggle-dash") {
+		const toggleTo = !settings.get_boolean("enable-dash");
+		settings.set_boolean("enable-dash", toggleTo);
+		main.notify("Tiling Assistant", "Dash " + (toggleTo ? "enabled" : "was disabled"));
+
+	// open the appDash consecutively to tile to a layout
+	} else if (["layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7"].includes(shortcutName)) {
+		tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(6)) - 1);
+
+	// automatically open apps in a tiled layout
+	} else if (["layout8", "layout9", "layout10"].includes(shortcutName)) {
 		tilingLayoutManager.openAppsInLayout(Number.parseInt(shortcutName.substring(6)) - 1);
-		return; 
-	}
 
-	let window = global.display.focus_window;
-	if (!window)
-		return;
+	// tile window to another tiled window / freeScreenRect
+	} else if (shortcutName === "replace-window") {
+		TilingReplacer.replaceTiledWindow();
 
-	let rect;
-	let workArea = window.get_work_area_current_monitor();
-	let currTileGroup = Util.getTopTileGroup();
-	let freeScreenRects = Util.getFreeScreenRects(currTileGroup);
-	let screenRects = [];
-	currTileGroup.forEach(w => screenRects.push(w.tiledRect.copy()));
-	screenRects = freeScreenRects.concat(screenRects);
-
-	switch (shortcutName) {
-		case "toggle-dash":
-			let toggleTo = !settings.get_boolean("enable-dash");
-			settings.set_boolean("enable-dash", toggleTo);
-
-			main.notify("Tiling Assistant", "Dash " + (toggleTo ? 'enabled' : 'was disabled'));
-			return;
-
-		case "layout1":
-		case "layout2":
-		case "layout3":
-		case "layout4":
-		case "layout5":
-		case "layout6":
-		case "layout7":
-			let idx = Number.parseInt(shortcutName.substring(6)) - 1;
-			tilingLayoutManager.startTilingToLayout(idx, window.get_monitor());
-			return;
-
-		case "tile-maximize":
-			rect = workArea;
-			break;
-			
-		case "tile-top-half":
-			rect = Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects);
-			break;
-
-		case "tile-left-half":
-			rect = Util.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects);
-			break;
-
-		case "tile-right-half":
-			rect = Util.getTileRectForSide(Meta.Side.RIGHT, workArea, screenRects);
-			break;
-
-		case "tile-bottom-half":
-			rect = Util.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects);
-			break;
-
-		case "tile-topleft-quarter":
-			rect = Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects);
-			break;
-
-		case "tile-topright-quarter":
-			rect = Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects);
-			break;
-
-		case "tile-bottomleft-quarter":
-			rect = Util.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea, screenRects);
-			break;
-
-		case "tile-bottomright-quarter":
-			rect = Util.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea, screenRects);
-			break;
-
-		case "tile-empty-space":
-			if (!freeScreenRects.length) {
-				rect = workArea;
-				
-			} else {
-				rect = freeScreenRects[0];
-				let area = freeScreenRects[0].area();
-
-				for (let i = 1; i < freeScreenRects.length; i++) {
-					let r = freeScreenRects[i];
-					area += r.area();
-					rect = rect.union(r);
-				}
-
-				let freeArea = rect.area();
-				// free screen space doesnt consist of "aligned" rects, e.g. only 1 quartered window or 2 diagonally quartered windows...
-				// TODO: need better alignment detection; currently it doesnt work if resized was done manually (i .e. holding ctrl) 
-				if (!Util.equalApprox(freeArea, area, 5))
-					rect = workArea;
-			}
-			break;
-		
-		case "replace-window":
-			TilingReplacer.replaceTiledWindow(window);
-			return;
-	}
-
-	if ((window.isTiled && Util.rectsAreAboutEqual(rect, window.tiledRect)) || (Util.rectsAreAboutEqual(rect, workArea) && window.get_maximized())) {
-		Util.restoreWindowSize(window, true);
-
+	// tiling for focused window
 	} else {
-		if (Util.rectsAreAboutEqual(rect, workArea))
-			Util.maximizeBoth(window);
+		const window = global.display.focus_window;
+		if (!window)
+			return;
+
+		let rect;
+		const workArea = window.get_work_area_current_monitor();
+		const currTileGroup = Util.getTopTileGroup();
+		const freeScreenRects = Util.getFreeScreenRects(currTileGroup);
+		const screenRects = freeScreenRects.concat(currTileGroup.map(w => w.tiledRect.copy()));
+
+		switch (shortcutName) {
+			case "tile-maximize":
+				rect = workArea;
+				break;
+
+			case "tile-top-half":
+				rect = Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects);
+				break;
+
+			case "tile-left-half":
+				rect = Util.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects);
+				break;
+
+			case "tile-right-half":
+				rect = Util.getTileRectForSide(Meta.Side.RIGHT, workArea, screenRects);
+				break;
+
+			case "tile-bottom-half":
+				rect = Util.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects);
+				break;
+
+			case "tile-topleft-quarter":
+				rect = Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects);
+				break;
+
+			case "tile-topright-quarter":
+				rect = Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects);
+				break;
+
+			case "tile-bottomleft-quarter":
+				rect = Util.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.LEFT, workArea, screenRects);
+				break;
+
+			case "tile-bottomright-quarter":
+				rect = Util.getTileRectForSide(Meta.Side.BOTTOM + Meta.Side.RIGHT, workArea, screenRects);
+				break;
+
+			case "tile-empty-space":
+				if (!freeScreenRects.length) {
+					rect = workArea;
+
+				} else {
+					let nonUnifiedArea = freeScreenRects[0].area();
+					rect = freeScreenRects.reduce((freeScreenSpace, currRect) => {
+						nonUnifiedArea += currRect.area();
+						return freeScreenSpace.union(currRect);
+					});
+
+					// free screen space doesnt consist of "aligned" rects, e.g. only 1 quartered window or 2 diagonally quartered windows...
+					// TODO: need better alignment detection; currently it doesnt work if resized was done manually (i .e. holding ctrl)
+					if (!Util.equalApprox(rect.area(), nonUnifiedArea, 5))
+						rect = workArea;
+				}
+		}
+
+		// if actually tiled || only maximized
+		if ((window.isTiled && Util.rectsAreAboutEqual(rect, window.tiledRect)) || (Util.rectsAreAboutEqual(rect, workArea) && window.get_maximized()))
+			Util.restoreWindowSize(window, true);
 		else
-			Util.tileWindow(window, rect);
+			(Util.rectsAreAboutEqual(rect, workArea)) ? Util.maximizeBoth(window) : Util.tileWindow(window, rect);
 	}
 };
 
@@ -353,7 +339,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 					if (Util.equalApprox(otherRect.y, grabbedRect.y, gap)) {
 						grabbedWindow.sameSideWindows.push(oW);
 						oW.preGrabRect = oW.get_frame_rect().copy();
-	
+
 					} else if (Util.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap)) {
 						grabbedWindow.opposingWindows.push(oW);
 						oW.preGrabRect = oW.get_frame_rect().copy();
@@ -464,7 +450,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 	if (!window)
 		return;
-	
+
 	// disconnect the signals
 	if (window.grabSignalIDs) {
 		window.grabSignalIDs.forEach(sID => window.disconnect(sID));
@@ -477,19 +463,19 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 		case Meta.GrabOp.RESIZING_E:
 		case Meta.GrabOp.RESIZING_W:
 			break;
-		
+
 		case Meta.GrabOp.MOVING:
 			if (tilingPreviewRect.showing) {
 				// halving already tiled window, if we dont tile over it completely
 				if (tilingPreviewRect.windowToSplit)
 					Util.tileWindow(tilingPreviewRect.windowToSplit, Util.rectDiff(tilingPreviewRect.windowToSplit.tiledRect, tilingPreviewRect.rect)[0], false);
-		
+
 				let workArea = window.get_work_area_current_monitor();
 				if (workArea.equal(tilingPreviewRect.rect))
 					Util.maximizeBoth(window);
 				else
 					Util.tileWindow(window, tilingPreviewRect.rect);
-		
+
 				tilingPreviewRect.close();
 			}
 
@@ -568,7 +554,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 			return;
 
 		global.display.end_grab_op(global.get_current_time());
-		
+
 		// timer needed because for some apps the grab will overwrite/ignore the size changes of Util.restoreWindowSize()
 		// so far I only noticed this behaviour with firefox
 		GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
@@ -620,14 +606,14 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 
 	// default sizes or halving tiled windows
 	if (isCtrlPressed) {
-		if (tileTopLeftQuarter) {  
+		if (tileTopLeftQuarter) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
 				width: workArea.width / 2,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileTopRightQuarter) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x + workArea.width / 2,
@@ -635,7 +621,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width / 2,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileBottomLeftQuarter) {
 		   tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
@@ -643,7 +629,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width / 2,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileBottomRightQuarter) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x + workArea.width / 2,
@@ -651,7 +637,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width / 2,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileRightHalf) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x + workArea.width / 2,
@@ -659,7 +645,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width / 2,
 				height: workArea.height,
 			}), monitorNr);
-	
+
 		} else if (tileLeftHalf) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
@@ -667,7 +653,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width / 2,
 				height: workArea.height,
 			}), monitorNr);
-	
+
 		} else if (tileTopHalf) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
@@ -675,7 +661,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileBottomHalf) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
@@ -683,7 +669,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				width: workArea.width,
 				height: workArea.height / 2,
 			}), monitorNr);
-	
+
 		} else if (tileMaximized) {
 			tilingPreviewRect.open(window, new Meta.Rectangle({
 				x: workArea.x,
@@ -723,7 +709,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 					width: _width,
 					height: _height
 				});
-			
+
 				tilingPreviewRect.open(window, r, monitorNr, ((horizontal || vertical) && i >= freeScreenRects.length) ? currTileGroup[i - freeScreenRects.length] : null);
 				return;
 			}
@@ -771,7 +757,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 function onWindowTiled(tiledWindow) {
 	if (!settings.get_boolean("enable-dash"))
 		return;
-	
+
 	let openWindows = Util.getOpenWindows();
 	let currTileGroup = Util.getTopTileGroup(openWindows, false);
 
@@ -783,7 +769,7 @@ function onWindowTiled(tiledWindow) {
 	let freeScreenRects = Util.getFreeScreenRects(currTileGroup);
 	if (!freeScreenRects.length)
 		return;
-	
+
 	let freeScreenSpace = freeScreenRects[0];
 	if (freeScreenRects.length > 1) {
 		let area = freeScreenRects[0].area();
@@ -794,7 +780,7 @@ function onWindowTiled(tiledWindow) {
 
 		// free screen space doesnt consist of "aligned" rects, e.g. only 1 quartered window or uneven windows, etc...
 		if (!Util.equalApprox(freeScreenSpace.area(), area, 50))
-			return;		
+			return;
 	}
 
 	// some (random) hardcoded min space requirements

@@ -11,7 +11,8 @@ const MODE = {
 	HORIZONTAL: 4,
 }
 
-function replaceTiledWindow(window) {
+function replaceTiledWindow() {
+	const window = global.display.focus_window;
 	if (!window)
 		return;
 	
@@ -227,8 +228,8 @@ const MyTilingReplacer = GObject.registerClass(
 
 			} else {
 				const idx = this.labelText.indexOf(keyEvent.unicode_value);
-				const rect = this.rects[idx];
 				if (idx !== -1 && idx < this.rects.length) {
+					const rect = this.rects[idx];
 					if (rect.window && rect.window !== this.window) // halve old window
 						Util.tileWindow(rect.window, Util.rectDiff(rect.window.tiledRect, rect)[0], false);
 

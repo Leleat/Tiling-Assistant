@@ -30,18 +30,13 @@ const MyPrefsWidget = new GObject.Class({
 			);
 
 			this._settingsSchema = gschema.lookup("org.gnome.shell.extensions.tiling-assistant", true);
-			this.settings = new Gio.Settings({
-				settings_schema: this._settingsSchema
-			});
+			this.settings = new Gio.Settings({settings_schema: this._settingsSchema});
 
 			this.parent(params);
 
 			this.builder = new Gtk.Builder();
 			this.builder.add_from_file(Me.path + '/prefs.ui');
-
-			const gtkNotebook = this.builder.get_object('main_prefs');
-			this.add(gtkNotebook);
-
+			this.add(this.builder.get_object('main_prefs'));
 			this.set_min_content_height(700);
 
 			// bind settings to the UI objects
@@ -54,27 +49,49 @@ const MyPrefsWidget = new GObject.Class({
 			});
 
 			// bind keybindings
-			const shortcuts = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space", "tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half", "tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
+			const shortcuts = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space",
+					"tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half",
+					"tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 					"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
-			shortcuts.forEach((sc) => {
-				this.makeShortcutEdit(sc);
-			});
+			shortcuts.forEach(sc => this.makeShortcutEdit(sc));
 
+			// translations
+			this.setupTranslations();
+
+			////////////////
+			////////////////
 			// Layouts gui:
 			// this.layouts is an array of arrays. The inner arrays contain "rects" in the format {x: NR, y: NR, width: NR, height: NR}
+			// layouts with apps attached are in the format [{x: NR, y: NR, width: NR, height: NR}, appName].
 			// NR is a float between 0 to 1.
 			// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
-			this.layouts = this.loadLayouts();
+			this.loadLayouts();
 			const drawAreas = [];
 			this.buttonIconSize = 16;
 
-			for (let i = 0; i < 10; i++) { // Nr of layouts are "hardcoded"
+			// layout reload button
+			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
+				this.loadLayouts();
+				drawAreas.forEach(d => d.queue_draw());
+			});
+
+			// layout save button
+			this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
+				this.saveLayouts();
+				this.loadLayouts();
+				drawAreas.forEach(d => d.queue_draw());
+			});
+
+			// other layout buttons (each layout has at least 1 of them)
+			// Nr (10) of layouts are "hardcoded"
+			for (let i = 0; i < 10; i++) {
 				const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
 				const hasAppButton = layoutListBox.get_row_at_index(0).get_child().get_children().length === 3;
 
 				// delete buttons
+				// resets Gtk.entries and add app buttons
 				this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
-					for (let j = 0; j < 8; j++) {
+					for (let j = 0; j < 8; j++) { // 8 Gtk.entries / possible rects in a layout
 						const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
 						entry.set_text("");
 
@@ -87,21 +104,22 @@ const MyPrefsWidget = new GObject.Class({
 					}
 				});
 
-				// AppChooserDialog button
+				// add button (each Gtk.entry / rectangle has one):
+				// opens an AppChooserDialog
 				if (hasAppButton) {
-					for (let j = 0; j < 8; j++) {
+					for (let j = 0; j < 8; j++) { // 8 Gtk.entries / possible rects in a layout
 						const appButton = layoutListBox.get_row_at_index(j).get_child().get_children()[2];
 						appButton.connect("clicked", () => {
 							const chooserDialog = new Gtk.AppChooserDialog({
 								transient_for: this.get_toplevel(),
 								modal: true
 							});
-		
+
 							chooserDialog.get_widget().set({
 								show_all: true,
 								show_other: true
 							});
-		
+
 							chooserDialog.connect('response', (dlg, id) => {
 								if (id === Gtk.ResponseType.OK) {
 									const appInfo = chooserDialog.get_widget().get_app_info();
@@ -109,22 +127,22 @@ const MyPrefsWidget = new GObject.Class({
 									appButton.set_image(img);
 									appButton.appInfo = appInfo;
 								}
-		
+
 								chooserDialog.destroy();
 							});
-		
+
 							chooserDialog.show();
 						});
 					}
 				}
 
-				// draw rects
+				// draw preview rects in the right column
 				const drawArea = this.builder.get_object(`DrawArea${i}`);
+				drawAreas.push(drawArea);
 				drawArea.connect("draw", (widget, cr) => {
-					// file couldnt be loaded or empty
 					if (!this.layouts)
 						return;
-					
+
 					const layout = this.layouts[i];
 					const [layoutIsValid, errMsg] = this.layoutIsValid(layout, hasAppButton);
 					if (layoutIsValid) {
@@ -153,24 +171,7 @@ const MyPrefsWidget = new GObject.Class({
 						}
 					}
 				});
-				drawAreas.push(drawArea);
 			}
-
-			// reload button
-			this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
-				this.layouts = this.loadLayouts();
-				drawAreas.forEach(d => d.queue_draw());
-			});
-
-			// save button
-			this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
-				this.saveLayouts();
-				this.layouts = this.loadLayouts();
-				drawAreas.forEach(d => d.queue_draw());
-			});
-
-			// translations
-			this.setupTranslations();
 		},
 
 		// manually add the keys to the arrays in this function
@@ -180,10 +181,8 @@ const MyPrefsWidget = new GObject.Class({
 
 			if (ints.includes(key))
 				return "value"; // spinbox.value
-
 			else if (bools.includes(key))
 				return "active"; //  switch.active
-
 			else
 				return null;
 		},
@@ -289,8 +288,7 @@ const MyPrefsWidget = new GObject.Class({
 			});
 
 			GLib.free(contents);
-
-			return layouts;
+			this.layouts = layouts;
 		},
 
 		// save to ~/.TilingAssistantExtension.layouts.json
@@ -330,7 +328,6 @@ const MyPrefsWidget = new GObject.Class({
 					}
 
 					const appButton = (hasAppButton) ? layoutListBox.get_row_at_index(j).get_child().get_children()[2] : null;
-
 					layout.push((!appButton) ? rect : (appButton.appInfo) ? [rect, appButton.appInfo.get_name()] : {x: 0, y: 0, width: 0, height: 0});
 				}
 

@@ -24,7 +24,7 @@ function rectHasPoint(rect, point) {
 	return point.x >= rect.x && point.x <= rect.x + rect.width && point.y >= rect.y && point.y <= rect.y + rect.height;
 };
 
-// given rectA and rectB, calculate the rectangles which remain from rectA, 
+// given rectA and rectB, calculate the rectangles which remain from rectA,
 // if rectB is substracted from it. The result is an array of 0 - 4 rects depending on rectA/B's position.
 // https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference (Java implementation)
 // they implemented it in a way, which gives the top and bottom rect dimensions higher priority than the left and right rect.
@@ -76,29 +76,29 @@ function rectDiff (rectA, rectB, ignoreMargin = 35, preferVertical = null) {
 		let topRect_height = rectB.y - rectA.y;
 		if (topRect_height > ignoreMargin && rectA.width > ignoreMargin)
 			resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectA.y, width: rectA.width, height: topRect_height}));
-	
+
 		// bottom rect
 		let rectA_y2 = rectA.y + rectA.height;
 		let rectB_y2 = rectB.y + rectB.height;
 		let bottomRect_height = rectA_y2 - rectB_y2;
 		if (bottomRect_height > ignoreMargin && rectA.width > ignoreMargin)
 			resultRects.push(new Meta.Rectangle({x: rectA.x, y: rectB_y2, width: rectA.width, height: bottomRect_height}));
-	
+
 		let sideRects_y = (rectB.y > rectA.y) ? rectB.y : rectA.y;
 		let sideRects_y2 = (rectB_y2 < rectA_y2) ? rectB_y2 : rectA_y2;
 		let sideRects_height = sideRects_y2 - sideRects_y;
-	
+
 		// left rect
 		let leftRect_width = rectB.x - rectA.x;
 		if (leftRect_width > ignoreMargin && sideRects_height > ignoreMargin)
 			resultRects.push(new Meta.Rectangle({x: rectA.x, y: sideRects_y, width: leftRect_width, height: sideRects_height}));
-	
+
 		// right rect
 		let rectA_x2 = rectA.x + rectA.width;
 		let rectB_x2 = rectB.x + rectB.width;
 		let rightRect_width = rectA_x2 - rectB_x2;
 		if (rightRect_width > ignoreMargin && sideRects_height > ignoreMargin)
-			resultRects.push(new Meta.Rectangle({x: rectB_x2, y: sideRects_y, width: rightRect_width, height: sideRects_height}));	
+			resultRects.push(new Meta.Rectangle({x: rectB_x2, y: sideRects_y, width: rightRect_width, height: sideRects_height}));
 	}
 
 	return resultRects;
@@ -140,7 +140,7 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 
 			let notInGroup = false;
 
-			// if a non-tiled window in a higher stack order overlaps the currently tested tiled window, 
+			// if a non-tiled window in a higher stack order overlaps the currently tested tiled window,
 			// the currently tested tiled window isnt part of the topmost tile group
 			for (let j = 0, l = notGroupedWindows.length; j < l; j++) {
 				let nW = notGroupedWindows[j];
@@ -152,7 +152,7 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 			}
 
 			if (!notInGroup)
-				// same for for tiled windows which are overlapped by tiled windows in a higher stack order
+				// same for tiled windows which are overlapped by tiled windows in a higher stack order
 				for (let j = 0, ln = groupedWindows.length; j < ln; j++)
 					if (groupedWindows[j].tiledRect.overlap(wRect)) {
 						notInGroup = true;
@@ -169,11 +169,11 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 			notGroupedWindows.push(window);
 		}
 	}
-	
+
 	return groupedWindows;
 };
 
-// returns an array of rectangles which represent the free screen space. 
+// returns an array of rectangles which represent the free screen space.
 // Steps:
 // first get the free screen space for each tiled window by itself (for each window 1 array of rects)
 // the final freeScreenRects array is the intersection of all these arrays
@@ -206,7 +206,7 @@ function getFreeScreenRects(tileGroup) {
 
 		freeScreenRects = intersections;
 	});
-	
+
 	return freeScreenRects;
 };
 
@@ -236,13 +236,13 @@ function getTileRectForSide(side, workArea, screenRects) {
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
 					let linedUpRects = [r];
-					
+
 					for (let j = i + 1; j < len; j++) {
 						let r2 = screenRects[j];
 						if (equalApprox(r.x + r.width, r2.x + r2.width, gaps))
 							linedUpRects.push(r2);
 					}
-	
+
 					let h = 0;
 					linedUpRects.forEach(r => h += r.height);
 					if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
@@ -254,7 +254,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!width || equalApprox(width, workArea.width, gaps))
 				width = workArea.width / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
@@ -262,7 +262,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 				height: workArea.height,
 			});
 
-		case Meta.Side.RIGHT:	
+		case Meta.Side.RIGHT:
 			// find the rectangles, which line up vertically
 			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
 				let scr = [...screenRects];
@@ -270,13 +270,13 @@ function getTileRectForSide(side, workArea, screenRects) {
 				for (let i = 0, len = scr.length; i < len; i++) {
 					let r = scr[i];
 					let linedUpRects = [r];
-					
+
 					for (let j = i + 1; j < len; j++) {
 						let r2 = scr[j];
 						if (equalApprox(r.x, r2.x, gaps))
 							linedUpRects.push(r2);
 					}
-	
+
 					let h = 0;
 					linedUpRects.forEach(r => h += r.height);
 					if (equalApprox(h, workArea.height, gaps)) { // rects line up and fill entire screen height
@@ -288,7 +288,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!width || equalApprox(width, workArea.width, gaps))
 				width = workArea.width / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
 				y: workArea.y,
@@ -302,13 +302,13 @@ function getTileRectForSide(side, workArea, screenRects) {
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
 					let linedUpRects = [r];
-					
+
 					for (let j = i + 1; j < len; j++) {
 						let r2 = screenRects[j];
 						if (equalApprox(r.y + r.height, r2.y + r2.height, gaps))
 							linedUpRects.push(r2);
 					}
-	
+
 					let w = 0;
 					linedUpRects.forEach(r => w += r.width);
 					if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
@@ -320,7 +320,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
@@ -336,13 +336,13 @@ function getTileRectForSide(side, workArea, screenRects) {
 				for (let i = 0, len = scr.length; i < len; i++) {
 					let r = scr[i];
 					let linedUpRects = [r];
-					
+
 					for (let j = i + 1; j < len; j++) {
 						let r2 = scr[j];
 						if (equalApprox(r.y + r.height, r2.y + r2.height, gaps) && !equalApprox(r2.y + r2.height, workArea.y + workArea.height, gaps))
 							linedUpRects.push(r2);
 					}
-	
+
 					let w = 0;
 					linedUpRects.forEach(r => w += r.width);
 					if (equalApprox(w, workArea.width, gaps)) { // rects line up and fill entire screen height
@@ -354,7 +354,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y + workArea.height - height,
@@ -366,7 +366,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
-					
+
 					if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y, workArea.y, gaps)) {
 						width = r.width;
 						height = r.height;
@@ -380,7 +380,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-		
+
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y,
@@ -392,7 +392,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
-					
+
 					if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y, workArea.y, gaps)) {
 						width = r.width;
 						height = r.height;
@@ -406,7 +406,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
 				y: workArea.y,
@@ -418,7 +418,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
-					
+
 					if (equalApprox(r.x, workArea.x, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
 						width = r.width;
 						height = r.height;
@@ -432,7 +432,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x,
 				y: workArea.y + workArea.height - height,
@@ -444,7 +444,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 			if (screenRects.length > 1) { // 1 => maximized window or no tiled windows
 				for (let i = 0, len = screenRects.length; i < len; i++) {
 					let r = screenRects[i];
-					
+
 					if (equalApprox(r.x + r.width, workArea.x + workArea.width, gaps) && equalApprox(r.y + r.height, workArea.y + workArea.height, gaps)) {
 						width = r.width;
 						height = r.height;
@@ -458,7 +458,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 
 			if (!height || equalApprox(height, workArea.height, gaps))
 				height = workArea.height / 2;
-			
+
 			return new Meta.Rectangle({
 				x: workArea.x + workArea.width - width,
 				y: workArea.y + workArea.height - height,
@@ -487,7 +487,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	let oldRect = window.get_frame_rect();
 	if (!window.isTiled)
 		window.isTiled = oldRect;
-	
+
 	// save the actual window rect without gaps and disregarding the actual window size for more acurate operations later.
 	// it helps with some terminals (or other windows) which cant be resized freely / which only resize in full rows/columns
 	// or for falsely opening the Dash when the windows' min size is bigger than newRect
@@ -543,7 +543,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	// Wayland workaround because some apps dont work properly (e. g. tiling Nautilius and then choosing firefox from the Dash)
 	if (Meta.is_wayland_compositor())
 		window.move_frame(false, rect.x, rect.y);
-		
+
 	// setting user_op to false helps with issues on terminals
 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
@@ -558,14 +558,14 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 function maximizeBoth(window) {
 	if (!window || !window.allows_move() || !window.allows_resize())
 		return;
-	
+
 	removeTileGroup(window);
 
 	// sometimes, because of the group-focusing (raising),
 	// the focused window will be below another window.
 	// so we raise the focused window to prevent unexpected behaviour and bugs
 	window.raise();
-	
+
 	let workArea = window.get_work_area_current_monitor();
 	window.tiledRect = workArea;
 
@@ -585,7 +585,7 @@ function maximizeBoth(window) {
 
 	// 	if (MyExtension.settings.get_boolean("use-anim"))
 	// 		main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
-			
+
 	// 	// setting user_op to false helps with issues on terminals
 	// 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
@@ -606,13 +606,13 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	if (restoreFullPos) {
 		// user_op as false to restore window while keeping it fully in screen in case DND-tiling dragged it offscreen
 		window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
-		
+
 	} else { // scale while keeping the top at the same relative y pos (for DNDing)
 		let currWindowFrame = window.get_frame_rect();
 		let [mouseX] = global.get_pointer();
 		let relativeMouseX = (mouseX - currWindowFrame.x) / currWindowFrame.width;
 		let newPosX = mouseX - oldRect.width * relativeMouseX;
-				
+
 		// user_op with true to properly restore big windows via DND so they can go partly offscreen
 		window.move_frame(true, newPosX, currWindowFrame.y); // Wayland workaround for DND/restore position
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
@@ -624,7 +624,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 };
 
 // raise tiled windows in a group:
-// each window saves its own tileGroup and 
+// each window saves its own tileGroup and
 // raises the other windows, if it is focused
 function updateTileGroup(tileGroup) {
 	tileGroup.forEach(w => {
@@ -637,7 +637,7 @@ function updateTileGroup(tileGroup) {
 			let workArea = w.get_work_area_current_monitor();
 			if (!w.tileGroup || w.get_maximized() == Meta.MaximizeFlags.BOTH || (w.isTiled && rectsAreAboutEqual(w.tiledRect, workArea)))
 				return;
-			
+
 			w.tileGroup.forEach(ww => {
 				if (ww.isTiled && ww.get_maximized() != Meta.MaximizeFlags.BOTH && !rectsAreAboutEqual(ww.tiledRect, workArea)) {
 					// update the tileGroup with the current tileGroup (in case of focusing a non-group but tiled window, which replaces a grouped window)
@@ -663,7 +663,7 @@ function removeTileGroup(window) {
 		window.disconnect(window.groupFocusSignalID);
 		window.groupFocusSignalID = 0;
 	}
-	
+
 	window.tileGroup.forEach(w => {
 		if (!w || !w.tileGroup)
 			return;
@@ -738,6 +738,9 @@ function resizeComplementingWindows(resizedWindow, grabOp, gap) {
 	}
 };
 
+// open app in a tiled state:
+// 1. via holding shift or alt when activating an appIcon with appDisplay.AppIcon or
+// 2. via defined layouts (last few) in the settings page of this extension
 function openAppTiled(app, rect, appsForLayouting = [], rectsForLayouting = []) {
 	if (!app) // when layouting
 		return main.notify("Tiling Assistant Extension", "App-to-tile isn't installed.");
@@ -745,28 +748,28 @@ function openAppTiled(app, rect, appsForLayouting = [], rectsForLayouting = []) 
 	if (!app.can_open_new_window())
 		return main.notify("Tiling Assistant Extension", `${app.get_name()} can't open a new window.`);
 
-	let wCreatedId = global.display.connect("window-created", (src, window) => {
+	const wCreatedId = global.display.connect("window-created", (src, window) => {
 		// here we try to ignore loading screens; different apps use different windows for loading screens:
 		// For ex.: Krita's and GIMP's loading screen returns true for is_skip_taskbar()
 		// Steam's loading screen is a normal window, which doesn't skip the taskbar but doesn't allow_resize()
 		if (window.get_window_type() != Meta.WindowType.NORMAL || window.is_skip_taskbar() || !window.allows_move() || !window.allows_resize())
 			return;
-		
+
 		global.display.disconnect(wCreatedId);
 
 		// in case window detection above didn't work properly, we will return here so that no unintended windows suddenly get tiled
 		// this breaks, if the current to-be-tiled app loads (-> load screen) and the user opens another window
 		// ... acceptable downside for me
-		let winTracker = Shell.WindowTracker.get_default();
-		let openedApp = winTracker.get_window_app(window);
+		const winTracker = Shell.WindowTracker.get_default();
+		const openedApp = winTracker.get_window_app(window);
 		if (openedApp != app)
 			return;
 
-		let wActor = window.get_compositor_private();
-		let firstFrameID = wActor.connect("first-frame", () => {
+		const wActor = window.get_compositor_private();
+		const firstFrameID = wActor.connect("first-frame", () => {
 			wActor.disconnect(firstFrameID);
 
-			let isLayouting = appsForLayouting.length && rectsForLayouting.length;
+			const isLayouting = appsForLayouting.length && rectsForLayouting.length;
 			tileWindow(window, rect, !isLayouting);
 			if (isLayouting)
 				openAppTiled(appsForLayouting.shift(), rectsForLayouting.shift(), appsForLayouting, rectsForLayouting);
