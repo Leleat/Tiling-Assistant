@@ -34,6 +34,8 @@ const MyTilingDashManager = GObject.registerClass(
 			this.openWindows = [];
 			this.windowClones = [];
 			this.windowDashAlreadyDestroyed = false;
+			this.appArrows = [];
+			this.arrowIsAbove = false;
 
 			this.highlightedApp = -1;
 			this.highlightedWindow = -1;
@@ -64,8 +66,13 @@ const MyTilingDashManager = GObject.registerClass(
 			// scale Dash, if it's too big to fit the free screen space
 			const finalScale = (this.appDash.width > freeScreenRect.width - 50) ? (freeScreenRect.width - 50) / this.appDash.width : 1;
 			this.appDash.set_scale(finalScale, finalScale);
-			this.appDash.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.appDash.width * finalScale / 2,
+			this.appDash.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.appDash.width * finalScale / 2, 
 					freeScreenRect.y + freeScreenRect.height / 2 - this.appDash.height * finalScale / 2);
+
+			// put arrows below appIcons (hide, if the app doesnt have multiple windows)
+			const monitorRect = global.display.get_monitor_geometry(this.monitorNr);
+			this.arrowIsAbove = freeScreenRect.y + freeScreenRect.height / 2 + this.windowPreviewSize >= monitorRect.height - this.windowPreviewSize;
+			this.drawArrows();
 
 			// animate opening of appDash
 			const finalX = this.appDash.x;
@@ -82,6 +89,21 @@ const MyTilingDashManager = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
+			// aniamte arrows to move along the appDash
+			this.appArrows.forEach(arrow => {
+				const x = arrow.x;
+				const y = arrow.y;
+				arrow.set_opacity(0);
+				arrow.set_position(x + 400 * this.animationDir.x, y + 400 * this.animationDir.y);
+				arrow.ease ({
+					x: x,
+					y: y,
+					opacity: 255,
+					duration: 250,
+					mode: Clutter.AnimationMode.EASE_OUT_QUINT
+				});
+			});
+
 			this.highlightItem(0, false, true);
 		}
 
@@ -93,6 +115,7 @@ const MyTilingDashManager = GObject.registerClass(
 			main.layoutManager.disconnect(this.systemModalOpenedId);
 			main.popModal(this);
 
+			this.appArrows.forEach(arrow => arrow.destroy());
 			this.windowClones.forEach(clone => {
 				clone.source.show();
 				clone.destroy();
@@ -173,6 +196,25 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 		}
 
+		drawArrows() {
+			const appIcons = this.appDash.get_children();
+			appIcons.forEach((icon, idx) => {
+				const arrow = new St.DrawingArea({
+					style: "color: white",
+					x: this.appDash.x + (icon.width * idx) + icon.width / 2 + 8 - ((idx === 0) ? 0 : 4), // MagicNrs.: margins/paddings of appIcons
+					y: (this.arrowIsAbove) ? this.appDash.y + 5 * this.monitorScale : this.appDash.y + this.appDash.height - 4 * this.monitorScale - 5 * this.monitorScale,
+					width: 8 * this.monitorScale, 
+					height: 4 * this.monitorScale,
+				});
+				main.uiGroup.add_child(arrow);
+				this.appArrows.push(arrow);
+				arrow.connect("repaint", () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
+
+				if (icon.cachedWindows.length == 1)
+					arrow.hide();
+			});
+		}
+
 		highlightItem(idx, forceAppFocus = false, focusViaHover = false) {
 			if (this.thumbnailsAreFocused && forceAppFocus)
 				this.closeWindowDash();
@@ -199,6 +241,10 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 		}
 
+		setArrowVisibility(visible) {
+			(visible) ? this.appArrows[this.highlightedApp].show() : this.appArrows[this.highlightedApp].hide();
+		}
+
 		openWindowDash(focusBackwards = false) {
 			const icons = this.appDash.get_children();
 			if (this.thumbnailsAreFocused || this.highlightedApp === -1 || this.highlightedApp >= icons.length)
@@ -214,14 +260,14 @@ const MyTilingDashManager = GObject.registerClass(
 
 			const appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length === 1)
-				appIcon.setArrowVisibility(true);
+				this.setArrowVisibility(true);
 
 			this.windowDash = new MyTilingDash(this, appIcon.cachedWindows, MyTilingWindowIcon);
 			this.add_child(this.windowDash);
 
 			// center under/above the highlighted appIcon
 			let x = this.appDash.x + appIcon.x + appIcon.width / 2 - this.windowDash.width / 2;
-			let y = (appIcon.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
+			let y = (this.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
 
 			// move windowDash into the monitor (with a 20px margin), if it's (partly) outside
 			const monitorRect = global.display.get_monitor_geometry(this.monitorNr);
@@ -255,7 +301,7 @@ const MyTilingDashManager = GObject.registerClass(
 
 			const appIcon = icons[this.highlightedApp];
 			if (appIcon.cachedWindows.length === 1)
-				appIcon.setArrowVisibility(false);
+				this.setArrowVisibility(false);
 
 			// animate closing
 			this.windowDashAlreadyDestroyed = false;
@@ -453,7 +499,6 @@ var MyTilingAppIcon = GObject.registerClass(
 			this.app = app;
 			this.idx = idx;
 			this.cachedWindows = [];
-			this.arrowIsAbove = false;
 			this.isHovered = false;
 
 			this.connect("button-press-event", () => dash.dashManager.activate(this.cachedWindows[0]));
@@ -479,49 +524,11 @@ var MyTilingAppIcon = GObject.registerClass(
 			const buttonSize = (MyExtension.settings.get_int("icon-size") + MyExtension.settings.get_int("icon-margin")) * monitorScale;
 			this.set_size(buttonSize, buttonSize);
 
-			const monitorRect = global.display.get_monitor_geometry(dash.dashManager.monitorNr);
-			const previewSize = dash.dashManager.windowPreviewSize;
-			const freeScreenRect = dash.dashManager.freeScreenRect;
-			this.arrowIsAbove = freeScreenRect.y + freeScreenRect.height / 2 + previewSize >= monitorRect.height - previewSize;
-
-			// add a top and bottom arrow to the appIcon.
-			// one of them will be shown depending on the Dash pos
-			//////////////////////
-			// top arrow
-			const topContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
-			this.topArrow = new St.DrawingArea({
-				style: "color: white",
-				width: 8 * monitorScale, height: 4 * monitorScale,
-			});
-			this.topArrow.set_opacity(0);
-			this.topArrow.connect("repaint", () => switcherPopup.drawArrow(this.topArrow, St.Side.TOP));
-			topContainer.add_child(this.topArrow);
-			this.add_child(topContainer);
-
 			// app icon
 			this.iconBin = new St.Bin({y_expand: true});
 			this.icon = app.create_icon_texture(MyExtension.settings.get_int("icon-size"));
 			this.add_child(this.iconBin);
 			this.iconBin.set_child(this.icon);
-
-			// bottom arrow
-			const bottomContainer = new St.BoxLayout({x_align: Clutter.ActorAlign.CENTER});
-			this.bottomArrow = new St.DrawingArea({
-				style: "color: white",
-				width: 8 * monitorScale, height: 4 * monitorScale,
-			});
-			this.bottomArrow.set_opacity(0);
-			this.bottomArrow.connect("repaint", () => switcherPopup.drawArrow(this.bottomArrow, St.Side.BOTTOM));
-			bottomContainer.add_child(this.bottomArrow);
-			this.add_child(bottomContainer);
-
-			if (this.cachedWindows.length > 1)
-				this.setArrowVisibility(true);
-		}
-
-		setArrowVisibility(visible) {
-			const arrow = this.arrowIsAbove ? this.topArrow : this.bottomArrow;
-			arrow.set_opacity(visible ? 255 : 0);
 		}
 
 		setHighlight(highlight) {
