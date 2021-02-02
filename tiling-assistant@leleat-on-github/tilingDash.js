@@ -8,7 +8,7 @@ const MyExtension = Me.imports.extension;
 const Util = Me.imports.util;
 
 function openDash(openWindows, tiledWindow, monitorNr, freeScreenSpace) {
-	if (!openWindows.length)
+	if (!openWindows.length || (tiledWindow && !tiledWindow.tileGroup) || !freeScreenSpace)
 		return;
 
 	new MyTilingDashManager(openWindows, tiledWindow, monitorNr, freeScreenSpace);
@@ -25,7 +25,7 @@ const MyTilingDashManager = GObject.registerClass(
 				return;
 			}
 
-			this.systemModalOpenedId = main.layoutManager.connect('system-modal-opened', () => this._destroy(true));
+			this.systemModalOpenedId = main.layoutManager.connect("system-modal-opened", () => this._destroy(true));
 
 			this.tiledWindow = tiledWindow;
 			this.monitorNr = monitorNr;

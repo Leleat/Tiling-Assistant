@@ -469,12 +469,12 @@ function getTileRectForSide(side, workArea, screenRects) {
 };
 
 function tileWindow(window, newRect, checkToOpenDash = true) {
-	if (!window)
+	if (!window || window.is_skip_taskbar())
 		return;
 
 	let wasMaximized = window.get_maximized();
 	if (wasMaximized)
-		window.unmaximize(window.get_maximized());
+		window.unmaximize(wasMaximized);
 
 	if (!window.allows_resize() || !window.allows_move())
 		return;
