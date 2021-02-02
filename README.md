@@ -50,7 +50,7 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 ## Installation
 
-You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), you can download the `tiling-assistant@leleat-on-github` folder and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`.
+You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), you can download the `tiling-assistant@leleat-on-github` folder and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`. After moving the folder to the correct place, restart the GNOME shell (Alt+F2 -> enter `r`. On Wayland you need to logout).
 
 ## License
 
