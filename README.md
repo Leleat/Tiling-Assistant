@@ -24,11 +24,11 @@ Activating an icon will tile the corresponding window to fill the free space.
 
 - Define up to 7 layouts. On pressing the corresponding keybinding the Dash will open and ask you which window you want in which spot of the layout. 
 
-- Define up to 3 layouts (at the end of the layouts list) with apps attached to them. When activating them the apps will be opened at their respective position. **experimental. This doesn't work reliably on Wayland (app-dependent).**
+- Define up to 3 layouts (at the end of the layouts list) with apps attached to them. When activating them the apps will be opened at their respective position. **experimental. This doesn't work reliably on Wayland.**
 
 - Raise/focus tiled windows as a group.
 
-- Resize tiled windows in a group (**horizontal and vertical only**). You can escape the group-resizing by holding `Ctrl` (doesn't work with GTK apps). This way only the windows directly opposed to the resized window will resize along.
+- Resize tiled windows in a group (**horizontal and vertical only**). You can escape the group-resizing by holding `Ctrl` (**doesn't work with all GTK/CSD? apps**). This way only the windows directly opposed to the resized window will resize along.
 
 - When using the "tile to other tiled window" keybinding, pressing `Ctrl` will halve the rectangles vertically. Another `Ctrl` press will halve the rectangles horizontally.
 
