@@ -15,7 +15,7 @@ function replaceTiledWindow() {
 	const window = global.display.focus_window;
 	if (!window)
 		return;
-	
+
 	new MyTilingReplacer(window);
 };
 
@@ -25,36 +25,30 @@ const MyTilingReplacer = GObject.registerClass(
 		_init(window) {
 			const activeWS = global.workspace_manager.get_active_workspace();
 			const entireWorkArea = activeWS.get_work_area_all_monitors();
-			
+
 			super._init({
 				reactive: true,
 				x: entireWorkArea.x,
 				y: entireWorkArea.y - main.panel.height,
 				width: entireWorkArea.width,
-				height: entireWorkArea.height + main.panel.height,
+				height: entireWorkArea.height + main.panel.height
 			});
 
 			main.uiGroup.add_child(this);
-			if (!main.pushModal(this)) {
-				this.destroy();
-				return;
-			}
-			
-			this.systemModalOpenedId = main.layoutManager.connect('system-modal-opened', () => this._destroy());
+
+			global.stage.set_key_focus(this);
+
 			this.window = window;
 			this.previewRects = [];
 			this.rects = [];
 			this.currMode = MODE.FULL;
 			this.labelText = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "f", "d", "s", "a", "w", "e", "r", "h", "z", "j", "k", "l", "u", "i", "o"];
-			
+
 			this.shadeBackground(entireWorkArea);
 			this.createRectPreviews();
 		}
 
 		_destroy() {
-			main.popModal(this);
-			main.layoutManager.disconnect(this.systemModalOpenedId);
-
 			this.previewRects.forEach(r => r.destroy());
 			this.shadeBG.destroy();
 			super.destroy();
@@ -63,13 +57,12 @@ const MyTilingReplacer = GObject.registerClass(
 		shadeBackground(entireWorkArea) {
 			this.shadeBG = new St.Widget({
 				style: ("background-color : black"),
-				reactive: true,
 				opacity: 0,
 				x: entireWorkArea.x,
 				y: entireWorkArea.y,
-				width: entireWorkArea.width, 
+				width: entireWorkArea.width,
 				height: entireWorkArea.height
-			}); 
+			});
 			global.window_group.add_child(this.shadeBG);
 
 			this.shadeBG.ease({
@@ -91,10 +84,10 @@ const MyTilingReplacer = GObject.registerClass(
 
 			for (let i = 0; i < Math.min(this.labelText.length, this.rects.length); i++) {
 				const rect = this.rects[i];
-				// for visibility: preview is slightly smaller than the rect 
+				// for visibility: preview is slightly smaller than the rect
 				const previewRect = new St.Widget({
 					style_class: "tile-preview",
-					x: rect.x + 10, 
+					x: rect.x + 10,
 					y: rect.y + 10,
 					width: rect.width - 2 * 10,
 					height: rect.height - 2 * 10,
@@ -127,7 +120,7 @@ const MyTilingReplacer = GObject.registerClass(
 			const windowCount = currTileGroup.length;
 			this.rects = currTileGroup.map(w => w.tiledRect.copy()).concat(freeScreenRects);
 			let tmpRects = [];
-			
+
 			switch (this.currMode) {
 				case MODE.FULL:
 					tmpRects = this.rects;
@@ -186,7 +179,7 @@ const MyTilingReplacer = GObject.registerClass(
 							r2.window = currTileGroup[i];
 						}
 					}
-					
+
 					break;
 			}
 
@@ -211,7 +204,7 @@ const MyTilingReplacer = GObject.registerClass(
 				Util.tileWindow(this.window, rect);
 				break;
 			}
-			
+
 			this._destroy();
 		}
 
@@ -235,7 +228,7 @@ const MyTilingReplacer = GObject.registerClass(
 
 					Util.tileWindow(this.window, rect);
 				}
-	
+
 				this._destroy();
 			}
 		}

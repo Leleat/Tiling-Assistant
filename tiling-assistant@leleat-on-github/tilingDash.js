@@ -1,14 +1,14 @@
 "use strict";
 
 const {altTab, main, switcherPopup} = imports.ui;
-const {Clutter, GLib, GObject, Graphene, Shell, St} = imports.gi;
+const {Clutter, GLib, GObject, Graphene, Meta, Shell, St} = imports.gi;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const MyExtension = Me.imports.extension;
 const Util = Me.imports.util;
 
 function openDash(openWindows, tiledWindow, monitorNr, freeScreenSpace) {
-	if (!openWindows.length || (tiledWindow && !tiledWindow.tileGroup) || !freeScreenSpace)
+	if (!openWindows.length || (tiledWindow && !tiledWindow.tileGroup) || !(freeScreenSpace instanceof Meta.Rectangle))
 		return;
 
 	new MyTilingDashManager(openWindows, tiledWindow, monitorNr, freeScreenSpace);
@@ -17,15 +17,20 @@ function openDash(openWindows, tiledWindow, monitorNr, freeScreenSpace) {
 const MyTilingDashManager = GObject.registerClass(
 	class MyTilingDashManager extends St.Widget {
 		_init(openWindows, tiledWindow, monitorNr, freeScreenRect) {
-			super._init({reactive: true});
+			const activeWS = global.workspace_manager.get_active_workspace();
+			const entireWorkArea = activeWS.get_work_area_all_monitors();
 
-			main.uiGroup.add_child(this);
-			if (!main.pushModal(this)) {
-				this.destroy();
-				return;
-			}
+			super._init({
+				reactive: true,
+				x: entireWorkArea.x,
+				y: entireWorkArea.y - main.panel.height,
+				width: entireWorkArea.width,
+				height: entireWorkArea.height + main.panel.height
+			});
 
-			this.systemModalOpenedId = main.layoutManager.connect("system-modal-opened", () => this._destroy(true));
+			main.layoutManager.addChrome(this);
+
+			global.stage.set_key_focus(this);
 
 			this.tiledWindow = tiledWindow;
 			this.monitorNr = monitorNr;
@@ -51,12 +56,6 @@ const MyTilingDashManager = GObject.registerClass(
 			const openApps = openWindows.map(w => winTracker.get_window_app(w));
 			this.openWindows = openWindows.filter((w, pos) => openApps.indexOf(winTracker.get_window_app(w)) === pos);
 
-			const activeWS = global.workspace_manager.get_active_workspace();
-			const entireWorkArea = activeWS.get_work_area_all_monitors();
-
-			this.set_position(entireWorkArea.x, entireWorkArea.y - main.panel.height);
-			this.set_size(entireWorkArea.width, entireWorkArea.height + main.panel.height);
-
 			// shade background for easier visibility
 			this.shadeBackground(tiledWindow, entireWorkArea);
 
@@ -66,8 +65,8 @@ const MyTilingDashManager = GObject.registerClass(
 			// scale Dash, if it's too big to fit the free screen space
 			const finalScale = (this.appDash.width > freeScreenRect.width - 50) ? (freeScreenRect.width - 50) / this.appDash.width : 1;
 			this.appDash.set_scale(finalScale, finalScale);
-			this.appDash.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.appDash.width * finalScale / 2, 
-					freeScreenRect.y + freeScreenRect.height / 2 - this.appDash.height * finalScale / 2);
+			this.appDash.set_position(freeScreenRect.x + freeScreenRect.width / 2 - this.appDash.width * finalScale / 2
+					, freeScreenRect.y + freeScreenRect.height / 2 - this.appDash.height * finalScale / 2);
 
 			// put arrows below appIcons (hide, if the app doesnt have multiple windows)
 			const monitorRect = global.display.get_monitor_geometry(this.monitorNr);
@@ -77,8 +76,8 @@ const MyTilingDashManager = GObject.registerClass(
 			// animate opening of appDash
 			const finalX = this.appDash.x;
 			const finalY = this.appDash.y;
-			this.animationDir.x = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x);
-			this.animationDir.y = Math.sign(((tiledWindow) ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
+			this.animationDir.x = Math.sign((tiledWindow?.tiledRect.x ?? 0) - this.freeScreenRect.x);
+			this.animationDir.y = Math.sign((tiledWindow?.tiledRect.y ?? 0) - this.freeScreenRect.y);
 			this.appDash.set_position(finalX + 400 * this.animationDir.x, this.appDash.y + 400 * this.animationDir.y);
 			this.appDash.set_opacity(0);
 			this.appDash.ease({
@@ -89,7 +88,7 @@ const MyTilingDashManager = GObject.registerClass(
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
 			});
 
-			// aniamte arrows to move along the appDash
+			// animate arrows to move along the appDash
 			this.appArrows.forEach(arrow => {
 				const x = arrow.x;
 				const y = arrow.y;
@@ -112,8 +111,6 @@ const MyTilingDashManager = GObject.registerClass(
 				return;
 
 			this.alreadyDestroyed = true;
-			main.layoutManager.disconnect(this.systemModalOpenedId);
-			main.popModal(this);
 
 			this.appArrows.forEach(arrow => arrow.destroy());
 			this.windowClones.forEach(clone => {
@@ -165,7 +162,7 @@ const MyTilingDashManager = GObject.registerClass(
 			});
 
 			if (tiledWindow) {
-				for (let w of tiledWindow.tileGroup) {
+				for (const w of tiledWindow.tileGroup) {
 					// tiling via layout ignores tilegroup and only checks if it was tiled via the layout
 					if (MyExtension.tilingLayoutManager.isTilingViaLayout && MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
 						continue;
@@ -203,14 +200,14 @@ const MyTilingDashManager = GObject.registerClass(
 					style: "color: white",
 					x: this.appDash.x + (icon.width * idx) + icon.width / 2 + 8 - ((idx === 0) ? 0 : 4), // MagicNrs.: margins/paddings of appIcons
 					y: (this.arrowIsAbove) ? this.appDash.y + 5 * this.monitorScale : this.appDash.y + this.appDash.height - 4 * this.monitorScale - 5 * this.monitorScale,
-					width: 8 * this.monitorScale, 
+					width: 8 * this.monitorScale,
 					height: 4 * this.monitorScale,
 				});
-				main.uiGroup.add_child(arrow);
+				main.layoutManager.addChrome(arrow);
 				this.appArrows.push(arrow);
 				arrow.connect("repaint", () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 
-				if (icon.cachedWindows.length == 1)
+				if (icon.cachedWindows.length === 1)
 					arrow.hide();
 			});
 		}
@@ -267,7 +264,7 @@ const MyTilingDashManager = GObject.registerClass(
 
 			// center under/above the highlighted appIcon
 			let x = this.appDash.x + appIcon.x + appIcon.width / 2 - this.windowDash.width / 2;
-			let y = (this.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
+			const y = (this.arrowIsAbove) ? this.appDash.y - this.windowDash.height - 25 : this.appDash.y + this.appDash.height + 25;
 
 			// move windowDash into the monitor (with a 20px margin), if it's (partly) outside
 			const monitorRect = global.display.get_monitor_geometry(this.monitorNr);
@@ -462,6 +459,8 @@ const MyTilingDashManager = GObject.registerClass(
 						this.openWindowDash();
 				}
 			}
+
+			return Clutter.EVENT_STOP;
 		}
 	}
 );
