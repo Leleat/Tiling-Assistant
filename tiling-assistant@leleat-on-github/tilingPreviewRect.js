@@ -11,10 +11,11 @@ var MyTilingPreviewRect = GObject.registerClass(
 	class MyTilingPreviewRect extends St.Widget {
 		_init() {
 			super._init();
-			main.uiGroup.add_child(this);
 
 			this.reset();
 			this.showing = false;
+
+			global.window_group.add_child(this);
 		}
 
 		open(window, tileRect, monitorIndex, windowToSplit = null) {
@@ -24,6 +25,8 @@ var MyTilingPreviewRect = GObject.registerClass(
 
 			if (this.rect && this.rect.equal(tileRect))
 				return;
+
+        	global.window_group.set_child_below_sibling(this, windowActor);
 
 			const changeMonitor = this.monitorIndex === -1 || this.monitorIndex !== monitorIndex;
 			this.monitorIndex = monitorIndex;
