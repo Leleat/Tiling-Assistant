@@ -194,7 +194,7 @@ const MyTilingReplacer = GObject.registerClass(
 		}
 
 		vfunc_button_press_event(buttonEvent) {
-			for (let rect of this.rects) {
+			for (const rect of this.rects) {
 				if (!Util.rectHasPoint(rect, buttonEvent))
 					continue;
 

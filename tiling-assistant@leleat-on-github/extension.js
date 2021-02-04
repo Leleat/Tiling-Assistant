@@ -78,18 +78,18 @@ function enable() {
 	// allow to directly open an app in a tiled state
 	// via holding Alt or Shift when activating the icon
 	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
-	appDisplay.AppIcon.prototype.activate = function (button) {
-		let event = Clutter.get_current_event();
-		let modifiers = event ? event.get_state() : 0;
-		let isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-		let isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
-		let isMiddleButton = button && button == Clutter.BUTTON_MIDDLE;
-		let isCtrlPressed = (modifiers & Clutter.ModifierType.CONTROL_MASK) != 0;
-		let openNewWindow = this.app.can_open_new_window() &&
-				this.app.state == Shell.AppState.RUNNING &&
-				(isCtrlPressed || isMiddleButton);
+	appDisplay.AppIcon.prototype.activate = function(button) {
+		const event = Clutter.get_current_event();
+		const modifiers = event?.get_state() ?? 0;
+		const isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
+		const isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
+		const isMiddleButton = button && button === Clutter.BUTTON_MIDDLE;
+		const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
+		const openNewWindow = this.app.can_open_new_window()
+				&& this.app.state === Shell.AppState.RUNNING
+				&& (isCtrlPressed || isMiddleButton);
 
-		if (this.app.state == Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
+		if (this.app.state === Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
 			this.animateLaunch();
 
 		if (openNewWindow) {
@@ -97,8 +97,8 @@ function enable() {
 
 		// main new code
 		} else if ((isShiftPressed || isAltPressed)) {
-			let workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
-			let rect = new Meta.Rectangle({
+			const workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
+			const rect = new Meta.Rectangle({
 				x: workArea.x + ((isShiftPressed) ? 0 : workArea.width / 2),
 				y: workArea.y,
 				width: workArea.width / 2,
@@ -117,19 +117,19 @@ function enable() {
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
 	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
 	main.panel._getDraggableWindowForPosition = function (stageX) {
-		let workspaceManager = global.workspace_manager;
+		const workspaceManager = global.workspace_manager;
 		const windows = workspaceManager.get_active_workspace().list_windows();
 		const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
 
 		return allWindowsByStacking.find(metaWindow => {
-			let rect = metaWindow.get_frame_rect();
-			let workArea = metaWindow.get_work_area_current_monitor();
+			const rect = metaWindow.get_frame_rect();
+			const workArea = metaWindow.get_work_area_current_monitor();
 
-			return metaWindow.is_on_primary_monitor() &&
-				metaWindow.showing_on_its_workspace() &&
-				metaWindow.get_window_type() != Meta.WindowType.DESKTOP &&
-				(metaWindow.maximized_vertically || (metaWindow.isTiled && metaWindow.tiledRect.y == workArea.y)) &&
-				stageX > rect.x && stageX < rect.x + rect.width;
+			return metaWindow.is_on_primary_monitor()
+					&& metaWindow.showing_on_its_workspace()
+					&& metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
+					&& (metaWindow.maximized_vertically || (metaWindow.isTiled && metaWindow.tiledRect.y === workArea.y))
+					&& stageX > rect.x && stageX < rect.x + rect.width;
 		});
 	};
 };
@@ -149,17 +149,15 @@ function disable() {
 	this.gnome_shell_settings.reset("edge-tiling");
 
 	// remove keybindings
-	this.keyBindings.forEach(key => {
-		main.wm.removeKeybinding(key);
-	});
+	this.keyBindings.forEach(key => main.wm.removeKeybinding(key));
 
 	// restore old function
 	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	// delete custom properties
-	let activeWS = global.workspace_manager.get_active_workspace()
-	let openWindows = activeWS.list_windows();
+	const activeWS = global.workspace_manager.get_active_workspace()
+	const openWindows = activeWS.list_windows();
 	openWindows.forEach(w => {
 		delete w.isTiled;
 		delete w.tiledRect;
@@ -281,10 +279,10 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 		return;
 
 	// resizing non-tiled window
-	if (grabOp != Meta.GrabOp.MOVING && !grabbedWindow.isTiled)
+	if (grabOp !== Meta.GrabOp.MOVING && !grabbedWindow.isTiled)
 		return;
 
-	let grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
+	const grabbedRect = (grabbedWindow.isTiled) ? grabbedWindow.tiledRect : grabbedWindow.get_frame_rect();
 	grabbedWindow.preGrabRect = grabbedWindow.get_frame_rect().copy();
 
 	grabbedWindow.grabSignalIDs = [];
@@ -296,38 +294,35 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	grabbedWindow.sameSideWindows = [];
 	grabbedWindow.opposingWindows = [];
 
-	let openWindows = Util.getOpenWindows();
+	const openWindows = Util.getOpenWindows();
 	openWindows.splice(openWindows.indexOf(grabbedWindow), 1);
 
 	// if ctrl is pressed, tile grabbed window and its directly opposing windows (instead of whole group)
-	let event = Clutter.get_current_event();
-	let modifiers = event ? event.get_state() : 0;
-	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-	let gap = settings.get_int("window-gaps");
+	const event = Clutter.get_current_event();
+	const modifiers = event?.get_state() ?? 0;
+	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
+	const gap = settings.get_int("window-gaps");
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
-			let [x, y] = global.get_pointer();
+			const [x, y] = global.get_pointer();
 			// rectangles of tileGroup and freeScreenRects; so together they represent the entire screen
-			let rects = [];
-			let currTileGroup = Util.getTopTileGroup();
-			let freeScreenRects = Util.getFreeScreenRects(currTileGroup);
-			currTileGroup.forEach(w => rects.push(w.tiledRect.copy()));
-			rects = freeScreenRects.concat(rects);
+			const currTileGroup = Util.getTopTileGroup();
+			const freeScreenRects = Util.getFreeScreenRects(currTileGroup);
+			const rects = freeScreenRects.concat(currTileGroup.map(w => w.tiledRect.copy()));
 
 			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("position-changed", onWindowMoving.bind(this, grabbedWindow, [x, y], currTileGroup, rects, freeScreenRects)));
 			break;
 
 		case Meta.GrabOp.RESIZING_N:
-			for (let i = 0, len = openWindows.length; i < len; i++) {
-				let oW = openWindows[i];
+			for (const oW of openWindows) {
 				if (!oW.isTiled) {
 					if (grabbedRect.contains_rect(oW.get_frame_rect()))
 						continue;
 					break;
 				}
 
-				let otherRect = oW.tiledRect;
+				const otherRect = oW.tiledRect;
 
 				if (isCtrlPressed) {
 					if (Util.equalApprox(otherRect.y + otherRect.height, grabbedRect.y, gap) && Util.equalApprox(grabbedRect.x, otherRect.x, gap) && Util.equalApprox(grabbedRect.width, otherRect.width, gap)) {
@@ -351,15 +346,14 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 			break;
 
 		case Meta.GrabOp.RESIZING_S:
-			for (let i = 0, len = openWindows.length; i < len; i++) {
-				let oW = openWindows[i];
+			for (const oW of openWindows) {
 				if (!oW.isTiled) {
 					if (grabbedRect.contains_rect(oW.get_frame_rect()))
 						continue;
 					break;
 				}
 
-				let otherRect = oW.tiledRect;
+				const otherRect = oW.tiledRect;
 
 				if (isCtrlPressed) {
 					if (Util.equalApprox(otherRect.y, grabbedRect.y + grabbedRect.height, gap) && Util.equalApprox(grabbedRect.x, otherRect.x, gap) && Util.equalApprox(grabbedRect.width, otherRect.width, gap)) {
@@ -383,15 +377,14 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 			break;
 
 		case Meta.GrabOp.RESIZING_E:
-			for (let i = 0, len = openWindows.length; i < len; i++) {
-				let oW = openWindows[i];
+			for (const oW of openWindows) {
 				if (!oW.isTiled) {
 					if (grabbedRect.contains_rect(oW.get_frame_rect()))
 						continue;
 					break;
 				}
 
-				let otherRect = oW.tiledRect;
+				const otherRect = oW.tiledRect;
 
 				if (isCtrlPressed) {
 					if (Util.equalApprox(otherRect.x, grabbedRect.x + grabbedRect.width, gap) && Util.equalApprox(grabbedRect.y, otherRect.y, gap) && Util.equalApprox(grabbedRect.height, otherRect.height, gap)) {
@@ -415,15 +408,14 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 			break;
 
 		case Meta.GrabOp.RESIZING_W:
-			for (let i = 0, len = openWindows.length; i < len; i++) {
-				let oW = openWindows[i];
+			for (const oW of openWindows) {
 				if (!oW.isTiled) {
 					if (grabbedRect.contains_rect(oW.get_frame_rect()))
 						continue;
 					break;
 				}
 
-				let otherRect = oW.tiledRect;
+				const otherRect = oW.tiledRect;
 
 				if (isCtrlPressed) {
 					if (Util.equalApprox(otherRect.x + otherRect.width, grabbedRect.x, gap) && Util.equalApprox(grabbedRect.y, otherRect.y, gap) && Util.equalApprox(grabbedRect.height, otherRect.height, gap)) {
@@ -470,7 +462,7 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 				if (tilingPreviewRect.windowToSplit)
 					Util.tileWindow(tilingPreviewRect.windowToSplit, Util.rectDiff(tilingPreviewRect.windowToSplit.tiledRect, tilingPreviewRect.rect)[0], false);
 
-				let workArea = window.get_work_area_current_monitor();
+				const workArea = window.get_work_area_current_monitor();
 				if (workArea.equal(tilingPreviewRect.rect))
 					Util.maximizeBoth(window);
 				else
@@ -488,30 +480,30 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 
 	// update the window.tiledRects.
 	// Careful with resizing issues for some terminals!
-	let gap = settings.get_int("window-gaps");
-	let newRect = window.get_frame_rect();
-	let oldTiledRect = window.tiledRect.copy();
+	const gap = settings.get_int("window-gaps");
+	const newRect = window.get_frame_rect();
+	const oldTiledRect = window.tiledRect.copy();
 
 	// first calculate the new tiledRect for the grabbed window
 	let diffX = window.preGrabRect.x - newRect.x;
 	let diffY = window.preGrabRect.y - newRect.y;
 
-	let _x = window.tiledRect.x - diffX;
-	let _y = window.tiledRect.y - diffY;
+	const _x = window.tiledRect.x - diffX;
+	const _y = window.tiledRect.y - diffY;
 	window.tiledRect = new Meta.Rectangle({
 		x: _x,
 		y: _y,
 		// tiledRect's x2 sticks to where it was, if not resizing on the East
-		width: (grabOp == Meta.GrabOp.RESIZING_E) ? newRect.width + 2 * gap : window.tiledRect.x + window.tiledRect.width - _x,
+		width: (grabOp === Meta.GrabOp.RESIZING_E) ? newRect.width + 2 * gap : window.tiledRect.x + window.tiledRect.width - _x,
 		// tiledRect's y2 sticks to where it was, if not resizing on the South
-		height: (grabOp == Meta.GrabOp.RESIZING_S) ? newRect.height + 2 * gap : window.tiledRect.y + window.tiledRect.height - _y
+		height: (grabOp === Meta.GrabOp.RESIZING_S) ? newRect.height + 2 * gap : window.tiledRect.y + window.tiledRect.height - _y
 	});
 
 	// update the diff vars based on the tiledRects diff
 	diffX = oldTiledRect.x - window.tiledRect.x;
 	diffY = oldTiledRect.y - window.tiledRect.y;
-	let diffWidth = oldTiledRect.width - window.tiledRect.width;
-	let diffHeight = oldTiledRect.height - window.tiledRect.height;
+	const diffWidth = oldTiledRect.width - window.tiledRect.width;
+	const diffHeight = oldTiledRect.height - window.tiledRect.height;
 
 	window.sameSideWindows.forEach(w => {
 		w.tiledRect = new Meta.Rectangle({
@@ -525,8 +517,8 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 
 	window.opposingWindows.forEach(w => {
 		w.tiledRect = new Meta.Rectangle({
-			x: w.tiledRect.x - ((grabOp == Meta.GrabOp.RESIZING_E) ? diffWidth : 0),
-			y: w.tiledRect.y - ((grabOp == Meta.GrabOp.RESIZING_S) ? diffHeight : 0),
+			x: w.tiledRect.x - ((grabOp === Meta.GrabOp.RESIZING_E) ? diffWidth : 0),
+			y: w.tiledRect.y - ((grabOp === Meta.GrabOp.RESIZING_S) ? diffHeight : 0),
 			width: w.tiledRect.width + diffWidth,
 			height: w.tiledRect.height + diffHeight
 		});
@@ -535,22 +527,22 @@ function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
 
 	// update tileGroup.
 	// only actually needed, if resizing while holding ctrl to resize single windows
-	let tileGroup = Util.getTopTileGroup(null, false);
+	const tileGroup = Util.getTopTileGroup(null, false);
 	tileGroup.forEach(w => Util.removeTileGroup(w));
 	Util.updateTileGroup(tileGroup);
 };
 
 // tile previewing via DND and restore window size, if window is already tiled
 function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeScreenRects) {
-	let [mouseX, mouseY] = global.get_pointer();
+	const [mouseX, mouseY] = global.get_pointer();
 
 	// restore the window size of tiled windows after DND distance of at least 1px
 	// to prevent restoring the window after just clicking on the title/top bar
 	if (window.isTiled) {
-		let moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
-		let moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
+		const moveVec = [grabStartPos[0] - mouseX, grabStartPos[1] - mouseY];
+		const moveDist = Math.sqrt(moveVec[0] * moveVec[0] + moveVec[1] * moveVec[1]);
 
-		if (moveDist <= 0)
+		if (!moveDist)
 			return;
 
 		global.display.end_grab_op(global.get_current_time());
@@ -577,32 +569,31 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		return;
 	}
 
-	let monitorNr = global.display.get_current_monitor();
-	let workArea = window.get_work_area_for_monitor(monitorNr);
-	let wRect = window.get_frame_rect();
+	const monitorNr = global.display.get_current_monitor();
+	const workArea = window.get_work_area_for_monitor(monitorNr);
+	const wRect = window.get_frame_rect();
 
-	let onTop = mouseY < main.panel.height + 25;
-	let onBottom = workArea.y + workArea.height - wRect.y < 40 || mouseY > workArea.y + workArea.height - 25;
-	let onLeft = mouseX <= workArea.x + 25;
-	let onRight = mouseX >= workArea.x + workArea.width - 25;
+	const onTop = mouseY < main.panel.height + 25;
+	const onBottom = workArea.y + workArea.height - wRect.y < 40 || mouseY > workArea.y + workArea.height - 25;
+	const onLeft = mouseX <= workArea.x + 25;
+	const onRight = mouseX >= workArea.x + workArea.width - 25;
 
-	let tileTopLeftQuarter = onTop && onLeft;
-	let tileTopRightQuarter = onTop && onRight;
-	let tileBottomLeftQuarter = onLeft && onBottom;
-	let tileBottomRightQuarter = onRight && onBottom;
+	const tileTopLeftQuarter = onTop && onLeft;
+	const tileTopRightQuarter = onTop && onRight;
+	const tileBottomLeftQuarter = onLeft && onBottom;
+	const tileBottomRightQuarter = onRight && onBottom;
 
 	// tile to top half on the most left and on the most right side of the topbar
-	let tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 4) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 4));
-	let tileRightHalf = onRight
-	let tileLeftHalf = onLeft;
-	let tileMaximized = onTop;
-	let tileBottomHalf = onBottom;
+	const tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 4) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 4));
+	const tileRightHalf = onRight
+	const tileLeftHalf = onLeft;
+	const tileMaximized = onTop;
+	const tileBottomHalf = onBottom;
 
 	// halve tiled window which is hovered while pressing ctrl
-	let event = Clutter.get_current_event();
-	let modifiers = event ? event.get_state() : 0;
-	let isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-	let mousePoint = {x: mouseX, y: mouseY};
+	const event = Clutter.get_current_event();
+	const modifiers = event?.get_state() ?? 0;
+	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
 
 	// default sizes or halving tiled windows
 	if (isCtrlPressed) {
@@ -681,7 +672,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		} else {
 			for (let i = 0; i < screenRects.length; i++) {
 				const rect = screenRects[i];
-				if (!Util.rectHasPoint(rect, mousePoint))
+				if (!Util.rectHasPoint(rect, {x: mouseX, y: mouseY}))
 					continue;
 
 				const top = mouseY < rect.y + rect.height * .2;
@@ -703,7 +694,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 					_height = rect.height / (vertical ? 2 : 1);
 				}
 
-				let r = new Meta.Rectangle({
+				const r = new Meta.Rectangle({
 					x: _x,
 					y: _y,
 					width: _width,
@@ -758,30 +749,25 @@ function onWindowTiled(tiledWindow) {
 	if (!settings.get_boolean("enable-dash"))
 		return;
 
-	let openWindows = Util.getOpenWindows();
-	let currTileGroup = Util.getTopTileGroup(openWindows, false);
+	const openWindows = Util.getOpenWindows();
+	const currTileGroup = Util.getTopTileGroup(openWindows, false);
 
 	// remove the tiled windows from openWindows to populate the Dash
 	currTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));
-	if (openWindows.length == 0)
+	if (!openWindows.length)
 		return;
 
-	let freeScreenRects = Util.getFreeScreenRects(currTileGroup);
+	const freeScreenRects = Util.getFreeScreenRects(currTileGroup);
 	if (!freeScreenRects.length)
 		return;
 
-	let freeScreenSpace = freeScreenRects[0];
-	if (freeScreenRects.length > 1) {
-		let area = freeScreenRects[0].area();
-		for (let i = 1; i < freeScreenRects.length; i++) {
-			area += freeScreenRects[i].area();
-			freeScreenSpace = freeScreenSpace.union(freeScreenRects[i]);
-		}
+	const [nonUnifiedArea, freeScreenSpace] = freeScreenRects.reduce((result, currRect) => {
+		return [result[0] += currRect.area(), result[1].union(currRect)];
+	}, [0, new Meta.Rectangle({x: freeScreenRects[0].x, y: freeScreenRects[0].y})]);
 
-		// free screen space doesnt consist of "aligned" rects, e.g. only 1 quartered window or uneven windows, etc...
-		if (!Util.equalApprox(freeScreenSpace.area(), area, 50))
-			return;
-	}
+	// freeScreenSpace doesnt consist of "aligned" rects, e.g. only 1 quartered window or uneven windows, etc...
+	if (!Util.equalApprox(freeScreenSpace.area(), nonUnifiedArea, 50))
+		return;
 
 	// some (random) hardcoded min space requirements
 	if (freeScreenSpace.width < 350 || freeScreenSpace.height < 350)

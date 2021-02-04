@@ -171,14 +171,14 @@ var MyTilingLayoutManager = GObject.registerClass(
 			const rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
 					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 
-			for (let i = 0, len = layout.length; i < len; i++) {
+			for (let i = 0; i < layout.length; i++) {
 				const r = layout[i];
 
 				// a rect is/reaches outside of screen (i. e. > 1)
 				if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
 					return false;
 
-				for (let j = i + 1; j < len; j++) {
+				for (let j = i + 1; j < layout.length; j++) {
 					if (rectsOverlap(r, layout[j]))
 						return false;
 				}
