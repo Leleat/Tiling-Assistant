@@ -28,9 +28,11 @@ const MyTilingDashManager = GObject.registerClass(
 				height: entireWorkArea.height + main.panel.height
 			});
 
-			main.layoutManager.addChrome(this);
+			main.uiGroup.add_child(this);
+			if (!main.pushModal(this))
+				return this.destroy();
 
-			global.stage.set_key_focus(this);
+			this.systemModalOpenedId = main.layoutManager.connect("system-modal-opened", () => this._destroy(true));
 
 			this.tiledWindow = tiledWindow;
 			this.monitorNr = monitorNr;
@@ -111,6 +113,9 @@ const MyTilingDashManager = GObject.registerClass(
 				return;
 
 			this.alreadyDestroyed = true;
+
+			main.layoutManager.disconnect(this.systemModalOpenedId);
+			main.popModal(this);
 
 			this.appArrows.forEach(arrow => arrow.destroy());
 			this.windowClones.forEach(clone => {
@@ -203,7 +208,7 @@ const MyTilingDashManager = GObject.registerClass(
 					width: 8 * this.monitorScale,
 					height: 4 * this.monitorScale,
 				});
-				main.layoutManager.addChrome(arrow);
+				main.uiGroup.add_child(arrow);
 				this.appArrows.push(arrow);
 				arrow.connect("repaint", () => switcherPopup.drawArrow(arrow, (this.arrowIsAbove) ? St.Side.TOP : St.Side.BOTTOM));
 
