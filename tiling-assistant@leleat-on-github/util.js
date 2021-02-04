@@ -480,7 +480,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 
 	// animation
 	const wActor = window.get_compositor_private();
-	const onlyMove = oldRect.width === rect.width && oldRect.height === rect.height;
+	const onlyMove = oldRect.width === rect.width && oldRect.height === rect.height && !wasMaximized;
 	if (MyExtension.settings.get_boolean("use-anim")) {
 		if (onlyMove) { // custom anim because they dont exist
 			const actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
@@ -510,7 +510,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 		} else if (wasMaximized) {
 
 		} else {
-			// hack => journalctl: error in size change accounting && Old animationInfo removed from actor (second one is rare)
+			// hack => journalctl: error in size change accounting; SizeChange flag?
 			main.wm._prepareAnimationInfo(global.window_manager, wActor, oldRect, Meta.SizeChange.MAXIMIZE);
 		}
 	}
@@ -519,7 +519,6 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	if (Meta.is_wayland_compositor())
 		window.move_frame(false, rect.x, rect.y);
 
-	// setting user_op to false helps with issues on terminals
 	window.move_resize_frame(false, rect.x, rect.y, rect.width, rect.height);
 
 	// setup tileGroup to raise tiled windows as a group
@@ -570,7 +569,8 @@ function maximizeBoth(window) {
 };
 
 function restoreWindowSize(window, restoreFullPos = false) {
-	if (window.get_maximized())
+	const wasMaximized = window.get_maximized();
+	if (wasMaximized)
 		window.unmaximize(window.get_maximized());
 
 	if (!window.isTiled || !window.allows_resize() || !window.allows_move())
@@ -579,6 +579,9 @@ function restoreWindowSize(window, restoreFullPos = false) {
 	const oldRect = window.isTiled;
 
 	if (restoreFullPos) {
+		// hack => journalctl: error in size change accounting; SizeChange flag?
+		if (MyExtension.settings.get_boolean("use-anim"))
+			main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), window.get_frame_rect(), Meta.SizeChange.UNMAXIMIZE);
 		// user_op as false to restore window while keeping it fully in screen in case DND-tiling dragged it offscreen
 		window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
 
@@ -588,8 +591,10 @@ function restoreWindowSize(window, restoreFullPos = false) {
 		const relativeMouseX = (mouseX - currWindowFrame.x) / currWindowFrame.width;
 		const newPosX = mouseX - oldRect.width * relativeMouseX;
 
+		if (Meta.is_wayland_compositor()) // Wayland workaround for DND/restore position
+			window.move_frame(true, newPosX, currWindowFrame.y);
+
 		// user_op with true to properly restore big windows via DND so they can go partly offscreen
-		window.move_frame(true, newPosX, currWindowFrame.y); // Wayland workaround for DND/restore position
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 	}
 
