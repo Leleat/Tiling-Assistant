@@ -163,8 +163,16 @@ const MyTilingDashManager = GObject.registerClass(
 				style: "background-color : black",
 				width: entireWorkArea.width,
 				height: entireWorkArea.height + main.panel.height,
-				opacity: 180,
+				opacity: 0
 			});
+
+			const fadeInShade = () => {
+				this.shadeBG.ease({
+					opacity: 180,
+					duration: 200,
+					mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+				});
+			}
 
 			if (tiledWindow) {
 				for (const w of tiledWindow.tileGroup) {
@@ -189,12 +197,15 @@ const MyTilingDashManager = GObject.registerClass(
 				const tiledWindowActor = tiledWindow.get_compositor_private();
 				const sID = tiledWindowActor.connect("queue-redraw", () => {
 					global.window_group.insert_child_below(this.shadeBG, tiledWindowActor);
+					fadeInShade();
+
 					tiledWindowActor.disconnect(sID);
 				});
 
 			// no tiledWindow on first rect when using layouts
 			} else {
 				global.window_group.add_child(this.shadeBG);
+				fadeInShade();
 			}
 		}
 
