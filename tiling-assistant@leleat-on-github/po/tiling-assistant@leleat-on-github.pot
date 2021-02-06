@@ -17,11 +17,15 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: prefs.js:298
-#, javascript-format
+# error messages when defining the layouts
+msgid "Missing rectangle or app."
+msgstr ""
+
+# error messages when defining the layouts
 msgid "Rectangle %d is (partly) outside of the screen."
 msgstr ""
 
+# error messages when defining the layouts
 #: prefs.js:302
 #, javascript-format
 msgid "Rectangles %d and %d overlap."
@@ -175,10 +179,7 @@ msgstr ""
 
 #: prefs.js:377
 msgid ""
-"<span size='small'>This extension is licensed under the <a href='https://www."
-"gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, "
-"version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of "
-"this license can be found in the Github repository.</span>"
+"<small>This extension is licensed under the <a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license can be found in the Github repository.</small>"
 msgstr ""
 
 #: prefs.js:379

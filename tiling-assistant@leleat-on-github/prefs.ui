@@ -441,7 +441,7 @@
                 <property name="margin-bottom">12</property>
                 <property name="spacing">32</property>
                 <child>
-                  <object class="GtkLabel" id="label29">
+                  <object class="GtkLabel" id="enableDashLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
@@ -485,7 +485,7 @@
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <child>
-                  <object class="GtkLabel" id="label12">
+                  <object class="GtkLabel" id="dashIconSizeLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Dash icon size</property>
@@ -535,7 +535,7 @@
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <child>
-                  <object class="GtkLabel" id="label13">
+                  <object class="GtkLabel" id="dashIconMarginLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Dash icon margin</property>
@@ -576,7 +576,6 @@
           <object class="GtkListBoxRow" id="listboxrow15">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
-            <property name="tooltip-text" translatable="yes">Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting.</property>
             <child>
               <object class="GtkBox" id="box15">
                 <property name="visible">True</property>
@@ -587,7 +586,7 @@
                 <property name="margin-bottom">12</property>
                 <property name="spacing">32</property>
                 <child>
-                  <object class="GtkLabel" id="label15">
+                  <object class="GtkLabel" id="enableAnimationsLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="valign">center</property>
@@ -601,9 +600,10 @@
                   </packing>
                 </child>
                 <child>
-                  <object class="GtkImage">
+                  <object class="GtkImage" id="animationsTooltipHint">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
+                    <property name="tooltip-text" translatable="yes">Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting.</property>
                     <property name="stock">gtk-about</property>
                   </object>
                   <packing>
@@ -643,7 +643,7 @@
                 <property name="margin-top">12</property>
                 <property name="margin-bottom">12</property>
                 <child>
-                  <object class="GtkLabel" id="label2">
+                  <object class="GtkLabel" id="gabLabel">
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="label" translatable="yes">Gap between tiled windows</property>
@@ -686,11 +686,11 @@
       </packing>
     </child>
     <child type="tab">
-      <object class="GtkLabel" id="generalLabel">
+      <object class="GtkLabel" id="generalTabLabel">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="hexpand">True</property>
-        <property name="label" translatable="yes">General</property>
+        <property name="label" translatable="yes">Generali</property>
       </object>
       <packing>
         <property name="tab-fill">False</property>
@@ -749,7 +749,7 @@
                                 <property name="margin-top">12</property>
                                 <property name="margin-bottom">12</property>
                                 <child>
-                                  <object class="GtkLabel" id="label3">
+                                  <object class="GtkLabel" id="toggleMaximizationLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -800,7 +800,7 @@
                                 <property name="margin-top">12</property>
                                 <property name="margin-bottom">12</property>
                                 <child>
-                                  <object class="GtkLabel" id="label20">
+                                  <object class="GtkLabel" id="tileToTopHalfLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -852,7 +852,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label21">
+                                  <object class="GtkLabel" id="tileToBottomHalfLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -904,7 +904,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label26">
+                                  <object class="GtkLabel" id="tileToRightHalfLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -956,7 +956,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label27">
+                                  <object class="GtkLabel" id="tileToLeftHalfLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1008,7 +1008,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label22">
+                                  <object class="GtkLabel" id="tileToTopLeftQuarterLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1060,11 +1060,11 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label23">
+                                  <object class="GtkLabel" id="tileToTopRightQuarterLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Tile to  top right quarter</property>
+                                    <property name="label" translatable="yes">Tile to top right quarter</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1112,7 +1112,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label24">
+                                  <object class="GtkLabel" id="tileToBottomLeftQuarterLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1164,7 +1164,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label25">
+                                  <object class="GtkLabel" id="tileToBottomRightQuarterLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1209,7 +1209,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="FixedTiling">
+                          <object class="GtkLabel" id="FixedTilingHeadingLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Fixed Tiling    &lt;/b&gt;</property>
@@ -1274,7 +1274,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="label1">
+                                  <object class="GtkLabel" id="tileToEmptySpaceLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1300,7 +1300,7 @@
                                 <property name="can-focus">False</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label4">
+                                  <object class="GtkLabel" id="tileToOtherTiledWindowLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1345,7 +1345,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="DynamicTiling">
+                          <object class="GtkLabel" id="DynamicTilingHeadingLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Dynamic Tiling    &lt;/b&gt;</property>
@@ -1410,7 +1410,7 @@
                                   </packing>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel" id="label30">
+                                  <object class="GtkLabel" id="toggleDashLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1433,7 +1433,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="Other">
+                          <object class="GtkLabel" id="OtherHeadingLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Other    &lt;/b&gt;</property>
@@ -1480,7 +1480,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label5">
+                                  <object class="GtkLabel" id="layout1KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1533,7 +1533,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label6">
+                                  <object class="GtkLabel" id="layout2KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1586,7 +1586,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label7">
+                                  <object class="GtkLabel" id="layout3KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1639,7 +1639,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label8">
+                                  <object class="GtkLabel" id="layout4KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1692,7 +1692,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label9">
+                                  <object class="GtkLabel" id="layout5KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1745,7 +1745,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label10">
+                                  <object class="GtkLabel" id="layout6KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1798,7 +1798,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label11">
+                                  <object class="GtkLabel" id="layout7KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1851,7 +1851,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label16">
+                                  <object class="GtkLabel" id="layout8KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1904,7 +1904,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label17">
+                                  <object class="GtkLabel" id="layout9KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -1957,7 +1957,7 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="spacing">32</property>
                                 <child>
-                                  <object class="GtkLabel" id="label18">
+                                  <object class="GtkLabel" id="layout10KeybindingLabel">
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
@@ -2002,7 +2002,7 @@
                           </object>
                         </child>
                         <child type="label">
-                          <object class="GtkLabel" id="Layouts">
+                          <object class="GtkLabel" id="LayoutsHeadingLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Layouts    &lt;/b&gt;</property>
@@ -2024,7 +2024,7 @@
       </packing>
     </child>
     <child type="tab">
-      <object class="GtkLabel" id="keybindingsLabel">
+      <object class="GtkLabel" id="keybindingsTabLabel">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="hexpand">True</property>
@@ -2050,7 +2050,7 @@
             <property name="spacing">20</property>
             <child>
               <object class="GtkButton" id="saveLayoutsButton">
-                <property name="label" translatable="yes"> Save</property>
+                <property name="label" translatable="yes">Save</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -2067,7 +2067,7 @@
             </child>
             <child>
               <object class="GtkButton" id="reloadLayoutsButton">
-                <property name="label" translatable="yes"> Reload</property>
+                <property name="label" translatable="yes">Reload</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">True</property>
@@ -6641,7 +6641,7 @@ The clear button clears the respective layout. This change is not yet saved.
       </packing>
     </child>
     <child type="tab">
-      <object class="GtkLabel" id="layoutsLabel">
+      <object class="GtkLabel" id="layoutsTabLabel">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="hexpand">True</property>
@@ -6724,7 +6724,7 @@ The clear button clears the respective layout. This change is not yet saved.
             <property name="valign">end</property>
             <property name="margin-bottom">20</property>
             <property name="vexpand">True</property>
-            <property name="label" translatable="yes">&lt;small&gt;This extension is licensed under the &lt;a href="https://www.gnu.org/licenses/old-licenses/gpl-2.0.html"&gt;GNU General Public License, version 2 or later&lt;/a&gt; and comes with &lt;u&gt;&lt;b&gt;NO WARRANTY&lt;/b&gt;&lt;/u&gt;.  A copy of this license can be found in the Github repository.&lt;/small&gt;</property>
+            <property name="label" translatable="yes">&lt;small&gt;This extension is licensed under the &lt;a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'&gt;GNU General Public License, version 2 or later&lt;/a&gt; and comes with &lt;u&gt;&lt;b&gt;NO WARRANTY&lt;/b&gt;&lt;/u&gt;.  A copy of this license can be found in the Github repository.&lt;/small&gt;</property>
             <property name="use-markup">True</property>
             <property name="justify">center</property>
             <property name="wrap">True</property>
@@ -6744,7 +6744,7 @@ The clear button clears the respective layout. This change is not yet saved.
       </packing>
     </child>
     <child type="tab">
-      <object class="GtkLabel" id="helpLabel">
+      <object class="GtkLabel" id="helpTabLabel">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="hexpand">True</property>
