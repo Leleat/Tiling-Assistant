@@ -24,7 +24,7 @@ const MyPrefsWidget = new GObject.Class({
 
 	_init: function (params) {
 		const gschema = Gio.SettingsSchemaSource.new_from_directory(
-			Me.dir.get_child('schemas').get_path(),
+			Me.dir.get_child("schemas").get_path(),
 			Gio.SettingsSchemaSource.get_default(),
 			false
 		);

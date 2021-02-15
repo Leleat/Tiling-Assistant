@@ -51,7 +51,7 @@ const MyTilingReplacer = GObject.registerClass(
 		_destroy() {
 			this.previewRects.forEach(r => r.destroy());
 			this.shadeBG.destroy();
-			super.destroy();
+			this.destroy();
 		}
 
 		shadeBackground(entireWorkArea) {
