@@ -3,11 +3,6 @@
 const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 
-const Gettext = imports.gettext;
-Gettext.textdomain("tiling-assistant@leleat-on-github");
-Gettext.bindtextdomain("tiling-assistant@leleat-on-github", Me.dir.get_child("locale").get_path());
-const _ = Gettext.gettext;
-
 function init () {
 };
 
@@ -54,9 +49,6 @@ const MyPrefsWidget = new GObject.Class({
 				"tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 				"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
 		shortcuts.forEach(sc => this.makeShortcutEdit(sc));
-
-		// translations
-		this.setupTranslations();
 
 		////////////////
 		////////////////
@@ -361,15 +353,15 @@ const MyPrefsWidget = new GObject.Class({
 			const appName = (hasAppButton) ? layout[i][1] : null;
 
 			if (hasAppButton && ((r && !appName) || (!r && appName)))
-				return [false, _("Missing rectangle or app.")];
+				return [false, "Missing rectangle or app."];
 
 			// rects is/reaches outside of screen (i. e. > 1)
 			if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
-				return [false, _("Rectangle %d is (partly) outside of the screen.").format(i + 1)];
+				return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
 
 			for (let j = i + 1; j < layout.length; j++) {
 				if (rectsOverlap(r, layout[j]))
-					return [false, _("Rectangles %d and %d overlap.").format(i + 1, j + 1)];
+					return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
 			}
 		}
 
@@ -405,44 +397,5 @@ const MyPrefsWidget = new GObject.Class({
 		});
 
 		cr.$dispose();
-	},
-
-	setupTranslations: function () {
-		const widgetNames = ["generalTabLabel", "keybindingsTabLabel", "layoutsTabLabel", "helpTabLabel"
-				, "enableDashLabel", "dashIconSizeLabel", "dashIconMarginLabel", "enableAnimationsLabel", "animationsTooltipHint","gabLabel"
-				, "toggleMaximizationLabel", "tileToTopHalfLabel", "tileToBottomHalfLabel", "tileToRightHalfLabel", "tileToLeftHalfLabel"
-				, "tileToTopLeftQuarterLabel", "tileToTopRightQuarterLabel", "tileToBottomLeftQuarterLabel", "tileToBottomRightQuarterLabel"
-				, "tileToEmptySpaceLabel", "tileToOtherTiledWindowLabel", "toggleDashLabel"
-				, "FixedTilingHeadingLabel", "DynamicTilingHeadingLabel", "OtherHeadingLabel", "LayoutsHeadingLabel"
-				, "layout1KeybindingLabel", "layout2KeybindingLabel", "layout3KeybindingLabel", "layout4KeybindingLabel", "layout5KeybindingLabel"
-				, "layout6KeybindingLabel", "layout7KeybindingLabel", "layout8KeybindingLabel", "layout9KeybindingLabel", "layout10KeybindingLabel"
-				, "saveLayoutsButton", "reloadLayoutsButton", "tooltipLayoutsEntry", "issueLabel", "licenseLabel"
-		];
-
-		for (const name of widgetNames) {
-			const widget = this.builder.get_object(name);
-			if (!widget || !(widget instanceof Gtk.Widget))
-				return;
-
-			const tooltipText = widget.get_tooltip_text();
-			tooltipText && widget.set_tooltip_text(_(tooltipText));
-			GLib.free(tooltipText);
-
-			if (widget instanceof Gtk.Label) {
-				const widgetText = widget.get_label();
-				if (widgetText) {
-					(widget.get_use_markup()) ? widget.set_label(_(widgetText))
-							: widget.set_text(_(widgetText));
-				}
-
-			} else if (widget instanceof Gtk.Entry) {
-				const placeholderText = widget.get_placeholder_text();
-				placeholderText && widget.set_placeholder_text(_(placeholderText));
-
-			} else if (widget instanceof Gtk.Button) {
-				const widgetText = widget.get_label();
-				widgetText && widget.set_label(_(widgetText));
-			}
-		}
 	},
 });
