@@ -78,8 +78,8 @@ const MyTilingDashManager = GObject.registerClass(
 			// animate opening of appDash
 			const finalX = this.appDash.x;
 			const finalY = this.appDash.y;
-			this.animationDir.x = Math.sign((tiledWindow?.tiledRect.x ?? 0) - this.freeScreenRect.x);
-			this.animationDir.y = Math.sign((tiledWindow?.tiledRect.y ?? 0) - this.freeScreenRect.y);
+			this.animationDir.x = Math.sign((tiledWindow ? tiledWindow.tiledRect.x : 0) - this.freeScreenRect.x);
+			this.animationDir.y = Math.sign((tiledWindow ? tiledWindow.tiledRect.y : 0) - this.freeScreenRect.y);
 			this.appDash.set_position(finalX + 400 * this.animationDir.x, this.appDash.y + 400 * this.animationDir.y);
 			this.appDash.set_opacity(0);
 			this.appDash.ease({

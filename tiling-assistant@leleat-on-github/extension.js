@@ -80,7 +80,7 @@ function enable() {
 	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
 	appDisplay.AppIcon.prototype.activate = function(button) {
 		const event = Clutter.get_current_event();
-		const modifiers = event?.get_state() ?? 0;
+		const modifiers = event ? event.get_state() : 0;
 		const isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
 		const isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
 		const isMiddleButton = button && button === Clutter.BUTTON_MIDDLE;
@@ -299,7 +299,7 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 
 	// if ctrl is pressed, tile grabbed window and its directly opposing windows (instead of whole group)
 	const event = Clutter.get_current_event();
-	const modifiers = event?.get_state() ?? 0;
+	const modifiers = event ? event.get_state() : 0;
 	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
 	const gap = settings.get_int("window-gaps");
 
@@ -584,7 +584,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const tileBottomRightQuarter = onRight && onBottom;
 
 	// tile to top half on the most left and on the most right side of the topbar
-	const tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 4) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 4));
+	const tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 5) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 5));
 	const tileRightHalf = onRight
 	const tileLeftHalf = onLeft;
 	const tileMaximized = onTop;
@@ -592,7 +592,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 
 	// halve tiled window which is hovered while pressing ctrl
 	const event = Clutter.get_current_event();
-	const modifiers = event?.get_state() ?? 0;
+	const modifiers = event ? event.get_state() : 0;
 	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
 
 	// default sizes or halving tiled windows
