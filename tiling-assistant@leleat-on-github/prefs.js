@@ -54,7 +54,6 @@ const MyPrefsWidget = new GObject.Class({
 		////////////////
 		// Layouts gui:
 		// this.layouts is an array of arrays. The inner arrays contain "rects" in the format {x: NR, y: NR, width: NR, height: NR}
-		// layouts with apps attached are in the format [{x: NR, y: NR, width: NR, height: NR}, appName].
 		// NR is a float between 0 to 1.
 		// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
 		this.loadLayouts();
@@ -78,7 +77,6 @@ const MyPrefsWidget = new GObject.Class({
 		// Nr (10) of layouts are "hardcoded"
 		for (let i = 0; i < 10; i++) {
 			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-			const hasAppButton = layoutListBox.get_row_at_index(0).get_child().get_children().length === 3;
 
 			// delete buttons
 			// resets Gtk.entries and add app buttons
@@ -86,47 +84,8 @@ const MyPrefsWidget = new GObject.Class({
 				for (let j = 0; j < 8; j++) { // 8 Gtk.entries / possible rects in a layout
 					const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
 					entry.set_text("");
-
-					if (hasAppButton) {
-						const appButton = layoutListBox.get_row_at_index(j).get_child().get_children()[2];
-						const img = Gtk.Image.new_from_icon_name("list-add", this.buttonIconSize);
-						appButton.set_image(img);
-						appButton.appInfo = null;
-					}
 				}
 			});
-
-			// add button (each Gtk.entry / rectangle has one):
-			// opens an AppChooserDialog
-			if (hasAppButton) {
-				for (let j = 0; j < 8; j++) { // 8 Gtk.entries / possible rects in a layout
-					const appButton = layoutListBox.get_row_at_index(j).get_child().get_children()[2];
-					appButton.connect("clicked", () => {
-						const chooserDialog = new Gtk.AppChooserDialog({
-							transient_for: this.get_toplevel(),
-							modal: true
-						});
-
-						chooserDialog.get_widget().set({
-							show_all: true,
-							show_other: true
-						});
-
-						chooserDialog.connect('response', (dlg, id) => {
-							if (id === Gtk.ResponseType.OK) {
-								const appInfo = chooserDialog.get_widget().get_app_info();
-								const img = Gtk.Image.new_from_gicon(appInfo.get_icon(), this.buttonIconSize);
-								appButton.set_image(img);
-								appButton.appInfo = appInfo;
-							}
-
-							chooserDialog.destroy();
-						});
-
-						chooserDialog.show();
-					});
-				}
-			}
 
 			// draw preview rects in the right column
 			const drawArea = this.builder.get_object(`DrawArea${i}`);
@@ -136,14 +95,14 @@ const MyPrefsWidget = new GObject.Class({
 					return;
 
 				const layout = this.layouts[i];
-				const [layoutIsValid, errMsg] = this.layoutIsValid(layout, hasAppButton);
+				const [layoutIsValid, errMsg] = this.layoutIsValid(layout);
 				if (layoutIsValid) {
 					// remove error label from overlay, if it exists
 					const gtkOverlay = widget.get_parent().get_parent();
 					if (gtkOverlay.get_children().length > 1)
 						gtkOverlay.remove(gtkOverlay.get_children()[1]);
 
-					this.drawLayoutsRects(widget, cr, layout, hasAppButton);
+					this.drawLayoutsRects(widget, cr, layout);
 
 				} else {
 					// add error label to overlay;
@@ -241,18 +200,9 @@ const MyPrefsWidget = new GObject.Class({
 		// reset layout's entries' text
 		for (let i = 0; i < 10; i++) {
 			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-			const hasAppButton = layoutListBox.get_row_at_index(0).get_child().get_children().length === 3;
-
 			for (let j = 0; j < 8; j++) {
 				const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
 				entry.set_text("");
-
-				if (hasAppButton) {
-					const appButton = layoutListBox.get_row_at_index(j).get_child().get_children()[2];
-					const img = Gtk.Image.new_from_icon_name("list-add", this.buttonIconSize);
-					appButton.set_image(img);
-					appButton.appInfo = null;
-				}
 			}
 		}
 
@@ -260,22 +210,11 @@ const MyPrefsWidget = new GObject.Class({
 		const layouts = JSON.parse(contents);
 		layouts.forEach((layout, index) => {
 			const layoutListBox = this.builder.get_object(`LayoutListbox${index}`);
-			const hasAppButton = layoutListBox.get_row_at_index(0).get_child().get_children().length === 3;
 
 			layout.forEach((item, idx) => {
-				const rect = (hasAppButton) ? item[0] : item;
-				const appName = (hasAppButton) ? item[1] : null;
-
+				const rect = item;
 				const entry = layoutListBox.get_row_at_index(idx).get_child().get_children()[1];
 				entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
-
-				if (hasAppButton) {
-					const appButton = layoutListBox.get_row_at_index(idx).get_child().get_children()[2];
-					const appInfo = Gio.AppInfo.get_all().find((info) => info.get_name() === appName);
-					const img = appInfo ? Gtk.Image.new_from_gicon(appInfo.get_icon(), this.buttonIconSize) : Gtk.Image.new_from_icon_name("list-add", this.buttonIconSize);
-					appButton.set_image(img);
-					appButton.appInfo = appInfo;
-				}
 			});
 		});
 
@@ -292,7 +231,6 @@ const MyPrefsWidget = new GObject.Class({
 		for (let i = 0; i < 10; i++) {
 			const layout = [];
 			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-			const hasAppButton = layoutListBox.get_row_at_index(0).get_child().get_children().length === 3;
 
 			// for each possible rect in the layout
 			for (let j = 0; j < 8; j++) {
@@ -319,8 +257,7 @@ const MyPrefsWidget = new GObject.Class({
 					rect[rectProps[k]] = propValue;
 				}
 
-				const appButton = (hasAppButton) ? layoutListBox.get_row_at_index(j).get_child().get_children()[2] : null;
-				layout.push((!appButton) ? rect : (appButton.appInfo) ? [rect, appButton.appInfo.get_name()] : {x: 0, y: 0, width: 0, height: 0});
+				layout.push(rect);
 			}
 
 			allLayouts.push(layout);
@@ -339,7 +276,7 @@ const MyPrefsWidget = new GObject.Class({
 		return success;
 	},
 
-	layoutIsValid: function (layout, hasAppButton) {
+	layoutIsValid: function (layout) {
 		if (!layout)
 			return [false, "No layout."];
 
@@ -349,11 +286,7 @@ const MyPrefsWidget = new GObject.Class({
 		}
 
 		for (let i = 0; i < layout.length; i++) {
-			const r = (hasAppButton) ? layout[i][0] : layout[i];
-			const appName = (hasAppButton) ? layout[i][1] : null;
-
-			if (hasAppButton && ((r && !appName) || (!r && appName)))
-				return [false, "Missing rectangle or app."];
+			const r = layout[i];
 
 			// rects is/reaches outside of screen (i. e. > 1)
 			if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
@@ -369,7 +302,7 @@ const MyPrefsWidget = new GObject.Class({
 	},
 
 	// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
-	drawLayoutsRects: function (layoutWidget, cr, layout, hasAppButton) {
+	drawLayoutsRects: function (layoutWidget, cr, layout) {
 		const color = new Gdk.RGBA();
 		const width = layoutWidget.get_allocated_width();
 		const height = layoutWidget.get_allocated_height();
@@ -377,7 +310,7 @@ const MyPrefsWidget = new GObject.Class({
 		cr.setLineWidth(1.0);
 
 		layout.forEach(item => {
-			const r = (!hasAppButton) ? item : item[0];
+			const r = item;
 			// 1px outline for rect in transparent white
 			color.parse("rgba(255, 255, 255, .2)");
 			Gdk.cairo_set_source_rgba(cr, color);

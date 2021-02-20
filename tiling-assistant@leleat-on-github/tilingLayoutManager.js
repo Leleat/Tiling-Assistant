@@ -55,31 +55,6 @@ var MyTilingLayoutManager = GObject.registerClass(
 			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
 		}
 
-		// called via keybinding of the respective layout (last few layouts)
-		// automatically opens a predefined list of apps in a layout
-		openAppsInLayout(layoutIdx) {
-			const [rectLayout, appList] = this.getLayout(layoutIdx, true);
-			if (!rectLayout || !rectLayout.length || !this.layoutIsValid(rectLayout))
-				return;
-
-			this.currentLayout = [];
-
-			// turn rect objects (gotten from .json) into Meta.Rectangles
-			// and scale rects to workArea size
-			const workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
-			rectLayout.forEach(r => {
-				this.currentLayout.push(new Meta.Rectangle({
-					x: workArea.x + r.x * workArea.width,
-					y: workArea.y + r.y * workArea.height,
-					width: r.width * workArea.width,
-					height: r.height * workArea.height,
-				}));
-			});
-
-			const currentLayoutRect = this.currentLayout.shift();
-			Util.openAppTiled(appList.shift(), currentLayoutRect, appList, this.currentLayout);
-		}
-
 		// called after a window was tiled with an appIcon from tilingDash.js
 		onWindowTiled(tiledWindow) {
 			if (!this.isTilingViaLayout)

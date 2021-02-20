@@ -42,142 +42,17 @@
     <property name="stock">gtk-delete</property>
     <property name="icon_size">3</property>
   </object>
-  <object class="GtkImage" id="image11">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="stock">gtk-add</property>
-  </object>
-  <object class="GtkImage" id="image12">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image13">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image14">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image15">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image16">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image17">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image18">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image19">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
   <object class="GtkImage" id="image2">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="stock">gtk-delete</property>
     <property name="icon_size">3</property>
   </object>
-  <object class="GtkImage" id="image20">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image21">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image22">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image23">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image24">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image25">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image26">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image27">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image28">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image29">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
   <object class="GtkImage" id="image3">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="stock">gtk-delete</property>
     <property name="icon_size">3</property>
-  </object>
-  <object class="GtkImage" id="image30">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image31">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image32">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image33">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image34">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
-  </object>
-  <object class="GtkImage" id="image35">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add</property>
   </object>
   <object class="GtkImage" id="image4">
     <property name="visible">True</property>
@@ -690,7 +565,7 @@
         <property name="visible">True</property>
         <property name="can-focus">False</property>
         <property name="hexpand">True</property>
-        <property name="label" translatable="yes">Generali</property>
+        <property name="label" translatable="yes">General</property>
       </object>
       <packing>
         <property name="tab-fill">False</property>
@@ -1374,94 +1249,6 @@
                         <property name="label-xalign">0.5</property>
                         <property name="shadow-type">in</property>
                         <child>
-                          <object class="GtkBox" id="box29">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">20</property>
-                            <property name="margin-end">20</property>
-                            <property name="margin-top">12</property>
-                            <property name="margin-bottom">12</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">20</property>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">False</property>
-                                <child>
-                                  <object class="GtkTreeView" id="toggle-dash-treeview">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="model">toggle-dash-liststore</property>
-                                    <property name="headers-visible">False</property>
-                                    <property name="enable-search">False</property>
-                                    <property name="search-column">0</property>
-                                    <property name="activate-on-single-click">True</property>
-                                    <child internal-child="selection">
-                                      <object class="GtkTreeSelection"/>
-                                    </child>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">True</property>
-                                    <property name="fill">True</property>
-                                    <property name="pack-type">end</property>
-                                    <property name="position">0</property>
-                                  </packing>
-                                </child>
-                                <child>
-                                  <object class="GtkLabel" id="toggleDashLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">False</property>
-                                    <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle Dash</property>
-                                    <property name="xalign">0</property>
-                                  </object>
-                                  <packing>
-                                    <property name="expand">True</property>
-                                    <property name="fill">True</property>
-                                    <property name="position">1</property>
-                                  </packing>
-                                </child>
-                              </object>
-                              <packing>
-                                <property name="expand">False</property>
-                                <property name="fill">True</property>
-                                <property name="position">0</property>
-                              </packing>
-                            </child>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel" id="OtherHeadingLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Other    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="margin-start">10</property>
-                    <property name="margin-end">10</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">10</property>
-                        <property name="margin-end">10</property>
-                        <property name="margin-bottom">10</property>
-                        <property name="label-xalign">0.5</property>
-                        <property name="shadow-type">in</property>
-                        <child>
                           <object class="GtkBox" id="box4">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
@@ -2006,6 +1793,94 @@
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="label" translatable="yes">&lt;b&gt;    Layouts    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="margin-start">10</property>
+                    <property name="margin-end">10</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">10</property>
+                        <property name="margin-end">10</property>
+                        <property name="margin-bottom">10</property>
+                        <property name="label-xalign">0.5</property>
+                        <property name="shadow-type">in</property>
+                        <child>
+                          <object class="GtkBox" id="box29">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">20</property>
+                            <property name="margin-end">20</property>
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">20</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <child>
+                                  <object class="GtkTreeView" id="toggle-dash-treeview">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="model">toggle-dash-liststore</property>
+                                    <property name="headers-visible">False</property>
+                                    <property name="enable-search">False</property>
+                                    <property name="search-column">0</property>
+                                    <property name="activate-on-single-click">True</property>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection"/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="pack-type">end</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkLabel" id="toggleDashLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="valign">center</property>
+                                    <property name="label" translatable="yes">Toggle Dash</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">True</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">0</property>
+                              </packing>
+                            </child>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel" id="OtherHeadingLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    Other    &lt;/b&gt;</property>
                             <property name="use-markup">True</property>
                           </object>
                         </child>
@@ -5089,20 +4964,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton17">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image28</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5142,20 +5004,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton18">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image29</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5195,20 +5044,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton19">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image30</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5248,20 +5084,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton20">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image31</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5301,20 +5124,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton21">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image32</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5354,20 +5164,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton22">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image33</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5407,20 +5204,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton23">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image34</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5460,20 +5244,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton24">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image35</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5629,20 +5400,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton9">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image20</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5682,20 +5440,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton10">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image21</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5735,20 +5480,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton11">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image22</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5788,20 +5520,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton12">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image23</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5841,20 +5560,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton13">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image24</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5894,20 +5600,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton14">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image25</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -5947,20 +5640,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton15">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image26</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6000,20 +5680,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton16">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image27</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6169,20 +5836,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton1">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image19</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6222,20 +5876,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton2">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image12</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6275,20 +5916,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton3">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image13</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6328,20 +5956,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton4">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image14</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6381,20 +5996,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton5">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image15</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6434,20 +6036,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton6">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image16</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6487,20 +6076,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton7">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image17</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>
@@ -6540,20 +6116,7 @@ The clear button clears the respective layout. This change is not yet saved.
                                                       </packing>
                                                     </child>
                                                     <child>
-                                                      <object class="GtkButton" id="AppButton8">
-                                                        <property name="visible">True</property>
-                                                        <property name="can-focus">True</property>
-                                                        <property name="receives-default">True</property>
-                                                        <property name="margin-start">12</property>
-                                                        <property name="margin-end">5</property>
-                                                        <property name="image">image18</property>
-                                                        <property name="always-show-image">True</property>
-                                                      </object>
-                                                      <packing>
-                                                        <property name="expand">False</property>
-                                                        <property name="fill">True</property>
-                                                        <property name="position">2</property>
-                                                      </packing>
+                                                      <placeholder/>
                                                     </child>
                                                   </object>
                                                 </child>

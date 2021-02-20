@@ -74,46 +74,6 @@ function enable() {
 		);
 	});
 
-	// change appDisplay.AppIcon.activate function.
-	// allow to directly open an app in a tiled state
-	// via holding Alt or Shift when activating the icon
-	this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
-	appDisplay.AppIcon.prototype.activate = function(button) {
-		const event = Clutter.get_current_event();
-		const modifiers = event ? event.get_state() : 0;
-		const isAltPressed = modifiers & Clutter.ModifierType.MOD1_MASK;
-		const isShiftPressed = modifiers & Clutter.ModifierType.SHIFT_MASK;
-		const isMiddleButton = button && button === Clutter.BUTTON_MIDDLE;
-		const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-		const openNewWindow = this.app.can_open_new_window()
-				&& this.app.state === Shell.AppState.RUNNING
-				&& (isCtrlPressed || isMiddleButton);
-
-		if (this.app.state === Shell.AppState.STOPPED || openNewWindow || isShiftPressed || isAltPressed)
-			this.animateLaunch();
-
-		if (openNewWindow) {
-			this.app.open_new_window(-1);
-
-		// main new code
-		} else if ((isShiftPressed || isAltPressed)) {
-			const workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
-			const rect = new Meta.Rectangle({
-				x: workArea.x + ((isShiftPressed) ? 0 : workArea.width / 2),
-				y: workArea.y,
-				width: workArea.width / 2,
-				height: workArea.height
-			});
-
-			Util.openAppTiled(this.app, rect);
-
-		} else {
-			this.app.activate();
-		}
-
-		main.overview.hide();
-	};
-
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
 	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
 	main.panel._getDraggableWindowForPosition = function (stageX) {
@@ -152,7 +112,6 @@ function disable() {
 	this.keyBindings.forEach(key => main.wm.removeKeybinding(key));
 
 	// restore old function
-	appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	// delete custom properties
@@ -187,12 +146,9 @@ function onMyTilingShortcutPressed(shortcutName) {
 		main.notify("Tiling Assistant", "Dash " + (toggleTo ? "enabled" : "was disabled"));
 
 	// open the appDash consecutively to tile to a layout
-	} else if (["layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7"].includes(shortcutName)) {
+	} else if (["layout1", "layout2", "layout3", "layout4", "layout5",
+			"layout6", "layout7", "layout8", "layout9", "layout10"].includes(shortcutName)) {
 		tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(6)) - 1);
-
-	// automatically open apps in a tiled layout
-	} else if (["layout8", "layout9", "layout10"].includes(shortcutName)) {
-		tilingLayoutManager.openAppsInLayout(Number.parseInt(shortcutName.substring(6)) - 1);
 
 	// tile window to another tiled window / freeScreenRect
 	} else if (shortcutName === "replace-window") {
