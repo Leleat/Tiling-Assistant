@@ -5,7 +5,6 @@ const {Clutter, GObject, Meta, St} = imports.gi;
 
 // this is the preview which is shown when DNDing to a screen edge/corner etc...
 // mostly from windowManager.js except:
-// show preview above all windows, because big windows may obscure small previews (e. g. quarter previews),
 // save the tiledWindow (until closing the preview) to tile over another tiled window when holding Ctrl
 var MyTilingPreviewRect = GObject.registerClass(
 	class MyTilingPreviewRect extends St.Widget {
