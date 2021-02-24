@@ -118,10 +118,6 @@ const MyTilingDashManager = GObject.registerClass(
 			main.popModal(this);
 
 			this.appArrows.forEach(arrow => arrow.destroy());
-			this.windowClones.forEach(clone => {
-				clone.source.show();
-				clone.destroy();
-			});
 
 			if (cancelTilingWithLayout)
 				MyExtension.tilingLayoutManager.endTilingViaLayout();
@@ -130,7 +126,13 @@ const MyTilingDashManager = GObject.registerClass(
 				opacity: 0,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.shadeBG.destroy()
+				onComplete: () => {
+					this.shadeBG.destroy();
+					this.windowClones.forEach(clone => {
+						clone.source.show();
+						clone.destroy();
+					});
+				}
 			});
 
 			if (this.thumbnailsAreFocused) {
@@ -165,15 +167,9 @@ const MyTilingDashManager = GObject.registerClass(
 				height: entireWorkArea.height + main.panel.height,
 				opacity: 0
 			});
+			global.window_group.add_child(this.shadeBG);
 
-			const fadeInShade = () => {
-				this.shadeBG.ease({
-					opacity: 180,
-					duration: 200,
-					mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				});
-			}
-
+			// tiledWindow == null, on intial tiling with layout
 			if (tiledWindow) {
 				for (const w of tiledWindow.tileGroup) {
 					// tiling via layout ignores tilegroup and only checks if it was tiled via the layout
@@ -192,21 +188,15 @@ const MyTilingDashManager = GObject.registerClass(
 					}
 				}
 
-				// shadeBG wont be set properly on consecutive tiling (i. e. holding shift/alt when tiling).
-				// signal used as a workaround; not sure if this is the right/best signal to use
 				const tiledWindowActor = tiledWindow.get_compositor_private();
-				const sID = tiledWindowActor.connect("queue-redraw", () => {
-					global.window_group.insert_child_below(this.shadeBG, tiledWindowActor);
-					fadeInShade();
-
-					tiledWindowActor.disconnect(sID);
-				});
-
-			// no tiledWindow on first rect when using layouts
-			} else {
-				global.window_group.add_child(this.shadeBG);
-				fadeInShade();
+				global.window_group.set_child_above_sibling(tiledWindowActor, this.shadeBG);
 			}
+
+			this.shadeBG.ease({
+				opacity: 180,
+				duration: 200,
+				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
+			});
 		}
 
 		drawArrows() {
