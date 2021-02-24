@@ -2,13 +2,14 @@
 
 const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
+const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
-function init () {
+function init() {
 };
 
-function buildPrefsWidget () {
+function buildPrefsWidget() {
 	const widget = new MyPrefsWidget();
-	widget.show_all();
+	shellVersion < 40 && widget.show_all();
 	return widget;
 };
 
@@ -17,130 +18,66 @@ const MyPrefsWidget = new GObject.Class({
 	GTypeName : "MyTilingPrefsWidget",
 	Extends : Gtk.ScrolledWindow,
 
-	_init: function (params) {
+	_init: function(params) {
 		const gschema = Gio.SettingsSchemaSource.new_from_directory(
 			Me.dir.get_child("schemas").get_path(),
 			Gio.SettingsSchemaSource.get_default(),
 			false
 		);
 
-		this._settingsSchema = gschema.lookup("org.gnome.shell.extensions.tiling-assistant", true);
-		this.settings = new Gio.Settings({settings_schema: this._settingsSchema});
+		const settingsSchema = gschema.lookup("org.gnome.shell.extensions.tiling-assistant", true);
+		this.settings = new Gio.Settings({settings_schema: settingsSchema});
 
 		this.parent(params);
 
 		this.builder = new Gtk.Builder();
-		this.builder.add_from_file(Me.path + '/prefs.ui');
-		this.add(this.builder.get_object('main_prefs'));
+		this.builder.add_from_file(Me.path + "/prefs.ui");
+		const mainPrefs = this.builder.get_object("main_prefs");
+		shellVersion < 40 ? this.add(mainPrefs) : this.set_child(mainPrefs);
+
 		this.set_min_content_height(700);
 
-		// bind settings to the UI objects
-		// make sure the objects in prefs.ui have the same name as the keys in the settings (schema.xml)
-		this._settingsSchema.list_keys().forEach(key => {
-			const bindProperty = this.getBindProperty(key);
-			const builderObject = this.builder.get_object(key);
-			if (builderObject !== null && bindProperty)
-				this.settings.bind(key, builderObject, bindProperty, Gio.SettingsBindFlags.DEFAULT);
-		});
+		this.bindWidgetsToSettings(settingsSchema.list_keys());
+		this.bindKeybindings();
 
-		// bind keybindings
+		this.setupLayoutsGUI();
+		this.loadLayouts();
+	},
+
+	bindWidgetsToSettings: function(settingsKeys) {
+		// widgets in prefs.ui need to have same ID
+		// as the keys in the gschema.xml file
+		const getBindProperty = function(key) {
+			const ints = ["icon-size", "icon-margin", "window-gaps"];
+			const bools = ["enable-dash", "use-anim"];
+
+			if (ints.includes(key))
+				return "value"; // Gtk.Spinbox.value
+			else if (bools.includes(key))
+				return "active"; //  Gtk.Switch.active
+			else
+				return null;
+		}
+
+		settingsKeys.forEach(key => {
+			const bindProperty = getBindProperty(key);
+			const widget = this.builder.get_object(key);
+			if (widget && bindProperty)
+				this.settings.bind(key, widget, bindProperty, Gio.SettingsBindFlags.DEFAULT);
+		});
+	},
+
+	bindKeybindings: function() {
 		const shortcuts = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space",
 				"tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half",
 				"tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
 				"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
-		shortcuts.forEach(sc => this.makeShortcutEdit(sc));
-
-		////////////////
-		////////////////
-		// Layouts gui:
-		// this.layouts is an array of arrays. The inner arrays contain "rects" in the format {x: NR, y: NR, width: NR, height: NR}
-		// NR is a float between 0 to 1.
-		// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
-		this.loadLayouts();
-		const drawAreas = [];
-		this.buttonIconSize = 16;
-
-		// layout reload button
-		this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
-			this.loadLayouts();
-			drawAreas.forEach(d => d.queue_draw());
-		});
-
-		// layout save button
-		this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
-			this.saveLayouts();
-			this.loadLayouts();
-			drawAreas.forEach(d => d.queue_draw());
-		});
-
-		// other layout buttons (each layout has at least 1 of them)
-		// Nr (10) of layouts are "hardcoded"
-		for (let i = 0; i < 10; i++) {
-			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-
-			// delete buttons
-			// resets Gtk.entries and add app buttons
-			this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
-				for (let j = 0; j < 8; j++) { // 8 Gtk.entries / possible rects in a layout
-					const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
-					entry.set_text("");
-				}
-			});
-
-			// draw preview rects in the right column
-			const drawArea = this.builder.get_object(`DrawArea${i}`);
-			drawAreas.push(drawArea);
-			drawArea.connect("draw", (widget, cr) => {
-				if (!this.layouts)
-					return;
-
-				const layout = this.layouts[i];
-				const [layoutIsValid, errMsg] = this.layoutIsValid(layout);
-				if (layoutIsValid) {
-					// remove error label from overlay, if it exists
-					const gtkOverlay = widget.get_parent().get_parent();
-					if (gtkOverlay.get_children().length > 1)
-						gtkOverlay.remove(gtkOverlay.get_children()[1]);
-
-					this.drawLayoutsRects(widget, cr, layout);
-
-				} else {
-					// add error label to overlay;
-					// only change old label text, if it already exists
-					const gtkOverlay = widget.get_parent().get_parent();
-					if (gtkOverlay.get_children().length > 1) {
-						gtkOverlay.get_children()[1].set_text(errMsg);
-					} else {
-						const label = new Gtk.Label({
-							label: errMsg,
-							halign:  Gtk.Align.CENTER,
-							valign:  Gtk.Align.CENTER,
-							visible: true,
-							wrap: true
-						});
-						gtkOverlay.add_overlay(label);
-					}
-				}
-			});
-		}
-	},
-
-	// manually add the keys to the arrays in this function
-	getBindProperty: function(key) {
-		const ints = ["icon-size", "icon-margin", "window-gaps"];
-		const bools = ["enable-dash", "use-anim"];
-
-		if (ints.includes(key))
-			return "value"; // spinbox.value
-		else if (bools.includes(key))
-			return "active"; //  switch.active
-		else
-			return null;
+		shortcuts.forEach(sc => this._makeShortcutEdit(sc));
 	},
 
 	// taken from Overview-Improved by human.experience
 	// https://extensions.gnome.org/extension/2802/overview-improved/
-	makeShortcutEdit: function(settingKey) {
+	_makeShortcutEdit: function(settingKey) {
 		const COLUMN_KEY = 0;
 		const COLUMN_MODS = 1;
 
@@ -155,7 +92,9 @@ const MyPrefsWidget = new GObject.Class({
 		view.append_column(column);
 
 		const updateShortcutRow = (accel) => {
-			const [key, mods] = accel ? Gtk.accelerator_parse(accel) : [0, 0];
+			// compatibility GNOME 40: GTK4's func returns 3 values / GTK3's only 2
+			const array = accel ? Gtk.accelerator_parse(accel) : [0, 0];
+			const [key, mods] = [array[array.length - 2], array[array.length - 1]];
 			store.set(iter, [COLUMN_KEY, COLUMN_MODS], [key, mods]);
 		};
 
@@ -177,8 +116,41 @@ const MyPrefsWidget = new GObject.Class({
 		updateShortcutRow(this.settings.get_strv(settingKey)[0]);
 	},
 
+	// this.layouts is an array of arrays. The inner arrays contain "rects" in the format:
+	// {x: NR, y: NR, width: NR, height: NR} -> NR is a float between 0 to 1.
+	// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
+	setupLayoutsGUI: function() {
+		// layout reload button
+		this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
+			this.loadLayouts();
+		});
+
+		// layout save button
+		this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
+			this._saveLayouts();
+			this.loadLayouts();
+		});
+
+		// Nr of layouts is "hardcoded" (i. e. 10 layouts)
+		for (let i = 0; i < 10; i++) {
+			// delete buttons: resets a layout's Gtk.Entries
+			this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
+				const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
+				for (let j = 0; j < 8; j++) // 8 Gtk.entries / possible rects in a layout
+					this._setEntryText(this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1), "");
+			});
+
+			// draw preview rects in the right column
+			const drawArea = this.builder.get_object(`DrawArea${i}`);
+			if (shellVersion < 40)
+				drawArea.connect("draw", (widget, cr) => this._drawLayoutsRects(i, widget, cr));
+			else
+				drawArea.set_draw_func(this._drawLayoutsRects.bind(this, [i]));
+		}
+	},
+
 	// load from ~/.TilingAssistantExtension.layouts.json
-	loadLayouts: function () {
+	loadLayouts: function() {
 		const path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
 		const file = Gio.File.new_for_path(path);
 
@@ -190,57 +162,75 @@ const MyPrefsWidget = new GObject.Class({
 
 		const [success, contents] = file.load_contents(null);
 		if (!success)
-			return null;
+			return;
 
 		if (!contents.length) {
 			GLib.free(contents);
-			return null;
+			return;
 		}
 
 		// reset layout's entries' text
 		for (let i = 0; i < 10; i++) {
 			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-			for (let j = 0; j < 8; j++) {
-				const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
-				entry.set_text("");
-			}
+			for (let j = 0; j < 8; j++)
+				this._setEntryText(this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1), "");
 		}
 
-		// set text for Gtk.entries & appButtons
-		const layouts = JSON.parse(contents);
-		layouts.forEach((layout, index) => {
+		// set text for Gtk.entries
+		this.layouts = JSON.parse(contents);
+		this.layouts.forEach((layout, index) => {
 			const layoutListBox = this.builder.get_object(`LayoutListbox${index}`);
-
-			layout.forEach((item, idx) => {
-				const rect = item;
-				const entry = layoutListBox.get_row_at_index(idx).get_child().get_children()[1];
-				entry.set_text(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`);
-			});
+			layout.forEach((rect, idx) => this._setEntryText(
+					this._getChildAtIndex(layoutListBox.get_row_at_index(idx).get_child(), 1),
+					`${rect.x}--${rect.y}--${rect.width}--${rect.height}`
+			));
 		});
 
 		GLib.free(contents);
-		this.layouts = layouts;
+
+		// redraw layout previews
+		for (let idx = 0; idx < 10; idx++) {
+			const layout = this.layouts[idx];
+			const [layoutIsValid, errMsg] = this._layoutIsValid(layout);
+
+			const drawArea = this.builder.get_object(`DrawArea${idx}`);
+			const gtkOverlay = drawArea.get_parent().get_parent();
+			const errorLabel = this._getChildAtIndex(gtkOverlay, 1);
+			drawArea.queue_draw();
+
+			if (layoutIsValid)
+				errorLabel && (shellVersion < 40 ? gtkOverlay.remove(errorLabel)
+						: gtkOverlay.remove_overlay(errorLabel));
+			else
+				errorLabel ? errorLabel.set_text(errMsg)
+						: gtkOverlay.add_overlay(new Gtk.Label({
+							label: errMsg,
+							halign:  Gtk.Align.CENTER,
+							valign:  Gtk.Align.CENTER,
+							visible: true,
+							wrap: true
+						}));
+		}
 	},
 
 	// save to ~/.TilingAssistantExtension.layouts.json
-	saveLayouts: function () {
+	_saveLayouts: function() {
 		const allLayouts = [];
-		const rectProps = ["x", "y", "width", "height"];
+		const props = ["x", "y", "width", "height"];
 
-		// for each possible layout
+		// for each layout
 		for (let i = 0; i < 10; i++) {
 			const layout = [];
 			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
 
-			// for each possible rect in the layout
+			// for each rect in *a* layout
 			for (let j = 0; j < 8; j++) {
 				const rect = {};
-
-				const entry = layoutListBox.get_row_at_index(j).get_child().get_children()[1];
+				const entry = this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1);
 				if (!entry.get_text_length())
 					continue;
 
-				const text = entry.get_text();
+				const text = shellVersion < 40 ? entry.get_text() : entry.get_buffer().get_text();
 				const splits = text.split("--");
 				if (splits.length !== 4) {
 					layout.push({x: 0, y: 0, width: 0, height: 0});
@@ -248,13 +238,13 @@ const MyPrefsWidget = new GObject.Class({
 				}
 
 				for (let k = 0; k < 4; k++) {
-					const propValue = parseFloat(splits[k].trim());
-					if (Number.isNaN(propValue)) {
+					const value = parseFloat(splits[k].trim());
+					if (Number.isNaN(value)) {
 						layout.push({x: 0, y: 0, width: 0, height: 0});
 						continue;
 					}
 
-					rect[rectProps[k]] = propValue;
+					rect[props[k]] = value;
 				}
 
 				layout.push(rect);
@@ -272,28 +262,30 @@ const MyPrefsWidget = new GObject.Class({
 
 		}
 
-		const [success] = file.replace_contents(JSON.stringify(allLayouts), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+		const [success] = file.replace_contents(JSON.stringify(allLayouts), null, false,
+				Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 		return success;
 	},
 
-	layoutIsValid: function (layout) {
+	_layoutIsValid: function(layout) {
 		if (!layout)
 			return [false, "No layout."];
 
 		// calculate the surface area of an overlap
 		const rectsOverlap = function(r1, r2) {
-			return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) * Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+			return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
+					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 		}
 
 		for (let i = 0; i < layout.length; i++) {
-			const r = layout[i];
-
+			const rect = layout[i];
 			// rects is/reaches outside of screen (i. e. > 1)
-			if (r.x < 0 || r.y < 0 || r.width <= 0 || r.height <= 0 || r.x + r.width > 1 || r.y + r.height > 1)
+			if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0
+						|| rect.x + rect.width > 1 || rect.y + rect.height > 1)
 				return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
 
 			for (let j = i + 1; j < layout.length; j++) {
-				if (rectsOverlap(r, layout[j]))
+				if (rectsOverlap(rect, layout[j]))
 					return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
 			}
 		}
@@ -301,26 +293,29 @@ const MyPrefsWidget = new GObject.Class({
 		return [true, ""];
 	},
 
-	// layout format = [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
-	drawLayoutsRects: function (layoutWidget, cr, layout) {
+	// layout format: [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
+	_drawLayoutsRects: function(idx, drawArea, cr) {
+		const layout = this.layouts[idx];
+		const [layoutIsValid, ] = this._layoutIsValid(layout);
+		if (!layoutIsValid)
+			layout = [{x: 0, y: 0, width: 0, height: 0}];
+
 		const color = new Gdk.RGBA();
-		const width = layoutWidget.get_allocated_width();
-		const height = layoutWidget.get_allocated_height();
+		const width = drawArea.get_allocated_width();
+		const height = drawArea.get_allocated_height();
 
 		cr.setLineWidth(1.0);
 
-		layout.forEach(item => {
-			const r = item;
+		layout.forEach(rect => {
 			// 1px outline for rect in transparent white
+			// 5 px gaps between rects
 			color.parse("rgba(255, 255, 255, .2)");
 			Gdk.cairo_set_source_rgba(cr, color);
-
-			// 5 px gaps between rects
-			cr.moveTo(r.x * width + 5, r.y * height + 5);
-			cr.lineTo((r.x + r.width) * width - 5, r.y * height + 5);
-			cr.lineTo((r.x + r.width) * width - 5, (r.y + r.height) * height - 5);
-			cr.lineTo(r.x * width + 5, (r.y + r.height) * height - 5);
-			cr.lineTo(r.x * width + 5, r.y * height + 5);
+			cr.moveTo(rect.x * width + 5, rect.y * height + 5);
+			cr.lineTo((rect.x + rect.width) * width - 5, rect.y * height + 5);
+			cr.lineTo((rect.x + rect.width) * width - 5, (rect.y + rect.height) * height - 5);
+			cr.lineTo(rect.x * width + 5, (rect.y + rect.height) * height - 5);
+			cr.lineTo(rect.x * width + 5, rect.y * height + 5);
 			cr.strokePreserve();
 
 			// fill rect in transparent black
@@ -331,4 +326,21 @@ const MyPrefsWidget = new GObject.Class({
 
 		cr.$dispose();
 	},
+
+	_setEntryText(entry, text) {
+		shellVersion < 40 ? entry.set_text(text) : entry.get_buffer().set_text(text, -1);
+	},
+
+	_getChildAtIndex(widget, idx) {
+		if (shellVersion < 40)
+			return widget.get_children()[idx];
+
+		if (idx < 0)
+			return null;
+
+		let child = widget.get_first_child();
+		for (; idx > 0 && child; idx--)
+			child = child.get_next_sibling();
+		return child;
+	}
 });
