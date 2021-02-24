@@ -29,6 +29,8 @@ const TilingPreviewRect = Me.imports.tilingPreviewRect;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 const TilingReplacer = Me.imports.tilingReplacer;
 
+const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
+
 var tilingPreviewRect = null;
 var tilingLayoutManager = null;
 var settings = null;
@@ -230,7 +232,9 @@ function onMyTilingShortcutPressed(shortcutName) {
 };
 
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
-function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
+function onGrabBegin(...params) {
+	// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
+	const [grabbedWindow, grabOp] = [params[params.length - 2], params[params.length - 1]];
 	if (!grabbedWindow)
 		return;
 
@@ -395,7 +399,9 @@ function onGrabBegin(_metaDisplay, metaDisplay, grabbedWindow, grabOp) {
 	}
 };
 
-function onGrabEnd(_metaDisplay, metaDisplay, window, grabOp) {
+function onGrabEnd(...params) {
+	// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
+	const [window, grabOp] = [params[params.length - 2], params[params.length - 1]];
 	if (!window)
 		return;
 
