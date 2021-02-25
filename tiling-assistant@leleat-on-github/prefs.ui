@@ -110,11 +110,6 @@
 			<column type="gint"/>
 		</columns>
 	</object>
-	<object class="GtkImage" id="reloadIcon">
-		<property name="visible">True</property>
-		<property name="icon-name">gtk-refresh</property>
-		<property name="icon_size">3</property>
-	</object>
 	<object class="GtkListStore" id="replace-window-liststore">
 		<columns>
 			<!-- column-name key -->
@@ -122,10 +117,6 @@
 			<!-- column-name mods -->
 			<column type="gint"/>
 		</columns>
-	</object>
-	<object class="GtkImage" id="saveIcon">
-		<property name="visible">True</property>
-		<property name="icon-name">gtk-save</property>
 	</object>
 	<object class="GtkAdjustment" id="terminalDelay">
 		<property name="upper">500</property>

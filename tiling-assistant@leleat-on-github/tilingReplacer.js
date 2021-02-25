@@ -48,10 +48,10 @@ const MyTilingReplacer = GObject.registerClass(
 			this.createRectPreviews();
 		}
 
-		_destroy() {
+		destroy() {
 			this.previewRects.forEach(r => r.destroy());
 			this.shadeBG.destroy();
-			this.destroy();
+			super.destroy();
 		}
 
 		shadeBackground(entireWorkArea) {
@@ -78,7 +78,7 @@ const MyTilingReplacer = GObject.registerClass(
 			this.setPreviewRects()
 			// no tiled windows below it; so only full display as rect
 			if (this.rects.length <= 1) {
-				this._destroy();
+				this.destroy();
 				return;
 			}
 
@@ -205,7 +205,7 @@ const MyTilingReplacer = GObject.registerClass(
 				break;
 			}
 
-			this._destroy();
+			this.destroy();
 		}
 
 		vfunc_key_press_event(keyEvent) {
@@ -229,7 +229,7 @@ const MyTilingReplacer = GObject.registerClass(
 					Util.tileWindow(this.window, rect);
 				}
 
-				this._destroy();
+				this.destroy();
 			}
 		}
 	}

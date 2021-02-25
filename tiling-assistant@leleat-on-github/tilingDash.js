@@ -32,7 +32,7 @@ const MyTilingDashManager = GObject.registerClass(
 			if (!main.pushModal(this))
 				return this.destroy();
 
-			this.systemModalOpenedId = main.layoutManager.connect("system-modal-opened", () => this._destroy(true));
+			this.systemModalOpenedId = main.layoutManager.connect("system-modal-opened", () => this.destroy(true));
 
 			this.tiledWindow = tiledWindow;
 			this.monitorNr = monitorNr;
@@ -108,7 +108,7 @@ const MyTilingDashManager = GObject.registerClass(
 			this.highlightItem(0, false, true);
 		}
 
-		_destroy(cancelTilingWithLayout = false) {
+		destroy(cancelTilingWithLayout = false) {
 			if (this.alreadyDestroyed)
 				return;
 
@@ -155,7 +155,7 @@ const MyTilingDashManager = GObject.registerClass(
 				opacity: 0,
 				duration: 200,
 				mode: Clutter.AnimationMode.EASE_OUT_QUINT,
-				onComplete: () => this.destroy()
+				onComplete: () => super.destroy()
 			});
 		}
 
@@ -362,7 +362,7 @@ const MyTilingDashManager = GObject.registerClass(
 			Util.tileWindow(window, this.freeScreenRect, !isTilingViaLayout);
 			MyExtension.tilingLayoutManager.onWindowTiled(window);
 
-			this._destroy();
+			this.destroy();
 		}
 
 		vfunc_key_press_event(keyEvent) {
@@ -407,7 +407,7 @@ const MyTilingDashManager = GObject.registerClass(
 			}
 
 			// destroy on all other key inputs
-			this._destroy(true);
+			this.destroy(true);
 
 			return Clutter.EVENT_STOP;
 		}
@@ -417,7 +417,7 @@ const MyTilingDashManager = GObject.registerClass(
 				const appIcon = this.appDash.get_children()[this.highlightedApp];
 				this.activate(appIcon.cachedWindows[this.thumbnailsAreFocused ? this.highlightedWindow : 0]);
 			} else {
-				this._destroy(true);
+				this.destroy(true);
 			}
 		}
 

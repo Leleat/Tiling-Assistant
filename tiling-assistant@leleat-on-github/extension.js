@@ -103,7 +103,7 @@ function disable() {
 
 	tilingPreviewRect.destroy();
 	tilingPreviewRect = null;
-	tilingLayoutManager._destroy();
+	tilingLayoutManager.destroy();
 	tilingLayoutManager = null;
 
 	// re-enable native tiling
@@ -126,13 +126,9 @@ function disable() {
 		delete w.sameSideWindows;
 		delete w.opposingWindows;
 		delete w.preGrabRect;
-
-		if (w.grabSignalIDs)
-			w.grabSignalIDs.forEach(id => w.disconnect(id));
+		w.grabSignalIDs && w.grabSignalIDs.forEach(id => w.disconnect(id));
 		delete w.grabSignalIDs;
-
-		if (w.groupFocusSignalID)
-			w.disconnect(w.groupFocusSignalID);
+		w.groupFocusSignalID && w.disconnect(w.groupFocusSignalID);
 		delete w.groupFocusSignalID;
 	});
 

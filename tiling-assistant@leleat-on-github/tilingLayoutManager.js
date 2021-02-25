@@ -12,13 +12,13 @@ var MyTilingLayoutManager = GObject.registerClass(
 	class MyTilingLayoutManager extends GObject.Object {
 		_init() {
 			this.currentLayout = []; // array of objects: {x: F, y: F, width: F, height: F} where F is a float between 0 and 1
-			this.layoutRectPreview = null; // preview for the current rect of the currentLayout
+			this.layoutRectPreview = null; // blue preview for the current rect of the currentLayout
 			this.cachedOpenWindows = []; // the open windows, which havent been tiled with the current layout yet
 			this.monitorNr = 0;
 			this.isTilingViaLayout = false;
 		}
 
-		_destroy() {
+		destroy() {
 			this.endTilingViaLayout();
 		}
 
@@ -29,8 +29,8 @@ var MyTilingLayoutManager = GObject.registerClass(
 			if (!openWindows.length)
 				return;
 
-			const [rectLayout, ] = this.getLayout(layoutIdx, false);
-			if (!rectLayout || !rectLayout.length || !this.layoutIsValid(rectLayout))
+			const rectLayout = this._getLayout(layoutIdx);
+			if (!rectLayout || !this._layoutIsValid(rectLayout))
 				return;
 
 			this.isTilingViaLayout = true;
@@ -51,7 +51,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			});
 
 			const currentLayoutRect = this.currentLayout.shift();
-			this.createTilingPreview(currentLayoutRect);
+			this._createTilingPreview(currentLayoutRect);
 			TilingDash.openDash(this.cachedOpenWindows, null, this.monitorNr, currentLayoutRect);
 		}
 
@@ -74,7 +74,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			}
 
 			const currentLayoutRect = this.currentLayout.shift();
-			this.createTilingPreview(currentLayoutRect);
+			this._createTilingPreview(currentLayoutRect);
 
 			TilingDash.openDash(this.cachedOpenWindows, tiledWindow, this.monitorNr, currentLayoutRect);
 		}
@@ -90,7 +90,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			}
 		}
 
-		createTilingPreview(rect) {
+		_createTilingPreview(rect) {
 			if (this.layoutRectPreview)
 				this.layoutRectPreview.destroy();
 
@@ -111,7 +111,7 @@ var MyTilingLayoutManager = GObject.registerClass(
 			});
 		}
 
-		getLayout(idx, tileWithAppList) {
+		_getLayout(idx) {
 			const path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
 			const layoutFile = Gio.File.new_for_path(path);
 
@@ -123,24 +123,23 @@ var MyTilingLayoutManager = GObject.registerClass(
 
 			const [success, contents] = layoutFile.load_contents(null);
 			if (success) {
+				if (!contents.length) {
+					GLib.free(contents);
+					return null;
+				}
+
 				const layouts = JSON.parse(contents);
 				GLib.free(contents);
 
-				const appSystem = Shell.AppSystem.get_default();
-				const rectLayout = (tileWithAppList) ? layouts[idx].map(element => element[0]) : layouts[idx];
-				const appList = (tileWithAppList) ? layouts[idx].map(element => {
-					const desktopAppInfo = appSystem.get_installed().find(appInfo => appInfo.get_name() === element[1]);
-					return appSystem.lookup_app(desktopAppInfo.get_id());
-				}) : null;
-
+				const rectLayout = layouts[idx];
 				if (layouts.length && idx < layouts.length)
-					return [rectLayout, appList];
+					return rectLayout;
 			}
 
-			return [];
+			return null;
 		}
 
-		layoutIsValid(layout) {
+		_layoutIsValid(layout) {
 			// calculate the surface area of an overlap
 			// 0 means no overlap
 			const rectsOverlap = (r1, r2) => Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
