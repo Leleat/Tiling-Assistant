@@ -200,11 +200,13 @@ const MyTilingDashManager = GObject.registerClass(
 		}
 
 		drawArrows() {
+			const activeWS = global.workspace_manager.get_active_workspace();
+			const workArea = activeWS.get_work_area_for_monitor(this.monitorNr);
 			const appIcons = this.appDash.get_children();
 			appIcons.forEach((icon, idx) => {
 				const arrow = new St.DrawingArea({
 					style: "color: white",
-					x: this.appDash.x + (icon.width * idx) + icon.width / 2 + 8 - ((idx === 0) ? 0 : 4), // MagicNrs.: margins/paddings of appIcons
+					x: workArea.x + this.appDash.x + (icon.width * idx) + icon.width / 2 + 8 - ((idx === 0) ? 0 : 4), // MagicNrs.: margins/paddings of appIcons
 					y: (this.arrowIsAbove) ? this.appDash.y + 5 * this.monitorScale : this.appDash.y + this.appDash.height - 4 * this.monitorScale - 5 * this.monitorScale,
 					width: 8 * this.monitorScale,
 					height: 4 * this.monitorScale,
