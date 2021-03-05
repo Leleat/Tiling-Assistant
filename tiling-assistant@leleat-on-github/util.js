@@ -117,7 +117,8 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 
 	const groupedWindows = []; // tiled windows which are considered in a group
 	const notGroupedWindows = []; // normal and tiled windows which appear between grouped windows in the stack order
-	const currMonitor = ((ignoreTopWindow) ? global.display.get_current_monitor() : openWindows[0].get_monitor()); // ignore the topmost window if DNDing, Tiling via keybinding and opening a window in a tiled state
+	// ignore the topmost window if DNDing, Tiling via keybinding and opening a window in a tiled state
+	const currMonitor = ((ignoreTopWindow) ? global.display.get_current_monitor() : openWindows[0].get_monitor());
 	let groupedWindowsArea = 0;
 
 	for (let i = (ignoreTopWindow) ? 1 : 0; i < openWindows.length; i++) {
@@ -138,28 +139,14 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 			if (groupedWindowsArea >= workArea.area())
 				break;
 
-			let notInGroup = false;
-
 			// if a non-tiled window in a higher stack order overlaps the currently tested tiled window,
 			// the currently tested tiled window isnt part of the topmost tile group
-			for (const nGW of notGroupedWindows) {
-				const nWR = (nGW.isTiled) ? nGW.tiledRect : nGW.get_frame_rect();
-				if (nWR.overlap(wRect)) {
-					notInGroup = true;
-					break;
-				}
-			}
-
-			if (!notInGroup)
-				// same for tiled windows which are overlapped by tiled windows in a higher stack order
-				for (const groupedWindow of groupedWindows)
-					if (groupedWindow.tiledRect.overlap(wRect)) {
-						notInGroup = true;
-						notGroupedWindows.push(window);
-						break;
-					}
-
-			if (!notInGroup) {
+			const windowOverlapsNonGroupedWindows = notGroupedWindows.some(w => (w.isTiled ? w.tiledRect : w.get_frame_rect()).overlap(wRect));
+			// same applies for grouped windows; but only check if, it doesnt already overlap before
+			const windowOverlapsGroupedWindows = !windowOverlapsNonGroupedWindows && groupedWindows.some(w => w.tiledRect.overlap(wRect));
+			if (windowOverlapsNonGroupedWindows || windowOverlapsGroupedWindows) {
+				notGroupedWindows.push(window);
+			} else {
 				groupedWindows.push(window);
 				groupedWindowsArea += wRect.area();
 			}
