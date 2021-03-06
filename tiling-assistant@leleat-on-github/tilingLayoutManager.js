@@ -123,13 +123,10 @@ var MyTilingLayoutManager = GObject.registerClass(
 
 			const [success, contents] = layoutFile.load_contents(null);
 			if (success) {
-				if (!contents.length) {
-					GLib.free(contents);
+				if (!contents.length)
 					return null;
-				}
 
 				const layouts = JSON.parse(contents);
-				GLib.free(contents);
 
 				const rectLayout = layouts[idx];
 				if (layouts.length && idx < layouts.length)

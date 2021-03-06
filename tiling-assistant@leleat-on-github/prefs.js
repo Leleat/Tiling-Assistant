@@ -164,10 +164,8 @@ const MyPrefsWidget = new GObject.Class({
 		if (!success)
 			return;
 
-		if (!contents.length) {
-			GLib.free(contents);
+		if (!contents.length)
 			return;
-		}
 
 		// reset layout's entries' text
 		for (let i = 0; i < 10; i++) {
@@ -185,8 +183,6 @@ const MyPrefsWidget = new GObject.Class({
 					`${rect.x}--${rect.y}--${rect.width}--${rect.height}`
 			));
 		});
-
-		GLib.free(contents);
 
 		// redraw layout previews
 		for (let idx = 0; idx < 10; idx++) {
