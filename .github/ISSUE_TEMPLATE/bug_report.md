@@ -19,6 +19,8 @@ assignees: ''
 **System Info:**
  - Distro (incl. version):
  - GNOME version:
+<!-- You can find the extensions version in the Extensions-app or in the file metadata.json in EXTENSIONS_LOCATION/tiling-assistant@leleat-on-github -->
+ - Extensions version: 
  - XOrg/Wayland:
 
 **Journalctl logs**
