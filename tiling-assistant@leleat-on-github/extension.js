@@ -492,6 +492,7 @@ function onGrabEnd(...params) {
 // tile previewing via DND and restore window size, if window is already tiled
 function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeScreenRects) {
 	const [mouseX, mouseY] = global.get_pointer();
+	const wRect = window.get_frame_rect();
 
 	// restore the window size of tiled windows after DND distance of at least 1px
 	// to prevent restoring the window after just clicking on the title/top bar
@@ -517,7 +518,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 				-1, // button
 				0, // modifier
 				global.get_current_time(),
-				mouseX, Math.max(grabStartPos[1], window.get_frame_rect().y)
+				mouseX, Math.max(grabStartPos[1], wRect.y)
 			);
 
 			return GLib.SOURCE_REMOVE;
@@ -530,14 +531,19 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const workArea = window.get_work_area_for_monitor(monitorNr);
 
 	const onTop = mouseY <= workArea.y + 10;
-	const onBottom = mouseY >= workArea.y + workArea.height - 10 || window.get_frame_rect().y >= workArea.y + workArea.height - 75;
+	const onBottom = mouseY >= workArea.y + workArea.height - 10;
 	const onLeft = mouseX <= workArea.x + 10;
 	const onRight = mouseX >= workArea.x + workArea.width - 10;
 
-	const tileTopLeftQuarter = onTop && onLeft;
-	const tileTopRightQuarter = onTop && onRight;
-	const tileBottomLeftQuarter = onLeft && onBottom;
-	const tileBottomRightQuarter = onRight && onBottom;
+	// also use window's pos for top and bottom area detection for quarters
+	// because global.get_pointer() isnt accurate (no idea why...)
+	// when slowly going from the left/right sides to the top/bottom corners
+	const windowTop = wRect.y === workArea.y;
+	const windowBottom = wRect.y >= workArea.y + workArea.height - 75;
+	const tileTopLeftQuarter = (onTop || windowTop) && onLeft;
+	const tileTopRightQuarter = (onTop || windowTop) && onRight;
+	const tileBottomLeftQuarter = onLeft && (onBottom || windowBottom);
+	const tileBottomRightQuarter = onRight && (onBottom || windowBottom);
 
 	// tile to top half on the most left and on the most right side of the topbar
 	const tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 5) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 5));
