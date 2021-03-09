@@ -117,8 +117,7 @@ function disable() {
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
 
 	// delete custom properties
-	const activeWS = global.workspace_manager.get_active_workspace()
-	const openWindows = activeWS.list_windows();
+	const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
 	openWindows.forEach(w => {
 		delete w.isTiled;
 		delete w.tiledRect;
