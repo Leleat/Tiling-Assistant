@@ -530,10 +530,11 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const monitorNr = global.display.get_current_monitor();
 	const workArea = window.get_work_area_for_monitor(monitorNr);
 
+	const quarterCorner = 40;
 	const onTop = mouseY <= workArea.y + 10;
 	const onBottom = mouseY >= workArea.y + workArea.height - 10;
-	const onLeft = mouseX <= workArea.x + 10;
-	const onRight = mouseX >= workArea.x + workArea.width - 10;
+	const onLeft = mouseX <= workArea.x + quarterCorner;
+	const onRight = mouseX >= workArea.x + workArea.width - quarterCorner;
 
 	// also use window's pos for top and bottom area detection for quarters
 	// because global.get_pointer() isnt accurate (no idea why...)
@@ -546,7 +547,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const tileBottomRightQuarter = onRight && (onBottom || windowBottom);
 
 	// tile to top half on the most left and on the most right side of the topbar
-	const tileTopHalf = onTop && ((mouseX > 25 && mouseX < workArea.width / 5) || (mouseX < workArea.y + workArea.width - 25 && mouseX > workArea.y + workArea.width - workArea.width / 5));
+	const tileTopHalf = onTop && ((mouseX > quarterCorner && mouseX < workArea.width / 5) || (mouseX < workArea.y + workArea.width - quarterCorner && mouseX > workArea.y + workArea.width - workArea.width / 5));
 	const tileRightHalf = onRight
 	const tileLeftHalf = onLeft;
 	const tileMaximized = onTop;
