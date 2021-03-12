@@ -441,6 +441,9 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	if (!window.allows_resize() || !window.allows_move())
 		return;
 
+	// remove @window from other windows' tileGroups so it doesnt falsely get raised with them
+	removeTileGroup(window);
+
 	// sometimes, because of the group-focusing (raising),
 	// the focused window will be below another window.
 	// so we raise the focused window to prevent unexpected behaviour
