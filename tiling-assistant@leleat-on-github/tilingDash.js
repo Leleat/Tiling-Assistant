@@ -328,9 +328,6 @@ const MyTilingDashManager = GObject.registerClass(
 			if (!window)
 				return;
 
-			window.move_to_monitor(this.monitorNr);
-			window.activate(global.get_current_time());
-
 			const isTilingViaLayout = MyExtension.tilingLayoutManager.isTilingViaLayout;
 
 			// halve the freeScreenRect when holding Shift or Alt
@@ -361,8 +358,10 @@ const MyTilingDashManager = GObject.registerClass(
 				}
 			}
 
+			window.move_to_monitor(this.monitorNr);
 			Util.tileWindow(window, this.freeScreenRect, !isTilingViaLayout);
 			MyExtension.tilingLayoutManager.onWindowTiled(window);
+			// window.activate(global.get_current_time());
 
 			this.destroy();
 		}
