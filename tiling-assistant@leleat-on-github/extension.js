@@ -547,7 +547,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const tileBottomRightQuarter = onRight && (onBottom || windowBottom);
 
 	// tile to top half on the most left and on the most right side of the topbar
-	const tileTopHalf = onTop && ((mouseX > quarterCorner && mouseX < workArea.width / 5) || (mouseX < workArea.y + workArea.width - quarterCorner && mouseX > workArea.y + workArea.width - workArea.width / 5));
+	const tileTopHalf = onTop && ((mouseX < workArea.x + workArea.width / 5) || (mouseX > workArea.x + workArea.width - workArea.width / 5));
 	const tileRightHalf = onRight
 	const tileLeftHalf = onLeft;
 	const tileMaximized = onTop;
