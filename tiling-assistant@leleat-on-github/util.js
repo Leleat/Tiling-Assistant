@@ -530,6 +530,10 @@ function maximizeBoth(window) {
 	// so we raise the focused window to prevent unexpected behaviour and bugs
 	window.raise();
 
+	const oldRect = window.get_frame_rect();
+	if (!window.isTiled)
+		window.isTiled = oldRect;
+
 	const workArea = window.get_work_area_current_monitor();
 	window.tiledRect = workArea;
 
@@ -605,6 +609,11 @@ function updateTileGroup(tileGroup) {
 
 		w.groupFocusSignalID = w.connect("focus", () => {
 			const workArea = w.get_work_area_current_monitor();
+			const disabledGroupFocus = MyExtension.settings.get_boolean("disable-group-focus");
+
+			if (disabledGroupFocus)
+				return;
+
 			if (!w.tileGroup || w.get_maximized() === Meta.MaximizeFlags.BOTH || (w.isTiled && rectsAreAboutEqual(w.tiledRect, workArea)))
 				return;
 

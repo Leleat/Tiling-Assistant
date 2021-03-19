@@ -404,6 +404,47 @@
 						</child>
 					</object>
 				</child>
+				<child>
+					<object class="GtkListBoxRow" id="disable-group-focus-listboxrow">
+						<property name="visible">True</property>
+						<child>
+							<object class="GtkBox" id="disable-group-focus-box">
+								<property name="visible">True</property>
+								<property name="margin-start">20</property>
+								<property name="margin-end">20</property>
+								<property name="margin-top">12</property>
+								<property name="margin-bottom">12</property>
+								<property name="spacing">32</property>
+								<child>
+									<object class="GtkLabel" id="disable-group-focus-label">
+										<property name="visible">True</property>
+										<property name="valign">center</property>
+										<property name="label" translatable="yes">Disable window group focus</property>
+										<property name="xalign">0</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkImage" id="disable-group-focus-tooltip">
+										<property name="visible">True</property>
+										<property name="tooltip-text" translatable="yes">Stop focusing all the windows tiled against the focused window.
+
+Useful when in taskbar/always visible dock mode.</property>
+										<property name="icon-name">dialog-information</property>
+										<property name="halign">1</property>
+									<property name="hexpand">true</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkSwitch" id="disable-group-focus">
+										<property name="visible">True</property>
+										<property name="valign">center</property>
+										<property name="active">True</property>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
 			</object>
 		</child>
 		<child type="tab">

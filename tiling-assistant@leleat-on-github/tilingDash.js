@@ -170,8 +170,9 @@ const MyTilingDashManager = GObject.registerClass(
 			global.window_group.add_child(this.shadeBG);
 
 			// tiledWindow == null, on intial tiling with layout
+			const tileGroup = Util.getTopTileGroup(null, false);
 			if (tiledWindow) {
-				for (const w of tiledWindow.tileGroup) {
+				for (const w of tileGroup) {
 					// tiling via layout ignores tilegroup and only checks if it was tiled via the layout
 					if (MyExtension.tilingLayoutManager.isTilingViaLayout && MyExtension.tilingLayoutManager.cachedOpenWindows.includes(w))
 						continue;

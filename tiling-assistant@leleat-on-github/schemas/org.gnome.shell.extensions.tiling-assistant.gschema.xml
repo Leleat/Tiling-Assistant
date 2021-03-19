@@ -17,6 +17,10 @@
 			<default>true</default>
 		</key>
 
+		<key name="disable-group-focus" type="b">
+			<default>false</default>
+		</key>
+
 		<key name="tile-maximize" type="as">
 			<default>[]</default>
 		</key>
