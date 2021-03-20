@@ -21,6 +21,14 @@
 			<default>false</default>
 		</key>
 
+		<key name="inverse-maximize-hold-landscape" type="b">
+			<default>false</default>
+		</key>
+
+		<key name="inverse-maximize-hold-portrait" type="b">
+			<default>false</default>
+		</key>
+		
 		<key name="tile-maximize" type="as">
 			<default>[]</default>
 		</key>
