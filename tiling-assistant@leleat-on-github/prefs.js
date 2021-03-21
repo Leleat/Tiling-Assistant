@@ -49,7 +49,7 @@ const MyPrefsWidget = new GObject.Class({
 		// as the keys in the gschema.xml file
 		const getBindProperty = function(key) {
 			const ints = ["icon-size", "icon-margin", "window-gaps"];
-			const bools = ["enable-dash", "use-anim", "disable-group-focus"];
+			const bools = ["enable-dash", "use-anim", "disable-group-focus", "inverse-maximize-hold-landscape", "inverse-maximize-hold-portrait"];
 
 			if (ints.includes(key))
 				return "value"; // Gtk.Spinbox.value

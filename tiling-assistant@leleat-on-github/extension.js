@@ -226,6 +226,14 @@ function onMyTilingShortcutPressed(shortcutName) {
 	}
 };
 
+let timeoutMaximizeHold = -1;
+function resetMaximizeHold() {
+	if (timeoutMaximizeHold != -1) {
+		GLib.Source.remove(timeoutMaximizeHold);
+		timeoutMaximizeHold = -1;
+	}
+}
+
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
 function onGrabBegin(...params) {
 	// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
@@ -400,6 +408,9 @@ function onGrabEnd(...params) {
 	if (!window)
 		return;
 
+	// not needed after hold has ended
+	resetMaximizeHold();
+
 	// disconnect the signals
 	if (window.grabSignalIDs) {
 		window.grabSignalIDs.forEach(sID => window.disconnect(sID));
@@ -528,7 +539,9 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	}
 
 	const monitorNr = global.display.get_current_monitor();
+	const monitorRect = global.display.get_monitor_geometry(monitorNr);
 	const workArea = window.get_work_area_for_monitor(monitorNr);
+	const isLandscape = (monitorRect.width >= monitorRect.height);
 
 	const quarterCorner = 40;
 	const onTop = mouseY <= workArea.y + 10;
@@ -557,6 +570,8 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const event = Clutter.get_current_event();
 	const modifiers = event ? event.get_state() : 0;
 	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
+
+	const holdMaximizeDelayMs = 750;
 
 	// default sizes or halving tiled windows
 	if (isCtrlPressed) {
@@ -670,9 +685,11 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		}
 
 	} else if (tileTopLeftQuarter) {
+		resetMaximizeHold();
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
 	} else if (tileTopRightQuarter) {
+		resetMaximizeHold();
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects), monitorNr);
 
 	} else if (tileBottomLeftQuarter) {
@@ -687,21 +704,58 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	} else if (tileLeftHalf) {
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
-	} else if (tileTopHalf) {
+	}
+	/*else if (tileTopHalf) {
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
 
-	} else if (tileBottomHalf) {
+	}*/ else if (tileBottomHalf) {
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects), monitorNr);
 
 	} else if (tileMaximized) {
-		tilingPreviewRect.open(window, new Meta.Rectangle({
-			x: workArea.x,
-			y: workArea.y,
-			width: workArea.width,
-			height: workArea.height,
-		}), monitorNr);
+		// Just do nothing while held in the same area when the timer has started
+		if (timeoutMaximizeHold != -1)
+			return;
+
+		const maximize = (isLandscape && !settings.get_boolean("inverse-maximize-hold-landscape")) || (!isLandscape && !settings.get_boolean("inverse-maximize-hold-portrait"));
+
+		// Figure out whether to half tile
+		if (maximize) {
+			// Maximize
+			tilingPreviewRect.open(window, new Meta.Rectangle({
+				x: workArea.x,
+				y: workArea.y,
+				width: workArea.width,
+				height: workArea.height,
+			}), monitorNr);
+		} else {
+			// Half-tile
+			tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
+		}
+
+		// Hold action
+		timeoutMaximizeHold = GLib.timeout_add(
+			GLib.PRIORITY_DEFAULT,
+			holdMaximizeDelayMs,
+			() => {
+				if (!maximize) {
+					// Maximize
+					tilingPreviewRect.open(window, new Meta.Rectangle({
+						x: workArea.x,
+						y: workArea.y,
+						width: workArea.width,
+						height: workArea.height,
+					}), monitorNr);
+				} else {
+					// Half-tile
+					tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
+				}
+
+				return GLib.SOURCE_REMOVE;
+			}
+		);
 
 	} else {
+		resetMaximizeHold();
 		tilingPreviewRect.close();
 	}
 };
