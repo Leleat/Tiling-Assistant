@@ -138,8 +138,8 @@ function disable() {
 function onMyTilingShortcutPressed(shortcutName) {
 	// toggle wether appDash will be opened when a window is tiled and there is free screen space
 	if (shortcutName === "toggle-dash") {
-		const toggleTo = !settings.get_boolean("enable-dash");
-		settings.set_boolean("enable-dash", toggleTo);
+		const toggleTo = !settings.get_boolean("enable-tiling-popup");
+		settings.set_boolean("enable-tiling-popup", toggleTo);
 		main.notify("Tiling Assistant", "Dash " + (toggleTo ? "enabled" : "was disabled"));
 
 	// open the appDash consecutively to tile to a layout
@@ -226,17 +226,37 @@ function onMyTilingShortcutPressed(shortcutName) {
 	}
 };
 
-let timeoutMaximizeHold = -1;
-function resetMaximizeHold() {
-	if (timeoutMaximizeHold != -1) {
-		GLib.Source.remove(timeoutMaximizeHold);
-		timeoutMaximizeHold = -1;
+let holdMaximizeTimeout = -1;
+function holdMaximizeTimeoutStop() {
+	if (holdMaximizeTimeout != -1) {
+		GLib.Source.remove(holdMaximizeTimeout);
+		holdMaximizeTimeout = -1;
 	}
+}
+
+function holdMaximizeTimeoutStart(callback) {
+	holdMaximizeTimeout = GLib.timeout_add(
+		GLib.PRIORITY_DEFAULT,
+		750,
+		() => {
+			callback();
+
+			return GLib.SOURCE_REMOVE;
+		}
+	);
+}
+
+function holdMaximizeHasStarted() {
+	return (holdMaximizeTimeout != -1);
 }
 
 let monitorMoveTimeout = -1;
 let monitorNrLock = -1;
 let monitorNrLast = -1;
+
+function monitorMoveResetLast() {
+	monitorNrLast = -1;
+}
 
 function monitorMoveStop() {
 	if (monitorMoveTimeout != -1)
@@ -246,10 +266,6 @@ function monitorMoveStop() {
 	monitorNrLock = -1;
 }
 
-function monitorMoveResetLast() {
-	monitorNrLast = -1;
-}
-
 function monitorMoveStart(newMonitorNr, callback) {
 	monitorMoveTimeout = GLib.timeout_add(
 		GLib.PRIORITY_DEFAULT,
@@ -257,6 +273,8 @@ function monitorMoveStart(newMonitorNr, callback) {
 		() => {
 			monitorMoveStop();
 			callback();
+
+			return GLib.SOURCE_REMOVE;
 		}
 	);
 }
@@ -295,7 +313,7 @@ function onGrabBegin(...params) {
 	const event = Clutter.get_current_event();
 	const modifiers = event ? event.get_state() : 0;
 	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
-	const gap = settings.get_int("window-gaps");
+	const gap = settings.get_int("window-gap");
 
 	switch (grabOp) {
 		case Meta.GrabOp.MOVING:
@@ -336,7 +354,7 @@ function onGrabBegin(...params) {
 				}
 			}
 
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Util.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gaps"))));
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Util.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gap"))));
 			break;
 
 		case Meta.GrabOp.RESIZING_S:
@@ -429,7 +447,7 @@ function onGrabBegin(...params) {
 				}
 			}
 
-			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Util.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gaps"))));
+			grabbedWindow.grabSignalIDs.push(grabbedWindow.connect("size-changed", Util.resizeComplementingWindows.bind(this, grabbedWindow, grabOp, settings.get_int("window-gap"))));
 	}
 };
 
@@ -443,8 +461,8 @@ function onGrabEnd(...params) {
 	monitorMoveResetLast();
 	monitorMoveStop();
 
-	// not needed after hold has ended
-	resetMaximizeHold();
+	// required when a window is maximized, so it clears the state for the next raised window
+	holdMaximizeTimeoutStop();
 
 	// disconnect the signals
 	if (window.grabSignalIDs) {
@@ -483,7 +501,7 @@ function onGrabEnd(...params) {
 
 	// update the window.tiledRects.
 	// Careful with resizing issues for some terminals!
-	const gap = settings.get_int("window-gaps");
+	const gap = settings.get_int("window-gap");
 	const newRect = window.get_frame_rect();
 	const oldTiledRect = window.tiledRect.copy();
 
@@ -626,8 +644,6 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	const modifiers = event ? event.get_state() : 0;
 	const isCtrlPressed = modifiers & Clutter.ModifierType.CONTROL_MASK;
 
-	const holdMaximizeDelayMs = 750;
-
 	// default sizes or halving tiled windows
 	if (isCtrlPressed) {
 		if (tileTopLeftQuarter) {
@@ -740,11 +756,11 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		}
 
 	} else if (tileTopLeftQuarter) {
-		resetMaximizeHold();
+		holdMaximizeTimeoutStop();
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
 	} else if (tileTopRightQuarter) {
-		resetMaximizeHold();
+		holdMaximizeTimeoutStop();
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP + Meta.Side.RIGHT, workArea, screenRects), monitorNr);
 
 	} else if (tileBottomLeftQuarter) {
@@ -764,10 +780,10 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 
 	} else if (tileMaximized) {
 		// Just do nothing while held in the same area when the timer has started
-		if (timeoutMaximizeHold != -1)
+		if (holdMaximizeHasStarted())
 			return;
 
-		const maximize = (isLandscape && !settings.get_boolean("inverse-maximize-hold-landscape")) || (!isLandscape && !settings.get_boolean("inverse-maximize-hold-portrait"));
+		const maximize = (isLandscape && !settings.get_boolean("enable-hold-maximize-inverse-landscape")) || (!isLandscape && !settings.get_boolean("enable-hold-maximize-inverse-portrait"));
 
 		// Figure out whether to half tile
 		if (maximize) {
@@ -784,29 +800,20 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		}
 
 		// Hold action
-		timeoutMaximizeHold = GLib.timeout_add(
-			GLib.PRIORITY_DEFAULT,
-			holdMaximizeDelayMs,
-			() => {
-				if (!maximize) {
-					// Maximize
-					tilingPreviewRect.open(window, new Meta.Rectangle({
-						x: workArea.x,
-						y: workArea.y,
-						width: workArea.width,
-						height: workArea.height,
-					}), monitorNr);
-				} else {
-					// Half-tile
-					tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
-				}
-
-				return GLib.SOURCE_REMOVE;
+		holdMaximizeTimeoutStart(() => {
+			if (!maximize) {
+				tilingPreviewRect.open(window, new Meta.Rectangle({
+					x: workArea.x,
+					y: workArea.y,
+					width: workArea.width,
+					height: workArea.height,
+				}), monitorNr);
+			} else {
+				tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
 			}
-		);
-
+		});
 	} else {
-		resetMaximizeHold();
+		holdMaximizeTimeoutStop();
 		tilingPreviewRect.close();
 	}
 };
@@ -814,7 +821,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 // called when a window is tiled (via tileWindow()).
 // decides wether the Dash should be opened. If yes, the dash will be opened.
 function onWindowTiled(tiledWindow) {
-	if (!settings.get_boolean("enable-dash"))
+	if (!settings.get_boolean("enable-tiling-popup"))
 		return;
 
 	const openWindows = Util.getOpenWindows();

@@ -211,7 +211,7 @@
 			<column type="gint"/>
 		</columns>
 	</object>
-	<object class="GtkAdjustment" id="windowGaps">
+	<object class="GtkAdjustment" id="window-gap-adjustment">
 		<property name="upper">50</property>
 		<property name="step-increment">1</property>
 		<property name="page-increment">10</property>
@@ -222,18 +222,19 @@
 		<property name="scrollable">True</property>
 		<property name="enable-popup">True</property>
 		<child>
-			<object class="GtkListBox" id="GeneralListBox">
+			<object class="GtkListBox">
 				<property name="visible">True</property>
 				<property name="margin-top">15</property>
 				<property name="margin-bottom">15</property>
 				<property name="hexpand">True</property>
 				<property name="vexpand">True</property>
 				<property name="selection-mode">none</property>
+
 				<child>
 					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="box28">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">20</property>
 								<property name="margin-end">20</property>
@@ -241,16 +242,56 @@
 								<property name="margin-bottom">12</property>
 								<property name="spacing">32</property>
 								<child>
-									<object class="GtkLabel" id="enableDashLabel">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
-										<property name="label" translatable="yes">Enable Tiling Dash</property>
+										<property name="label" translatable="yes">Animations</property>
+										<property name="xalign">0</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkImage">
+										<property name="visible">True</property>
+										<property name="tooltip-text" translatable="yes">Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting.</property>
+										<property name="icon-name">dialog-information</property>
+										<property name="halign">1</property>
+									<property name="hexpand">true</property>
+									</object>
+								</child>
+								<child>
+									<object class="GtkSwitch" id="enable-animations">
+										<property name="visible">True</property>
+										<property name="valign">center</property>
+										<property name="active">True</property>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+
+				<child>
+					<object class="GtkListBoxRow">
+						<property name="visible">True</property>
+						<child>
+							<object class="GtkBox">
+								<property name="visible">True</property>
+								<property name="margin-start">20</property>
+								<property name="margin-end">20</property>
+								<property name="margin-top">12</property>
+								<property name="margin-bottom">12</property>
+								<property name="spacing">32</property>
+								<child>
+									<object class="GtkLabel">
+										<property name="visible">True</property>
+										<property name="valign">center</property>
+										<property name="label" translatable="yes">Tiling Popup</property>
 										<property name="xalign">0</property>
 										<property name="hexpand">True</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkSwitch" id="enable-dash">
+									<object class="GtkSwitch" id="enable-tiling-popup">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="active">True</property>
@@ -261,19 +302,19 @@
 					</object>
 				</child>
 				<child>
-					<object class="GtkListBoxRow" id="listboxrow12">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="box12">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">40</property>
 								<property name="margin-end">20</property>
 								<property name="margin-top">12</property>
 								<property name="margin-bottom">12</property>
 								<child>
-									<object class="GtkLabel" id="dashIconSizeLabel">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
-										<property name="label" translatable="yes">Dash icon size</property>
+										<property name="label" translatable="yes">Icon size</property>
 										<property name="xalign">0</property>
 										<property name="hexpand">True</property>
 									</object>
@@ -296,19 +337,19 @@
 					</object>
 				</child>
 				<child>
-					<object class="GtkListBoxRow" id="listboxrow13">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="box13">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">40</property>
 								<property name="margin-end">20</property>
 								<property name="margin-top">12</property>
 								<property name="margin-bottom">12</property>
 								<child>
-									<object class="GtkLabel" id="dashIconMarginLabel">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
-										<property name="label" translatable="yes">Dash icon margin</property>
+										<property name="label" translatable="yes">Icon margin</property>
 										<property name="xalign">0</property>
 										<property name="hexpand">True</property>
 									</object>
@@ -330,11 +371,12 @@
 						</child>
 					</object>
 				</child>
+
 				<child>
-					<object class="GtkListBoxRow" id="listboxrow15">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="box15">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">20</property>
 								<property name="margin-end">20</property>
@@ -342,24 +384,49 @@
 								<property name="margin-bottom">12</property>
 								<property name="spacing">32</property>
 								<child>
-									<object class="GtkLabel" id="enableAnimationsLabel">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
-										<property name="label" translatable="yes">Enable animations</property>
+										<property name="label" translatable="yes">Window</property>
+										<property name="xalign">0</property>
+										<property name="hexpand">true</property>
+									</object>
+								</child>
+							</object>
+						</child>
+					</object>
+				</child>
+
+				<child>
+					<object class="GtkListBoxRow">
+						<property name="visible">True</property>
+						<child>
+							<object class="GtkBox">
+								<property name="visible">True</property>
+								<property name="margin-start">40</property>
+								<property name="margin-end">20</property>
+								<property name="margin-top">12</property>
+								<property name="margin-bottom">12</property>
+								<property name="spacing">32</property>
+								<child>
+									<object class="GtkLabel">
+										<property name="visible">True</property>
+										<property name="valign">center</property>
+										<property name="label" translatable="yes">Raise Group</property>
 										<property name="xalign">0</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkImage" id="animationsTooltipHint">
+									<object class="GtkImage">
 										<property name="visible">True</property>
-										<property name="tooltip-text" translatable="yes">Even if this setting is turned off, not all move/resize animations will be disabled. Some are native to GNOME and thus unaffected by this setting.</property>
+										<property name="tooltip-text" translatable="yes">Raises tiled windows along with the focused window.</property>
 										<property name="icon-name">dialog-information</property>
 										<property name="halign">1</property>
 									<property name="hexpand">true</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkSwitch" id="use-anim">
+									<object class="GtkSwitch" id="enable-group-focus">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="active">True</property>
@@ -369,30 +436,31 @@
 						</child>
 					</object>
 				</child>
+
 				<child>
-					<object class="GtkListBoxRow" id="listboxrow2">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="box2">
+							<object class="GtkBox">
 								<property name="visible">True</property>
-								<property name="margin-start">20</property>
+								<property name="margin-start">40</property>
 								<property name="margin-end">20</property>
 								<property name="margin-top">12</property>
 								<property name="margin-bottom">12</property>
 								<child>
-									<object class="GtkLabel" id="gabLabel">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
-										<property name="label" translatable="yes">Gap between tiled windows</property>
+										<property name="label" translatable="yes">Gap</property>
 										<property name="xalign">0</property>
 										<property name="hexpand">True</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkSpinButton" id="window-gaps">
+									<object class="GtkSpinButton" id="window-gap">
 										<property name="visible">True</property>
 										<property name="width-chars">10</property>
 										<property name="text" translatable="yes">20</property>
-										<property name="adjustment">windowGaps</property>
+										<property name="adjustment">window-gap-adjustment</property>
 										<property name="climb-rate">1</property>
 										<property name="snap-to-ticks">True</property>
 										<property name="numeric">True</property>
@@ -404,53 +472,12 @@
 						</child>
 					</object>
 				</child>
-				<child>
-					<object class="GtkListBoxRow" id="disable-group-focus-listboxrow">
-						<property name="visible">True</property>
-						<child>
-							<object class="GtkBox" id="disable-group-focus-box">
-								<property name="visible">True</property>
-								<property name="margin-start">20</property>
-								<property name="margin-end">20</property>
-								<property name="margin-top">12</property>
-								<property name="margin-bottom">12</property>
-								<property name="spacing">32</property>
-								<child>
-									<object class="GtkLabel" id="disable-group-focus-label">
-										<property name="visible">True</property>
-										<property name="valign">center</property>
-										<property name="label" translatable="yes">Disable window group focus</property>
-										<property name="xalign">0</property>
-									</object>
-								</child>
-								<child>
-									<object class="GtkImage" id="disable-group-focus-tooltip">
-										<property name="visible">True</property>
-										<property name="tooltip-text" translatable="yes">Stop focusing all the windows tiled against the focused window.
 
-Useful when in taskbar/always visible dock mode.</property>
-										<property name="icon-name">dialog-information</property>
-										<property name="halign">1</property>
-									<property name="hexpand">true</property>
-									</object>
-								</child>
-								<child>
-									<object class="GtkSwitch" id="disable-group-focus">
-										<property name="visible">True</property>
-										<property name="valign">center</property>
-										<property name="active">True</property>
-									</object>
-								</child>
-							</object>
-						</child>
-					</object>
-				</child>
-				
 				<child>
-					<object class="GtkListBoxRow" id="inverse-maximize-hold-listboxrow">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="inverse-maximize-hold-box">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">20</property>
 								<property name="margin-end">20</property>
@@ -458,17 +485,17 @@ Useful when in taskbar/always visible dock mode.</property>
 								<property name="margin-bottom">12</property>
 								<property name="spacing">32</property>
 								<child>
-									<object class="GtkLabel" id="inverse-maximize-hold-label">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
-										<property name="label" translatable="yes">Inverse maximize/half-tile</property>
+										<property name="label" translatable="yes">Inverse Top Screen Edge Action</property>
 										<property name="xalign">0</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkImage" id="inverse-maximize-hold-tooltip">
+									<object class="GtkImage">
 										<property name="visible">True</property>
-										<property name="tooltip-text" translatable="yes">This will make the window half-tiled by default.</property>
+										<property name="tooltip-text" translatable="yes">Cause the action to half-tile by default.</property>
 										<property name="icon-name">dialog-information</property>
 										<property name="halign">1</property>
 									<property name="hexpand">true</property>
@@ -479,10 +506,10 @@ Useful when in taskbar/always visible dock mode.</property>
 					</object>
 				</child>
 				<child>
-					<object class="GtkListBoxRow" id="inverse-maximize-hold-landscape-listboxrow">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="inverse-maximize-hold-landscape-box">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">40</property>
 								<property name="margin-end">20</property>
@@ -490,7 +517,7 @@ Useful when in taskbar/always visible dock mode.</property>
 								<property name="margin-bottom">12</property>
 								<property name="spacing">32</property>
 								<child>
-									<object class="GtkLabel" id="inverse-maximize-hold-landscape-label">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="label" translatable="yes">Landscape</property>
@@ -499,7 +526,7 @@ Useful when in taskbar/always visible dock mode.</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkSwitch" id="inverse-maximize-hold-landscape">
+									<object class="GtkSwitch" id="enable-hold-maximize-inverse-landscape">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="active">True</property>
@@ -510,10 +537,10 @@ Useful when in taskbar/always visible dock mode.</property>
 					</object>
 				</child>
 				<child>
-					<object class="GtkListBoxRow" id="inverse-maximize-hold-portrait-listboxrow">
+					<object class="GtkListBoxRow">
 						<property name="visible">True</property>
 						<child>
-							<object class="GtkBox" id="inverse-maximize-hold-portrait-box">
+							<object class="GtkBox">
 								<property name="visible">True</property>
 								<property name="margin-start">40</property>
 								<property name="margin-end">20</property>
@@ -521,7 +548,7 @@ Useful when in taskbar/always visible dock mode.</property>
 								<property name="margin-bottom">12</property>
 								<property name="spacing">32</property>
 								<child>
-									<object class="GtkLabel" id="inverse-maximize-hold-portrait-label">
+									<object class="GtkLabel">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="label" translatable="yes">Portrait</property>
@@ -530,7 +557,7 @@ Useful when in taskbar/always visible dock mode.</property>
 									</object>
 								</child>
 								<child>
-									<object class="GtkSwitch" id="inverse-maximize-hold-portrait">
+									<object class="GtkSwitch" id="enable-hold-maximize-inverse-portrait">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="active">True</property>
@@ -1390,7 +1417,7 @@ Useful when in taskbar/always visible dock mode.</property>
 																	<object class="GtkLabel" id="toggleDashLabel">
 																		<property name="visible">True</property>
 																		<property name="valign">center</property>
-																		<property name="label" translatable="yes">Toggle 'Enable Tiling Dash'</property>
+																		<property name="label" translatable="yes"></property>
 																		<property name="xalign">0</property>
 																	</object>
 																</child>
