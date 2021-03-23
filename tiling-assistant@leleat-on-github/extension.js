@@ -234,6 +234,37 @@ function resetMaximizeHold() {
 	}
 }
 
+let monitorMoveTimeout = -1;
+let monitorNrLock = -1;
+let monitorNrLast = -1;
+
+function monitorMoveStop() {
+	if (monitorMoveTimeout != -1)
+		GLib.Source.remove(monitorMoveTimeout);
+
+	monitorMoveTimeout = -1;
+	monitorNrLock = -1;
+}
+
+function monitorMoveResetLast() {
+	monitorNrLast = -1;
+}
+
+function monitorMoveStart(newMonitorNr, callback) {
+	monitorMoveTimeout = GLib.timeout_add(
+		GLib.PRIORITY_DEFAULT,
+		150,
+		() => {
+			monitorMoveStop();
+			callback();
+		}
+	);
+}
+
+function monitorMoveHasStarted() {
+	return (monitorMoveTimeout != -1);
+}
+
 // calls either restoreWindowSize(), onWindowMoving() or resizeComplementingWindows() depending on where the drag began on the window
 function onGrabBegin(...params) {
 	// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
@@ -408,6 +439,10 @@ function onGrabEnd(...params) {
 	if (!window)
 		return;
 
+	// ensure next grab doesn't use the last monitor & reset last monitor reference
+	monitorMoveResetLast();
+	monitorMoveStop();
+
 	// not needed after hold has ended
 	resetMaximizeHold();
 
@@ -538,7 +573,27 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 		return;
 	}
 
-	const monitorNr = global.display.get_current_monitor();
+	let monitorNr = global.display.get_current_monitor();
+	monitorNrLast = (monitorNrLast == -1)? monitorNr: monitorNrLast;
+	
+	if (monitorNr == monitorNrLock)
+		monitorMoveStop();
+
+	if (monitorNrLast != monitorNr) {
+		if (monitorNr != monitorNrLock) {
+			if (!monitorMoveHasStarted()) {
+				monitorNrLock = monitorNrLast;
+				monitorMoveStart(monitorNr, () => onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeScreenRects));
+			}
+		}
+	}
+
+	monitorNrLast = monitorNr;
+
+	if (monitorMoveHasStarted())
+		monitorNr = monitorNrLock;
+		
+
 	const monitorRect = global.display.get_monitor_geometry(monitorNr);
 	const workArea = window.get_work_area_for_monitor(monitorNr);
 	const isLandscape = (monitorRect.width >= monitorRect.height);
@@ -704,11 +759,7 @@ function onWindowMoving(window, grabStartPos, currTileGroup, screenRects, freeSc
 	} else if (tileLeftHalf) {
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.LEFT, workArea, screenRects), monitorNr);
 
-	}
-	/*else if (tileTopHalf) {
-		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.TOP, workArea, screenRects), monitorNr);
-
-	}*/ else if (tileBottomHalf) {
+	} else if (tileBottomHalf) {
 		tilingPreviewRect.open(window, Util.getTileRectForSide(Meta.Side.BOTTOM, workArea, screenRects), monitorNr);
 
 	} else if (tileMaximized) {
