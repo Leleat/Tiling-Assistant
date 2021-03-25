@@ -48,8 +48,8 @@ const MyPrefsWidget = new GObject.Class({
 		// widgets in prefs.ui need to have same ID
 		// as the keys in the gschema.xml file
 		const getBindProperty = function(key) {
-			const ints = ["icon-size", "icon-margin", "window-gaps"];
-			const bools = ["enable-dash", "use-anim", "disable-group-focus", "inverse-maximize-hold-landscape", "inverse-maximize-hold-portrait"];
+			const ints = ["icon-size", "icon-margin", "window-gap"];
+			const bools = ["enable-tiling-popup", "enable-animations", "enable-window-group-focus", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"];
 
 			if (ints.includes(key))
 				return "value"; // Gtk.Spinbox.value

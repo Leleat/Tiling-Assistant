@@ -163,7 +163,7 @@ function getTopTileGroup(openWindows = null, ignoreTopWindow = true) {
 // 1. get the free screen space for each tiled window by itself (for each window 1 array of rects)
 // 2. the final freeScreenRects array is the intersection of all these arrays
 function getFreeScreenRects(tileGroup) {
-	const gap = MyExtension.settings.get_int("window-gaps");
+	const gap = MyExtension.settings.get_int("window-gap");
 	const entireWorkArea = (tileGroup.length) ? tileGroup[0].get_work_area_current_monitor() : global.workspace_manager.get_active_workspace().get_work_area_for_monitor(global.display.get_current_monitor());
 
 	// get freeSreenRects for each tiled window individually
@@ -201,7 +201,7 @@ function getTileRectForSide(side, workArea, screenRects) {
 		return r1.y - r2.y;
 	});
 
-	const gaps = MyExtension.settings.get_int("window-gaps");
+	const gaps = MyExtension.settings.get_int("window-gap");
 
 	switch (side) {
 		case Meta.Side.LEFT:
@@ -460,7 +460,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 
 	// window gaps & work on a copy
 	const rect = newRect.copy();
-	const gap = MyExtension.settings.get_int("window-gaps");
+	const gap = MyExtension.settings.get_int("window-gap");
 	if (gap) {
 		rect.x += gap;
 		rect.y += gap;
@@ -471,7 +471,7 @@ function tileWindow(window, newRect, checkToOpenDash = true) {
 	// animation
 	const wActor = window.get_compositor_private();
 	const onlyMove = oldRect.width === rect.width && oldRect.height === rect.height && !wasMaximized;
-	if (MyExtension.settings.get_boolean("use-anim")) {
+	if (MyExtension.settings.get_boolean("enable-animations")) {
 		if (onlyMove) { // custom anim because they dont exist
 			const actorContent = Shell.util_get_content_for_window_actor(wActor, oldRect);
 			const clone = new St.Widget({
@@ -537,7 +537,7 @@ function maximizeBoth(window) {
 	const workArea = window.get_work_area_current_monitor();
 	window.tiledRect = workArea;
 
-	// const gap = MyExtension.settings.get_int("window-gaps");
+	// const gap = MyExtension.settings.get_int("window-gap");
 	// if (gap) {
 	// 	const rect = new Meta.Rectangle({
 	// 		x: workArea.x + gap,
@@ -551,7 +551,7 @@ function maximizeBoth(window) {
 	// 	if (!window.isTiled)
 	// 		window.isTiled = oldRect;
 
-	// 	if (MyExtension.settings.get_boolean("use-anim"))
+	// 	if (MyExtension.settings.get_boolean("enable-animations"))
 	// 		main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), oldRect, Meta.SizeChange.MAXIMIZE);
 
 	// 	// setting user_op to false helps with issues on terminals
@@ -574,7 +574,7 @@ function restoreWindowSize(window, restoreFullPos = false) {
 
 	if (restoreFullPos) {
 		// hack => journalctl: error in size change accounting; SizeChange flag?
-		if (MyExtension.settings.get_boolean("use-anim"))
+		if (MyExtension.settings.get_boolean("enable-animations"))
 			main.wm._prepareAnimationInfo(global.window_manager, window.get_compositor_private(), window.get_frame_rect(), Meta.SizeChange.UNMAXIMIZE);
 		// user_op as false to restore window while keeping it fully in screen in case DND-tiling dragged it offscreen
 		window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
@@ -609,9 +609,9 @@ function updateTileGroup(tileGroup) {
 
 		w.groupFocusSignalID = w.connect("focus", () => {
 			const workArea = w.get_work_area_current_monitor();
-			const disabledGroupFocus = MyExtension.settings.get_boolean("disable-group-focus");
+			const enableGroupFocus = MyExtension.settings.get_boolean("enable-window-group-focus");
 
-			if (disabledGroupFocus)
+			if (!enableGroupFocus)
 				return;
 
 			if (!w.tileGroup || w.get_maximized() === Meta.MaximizeFlags.BOTH || (w.isTiled && rectsAreAboutEqual(w.tiledRect, workArea)))
