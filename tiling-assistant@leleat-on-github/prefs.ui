@@ -1417,7 +1417,7 @@
 																	<object class="GtkLabel" id="toggleDashLabel">
 																		<property name="visible">True</property>
 																		<property name="valign">center</property>
-																		<property name="label" translatable="yes"></property>
+																		<property name="label" translatable="yes">Toggle 'Enable Tiling Dash'</property>
 																		<property name="xalign">0</property>
 																	</object>
 																</child>
