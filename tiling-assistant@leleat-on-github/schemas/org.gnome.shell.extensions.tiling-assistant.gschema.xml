@@ -4,120 +4,163 @@
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
 		</key>
-		
-		<key name="icon-size" type="i">
-			<default>96</default>
-		</key>
-
-		<key name="icon-margin" type="i">
-			<default>25</default>
-		</key>
-
-		<key name="enable-animations" type="b">
+		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>
-
-		<key name="enable-window-group-focus" type="b">
-			<default>true</default>
-		</key>
-
-		<key name="enable-hold-maximize-inverse-landscape" type="b">
-			<default>false</default>
-		</key>
-
-		<key name="enable-hold-maximize-inverse-portrait" type="b">
-			<default>false</default>
-		</key>
-		
-		<key name="tile-maximize" type="as">
-			<default><![CDATA[['<Super>KP_5']]]></default>
-		</key>
-
-		<key name="tile-top-half" type="as">
-			<default><![CDATA[['<Super>KP_8']]]></default>
-		</key>
-
-		<key name="tile-right-half" type="as">
-			<default><![CDATA[['<Super>KP_6']]]></default>
-		</key>
-
-		<key name="tile-left-half" type="as">
-			<default><![CDATA[['<Super>KP_4']]]></default>
-		</key>
-
-		<key name="tile-bottom-half" type="as">
-			<default><![CDATA[['<Super>KP_2']]]></default>
-		</key>
-
-		<key name="tile-topleft-quarter" type="as">
-			<default><![CDATA[['<Super>KP_7']]]></default>
-		</key>
-
-		<key name="tile-topright-quarter" type="as">
-			<default><![CDATA[['<Super>KP_9']]]></default>
-		</key>
-
-		<key name="tile-bottomleft-quarter" type="as">
-			<default><![CDATA[['<Super>KP_1']]]></default>
-		</key>
-
-		<key name="tile-bottomright-quarter" type="as">
-			<default><![CDATA[['<Super>KP_3']]]></default>
-		</key>
-
-		<key name="tile-empty-space" type="as">
-			<default>[]</default>
-		</key>
-
-		<key name="replace-window" type="as">
-			<default>[]</default>
-		</key>
-
-		<key name="toggle-dash" type="as">
-			<default>[]</default>
-		</key>
-
+		<key name="enable-dynamic-tiling" type="b">
+      		<default>false</default>
+    	</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
-
-		<key name="layout1" type="as">
+		<key name="enable-hold-maximize-inverse-landscape" type="b">
+			<default>false</default>
+		</key>
+		<key name="enable-hold-maximize-inverse-portrait" type="b">
+			<default>false</default>
+		</key>
+		<key name="auto-tile" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout2" type="as">
+		<key name="tile-edit-mode" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout3" type="as">
+		<key name="tile-maximize" type="as">
+			<default><![CDATA[['<Super>KP_5']]]></default>
+		</key>
+		<key name="tile-top-half" type="as">
+			<default><![CDATA[['<Super>KP_8']]]></default>
+		</key>
+		<key name="tile-right-half" type="as">
+			<default><![CDATA[['<Super>KP_6']]]></default>
+		</key>
+		<key name="tile-left-half" type="as">
+			<default><![CDATA[['<Super>KP_4']]]></default>
+		</key>
+		<key name="tile-bottom-half" type="as">
+			<default><![CDATA[['<Super>KP_2']]]></default>
+		</key>
+		<key name="tile-topleft-quarter" type="as">
+			<default><![CDATA[['<Super>KP_7']]]></default>
+		</key>
+		<key name="tile-topright-quarter" type="as">
+			<default><![CDATA[['<Super>KP_9']]]></default>
+		</key>
+		<key name="tile-bottomleft-quarter" type="as">
+			<default><![CDATA[['<Super>KP_1']]]></default>
+		</key>
+		<key name="tile-bottomright-quarter" type="as">
+			<default><![CDATA[['<Super>KP_3']]]></default>
+		</key>
+		<key name="toggle-tiling-popup" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout4" type="as">
+		<key name="enable-tile-animations" type="b">
+			<default>true</default>
+		</key>
+		<key name="enable-untile-animations" type="b">
+			<default>true</default>
+		</key>
+		<key name="toggle-maximize-tophalf-timer" type="i">
+			<default>600</default>
+		</key>
+		<key name="vertical-preview-area" type="i">
+			<default>15</default>
+		</key>
+		<key name="horizontal-preview-area" type="i">
+			<default>15</default>
+		</key>
+		<key name="debugging-show-tiled-rects" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout5" type="as">
+		<key name="activate-layout0" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout6" type="as">
+		<key name="activate-layout1" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout7" type="as">
+		<key name="activate-layout2" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout8" type="as">
+		<key name="activate-layout3" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout9" type="as">
+		<key name="activate-layout4" type="as">
 			<default>[]</default>
 		</key>
-
-		<key name="layout10" type="as">
+		<key name="activate-layout5" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout6" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout7" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout8" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout9" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout10" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout11" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout12" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout13" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout14" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout15" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout16" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout17" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout18" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout19" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout20" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout21" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout22" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout23" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout24" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout25" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout26" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout27" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout28" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout29" type="as">
 			<default>[]</default>
 		</key>
 	</schema>

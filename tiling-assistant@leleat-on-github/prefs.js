@@ -4,6 +4,22 @@ const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
+const TILING = { // keybindings
+	DEBUGGING: "debugging-show-tiled-rects",
+	TOGGLE_POPUP: "toggle-tiling-popup",
+	AUTO: "auto-tile",
+	MAXIMIZE: "tile-maximize",
+	EDIT_MODE: "tile-edit-mode",
+	RIGHT: "tile-right-half",
+	LEFT: "tile-left-half",
+	TOP: "tile-top-half",
+	BOTTOM: "tile-bottom-half",
+	TOP_LEFT: "tile-topleft-quarter",
+	TOP_RIGHT: "tile-topright-quarter",
+	BOTTOM_LEFT: "tile-bottomleft-quarter",
+	BOTTOM_RIGHT: "tile-bottomright-quarter"
+};
+
 function init() {
 };
 
@@ -14,15 +30,15 @@ function buildPrefsWidget() {
 };
 
 const MyPrefsWidget = new GObject.Class({
-	Name : "MyTilingPrefsWidget",
-	GTypeName : "MyTilingPrefsWidget",
+	Name : "TilingAssistantPrefsWidget",
+	GTypeName : "TilingAssistantPrefsWidget",
 	Extends : Gtk.ScrolledWindow,
 
 	_init: function(params) {
 		const gschema = Gio.SettingsSchemaSource.new_from_directory(
-			Me.dir.get_child("schemas").get_path(),
-			Gio.SettingsSchemaSource.get_default(),
-			false
+			Me.dir.get_child("schemas").get_path()
+			, Gio.SettingsSchemaSource.get_default()
+			, false
 		);
 
 		const settingsSchema = gschema.lookup("org.gnome.shell.extensions.tiling-assistant", true);
@@ -31,26 +47,29 @@ const MyPrefsWidget = new GObject.Class({
 		this.parent(params);
 
 		this.builder = new Gtk.Builder();
-		this.builder.add_from_file(Me.path + "/prefs.ui");
+		this.builder.add_from_file(Me.path + `/prefs${shellVersion < 40 ? "" : "40"}.ui`);
 		const mainPrefs = this.builder.get_object("main_prefs");
-		shellVersion < 40 ? this.add(mainPrefs) : this.set_child(mainPrefs);
+		_addChildTo(this, mainPrefs);
 
-		this.set_min_content_height(700);
+		this.set_min_content_width(650);
+		this.set_min_content_height(650);
 
-		this.bindWidgetsToSettings(settingsSchema.list_keys());
-		this.bindKeybindings();
+		this._setupLayouts();
 
-		this.setupLayoutsGUI();
-		this.loadLayouts();
+		this._bindWidgetsToSettings(settingsSchema.list_keys());
+		this._bindKeybindings();
+
+		this.connect("destroy", () => this.settings.run_dispose());
 	},
 
-	bindWidgetsToSettings: function(settingsKeys) {
-		// widgets in prefs.ui need to have same ID
-		// as the keys in the gschema.xml file
-		const getBindProperty = function(key) {
-			const ints = ["icon-size", "icon-margin", "window-gap"];
-			const bools = ["enable-tiling-popup", "enable-animations", "enable-window-group-focus", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"];
+	// widgets in prefs.ui need to have same ID as the keys in the gschema.xml file
+	_bindWidgetsToSettings: function(settingsKeys) {
+		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"];
+		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
+				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"];
+		const enums = [];
 
+		const getBindProperty = function(key) {
 			if (ints.includes(key))
 				return "value"; // Gtk.Spinbox.value
 			else if (bools.includes(key))
@@ -59,32 +78,37 @@ const MyPrefsWidget = new GObject.Class({
 				return null;
 		}
 
+		// int & bool settings
 		settingsKeys.forEach(key => {
 			const bindProperty = getBindProperty(key);
 			const widget = this.builder.get_object(key);
 			if (widget && bindProperty)
 				this.settings.bind(key, widget, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 		});
+
+		// enum settings
+		enums.forEach(key => {
+			const widget = this.builder.get_object(key);
+			widget.set_active(this.settings.get_enum(key));
+			widget.connect("changed", src => this.settings.set_enum(key, widget.get_active()));
+		});
 	},
 
-	bindKeybindings: function() {
-		const shortcuts = ["toggle-dash", "replace-window", "tile-maximize", "tile-empty-space",
-				"tile-right-half", "tile-left-half", "tile-top-half", "tile-bottom-half",
-				"tile-bottomleft-quarter", "tile-bottomright-quarter", "tile-topright-quarter", "tile-topleft-quarter",
-				"layout1", "layout2", "layout3", "layout4", "layout5", "layout6", "layout7", "layout8", "layout9", "layout10"];
+	_bindKeybindings: function() {
+		const shortcuts = Object.values(TILING);
 		shortcuts.forEach(sc => this._makeShortcutEdit(sc));
 	},
 
 	// taken from Overview-Improved by human.experience
 	// https://extensions.gnome.org/extension/2802/overview-improved/
-	_makeShortcutEdit: function(settingKey) {
+	_makeShortcutEdit: function(settingKey, treeView, listStore) {
 		const COLUMN_KEY = 0;
 		const COLUMN_MODS = 1;
 
-		const view = this.builder.get_object(settingKey + "-treeview");
-		const store = this.builder.get_object(settingKey + "-liststore");
+		const view = treeView || this.builder.get_object(settingKey + "-treeview");
+		const store = listStore || this.builder.get_object(settingKey + "-liststore");
 		const iter = store.append();
-		const renderer = new Gtk.CellRendererAccel({ editable: true });
+		const renderer = new Gtk.CellRendererAccel({xalign: 1, editable: true});
 		const column = new Gtk.TreeViewColumn();
 		column.pack_start(renderer, true);
 		column.add_attribute(renderer, "accel-key", COLUMN_KEY);
@@ -116,227 +140,335 @@ const MyPrefsWidget = new GObject.Class({
 		updateShortcutRow(this.settings.get_strv(settingKey)[0]);
 	},
 
-	// this.layouts is an array of arrays. The inner arrays contain "rects" in the format:
-	// {x: NR, y: NR, width: NR, height: NR} -> NR is a float between 0 to 1.
-	// the user defines the rects via Gtk.Entrys in the format xVal--yVal--widthVal--heightVal.
-	setupLayoutsGUI: function() {
-		// layout reload button
-		this.builder.get_object("reloadLayoutsButton").connect("clicked", () => {
-			this.loadLayouts();
-		});
+	_setupLayouts: function() {
+		this._loadLayouts();
 
-		// layout save button
-		this.builder.get_object("saveLayoutsButton").connect("clicked", () => {
+		const saveButton = this.builder.get_object("save-layout-button");
+		saveButton.connect("clicked", button => {
 			this._saveLayouts();
-			this.loadLayouts();
+			this._loadLayouts();
 		});
-
-		// Nr of layouts is "hardcoded" (i. e. 10 layouts)
-		for (let i = 0; i < 10; i++) {
-			// delete buttons: resets a layout's Gtk.Entries
-			this.builder.get_object(`deleteLayoutButton${i}`).connect("clicked", () => {
-				const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-				for (let j = 0; j < 8; j++) // 8 Gtk.entries / possible rects in a layout
-					this._setEntryText(this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1), "");
-			});
-
-			// draw preview rects in the right column
-			const drawArea = this.builder.get_object(`DrawArea${i}`);
-			if (shellVersion < 40)
-				drawArea.connect("draw", (widget, cr) => this._drawLayoutsRects(i, widget, cr));
-			else
-				drawArea.set_draw_func(this._drawLayoutsRects.bind(this, [i]));
-		}
+		const reloadButton = this.builder.get_object("reload-layout-button");
+		reloadButton.connect("clicked", button => this._loadLayouts());
 	},
 
-	// load from ~/.TilingAssistantExtension.layouts.json
-	loadLayouts: function() {
-		const path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+	_loadLayouts: function() {
+		const layoutsListBox = this.builder.get_object("layouts-listbox");
+		_forEachChild(this, layoutsListBox, row => row.destroy());
+
+		const path = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
 		const file = Gio.File.new_for_path(path);
-
-		try {
-			file.create(Gio.FileCreateFlags.NONE, null);
-		} catch (e) {
-
-		}
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
 
 		const [success, contents] = file.load_contents(null);
 		if (!success)
 			return;
 
-		if (!contents.length)
-			return;
-
-		// reset layout's entries' text
-		for (let i = 0; i < 10; i++) {
-			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-			for (let j = 0; j < 8; j++)
-				this._setEntryText(this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1), "");
-		}
-
-		// set text for Gtk.entries
-		this.layouts = JSON.parse(contents);
-		this.layouts.forEach((layout, index) => {
-			const layoutListBox = this.builder.get_object(`LayoutListbox${index}`);
-			layout.forEach((rect, idx) => this._setEntryText(
-					this._getChildAtIndex(layoutListBox.get_row_at_index(idx).get_child(), 1),
-					`${rect.x}--${rect.y}--${rect.width}--${rect.height}`
-			));
-		});
-
-		// redraw layout previews
-		for (let idx = 0; idx < 10; idx++) {
-			const layout = this.layouts[idx];
-			const [layoutIsValid, errMsg] = this._layoutIsValid(layout);
-
-			const drawArea = this.builder.get_object(`DrawArea${idx}`);
-			const gtkOverlay = drawArea.get_parent().get_parent();
-			const errorLabel = this._getChildAtIndex(gtkOverlay, 1);
-			drawArea.queue_draw();
-
-			if (layoutIsValid)
-				errorLabel && (shellVersion < 40 ? gtkOverlay.remove(errorLabel)
-						: gtkOverlay.remove_overlay(errorLabel));
-			else
-				errorLabel ? errorLabel.set_text(errMsg)
-						: gtkOverlay.add_overlay(new Gtk.Label({
-							label: errMsg,
-							halign:  Gtk.Align.CENTER,
-							valign:  Gtk.Align.CENTER,
-							visible: true,
-							wrap: true
-						}));
-		}
+		this.layouts = contents.length ? JSON.parse(contents) : [];
+		this.layouts.length && this.layouts.forEach(() => this._createLayoutRow());
+		this._createLayoutRow(); // ensure at least 1 empty row
 	},
 
-	// save to ~/.TilingAssistantExtension.layouts.json
 	_saveLayouts: function() {
 		const allLayouts = [];
-		const props = ["x", "y", "width", "height"];
 
-		// for each layout
-		for (let i = 0; i < 10; i++) {
-			const layout = [];
-			const layoutListBox = this.builder.get_object(`LayoutListbox${i}`);
-
-			// for each rect in *a* layout
-			for (let j = 0; j < 8; j++) {
-				const rect = {};
-				const entry = this._getChildAtIndex(layoutListBox.get_row_at_index(j).get_child(), 1);
+		const layoutsListBox = this.builder.get_object("layouts-listbox");
+		_forEachChild(this, layoutsListBox, row => {
+			const layoutRects = [];
+			_forEachChild(this, row.entriesContainer, entry => {
 				if (!entry.get_text_length())
-					continue;
+					return;
 
-				const text = shellVersion < 40 ? entry.get_text() : entry.get_buffer().get_text();
+				const text = _getEntryText(entry);
 				const splits = text.split("--");
-				if (splits.length !== 4) {
-					layout.push({x: 0, y: 0, width: 0, height: 0});
-					continue;
-				}
+				if (splits.length !== 4)
+					return;
 
-				for (let k = 0; k < 4; k++) {
-					const value = parseFloat(splits[k].trim());
-					if (Number.isNaN(value)) {
-						layout.push({x: 0, y: 0, width: 0, height: 0});
-						continue;
-					}
+				const rect = {};
+				let rectIsValid = true;
+				["x", "y", "width", "height"].forEach((property, i) => {
+					const value = parseFloat(splits[i].trim());
+					if (Number.isNaN(value))
+						rectIsValid = false;
 
-					rect[props[k]] = value;
-				}
+					rect[property] = value;
+				});
 
-				layout.push(rect);
-			}
+				rectIsValid && layoutRects.push(rect);
+			});
 
-			allLayouts.push(layout);
-		}
+			const layoutName = row.getLayoutName();
+			const layout = {name: layoutName, rects: layoutRects};
+			layoutRects.length && allLayouts.push(layout);
+		});
 
-		const path = GLib.build_filenamev([GLib.get_home_dir(), ".TilingAssistantExtension.layouts.json"]);
+		const path = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
 		const file = Gio.File.new_for_path(path);
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
 
-		try {
-			file.create(Gio.FileCreateFlags.NONE, null);
-		} catch (e) {
-
-		}
-
-		const [success] = file.replace_contents(JSON.stringify(allLayouts), null, false,
-				Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+		const [success] = file.replace_contents(JSON.stringify(allLayouts), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 		return success;
 	},
 
-	_layoutIsValid: function(layout) {
-		if (!layout)
-			return [false, "No layout."];
+	_createLayoutRow() {
+		const layoutsListBox = this.builder.get_object("layouts-listbox");
+		const index = _getChildCount(layoutsListBox);
 
-		// calculate the surface area of an overlap
-		const rectsOverlap = function(r1, r2) {
-			return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
-					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
-		}
+		// layout numbers are limited to 30
+		// since there are only that many keybindings in the schemas file
+		if (index >= 30)
+			return;
 
-		for (let i = 0; i < layout.length; i++) {
-			const rect = layout[i];
-			// rects is/reaches outside of screen (i. e. > 1)
-			if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0
-						|| rect.x + rect.width > 1 || rect.y + rect.height > 1)
-				return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
-
-			for (let j = i + 1; j < layout.length; j++) {
-				if (rectsOverlap(rect, layout[j]))
-					return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
-			}
-		}
-
-		return [true, ""];
-	},
-
-	// layout format: [{x: 0, y: 0, width: .5, height: .5}, {x: 0, y: 0.5, width: 1, height: .5}, ...]
-	_drawLayoutsRects: function(idx, drawArea, cr) {
-		const layout = this.layouts[idx];
-		const [layoutIsValid, ] = this._layoutIsValid(layout);
-		if (!layoutIsValid)
-			layout = [{x: 0, y: 0, width: 0, height: 0}];
-
-		const color = new Gdk.RGBA();
-		const width = drawArea.get_allocated_width();
-		const height = drawArea.get_allocated_height();
-
-		cr.setLineWidth(1.0);
-
-		layout.forEach(rect => {
-			// 1px outline for rect in transparent white
-			// 5 px gaps between rects
-			color.parse("rgba(255, 255, 255, .2)");
-			Gdk.cairo_set_source_rgba(cr, color);
-			cr.moveTo(rect.x * width + 5, rect.y * height + 5);
-			cr.lineTo((rect.x + rect.width) * width - 5, rect.y * height + 5);
-			cr.lineTo((rect.x + rect.width) * width - 5, (rect.y + rect.height) * height - 5);
-			cr.lineTo(rect.x * width + 5, (rect.y + rect.height) * height - 5);
-			cr.lineTo(rect.x * width + 5, rect.y * height + 5);
-			cr.strokePreserve();
-
-			// fill rect in transparent black
-			color.parse("rgba(0, 0, 0, .15)");
-			Gdk.cairo_set_source_rgba(cr, color);
-			cr.fill();
-		});
-
-		cr.$dispose();
-	},
-
-	_setEntryText(entry, text) {
-		shellVersion < 40 ? entry.set_text(text) : entry.get_buffer().set_text(text, -1);
-	},
-
-	_getChildAtIndex(widget, idx) {
-		if (shellVersion < 40)
-			return widget.get_children()[idx];
-
-		if (idx < 0)
-			return null;
-
-		let child = widget.get_first_child();
-		for (; idx > 0 && child; idx--)
-			child = child.get_next_sibling();
-		return child;
+		const row = new LayoutsRow(this.layouts[index]);
+		_addChildTo(layoutsListBox, row);
+		this._makeShortcutEdit(`activate-layout${index}`, row.treeView, row.listStore);
 	}
 });
+
+const LayoutsRow = GObject.registerClass(
+	class LayoutsRow extends Gtk.ListBoxRow {
+		_init(layout) {
+			super._init({
+				selectable: false,
+				margin_bottom: 12
+			});
+
+			this._layout = layout;
+
+			const mainFrame = new Gtk.Frame();
+			_addChildTo(this, mainFrame)
+
+			const mainBox = new Gtk.Box({
+				orientation: Gtk.Orientation.VERTICAL,
+				spacing: 12,
+				margin_top: 12,
+				margin_bottom: 12,
+				margin_start: 12,
+				margin_end: 12,
+			});
+			_addChildTo(mainFrame, mainBox)
+
+			/* --- keybinding & name row --- */
+
+			const topBox = new Gtk.Box({
+				orientation: Gtk.Orientation.HORIZONTAL,
+				homogeneous: true,
+				spacing: 12
+			});
+			_addChildTo(mainBox, topBox);
+
+			const keybindingFrame = new Gtk.Frame({margin_end: 8});
+			_addChildTo(topBox, keybindingFrame);
+
+			this.listStore = new Gtk.ListStore();
+			this.listStore.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
+
+			this.treeView = new Gtk.TreeView({
+				model: this.listStore,
+				halign: Gtk.Align.START,
+				valign: Gtk.Align.CENTER,
+				headers_visible: false
+			});
+			_addChildTo(keybindingFrame, this.treeView);
+
+			this._nameEntry = new Gtk.Entry();
+			const layoutName = layout && layout.name;
+			layoutName && _setEntryText(this._nameEntry, layoutName);
+			!layoutName && this._nameEntry.set_placeholder_text("Layout name...");
+			_addChildTo(topBox, this._nameEntry);
+
+			/* --- rectangles entries and preview row --- */
+
+			const rectangleBox = new Gtk.Box({
+				orientation: Gtk.Orientation.HORIZONTAL,
+				homogeneous: true,
+				spacing: 12,
+				height_request: 175
+			});
+			_addChildTo(mainBox, rectangleBox);
+
+			// left column (rectangle entries)
+			const rectangleEntriesWindow = new Gtk.ScrolledWindow({vscrollbar_policy: Gtk.PolicyType.ALWAYS});
+			_addChildTo(rectangleBox, rectangleEntriesWindow);
+
+			const rectangleLeftBox = new Gtk.Box({
+				orientation: Gtk.Orientation.VERTICAL,
+				spacing: 6,
+				margin_end: 8
+			})
+			_addChildTo(rectangleEntriesWindow, rectangleLeftBox);
+
+			this.entriesContainer = new Gtk.Box({
+				orientation: Gtk.Orientation.VERTICAL,
+				spacing: 6,
+			});
+			_addChildTo(rectangleLeftBox, this.entriesContainer);
+
+			layout && layout.rects.forEach(rect => this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`));
+			this._addRectangleEntry();
+
+			const rectangleAddButton = new Gtk.Button();
+			if (shellVersion < 40) {
+				rectangleAddButton.set_always_show_image(true);
+				rectangleAddButton.set_image(new Gtk.Image({icon_name: "list-add-symbolic"}));
+			} else {
+				rectangleAddButton.set_icon_name("list-add-symbolic");
+			}
+			_addChildTo(rectangleLeftBox, rectangleAddButton);
+			rectangleAddButton.connect("clicked", () => this._addRectangleEntry());
+
+			// right column (layout preview)
+			const errorOverlay = new Gtk.Overlay();
+			_addChildTo(rectangleBox, errorOverlay);
+
+			const rectangleFrame = new Gtk.Frame();
+			_addChildTo(errorOverlay, rectangleFrame);
+
+			const [layoutIsValid, errMsg] = this._layoutIsValid(layout);
+			if (layoutIsValid) {
+				const drawingArea = new Gtk.DrawingArea();
+				_addChildTo(rectangleFrame, drawingArea);
+				shellVersion < 40 ? drawingArea.connect("draw", (widget, cr) => this._drawPreview(widget, cr))
+						: drawingArea.set_draw_func(this._drawPreview.bind(this));
+
+			} else {
+				const errorLabel = new Gtk.Label({
+					label: errMsg,
+					halign: Gtk.Align.CENTER,
+					valign: Gtk.Align.CENTER,
+					visible: true,
+					wrap: true
+				});
+				errorOverlay.add_overlay(errorLabel);
+			}
+
+			/* --- button row --- */
+
+			const deleteButton = new Gtk.Button();
+			if (shellVersion < 40) {
+				deleteButton.set_always_show_image(true);
+				deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
+			} else {
+				deleteButton.set_icon_name("edit-delete-symbolic");
+			}
+			_addChildTo(mainBox, deleteButton);
+			deleteButton.connect("clicked", button => this.destroy());
+
+			shellVersion < 40 && this.show_all();
+		}
+
+		destroy() {
+			shellVersion < 40 ? super.destroy() : this.get_parent().remove(this);
+		}
+
+		getLayoutName() {
+			return _getEntryText(this._nameEntry);
+		}
+
+		_addRectangleEntry(text) {
+			const tooltip = "Set a keybinding by clicking the 'Disabled' button. Enter the dimensions of the rectangles for the layouts in the left column.\
+The right column shows a preview of your layouts (after saving). Format:\n\nxVal--yVal--widthVal--heightVal\n\n\
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner."
+			const rectEntry = new Gtk.Entry({tooltip_text: tooltip});
+			_addChildTo(this.entriesContainer, rectEntry);
+
+			!text && _getChildCount(this.entriesContainer) <= 1 && rectEntry.set_placeholder_text("tooltip for help...");
+			text && _setEntryText(rectEntry, text);
+			shellVersion < 40 && rectEntry.show();
+		}
+
+		_drawPreview(drawingArea, cr) {
+			const color = new Gdk.RGBA();
+			const width = drawingArea.get_allocated_width();
+			const height = drawingArea.get_allocated_height();
+
+			cr.setLineWidth(1.0);
+
+			this._layout.rects.forEach(rect => {
+				// 1px outline for rect in transparent white
+				// 5 px gaps between rects
+				color.parse("rgba(255, 255, 255, .2)");
+				Gdk.cairo_set_source_rgba(cr, color);
+				cr.moveTo(rect.x * width + 5, rect.y * height + 5);
+				cr.lineTo((rect.x + rect.width) * width - 5, rect.y * height + 5);
+				cr.lineTo((rect.x + rect.width) * width - 5, (rect.y + rect.height) * height - 5);
+				cr.lineTo(rect.x * width + 5, (rect.y + rect.height) * height - 5);
+				cr.lineTo(rect.x * width + 5, rect.y * height + 5);
+				cr.strokePreserve();
+
+				// fill rect in transparent black
+				color.parse("rgba(0, 0, 0, .15)");
+				Gdk.cairo_set_source_rgba(cr, color);
+				cr.fill();
+			});
+
+			cr.$dispose();
+		}
+
+		_layoutIsValid() {
+			if (!this._layout)
+				return [false, "No preview..."];
+
+			// calculate the surface area of an overlap
+			const rectsOverlap = function(r1, r2) {
+				return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
+						* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+			}
+
+			for (let i = 0; i < this._layout.rects.length; i++) {
+				const rect = this._layout.rects[i];
+				// rects is/reaches outside of screen (i. e. > 1)
+				if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
+					return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
+
+				for (let j = i + 1; j < this._layout.rects.length; j++) {
+					if (rectsOverlap(rect, this._layout.rects[j]))
+						return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
+				}
+			}
+
+			return [true, ""];
+		}
+	}
+);
+
+/* --- GTK 4 compatibility --- */
+
+function _getEntryText(entry) {
+	return shellVersion < 40 ? entry.get_text() : entry.get_buffer().get_text();
+}
+
+function _setEntryText(entry, text) {
+	shellVersion < 40 ? entry.set_text(text) : entry.get_buffer().set_text(text, -1);
+}
+
+function _getChildCount(container) {
+	if (shellVersion < 40)
+		return container.get_children().length;
+
+	let childCount = 0;
+	for (let child = container.get_first_child(); !!child; child = child.get_next_sibling())
+		childCount++;
+	return childCount;
+}
+
+function _forEachChild(that, container, callback) {
+	if (shellVersion < 40) {
+		container.foreach(callback.bind(that));
+
+	} else {
+		for (let child = container.get_first_child(); !!child;) {
+			const nxtSibling = child.get_next_sibling();
+			callback.call(that, child);
+			child = nxtSibling;
+		}
+	}
+}
+
+function _addChildTo(parent, child) {
+	if (parent instanceof Gtk.Box || parent instanceof Gtk.ListBox)
+		shellVersion < 40 ? parent.add(child) : parent.append(child);
+
+	else if (parent instanceof Gtk.ListBoxRow || parent instanceof Gtk.ScrolledWindow || parent instanceof Gtk.Frame || parent instanceof Gtk.Overlay)
+		shellVersion < 40 ? parent.add(child) : parent.set_child(child);
+}
