@@ -386,7 +386,7 @@
 									</object>
 								</child>
 								<child>
-									<object class="GtkSwitch" id="enable-group-focus">
+									<object class="GtkSwitch" id="enable-window-group-focus">
 										<property name="visible">True</property>
 										<property name="valign">center</property>
 										<property name="active">True</property>
