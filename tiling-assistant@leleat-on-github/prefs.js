@@ -151,6 +151,9 @@ const MyPrefsWidget = new GObject.Class({
 		});
 		const reloadButton = this.builder.get_object("reload-layout-button");
 		reloadButton.connect("clicked", button => this._loadLayouts());
+		const addButton = this.builder.get_object("add-layout-button");
+		addButton.connect("clicked", button =>
+				this._createLayoutRow(_getChildCount(this.builder.get_object("layouts-listbox"))));
 	},
 
 	_loadLayouts: function() {
@@ -165,9 +168,11 @@ const MyPrefsWidget = new GObject.Class({
 		if (!success)
 			return;
 
-		this.layouts = contents.length ? JSON.parse(contents) : [];
-		this.layouts.length && this.layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
-		this._createLayoutRow(this.layouts.length, null); // make 1 empty row
+		const layouts = contents.length ? JSON.parse(contents) : [];
+		layouts.length && layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
+
+		if (!layouts.length) // make sure there is at least 1 empty row
+			this._createLayoutRow(0);
 	},
 
 	_saveLayouts: function() {
