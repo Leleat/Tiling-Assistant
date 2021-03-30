@@ -73,6 +73,14 @@
     <property name="step-increment">5</property>
     <property name="page-increment">10</property>
   </object>
+  <object class="GtkListStore" id="layouts-overview-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="push-tile-down-liststore">
     <columns>
       <!-- column-name key -->
@@ -616,10 +624,12 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                           <object class="GtkBox">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
                             <property name="margin-top">8</property>
                             <property name="margin-bottom">8</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">20</property>
+                            <property name="spacing">12</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -720,47 +730,56 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                                 <property name="position">1</property>
                               </packing>
                             </child>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    General    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkBox">
-                            <property name="width-request">-1</property>
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-top">8</property>
-                            <property name="margin-bottom">8</property>
-                            <property name="orientation">vertical</property>
-                            <property name="spacing">20</property>
-                            <property name="homogeneous">True</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <property name="margin-top">8</property>
+                                <property name="margin-bottom">8</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="valign">center</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Layout Selector</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeView" id="layouts-overview-treeview">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="model">layouts-overview-liststore</property>
+                                    <property name="headers-visible">False</property>
+                                    <property name="enable-search">False</property>
+                                    <property name="search-column">0</property>
+                                    <property name="activate-on-single-click">True</property>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection"/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">2</property>
+                              </packing>
+                            </child>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -823,7 +842,7 @@ If there is no space, the window will either untile or maximize depending on wet
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">0</property>
+                                <property name="position">3</property>
                               </packing>
                             </child>
                             <child>
@@ -873,9 +892,52 @@ If there is no space, the window will either untile or maximize depending on wet
                               <packing>
                                 <property name="expand">False</property>
                                 <property name="fill">True</property>
-                                <property name="position">1</property>
+                                <property name="position">4</property>
                               </packing>
                             </child>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    General    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">8</property>
+                        <property name="margin-end">8</property>
+                        <property name="margin-top">8</property>
+                        <property name="margin-bottom">8</property>
+                        <property name="label-xalign">0.5</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="width-request">-1</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
+                            <property name="margin-top">8</property>
+                            <property name="margin-bottom">8</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <property name="homogeneous">True</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -889,7 +951,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top Half</property>
+                                    <property name="label" translatable="yes">Toggle to Top</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -940,7 +1002,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom Half</property>
+                                    <property name="label" translatable="yes">Toggle to Bottom</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -991,7 +1053,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Left Half</property>
+                                    <property name="label" translatable="yes">Toggle to Left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1042,7 +1104,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Right Half</property>
+                                    <property name="label" translatable="yes">Toggle to Right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1079,6 +1141,49 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="position">5</property>
                               </packing>
                             </child>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    Side Tiling    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">8</property>
+                        <property name="margin-end">8</property>
+                        <property name="margin-top">8</property>
+                        <property name="margin-bottom">8</property>
+                        <property name="label-xalign">0.5</property>
+                        <child>
+                          <object class="GtkBox">
+                            <property name="width-request">-1</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">4</property>
+                            <property name="margin-end">4</property>
+                            <property name="margin-top">8</property>
+                            <property name="margin-bottom">8</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <property name="homogeneous">True</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -1093,7 +1198,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top-Left Quarter</property>
+                                    <property name="label" translatable="yes">Toggle to Top-Left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1144,7 +1249,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top-Right Quarter</property>
+                                    <property name="label" translatable="yes">Toggle to Top-Right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1195,7 +1300,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom-Left Quarter</property>
+                                    <property name="label" translatable="yes">Toggle to Bottom-Left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1246,7 +1351,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom-Right Quarter</property>
+                                    <property name="label" translatable="yes">Toggle to Bottom-Right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                   <packing>
@@ -1289,7 +1394,7 @@ If there is no space, the window will either untile or maximize depending on wet
                           <object class="GtkLabel">
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Tiling    &lt;/b&gt;</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    Corner Tiling    &lt;/b&gt;</property>
                             <property name="use-markup">True</property>
                           </object>
                         </child>

@@ -25,6 +25,9 @@
 		<key name="tile-edit-mode" type="as">
 			<default>[]</default>
 		</key>
+		<key name="layouts-overview" type="as">
+			<default>[]</default>
+		</key>
 		<key name="tile-maximize" type="as">
 			<default><![CDATA[['<Super>KP_5']]]></default>
 		</key>

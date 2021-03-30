@@ -10,6 +10,7 @@ const TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
+	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
 	TOP: "tile-top-half",

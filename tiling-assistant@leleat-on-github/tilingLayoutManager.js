@@ -144,4 +144,8 @@ var LayoutManager = class TilingLayoutManager {
 		this.cachedOpenWindows.splice(this.cachedOpenWindows.indexOf(tiledWindow), 1);
 		this.currentLayoutRects.length && this.cachedOpenWindows.length ? this._tileNextRect() : this._finishTilingToLayout();
 	}
+
+    openLayoutSelector() {
+        log("selector opened--")
+    }
 }

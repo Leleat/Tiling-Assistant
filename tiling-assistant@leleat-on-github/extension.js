@@ -34,6 +34,7 @@ var TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
+	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
 	TOP: "tile-top-half",
@@ -157,16 +158,21 @@ function onCustomKeybindingPressed(shortcutName) {
 		}
 		return;
 
-	// open the appDash consecutively to tile to a layout
-	} else if (shortcutName.startsWith("activate-layout")) {
-		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
-		return;
-
 	// toggle the popup, which appears when a window is tiled and there's free screen space
 	} else if (shortcutName === TILING.TOGGLE_POPUP) {
 		const toggleTo = !settings.get_boolean("enable-tiling-popup");
 		settings.set_boolean("enable-tiling-popup", toggleTo);
 		main.notify("Tiling Assistant", "Tiling-assistant's popup " + (toggleTo ? "enabled" : "was disabled"));
+		return;
+
+	// layout overview
+	} else if (shortcutName === TILING.LAYOUTS_OVERVIEW) {
+        this.tilingLayoutManager.openLayoutSelector();
+		return;
+
+	// open the appDash consecutively to tile to a layout
+	} else if (shortcutName.startsWith("activate-layout")) {
+		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
 		return;
 	}
 
