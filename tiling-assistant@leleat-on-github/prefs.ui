@@ -1831,7 +1831,7 @@ The group raising can be disabled with a setting. The group resizing can be esca
 
 - multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor &lt;b&gt;(by c-ridgway)&lt;/b&gt;
 
-- default keybindings with the num/keypad for tiling &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- default keybindings with the numpad for tiling &lt;b&gt;(by c-ridgway)&lt;/b&gt;
 
 - add 'User Guide' and 'Changelog' settings tab
 - other minor settings additions/removals/changes
