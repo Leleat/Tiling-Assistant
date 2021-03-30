@@ -165,8 +165,8 @@ const MyPrefsWidget = new GObject.Class({
 			return;
 
 		this.layouts = contents.length ? JSON.parse(contents) : [];
-		this.layouts.length && this.layouts.forEach(() => this._createLayoutRow());
-		this._createLayoutRow(); // ensure at least 1 empty row
+		this.layouts.length && this.layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
+		this._createLayoutRow(this.layouts.length, null); // make 1 empty row
 	},
 
 	_saveLayouts: function() {
@@ -175,7 +175,10 @@ const MyPrefsWidget = new GObject.Class({
 		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_forEachChild(this, layoutsListBox, row => {
 			const layoutRects = [];
-			_forEachChild(this, row.entriesContainer, entry => {
+			_forEachChild(this, row.entriesContainer, entryBox => {
+				const entry = shellVersion < 40 ? entryBox.get_children()[1]
+						: entryBox.get_first_child().get_next_sibling();
+
 				if (!entry.get_text_length())
 					return;
 
@@ -210,16 +213,14 @@ const MyPrefsWidget = new GObject.Class({
 		return success;
 	},
 
-	_createLayoutRow() {
-		const layoutsListBox = this.builder.get_object("layouts-listbox");
-		const index = _getChildCount(layoutsListBox);
-
+	_createLayoutRow(index, layout) {
 		// layout numbers are limited to 30
 		// since there are only that many keybindings in the schemas file
 		if (index >= 30)
 			return;
 
-		const row = new LayoutsRow(this.layouts[index]);
+		const row = new LayoutsRow(layout, index);
+		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_addChildTo(layoutsListBox, row);
 		this._makeShortcutEdit(`activate-layout${index}`, row.treeView, row.listStore);
 	}
@@ -227,15 +228,20 @@ const MyPrefsWidget = new GObject.Class({
 
 const LayoutsRow = GObject.registerClass(
 	class LayoutsRow extends Gtk.ListBoxRow {
-		_init(layout) {
+		_init(layout, idx) {
 			super._init({
 				selectable: false,
 				margin_bottom: 12
 			});
 
-			this._layout = layout;
-
-			const mainFrame = new Gtk.Frame();
+			const mainFrame = new Gtk.Frame({
+				label: `    Layout ${idx + 1}    `,
+				label_xalign: 0.5,
+				margin_top: 8,
+				margin_bottom: 8,
+				margin_start: 8,
+				margin_end: 8
+			});
 			_addChildTo(this, mainFrame)
 
 			const mainBox = new Gtk.Box({
@@ -244,7 +250,7 @@ const LayoutsRow = GObject.registerClass(
 				margin_top: 12,
 				margin_bottom: 12,
 				margin_start: 12,
-				margin_end: 12,
+				margin_end: 12
 			});
 			_addChildTo(mainFrame, mainBox)
 
@@ -293,14 +299,14 @@ const LayoutsRow = GObject.registerClass(
 
 			const rectangleLeftBox = new Gtk.Box({
 				orientation: Gtk.Orientation.VERTICAL,
-				spacing: 6,
+				spacing: 8,
 				margin_end: 8
 			})
 			_addChildTo(rectangleEntriesWindow, rectangleLeftBox);
 
 			this.entriesContainer = new Gtk.Box({
 				orientation: Gtk.Orientation.VERTICAL,
-				spacing: 6,
+				spacing: 8,
 			});
 			_addChildTo(rectangleLeftBox, this.entriesContainer);
 
@@ -328,8 +334,8 @@ const LayoutsRow = GObject.registerClass(
 			if (layoutIsValid) {
 				const drawingArea = new Gtk.DrawingArea();
 				_addChildTo(rectangleFrame, drawingArea);
-				shellVersion < 40 ? drawingArea.connect("draw", (widget, cr) => this._drawPreview(widget, cr))
-						: drawingArea.set_draw_func(this._drawPreview.bind(this));
+				shellVersion < 40 ? drawingArea.connect("draw", (widget, cr) => this._drawPreview(layout, widget, cr))
+						: drawingArea.set_draw_func(this._drawPreview.bind(this, layout));
 
 			} else {
 				const errorLabel = new Gtk.Label({
@@ -366,25 +372,38 @@ const LayoutsRow = GObject.registerClass(
 		}
 
 		_addRectangleEntry(text) {
-			const tooltip = "Set a keybinding by clicking the 'Disabled' button. Enter the dimensions of the rectangles for the layouts in the left column.\
-The right column shows a preview of your layouts (after saving). Format:\n\nxVal--yVal--widthVal--heightVal\n\n\
-The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner."
-			const rectEntry = new Gtk.Entry({tooltip_text: tooltip});
-			_addChildTo(this.entriesContainer, rectEntry);
+			const entryBox = new Gtk.Box({
+				orientation: Gtk.Orientation.HORIZONTAL,
+				spacing: 8
+			});
+			_addChildTo(this.entriesContainer, entryBox);
 
-			!text && _getChildCount(this.entriesContainer) <= 1 && rectEntry.set_placeholder_text("tooltip for help...");
+			const entryCount = _getChildCount(this.entriesContainer);
+			const entryLabel = new Gtk.Label({label: `${entryCount}:`});
+			_addChildTo(entryBox, entryLabel);
+
+			const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
+The right column shows a preview of your layouts (after saving). Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner."
+			const rectEntry = new Gtk.Entry({
+				tooltip_text: tooltip,
+				hexpand: true
+			});
+			!text && entryCount <= 1 && rectEntry.set_placeholder_text("tooltip for help...");
 			text && _setEntryText(rectEntry, text);
-			shellVersion < 40 && rectEntry.show();
+			_addChildTo(entryBox, rectEntry);
+
+			shellVersion < 40 && entryBox.show_all();
 		}
 
-		_drawPreview(drawingArea, cr) {
+		_drawPreview(layout, drawingArea, cr) {
 			const color = new Gdk.RGBA();
 			const width = drawingArea.get_allocated_width();
 			const height = drawingArea.get_allocated_height();
 
 			cr.setLineWidth(1.0);
 
-			this._layout.rects.forEach(rect => {
+			layout.rects.forEach(rect => {
 				// 1px outline for rect in transparent white
 				// 5 px gaps between rects
 				color.parse("rgba(255, 255, 255, .2)");
@@ -405,8 +424,8 @@ The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (
 			cr.$dispose();
 		}
 
-		_layoutIsValid() {
-			if (!this._layout)
+		_layoutIsValid(layout) {
+			if (!layout)
 				return [false, "No preview..."];
 
 			// calculate the surface area of an overlap
@@ -415,14 +434,14 @@ The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (
 						* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
 			}
 
-			for (let i = 0; i < this._layout.rects.length; i++) {
-				const rect = this._layout.rects[i];
+			for (let i = 0; i < layout.rects.length; i++) {
+				const rect = layout.rects[i];
 				// rects is/reaches outside of screen (i. e. > 1)
 				if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
 					return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
 
-				for (let j = i + 1; j < this._layout.rects.length; j++) {
-					if (rectsOverlap(rect, this._layout.rects[j]))
+				for (let j = i + 1; j < layout.rects.length; j++) {
+					if (rectsOverlap(rect, layout.rects[j]))
 						return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
 				}
 			}

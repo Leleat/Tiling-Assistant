@@ -1326,8 +1326,8 @@ If there is no space, the window will either untile or maximize depending on wet
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
-        <property name="margin-start">16</property>
-        <property name="margin-end">16</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
         <property name="margin-top">16</property>
         <property name="margin-bottom">16</property>
         <property name="orientation">vertical</property>
@@ -1335,6 +1335,8 @@ If there is no space, the window will either untile or maximize depending on wet
           <object class="GtkBox">
             <property name="visible">True</property>
             <property name="can-focus">False</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
             <property name="margin-bottom">12</property>
             <property name="spacing">12</property>
             <property name="homogeneous">True</property>
