@@ -61,7 +61,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			global.display.end_grab_op(global.get_current_time());
 			// timer needed because for some apps the grab will overwrite the size changes of restoreWindowSize
 			// so far I only noticed this behaviour with firefox
-			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 1, () => {
+			GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE + 10, 1, () => {
 				Util.restoreWindowSize(window, false, eventX, windowWasMaximized);
 				global.display.begin_grab_op(
 					window,
