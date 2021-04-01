@@ -1645,7 +1645,7 @@ The default keybindings for tiling are &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;NU
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">This is the popup, which will open when you tile a window and there is (unambiguous) free screen space. It will list the open windows on the current workspace. 
 
-The popup's app icons can be activated with &lt;tt&gt;Space&lt;/tt&gt;, &lt;tt&gt;Enter&lt;/tt&gt;, or &lt;tt&gt;Middle Mouse Button&lt;/tt&gt;. Activating one of the popup's app icons will tile the corresponding window to the free screen space. 
+The popup's app icons can be activated with &lt;tt&gt;Space&lt;/tt&gt;, &lt;tt&gt;Enter&lt;/tt&gt;, and &lt;tt&gt;Right&lt;/tt&gt; or &lt;tt&gt;Middle Mouse Button&lt;/tt&gt;. Activating one of the popup's app icons will tile the corresponding window to the free screen space. 
 
 Holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; while activating an app icon, will tile the window to the top/left or bottom/right half of the free space depending on the space's orientation (spiral tiling).</property>
                             <property name="use-markup">True</property>
@@ -1737,7 +1737,9 @@ The group raising can be disabled with a setting. The group resizing can be esca
                             <property name="margin-end">12</property>
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">A layout consists of a list of arbitrary rectangles. When activating a layout the tiling popup will ask you which of the open windows you want in which rectangle of your layout.</property>
+                            <property name="label" translatable="yes">A layout consists of a list of arbitrary rectangles. When activating a layout the tiling popup will ask you which of the open windows you want in which rectangle of your layout.
+
+The layout selector enables you to search for layouts by name. That means you don't have to remember their keybindings. </property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
                           </object>
@@ -1833,11 +1835,12 @@ The group raising can be disabled with a setting. The group resizing can be esca
 
 - default keybindings with the numpad for tiling &lt;b&gt;(by c-ridgway)&lt;/b&gt;
 
+- dynamic numbers of layouts &amp; layout selector
+
 - add 'User Guide' and 'Changelog' settings tab
 - other minor settings additions/removals/changes
-- dynamic numbers of layouts
 
-- bigger refactor and minor bugfixes</property>
+- refactor and minor bugfixes</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>

@@ -180,7 +180,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 		}
 
 		vfunc_button_press_event(buttonEvent) {
-			if (buttonEvent.button === Clutter.BUTTON_MIDDLE) {
+			if (buttonEvent.button === Clutter.BUTTON_MIDDLE || buttonEvent.button === Clutter.BUTTON_SECONDARY) {
 				this._finish(global.get_current_time());
 				return Clutter.EVENT_PROPAGATE;
 			}
