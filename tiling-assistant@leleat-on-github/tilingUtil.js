@@ -10,10 +10,13 @@ const TilingPopup = Me.imports.tilingPopup;
 
 // given @rectA and @rectB, calculate the rectangles which remain from @rectA,
 // if @rectB is substracted from it. The result is an array of 0 - 4 rects depending on @rectA/B's position.
-// https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference (Java implementation)
-// they implemented it in a way, which gives the vertical rects (top and bottom) higher priority than horizontal rects (left and right).
-// I've simplified/clarified it a bit and prefered the horizontal rects over the vertical ones since screens mostly use a horizontal layout
-// ... although for quarter-tiling-only it won't make a difference
+//
+// idea from https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference (Java implementation)
+// no license is given... only the general CC-BY-AS (for text) is mentioned in the footer. 
+// Since I've translated it to JS, my function now is only based on the original principle -- they implemented it in a way,
+// which made the vertical rects (top and bottom) bigger than horizontal rects (left and right),
+// I prefered the horizontal rects since screen's are mostly horizontal -- and the algorithm itself is fairly generic
+// (i. e. a short list of additions and subtractions), I think I should be good license-wise
 function rectDiff(rectA, rectB, margin) {
 	const resultRects = [];
 	if (!rectA || !rectB)
@@ -33,8 +36,8 @@ function rectDiff(rectA, rectB, margin) {
 	if (rightRectWidth > margin && rectA.height > margin)
 		resultRects.push(new Meta.Rectangle({x: rectBX2, y: rectA.y, width: rightRectWidth, height: rectA.height}));
 
-	const sideRectsX1 = (rectB.x > rectA.x) ? rectB.x : rectA.x;
-	const sideRectsX2 = (rectBX2 < rectAX2) ? rectBX2 : rectAX2;
+	const sideRectsX1 = rectB.x > rectA.x ? rectB.x : rectA.x;
+	const sideRectsX2 = rectBX2 < rectAX2 ? rectBX2 : rectAX2;
 	const sideRectsWidth = sideRectsX2 - sideRectsX1;
 
 	// top rect
