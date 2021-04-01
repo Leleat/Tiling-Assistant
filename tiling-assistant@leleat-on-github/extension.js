@@ -167,7 +167,7 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// layout overview
 	} else if (shortcutName === TILING.LAYOUTS_OVERVIEW) {
-        this.tilingLayoutManager.openLayoutSelector();
+		this.tilingLayoutManager.openLayoutSelector();
 		return;
 
 	// open the appDash consecutively to tile to a layout
