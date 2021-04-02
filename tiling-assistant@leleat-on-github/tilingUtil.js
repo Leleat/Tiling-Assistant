@@ -247,50 +247,50 @@ function getTileRectFor(position, workArea) {
 
 		case MainExtension.TILING.LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: workArea.height});
 
 		case MainExtension.TILING.RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width,height: workArea.height});
 
 		case MainExtension.TILING.TOP:
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width: workArea.width, height});
 
 		case MainExtension.TILING.BOTTOM:
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width: workArea.width, height});
 
 		case MainExtension.TILING.TOP_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: height});
 
 		case MainExtension.TILING.TOP_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width, height});
 
 		case MainExtension.TILING.BOTTOM_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width, height});
 
 		case MainExtension.TILING.BOTTOM_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.floor(workArea.width / 2);
+			width = rect ? rect.width : Math.round(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.floor(workArea.height / 2);
+			height = rect ? rect.height : Math.round(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y + workArea.height - height, width, height});
 	}
 };
