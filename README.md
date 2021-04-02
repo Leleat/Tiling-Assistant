@@ -16,7 +16,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 - **Spiral Tiling**: You can hold `Shift` while activating one of the Tiling Popup's icon to tile a window to the top/left half of the available screen space and `Alt` to tile the window to the bottom/right half depending on the orientation of the available space.
 
-- **DND**: Moving a window to the screen edges or quarters will open a preview to tile the window to. Holding `Ctrl` while moving a window around and hovering a tiled window will make the grabbed window and the tiled window share the same space. A similiar principle applies to hovering a free screen rect.
+- **DND**: Moving a window to the screen edges or quarters will open a preview to tile the window to. Holding `Ctrl` while moving a window around and hovering a tiled window will make the grabbed window and the tiled window share the same space. A similiar principle applies to hovering a free screen rect. Hovering at the very edges will make this affect multiple windows.
 
 - **Tile Groups**: Tiled windows are considered in a group, if they don't overlap each other and aren't interrupted by non-tiled windows. If one of the windows is focused, the rest of the group will be raised to the foreground as well. A Tile Group also resizes together. If you hold `Ctrl` when starting a horizontal or vertical resize operation, only directly opposing windows will resize in a group.
 
