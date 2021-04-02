@@ -72,15 +72,11 @@ function enable() {
 
 	// keybindings
 	this.keyBindings = Object.values(TILING);
+	[...Array(30)].forEach((nr, idx) => this.keyBindings.push(`activate-layout${idx}`));
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 				, onCustomKeybindingPressed.bind(this, key));
 	});
-	for (let i = 0; i < 30; i++) {
-		const key = `activate-layout${i}`;
-		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
-				, onCustomKeybindingPressed.bind(this, key));
-	}
 
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
 	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
