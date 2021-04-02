@@ -146,9 +146,9 @@ var TilingSwitcherPopup = GObject.registerClass({
 
 			if (this._thumbnails) {
 				const childBox = this._switcherList.get_allocation_box();
-                const focusedWindow = global.display.focus_window;
+				const focusedWindow = global.display.focus_window;
 				const monitor = global.display.get_monitor_geometry(
-                        focusedWindow ? focusedWindow.get_monitor() : global.display.get_current_monitor());
+						focusedWindow ? focusedWindow.get_monitor() : global.display.get_current_monitor());
 
 				const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
 				const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
@@ -280,18 +280,18 @@ var TilingSwitcherPopup = GObject.registerClass({
 			if (isAltPressed) { // halve to right or bottom
 				// prefer vertical tiling more (because of horizontal screen orientation)
 				if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25) {
-					this.freeScreenRect.x = this.freeScreenRect.x + this.freeScreenRect.width / 2;
+					this.freeScreenRect.x = this.freeScreenRect.x + Math.round(this.freeScreenRect.width / 2);
 					this.freeScreenRect.width = this.freeScreenRect.width / 2;
 				} else {
-					this.freeScreenRect.y = this.freeScreenRect.y + this.freeScreenRect.height / 2;
-					this.freeScreenRect.height = this.freeScreenRect.height / 2;
+					this.freeScreenRect.y = this.freeScreenRect.y + Math.round(this.freeScreenRect.height / 2);
+					this.freeScreenRect.height = Math.round(this.freeScreenRect.height / 2);
 				}
 
 			} else if (isShiftPressed) { // halve to left or top
 				if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25)
-					this.freeScreenRect.width = this.freeScreenRect.width / 2;
+					this.freeScreenRect.width = Math.round(this.freeScreenRect.width / 2);
 				else
-					this.freeScreenRect.height = this.freeScreenRect.height / 2;
+					this.freeScreenRect.height = Math.round(this.freeScreenRect.height / 2);
 			}
 
 			this.tiledWindow = window;

@@ -203,6 +203,15 @@ const LayoutSelector = GObject.registerClass({
 			this._focus(0);
 		}
 
+		destroy() {
+			// destroy may be called when activating a layout and when losing focus
+			if (this.alreadyDestroyed)
+				return;
+
+			this.alreadyDestroyed = true;
+			super.destroy();
+		}
+
 		_createMenuItem(layout, fontSize) {
 			if (!layout.isValid)
 				return;
@@ -259,6 +268,7 @@ const LayoutSelector = GObject.registerClass({
 
 		_activateLayout() {
 			this._focusedIdx !== -1 && this.emit("item-activated", this._focusedIdx);
+			this.destroy();
 		}
 	}
 )

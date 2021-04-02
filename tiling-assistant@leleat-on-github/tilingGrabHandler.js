@@ -8,11 +8,22 @@ const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 
+const PREVIEW_STATE = {
+	DEFAULT: 1, // default screen edge/quarter tiling
+	SINGLE: 2, // hold Ctrl while hovering any screen rect
+	GROUP: 4 // hold Ctrl while hovering any screen rect at the very edges
+};
+
 // class to handle the grab of a window
 
 var WindowGrabHandler = class TilingWindowGrabHandler {
 	constructor() {
 		this.tilePreview = new windowManager.TilePreview();
+		this.tilePreview.state = PREVIEW_STATE.DEFAULT;
+		// only use normal tile-preview style class and don't round corners
+		// because native rounding code doesnt fit my possible previews
+		this.tilePreview.style_class = "tile-preview";
+		this.tilePreview._updateStyle = () => {};
 	}
 
 	destroy() {
@@ -35,12 +46,67 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			return;
 
 		const previewRect = this.tilePreview._rect;
-		// the hovered tiled window when holding Ctrl while moving a window
-		if (Util.isModPressed(Clutter.ModifierType.CONTROL_MASK) && this.hoveredWindow)
-			Util.tileWindow(this.hoveredWindow, Util.rectDiff(this.hoveredWindow.tiledRect, previewRect)[0], false);
-		this.hoveredWindow = null;
 
-		Util.tileWindow(window, previewRect);
+		switch (this.tilePreview.state) {
+			case PREVIEW_STATE.GROUP:
+				const topTileGroup = Util.getTopTileGroup();
+				const isVertical = this.tilePreview._rect.width > this.tilePreview._rect.height;
+				const isPushedIn = function(window) {
+					const prop = isVertical ? "y" : "x";
+					return window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
+				};
+				const isPushedOut = function(window) {
+					const prop = isVertical ? "y" : "x";
+					return window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
+				};
+				const resizeAmount = isVertical ? 250 : 350;
+				let pushedInW;
+				let pushedOutW;
+
+				topTileGroup.forEach(w => {
+					if(isPushedIn(w)) {
+						pushedInW = w;
+						Util.tileWindow(w, new Meta.Rectangle({
+							x: w.tiledRect.x,
+							y: w.tiledRect.y,
+							width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
+							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
+						}), false);
+
+					} else if (isPushedOut(w)) {
+						pushedOutW = w;
+						Util.tileWindow(w, new Meta.Rectangle({
+							x: isVertical ? w.tiledRect.x : w.tiledRect.x + resizeAmount,
+							y: isVertical ? w.tiledRect.y + resizeAmount : w.tiledRect.y,
+							width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
+							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
+						}), false);
+					}
+				});
+
+				const workArea = window.get_work_area_for_monitor(window.get_monitor());
+				Util.tileWindow(window, new Meta.Rectangle({
+					x: isVertical ? previewRect.x : (pushedInW ? pushedInW.tiledRect.x + pushedInW.tiledRect.width : workArea.x),
+					y: isVertical ? (pushedInW ? pushedInW.tiledRect.y + pushedInW.tiledRect.height : workArea.y) : previewRect.y,
+					width: isVertical ? previewRect.width : resizeAmount * (pushedInW && pushedOutW ? 2 : 1),
+					height: isVertical ? resizeAmount * (pushedInW && pushedOutW ? 2 : 1) : previewRect.height
+				}));
+				break;
+
+			case PREVIEW_STATE.SINGLE:
+				if (this._ctrlHoveredWindow && !previewRect.equal(this._ctrlHoveredWindow.tiledRect)) {
+					const splitRect = Util.rectDiff(this._ctrlHoveredWindow.tiledRect, previewRect)[0];
+					Util.tileWindow(this._ctrlHoveredWindow, splitRect, false);
+				}
+
+			case PREVIEW_STATE.DEFAULT:
+				Util.tileWindow(window, previewRect);
+		}
+
+		// reset everything that may have been set
+		this._ctrlHoveredWindow = null;
+		this._ctrlHoveredRect = null;
+
 		this.tilePreview.close();
 	}
 
@@ -83,15 +149,17 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 
 		// tile preview
 		Util.isModPressed(Clutter.ModifierType.CONTROL_MASK)
-				? this._alternatePreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY)
+				? this._ctrlPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY)
 				: this._previewTile(window, eventX, eventY);
 	}
 
 	_previewTile(window, eventX, eventY) {
-        // when switching monitors, provide a short grace period
-        // in which the tile preview will stick to the old monitor so that
-        // the user doesn't have to slowly move/inch the mouse to the monitor edge
-        // just because there is a second monitor in that direction
+		this.tilePreview.state = PREVIEW_STATE.DEFAULT;
+
+		// when switching monitors, provide a short grace period
+		// in which the tile preview will stick to the old monitor so that
+		// the user doesn't have to slowly move/inch the mouse to the monitor edge
+		// just because there is a second monitor in that direction
 		const currMonitorNr = global.display.get_current_monitor();
 		if (this.lastMonitorNr !== currMonitorNr) {
 			this.monitorNr = this.lastMonitorNr;
@@ -174,41 +242,100 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 	}
 
-	_alternatePreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY) {
+	_ctrlPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY) {
 		const pointerLocation = {x: eventX, y: eventY};
-		const hoveredWindow = topTileGroup.find(w => Util.rectHasPoint(w.get_frame_rect(), pointerLocation));
-		const hoveredFreeRect = !hoveredWindow && freeScreenRects.find(r => Util.rectHasPoint(r, pointerLocation));
-
-		const getSplitRect = function(rect) {
-			const pointerAtTop = eventY < rect.y + rect.height * .2;
-			const pointerAtBottom = eventY > rect.y + rect.height * .8;
-			const pointerAtRight = eventX > rect.x + rect.width * .8;
-			const pointerAtLeft = eventX < rect.x + rect.width * .2;
-			const splitVertically = pointerAtTop || pointerAtBottom;
-			const splitHorizontally = pointerAtLeft || pointerAtRight;
-
-			return new Meta.Rectangle({
-				x: rect.x + (pointerAtRight && !splitVertically ? rect.width / 2 : 0),
-				y: rect.y + (pointerAtBottom ? rect.height / 2 : 0),
-				width: rect.width / (splitHorizontally && !splitVertically ? 2 : 1),
-				height: rect.height / (splitVertically ? 2 : 1)
-			});
-		};
-
-		this.hoveredWindow = null;
-
-		if (hoveredWindow) {
-			const tileRect = getSplitRect(hoveredWindow.tiledRect);
-			this.tilePreview.open(window, tileRect, global.display.get_current_monitor());
-			this.hoveredWindow = hoveredWindow;
-
-		} else if (hoveredFreeRect) {
-			const tileRect = getSplitRect(hoveredFreeRect);
-			this.tilePreview.open(window, tileRect, global.display.get_current_monitor());
-
-		} else {
+		const screenRects = topTileGroup.map(w => w.tiledRect).concat(freeScreenRects);
+		const index = screenRects.findIndex(rect => Util.rectHasPoint(rect, pointerLocation));
+		const hoveredRect = screenRects[index];
+		if (!hoveredRect) {
 			this.tilePreview.close();
+			return;
 		}
+
+		this._ctrlHoveredWindow = topTileGroup[index];
+
+		const edgeRadius = 40;
+		const atTopEdge = eventY < hoveredRect.y + edgeRadius;
+		const atBottomEdge = eventY > hoveredRect.y + hoveredRect.height - edgeRadius;
+		const atLeftEdge = eventX < hoveredRect.x + edgeRadius;
+		const atRightEdge = eventX > hoveredRect.x + hoveredRect.width - edgeRadius;
+
+		// group: possibly push multiple windows away
+		if (atTopEdge || atBottomEdge || atLeftEdge || atRightEdge)
+			this._ctrlGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge);
+		// single: push at max. 1 window away
+		else
+			this._ctrlSinglePreview(window, hoveredRect, eventX, eventY);
+	}
+
+	_ctrlSinglePreview(window, hoveredRect, eventX, eventY) {
+		this.tilePreview.state = PREVIEW_STATE.SINGLE;
+
+		const atTop = eventY < hoveredRect.y + hoveredRect.height * .25;
+		const atBottom = eventY > hoveredRect.y + hoveredRect.height * .75;
+		const atRight = eventX > hoveredRect.x + hoveredRect.width * .75;
+		const atLeft = eventX < hoveredRect.x + hoveredRect.width * .25;
+		const splitVertically = atTop || atBottom;
+		const splitHorizontally = atLeft || atRight;
+
+		const previewRect = new Meta.Rectangle({
+			x: hoveredRect.x + (atRight && !splitVertically ? Math.round(hoveredRect.width / 2) : 0),
+			y: hoveredRect.y + (atBottom ? Math.round(hoveredRect.height / 2) : 0),
+			width: Math.round(hoveredRect.width / (splitHorizontally && !splitVertically ? 2 : 1)),
+			height: Math.round(hoveredRect.height / (splitVertically ? 2 : 1))
+		});
+		this.tilePreview.open(window, previewRect, global.display.get_current_monitor());
+	}
+
+	_ctrlGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge) {
+		this.tilePreview.state = PREVIEW_STATE.GROUP;
+		this._ctrlHoveredRect = hoveredRect;
+
+		const previewRect = new Meta.Rectangle();
+		const previewSize = 18;
+
+		if (atTopEdge) {
+			const x1x2 = topTileGroup.reduce((result, w) => {
+				return w.tiledRect.y === hoveredRect.y
+					? [Math.min(w.tiledRect.x, result[0]), Math.max(w.tiledRect.x + w.tiledRect.width, result[1])] : result;
+			}, [hoveredRect.x, hoveredRect.x + hoveredRect.width]);
+			previewRect.x = x1x2[0];
+			previewRect.y = hoveredRect.y - Math.floor(previewSize / 2);
+			previewRect.width = x1x2[1] - x1x2[0];
+			previewRect.height = previewSize;
+
+		} else if (atBottomEdge) {
+			const x1x2 = topTileGroup.reduce((result, w) => {
+				return w.tiledRect.y + w.tiledRect.height === hoveredRect.y + hoveredRect.height
+					? [Math.min(w.tiledRect.x, result[0]), Math.max(w.tiledRect.x + w.tiledRect.width, result[1])] : result;
+			}, [hoveredRect.x, hoveredRect.x + hoveredRect.width]);
+			previewRect.x = x1x2[0];
+			previewRect.y = hoveredRect.y + hoveredRect.height - previewSize + Math.ceil(previewSize / 2);
+			previewRect.width = x1x2[1] - x1x2[0];
+			previewRect.height = previewSize;
+
+		} else if (atLeftEdge) {
+			const y1y2 = topTileGroup.reduce((result, w) => {
+				return w.tiledRect.x === hoveredRect.x
+					? [Math.min(w.tiledRect.y, result[0]), Math.max(w.tiledRect.y + w.tiledRect.height, result[1])] : result;
+			}, [hoveredRect.y, hoveredRect.y + hoveredRect.height]);
+			previewRect.x = hoveredRect.x - Math.floor(previewSize / 2);
+			previewRect.y = y1y2[0];
+			previewRect.width = previewSize;
+			previewRect.height = y1y2[1] - y1y2[0];
+
+		} else if (atRightEdge) {
+			const y1y2 = topTileGroup.reduce((result, w) => {
+				return w.tiledRect.x + w.tiledRect.width === hoveredRect.x + hoveredRect.width
+					? [Math.min(w.tiledRect.y, result[0]), Math.max(w.tiledRect.y + w.tiledRect.height, result[1])] : result;
+			}, [hoveredRect.y, hoveredRect.y + hoveredRect.height]);
+			previewRect.x = hoveredRect.x + hoveredRect.width - previewSize + Math.ceil(previewSize / 2);
+			previewRect.y = y1y2[0];
+			previewRect.width = previewSize;
+			previewRect.height = y1y2[1] - y1y2[0];
+		}
+
+		this.tilePreview.open(window, previewRect, global.display.get_current_monitor());
 	}
 
 	// called via global.diplay's signal (grab-op-begin)

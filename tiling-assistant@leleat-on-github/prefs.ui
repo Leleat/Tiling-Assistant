@@ -1597,7 +1597,7 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">Dragging a window to the screen edges or quarters will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted.
 
-Holding &lt;tt&gt;Ctrl&lt;/tt&gt; when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space.
+Holding &lt;tt&gt;Ctrl&lt;/tt&gt; when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space. Hovering at the very edges will affect multiple windows.
 
 The default keybindings for tiling are &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;NUM_PAD&lt;/tt&gt;.</property>
                             <property name="use-markup">True</property>
@@ -1828,6 +1828,8 @@ The layout selector enables you to search for layouts by name. That means you do
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">- dynamic tiling
+
+- ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
 
 - inverse top screen edge action &lt;b&gt;(by c-ridgway)&lt;/b&gt;
 
