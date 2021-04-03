@@ -8,6 +8,10 @@ const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const TilingPopup = Me.imports.tilingPopup;
 
+function equalApprox(value, value2, margin = MainExtension.settings.get_int("window-gap")) {
+	return value >= value2 - margin && value <= value2 + margin;
+};
+
 // given @rectA and @rectB, calculate the rectangles which remain from @rectA,
 // if @rectB is substracted from it. The result is an array of 0 - 4 rects depending on @rectA/B's position.
 //
@@ -17,12 +21,10 @@ const TilingPopup = Me.imports.tilingPopup;
 // which made the vertical rects (top and bottom) bigger than horizontal rects (left and right),
 // I prefered the horizontal rects since screen's are mostly horizontal -- and the algorithm itself is fairly generic
 // (i. e. a short list of additions and subtractions), I think I should be good license-wise
-function rectDiff(rectA, rectB, margin) {
+function rectDiff(rectA, rectB, margin = MainExtension.settings.get_int("window-gap")) {
 	const resultRects = [];
 	if (!rectA || !rectB)
 		return resultRects;
-
-	margin = margin || MainExtension.settings.get_int("window-gap");
 
 	// left rect
 	const leftRectWidth = rectB.x - rectA.x;

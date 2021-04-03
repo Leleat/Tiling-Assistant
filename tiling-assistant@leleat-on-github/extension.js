@@ -72,7 +72,7 @@ function enable() {
 
 	// keybindings
 	this.keyBindings = Object.values(TILING);
-	[...Array(30)].forEach((nr, idx) => this.keyBindings.push(`activate-layout${idx}`));
+	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 				, onCustomKeybindingPressed.bind(this, key));

@@ -70,37 +70,8 @@ const SelectMode = GObject.registerClass(
 	}
 );
 
-// tile the selected window to the highlighted spot
-const TileMode = GObject.registerClass(
-	class TileMode extends St.Widget {
-		_init() {
-			super._init();
-			this.tileEditor = tileEditor;
-		}
-
-		destroy() {
-			super.destroy();
-		}
-	}
-);
-
-// swap the selected window with the highlighted window
-const SwapMode = GObject.registerClass(
-	class SwapMode extends St.Widget {
-		_init() {
-			super._init();
-			this.tileEditor = tileEditor;
-		}
-
-		destroy() {
-			super.destroy();
-		}
-	}
-);
-
-// resize the selected window
-const ResizeMode = GObject.registerClass(
-	class ResizeMode extends St.Widget {
+const EditMode = GObject.registerClass(
+	class EditMode extends St.Widget {
 		_init() {
 			super._init();
 			this.tileEditor = tileEditor;

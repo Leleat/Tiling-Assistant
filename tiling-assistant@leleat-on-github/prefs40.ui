@@ -396,6 +396,53 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
           <object class="GtkListBoxRow">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Restore Window Size on</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="tooltip-text" translatable="yes">This setting is for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland. If that is the case, try 'Restore Window Size on Grab End' instead.</property>
+                    <property name="margin-start">12</property>
+                    <property name="icon-name">dialog-information-symbolic</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="restore-window-size-on">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="active-id">0</property>
+                    <items>
+                      <item id="0" translatable="yes">Grab Start</item>
+                      <item id="1" translatable="yes">Grab End</item>
+                    </items>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
             <property name="activatable">False</property>
             <property name="selectable">False</property>
             <child>
@@ -1264,9 +1311,7 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">Dragging a window to the screen edges or quarters will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted.
-
 Holding &lt;tt&gt;Ctrl&lt;/tt&gt; when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space. Hovering at the very edges will affect multiple windows.
-
 The default keybindings for tiling are &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;NUM_PAD&lt;/tt&gt;.</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
@@ -1312,9 +1357,7 @@ The default keybindings for tiling are &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;NU
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">This is the popup, which will open when you tile a window and there is (unambiguous) free screen space. It will list the open windows on the current workspace.
-
 The popup's app icons can be activated with &lt;tt&gt;Space&lt;/tt&gt;, &lt;tt&gt;Enter&lt;/tt&gt;, and &lt;tt&gt;Right&lt;/tt&gt; or &lt;tt&gt;Middle Mouse Button&lt;/tt&gt;. Activating one of the popup's app icons will tile the corresponding window to the free screen space.
-
 Holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; while activating an app icon, will tile the window to the top/left or bottom/right half of the free space depending on the space's orientation (spiral tiling).</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
@@ -1360,7 +1403,6 @@ Holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; while activating 
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is focused. Resizing one of the windows will also affect the other windows in the group.
-
 The group raising can be disabled with a setting. The group resizing can be escaped by holding &lt;tt&gt;Ctrl&lt;/tt&gt; when starting the resize operation. This way only directly opposing windows will resize together.</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
@@ -1406,7 +1448,6 @@ The group raising can be disabled with a setting. The group resizing can be esca
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">A layout consists of a list of arbitrary rectangles. When activating a layout the tiling popup will ask you which of the open windows you want in which rectangle of your layout.
-
 The layout selector enables you to search for layouts by name. That means you don't have to remember their keybindings. </property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
@@ -1492,11 +1533,11 @@ The layout selector enables you to search for layouts by name. That means you do
 
 - ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
 
-- inverse top screen edge action &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- inverse top screen edge action (by c-ridgway)
 
-- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
 
-- default keybindings with the numpad for tiling &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- default keybindings with the numpad for tiling (by c-ridgway)
 
 - dynamic numbers of layouts &amp; layout selector
 
