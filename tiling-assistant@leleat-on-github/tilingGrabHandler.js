@@ -94,23 +94,23 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		const previewRect = this.tilePreview._rect;
 
 		switch (this.tilePreview.state) {
-			case PREVIEW_STATE.GROUP: // TODO needs testing
+			case PREVIEW_STATE.GROUP:
 				const topTileGroup = Util.getTopTileGroup();
 				if (!topTileGroup.length)
 					return;
 
 				const isVertical = this.tilePreview._rect.width > this.tilePreview._rect.height;
 				const prop = isVertical ? "y" : "x";
-				// pushed "in" means that only the width/height of the window will change
+				// "before preview" means only the width/height of the window will change
 				// i. e. window is bordering on the left/top of the tile preview
-				const isPushedIn = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
-				// pushed "out" is the opposite (bottom/right)
-				const isPushedOut = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
+				const isBeforePreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
+				// "after preview" is the opposite (bottom/right of the tile preview)
+				const isAfterPreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
 				const resizeAmount = isVertical ? 250 : 350;
 				let pushedInW, pushedOutW;
 
 				topTileGroup.forEach(w => {
-					if(isPushedIn(w)) {
+					if(isBeforePreview(w)) {
 						pushedInW = w;
 						Util.tileWindow(w, new Meta.Rectangle({
 							x: w.tiledRect.x,
@@ -119,7 +119,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
 						}), false);
 
-					} else if (isPushedOut(w)) {
+					} else if (isAfterPreview(w)) {
 						pushedOutW = w;
 						Util.tileWindow(w, new Meta.Rectangle({
 							x: isVertical ? w.tiledRect.x : w.tiledRect.x + resizeAmount,
@@ -196,8 +196,11 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			let timerId = 0;
 			this.latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
 				// only update the monitorNr, if the latest timer timed out
-				if (timerId === this.latestMonitorLockTimerId) // TODO update preview after timer runs out
+				if (timerId === this.latestMonitorLockTimerId) {
 					this.monitorNr = global.display.get_current_monitor();
+					if (global.display.get_grab_op() == this._grabOp)
+						this._previewTile(window, eventX, eventY);
+				}
 				return GLib.SOURCE_REMOVE;
 			});
 			timerId = this.latestMonitorLockTimerId;

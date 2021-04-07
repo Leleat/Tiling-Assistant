@@ -25,8 +25,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
-const TileEditingMode = Me.imports.tilingEditingMode;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
+const PieMenu = Me.imports.tilingPieMenu;
 
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
@@ -185,6 +185,7 @@ function onCustomKeybindingPressed(shortcutName) {
 	// tile edit mode: resize & swap tiled windows and tile a non-tiled window
 	} else if (shortcutName === TILING.EDIT_MODE) {
 		log("--- tiling editing mode not yet implemented ---")
+		new PieMenu.PieMenu(global.get_pointer());
 
 	// tile window
 	} else {
