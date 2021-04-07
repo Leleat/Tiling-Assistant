@@ -9,7 +9,7 @@ const TILING = { // keybindings
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	EDIT_MODE: "tile-edit-mode",
+	// EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -68,7 +68,7 @@ const MyPrefsWidget = new GObject.Class({
 		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"];
 		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
 				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"];
-		const enums = [];
+		const enums = ["restore-window-size-on"];
 
 		const getBindProperty = function(key) {
 			if (ints.includes(key))

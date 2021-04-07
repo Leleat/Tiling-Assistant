@@ -149,7 +149,7 @@ var LayoutManager = class TilingLayoutManager {
 	openLayoutSelector() {
 		const layouts = this._getLayouts();
 		if (!layouts) {
-			main.notify("Tiling Assistant", "No valid layouts available.");
+			main.notify("Tiling Assistant", "No valid layouts defined.");
 			return;
 		}
 

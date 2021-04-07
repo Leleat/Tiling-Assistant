@@ -583,39 +583,7 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                               </object>
                             </child>
                             <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">8</property>
-                                <property name="margin-bottom">8</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Tile Editing Mode</property>
-                                    <property name="xalign">0</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkTreeView" id="tile-edit-mode-treeview">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="model">tile-edit-mode-liststore</property>
-                                    <property name="headers-visible">False</property>
-                                    <property name="enable-search">False</property>
-                                    <property name="search-column">0</property>
-                                    <property name="activate-on-single-click">True</property>
-                                    <child internal-child="selection">
-                                      <object class="GtkTreeSelection"/>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
+                              <placeholder/>
                             </child>
                             <child>
                               <object class="GtkBox">
@@ -1492,11 +1460,11 @@ The layout selector enables you to search for layouts by name. That means you do
 
 - ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
 
-- inverse top screen edge action &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- inverse top screen edge action (by c-ridgway)
 
-- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
 
-- default keybindings with the numpad for tiling &lt;b&gt;(by c-ridgway)&lt;/b&gt;
+- default keybindings with the numpad for tiling (by c-ridgway)
 
 - dynamic numbers of layouts &amp; layout selector
 
@@ -1826,6 +1794,54 @@ please open an issue on Github.</property>
                     <property name="snap-to-ticks">True</property>
                     <property name="update-policy">if-valid</property>
                     <property name="value">750</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Restore Window Size on</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="tooltip-text" translatable="yes">This setting is mainly intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
+If that is the case, you can try 'Restore Window Size on Grab End' instead.</property>
+                    <property name="margin-start">12</property>
+                    <property name="icon-name">dialog-information-symbolic</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkComboBoxText" id="restore-window-size-on">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="active-id">0</property>
+                    <items>
+                      <item id="0" translatable="yes">Grab Start</item>
+                      <item id="1" translatable="yes">Grab End</item>
+                    </items>
                   </object>
                 </child>
               </object>

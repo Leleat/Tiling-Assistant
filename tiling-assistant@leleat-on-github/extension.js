@@ -25,7 +25,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
-const TileEditingMode = Me.imports.tilingEditingMode;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 
 var TILING = { // keybindings
@@ -33,7 +32,7 @@ var TILING = { // keybindings
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	EDIT_MODE: "tile-edit-mode",
+	// EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -72,7 +71,7 @@ function enable() {
 
 	// keybindings
 	this.keyBindings = Object.values(TILING);
-	[...Array(30)].forEach((nr, idx) => this.keyBindings.push(`activate-layout${idx}`));
+	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 				, onCustomKeybindingPressed.bind(this, key));
@@ -184,7 +183,7 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// tile edit mode: resize & swap tiled windows and tile a non-tiled window
 	} else if (shortcutName === TILING.EDIT_MODE) {
-		log("--- tiling editing mode not yet implemented ---")
+		; // TODO
 
 	// tile window
 	} else {

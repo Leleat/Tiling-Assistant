@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
+	<enum id="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
+		<value value="0" nick="Grab Start" />
+		<value value="1" nick="Grab End" />
+	</enum>
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
@@ -8,10 +12,13 @@
 			<default>true</default>
 		</key>
 		<key name="enable-dynamic-tiling" type="b">
-      		<default>false</default>
-    	</key>
+	  		<default>false</default>
+		</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
+		</key>
+		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
+			<default>"Grab Start"</default>
 		</key>
 		<key name="enable-hold-maximize-inverse-landscape" type="b">
 			<default>false</default>

@@ -35,36 +35,82 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		this.monitorNr = global.display.get_current_monitor();
 		this.lastMonitorNr = this.monitorNr;
 
+		if (!this.isArtificalGrab) {
+			this._restoreOnGrabStart = MainExtension.settings.get_string("restore-window-size-on") === "Grab Start";
+			this._windowWasMaximized = window.get_maximized();
+			this._grabOp = grabOp;
+			this._moveStarted = false;
+		}
+
 		const topTileGroup = Util.getTopTileGroup();
-		window.grabSignalID = window.connect("position-changed", this.onMoving.bind(this, grabOp, window
-				, window.get_maximized(), topTileGroup, Util.getFreeScreenRects(topTileGroup)));
+		window.grabSignalID = window.connect("position-changed", this.onMoving.bind(this, window
+				, topTileGroup, Util.getFreeScreenRects(topTileGroup)));
 	}
 
 	// called via global.diplay's signal (grab-op-end)
 	onMoveFinished(window) {
-		if (!this.tilePreview._showing)
+		if (!this._moveStarted)
 			return;
+
+		if (!this.tilePreview._showing) {
+			// restore window size & restart the grab after having artificially ended it,
+			// so the mouse is at the correct position
+			if (window.isTiled || this._windowWasMaximized) {
+				// timer needed because for some apps the grab will overwrite the size changes of restoreWindowSize
+				// so far I only noticed this behaviour with firefox
+				GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE + 10, 1, () => {
+					if (this._restoreOnGrabStart) {
+						Util.restoreWindowSize(window, false, this._grabStartX, this._windowWasMaximized);
+
+					} else {
+						if (this.isArtificalGrab) { // var used to restore window size on grab end
+							!this._windowWasMaximized && Util.restoreWindowSize(window, false, this._grabStartX);
+							this.isArtificalGrab = false;
+							return;
+						}
+						this.isArtificalGrab = true;
+					}
+
+					const [, , mods] = global.get_pointer();
+					global.display.begin_grab_op(
+						window,
+						this._grabOp,
+						true, // pointer already grabbed
+						true, // frame action
+						-1, // button
+						mods, // modifier
+						global.get_current_time(),
+						// Math.max so the pointer isn't above the window in some cases
+						this._grabStartX, Math.max(this._grabStartY, window.get_frame_rect().y)
+					);
+
+					return GLib.SOURCE_REMOVE;
+				});
+			}
+
+			return;
+		}
 
 		const previewRect = this.tilePreview._rect;
 
 		switch (this.tilePreview.state) {
 			case PREVIEW_STATE.GROUP:
 				const topTileGroup = Util.getTopTileGroup();
+				if (!topTileGroup.length)
+					return;
+
 				const isVertical = this.tilePreview._rect.width > this.tilePreview._rect.height;
-				const isPushedIn = function(window) {
-					const prop = isVertical ? "y" : "x";
-					return window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
-				};
-				const isPushedOut = function(window) {
-					const prop = isVertical ? "y" : "x";
-					return window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
-				};
+				const prop = isVertical ? "y" : "x";
+				// "before preview" means only the width/height of the window will change
+				// i. e. window is bordering on the left/top of the tile preview
+				const isBeforePreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
+				// "after preview" is the opposite (bottom/right of the tile preview)
+				const isAfterPreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
 				const resizeAmount = isVertical ? 250 : 350;
-				let pushedInW;
-				let pushedOutW;
+				let pushedInW, pushedOutW;
 
 				topTileGroup.forEach(w => {
-					if(isPushedIn(w)) {
+					if(isBeforePreview(w)) {
 						pushedInW = w;
 						Util.tileWindow(w, new Meta.Rectangle({
 							x: w.tiledRect.x,
@@ -73,7 +119,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
 						}), false);
 
-					} else if (isPushedOut(w)) {
+					} else if (isAfterPreview(w)) {
 						pushedOutW = w;
 						Util.tileWindow(w, new Meta.Rectangle({
 							x: isVertical ? w.tiledRect.x : w.tiledRect.x + resizeAmount,
@@ -111,7 +157,8 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 	}
 
 	// called via @window's signal (position-changed)
-	onMoving(grabOp, window, windowWasMaximized, topTileGroup, freeScreenRects) {
+	onMoving(window, topTileGroup, freeScreenRects) {
+		this._moveStarted = true;
 		// use the current event's coords instead of global.get_pointer to support touch.
 		// event === null when dnding a maximized window...?
 		const event = Clutter.get_current_event();
@@ -121,29 +168,12 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		const [eventX, eventY] = event.get_coords();
 
 		// restore @window's size, if it's tiled. Try for @windowWasMaximized as well
-		// since @window may have been tiled before it was maximized
-		if (window.isTiled || windowWasMaximized) {
-			const [, , mods] = global.get_pointer();
+		// since @window may have been tiled before it was maximized. .onMoveFinished restarts the grab
+		// so the mouse is at the correct position, if the grab started in the panel
+		if ((window.isTiled || this._windowWasMaximized) && !this.isArtificalGrab) {
+			this._grabStartX = eventX;
+			this._grabStartY = eventY;
 			global.display.end_grab_op(global.get_current_time());
-			// timer needed because for some apps the grab will overwrite the size changes of restoreWindowSize
-			// so far I only noticed this behaviour with firefox
-			GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE + 10, 1, () => {
-				Util.restoreWindowSize(window, false, eventX, windowWasMaximized);
-				global.display.begin_grab_op(
-					window,
-					grabOp,
-					true, // pointer already grabbed
-					true, // frame action
-					-1, // button
-					mods, // modifier
-					global.get_current_time(),
-					// Math.max so the pointer isn't above the window in some cases
-					eventX, Math.max(eventY, window.get_frame_rect().y)
-				);
-
-				return GLib.SOURCE_REMOVE;
-			});
-
 			return;
 		}
 
@@ -166,8 +196,11 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			let timerId = 0;
 			this.latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
 				// only update the monitorNr, if the latest timer timed out
-				if (timerId === this.latestMonitorLockTimerId)
+				if (timerId === this.latestMonitorLockTimerId) {
 					this.monitorNr = global.display.get_current_monitor();
+					if (global.display.get_grab_op() == this._grabOp)
+						this._previewTile(window, eventX, eventY);
+				}
 				return GLib.SOURCE_REMOVE;
 			});
 			timerId = this.latestMonitorLockTimerId;
@@ -243,6 +276,9 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 	}
 
 	_ctrlPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY) {
+		if (!topTileGroup.length)
+			return;
+
 		const pointerLocation = {x: eventX, y: eventY};
 		const screenRects = topTileGroup.map(w => w.tiledRect).concat(freeScreenRects);
 		const index = screenRects.findIndex(rect => Util.rectHasPoint(rect, pointerLocation));
@@ -253,6 +289,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 
 		this._ctrlHoveredWindow = topTileGroup[index];
+		this._ctrlHoveredRect = hoveredRect;
 
 		const edgeRadius = 40;
 		const atTopEdge = eventY < hoveredRect.y + edgeRadius;
@@ -289,7 +326,11 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 
 	_ctrlGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge) {
 		this.tilePreview.state = PREVIEW_STATE.GROUP;
-		this._ctrlHoveredRect = hoveredRect;
+
+		if (!this._ctrlHoveredWindow) {
+			this.tilePreview.close();
+			return;
+		}
 
 		const previewRect = new Meta.Rectangle();
 		const previewSize = 18;
@@ -357,9 +398,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_N:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					!isCtrlPressed ? this._setupResizeDir(otherWindow, grabbedRect.y === otherRect.y, grabbedRect.y === otherRect.y + otherRect.height, false, false)
-							: this._setupResizeDir(otherWindow, false, grabbedRect.y === otherRect.y + otherRect.height
-									&& grabbedRect.x === otherRect.x && grabbedRect.width === otherRect.width, false, false);
+					!isCtrlPressed ? this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y, otherRect.y)
+							, Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height), false, false)
+							: this._setupResizeDir(otherWindow, false, Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height)
+									&& Util.equalApprox(grabbedRect.x, otherRect.x) && Util.equalApprox(grabbedRect.width, otherRect.width), false, false);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, grabOp, null));
@@ -368,10 +410,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_S:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					!isCtrlPressed ? this._setupResizeDir(otherWindow, grabbedRect.y + grabbedRect.height === otherRect.y + otherRect.height
-							, grabbedRect.y + grabbedRect.height === otherRect.y, false, false)
-							: this._setupResizeDir(otherWindow, false, grabbedRect.y + grabbedRect.height === otherRect.y
-									&& grabbedRect.x === otherRect.x && grabbedRect.width === otherRect.width, false, false);
+					!isCtrlPressed ? this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y + otherRect.height)
+							, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y), false, false)
+							: this._setupResizeDir(otherWindow, false, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y)
+									&& Util.equalApprox(grabbedRect.x, otherRect.x) && Util.equalApprox(grabbedRect.width, otherRect.width), false, false);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, grabOp, null));
@@ -380,10 +422,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_E:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, grabbedRect.x + grabbedRect.width === otherRect.x + otherRect.width
-							, grabbedRect.x + grabbedRect.width === otherRect.x)
-							: this._setupResizeDir(otherWindow, false, false, false, grabbedRect.x + grabbedRect.width === otherRect.x
-									&& grabbedRect.y === otherRect.y && grabbedRect.height === otherRect.height);
+					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x + otherRect.width)
+							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x))
+							: this._setupResizeDir(otherWindow, false, false, false, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x)
+									&& Util.equalApprox(grabbedRect.y, otherRect.y) && Util.equalApprox(grabbedRect.height, otherRect.height));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, null, grabOp));
@@ -392,10 +434,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_W:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, grabbedRect.x === otherRect.x
-							, grabbedRect.x === otherRect.x + otherRect.width)
-							: this._setupResizeDir(otherWindow, false, false, false, grabbedRect.x === otherRect.x + otherRect.width
-									&& grabbedRect.y === otherRect.y && grabbedRect.height === otherRect.height);
+					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, Util.equalApprox(grabbedRect.x, otherRect.x)
+							, Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width))
+							: this._setupResizeDir(otherWindow, false, false, false, Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width)
+									&& Util.equalApprox(grabbedRect.y, otherRect.y) && Util.equalApprox(grabbedRect.height, otherRect.height));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, null, grabOp));
@@ -405,8 +447,8 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_NW:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					this._setupResizeDir(otherWindow, grabbedRect.y === otherRect.y, grabbedRect.y === otherRect.y + otherRect.height
-							, grabbedRect.x === otherRect.x, grabbedRect.x === otherRect.x + otherRect.width);
+					this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y, otherRect.y), Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height)
+							, Util.equalApprox(grabbedRect.x, otherRect.x), Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this
@@ -416,9 +458,9 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_NE:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					this._setupResizeDir(otherWindow, grabbedRect.y === otherRect.y, grabbedRect.y === otherRect.y + otherRect.height
-							, grabbedRect.x + grabbedRect.width === otherRect.x + otherRect.width
-							, grabbedRect.x + grabbedRect.width === otherRect.x);
+					this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y, otherRect.y), Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height)
+							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x + otherRect.width)
+							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this
@@ -428,9 +470,9 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_SW:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					this._setupResizeDir(otherWindow, grabbedRect.y + grabbedRect.height === otherRect.y + otherRect.height
-						, grabbedRect.y + grabbedRect.height === otherRect.y, grabbedRect.x === otherRect.x
-						, grabbedRect.x === otherRect.x + otherRect.width);
+					this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y + otherRect.height)
+						, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y), Util.equalApprox(grabbedRect.x, otherRect.x)
+						, Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this
@@ -440,10 +482,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			case Meta.GrabOp.RESIZING_SE:
 				for (const otherWindow of topTileGroup) {
 					const otherRect = otherWindow.tiledRect;
-					this._setupResizeDir(otherWindow, grabbedRect.y + grabbedRect.height === otherRect.y + otherRect.height
-							, grabbedRect.y + grabbedRect.height === otherRect.y
-							, grabbedRect.x + grabbedRect.width === otherRect.x + otherRect.width
-							, grabbedRect.x + grabbedRect.width === otherRect.x);
+					this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y + otherRect.height)
+							, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y)
+							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x + otherRect.width)
+							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x));
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this
