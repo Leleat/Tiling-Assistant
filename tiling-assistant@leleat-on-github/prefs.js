@@ -9,7 +9,7 @@ const TILING = { // keybindings
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	// EDIT_MODE: "tile-edit-mode",
+	EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -56,6 +56,7 @@ const MyPrefsWidget = new GObject.Class({
 		this.set_min_content_height(650);
 
 		this._setupLayouts();
+		this._setupPieMenu();
 
 		this._bindWidgetsToSettings(settingsSchema.list_keys());
 		this._bindKeybindings();
@@ -156,6 +157,20 @@ const MyPrefsWidget = new GObject.Class({
 				this._createLayoutRow(_getChildCount(this.builder.get_object("layouts-listbox"))));
 	},
 
+	_setupPieMenu() {
+		this._loadPieMenu();
+		
+		const saveButton = this.builder.get_object("save-pie-menu-button");
+		saveButton.connect("clicked", button => {
+			this._savePieMenu();
+			this._loadPieMenu();
+		});
+		const reloadButton = this.builder.get_object("reload-pie-menu-button");
+		reloadButton.connect("clicked", button => this._loadPieMenu());
+		const addButton = this.builder.get_object("add-pie-menu-item-button");
+		addButton.connect("clicked", button => this._createPieMenuRow());
+	},
+
 	_loadLayouts: function() {
 		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_forEachChild(this, layoutsListBox, row => row.destroy());
@@ -229,233 +244,318 @@ const MyPrefsWidget = new GObject.Class({
 		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_addChildTo(layoutsListBox, row);
 		this._makeShortcutEdit(`activate-layout${index}`, row.treeView, row.listStore);
+	},
+
+	_loadPieMenu: function() {
+		const pieMenuListBox = this.builder.get_object("pie-menu-listbox");
+		_forEachChild(this, pieMenuListBox, row => row.destroy());
+
+		const path = GLib.build_filenamev([Me.dir.get_path(), ".pieMenu.json"]);
+		const file = Gio.File.new_for_path(path);
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+
+		const [success, contents] = file.load_contents(null);
+		if (!success)
+			return;
+
+		const pieMenuItemIds = contents.length ? JSON.parse(contents) : [];
+		pieMenuItemIds.length && pieMenuItemIds.forEach(activeId => this._createPieMenuRow(activeId));
+	},
+
+	_savePieMenu: function() {
+		const selectedIds = [];
+		const pieMenuListBox = this.builder.get_object("pie-menu-listbox");
+		_forEachChild(this, pieMenuListBox, row => {
+			const id = row.getActiveId();
+			id && selectedIds.push(id);
+		});
+
+		const path = GLib.build_filenamev([Me.dir.get_path(), ".pieMenu.json"]);
+		const file = Gio.File.new_for_path(path);
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+
+		const [success] = file.replace_contents(JSON.stringify(selectedIds), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+		return success;
+	},
+
+	_createPieMenuRow: function(activeId) {
+		const options = [ // make sure this has the same order as tilingPieMenu.js
+				"Toggle 'Maximize'", "Minimize window", "Close window", "Move to previous workspace", "Move to next workspace"
+				, "Move to top monitor", "Move to bottom monitor", "Move to left monitor", "Move to right monitor"
+				, "Toggle fullscreen", "Always on top", "Tile left", "Tile right", "Tile top", "Tile bottom"
+				, "Tile top-left", "Tile top-right", "Tile bottom-left", "Tile bottom-right"
+		];
+		const row = new PieMenuRow(options);
+		activeId && row.setActiveId(activeId);
+		_addChildTo(this.builder.get_object("pie-menu-listbox"), row);
 	}
 });
 
-const LayoutsRow = GObject.registerClass(
-	class LayoutsRow extends Gtk.ListBoxRow {
-		_init(layout, idx) {
-			super._init({
-				selectable: false,
-				margin_bottom: 12
-			});
+const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow {
+	_init(layout, idx) {
+		super._init({
+			selectable: false,
+			margin_bottom: 12
+		});
 
-			const mainFrame = new Gtk.Frame({
-				label: `    Layout ${idx + 1}    `,
-				label_xalign: 0.5,
-				margin_top: 8,
-				margin_bottom: 8,
-				margin_start: 8,
-				margin_end: 8
-			});
-			_addChildTo(this, mainFrame)
+		const mainFrame = new Gtk.Frame({
+			label: `    Layout ${idx + 1}    `,
+			label_xalign: 0.5,
+			margin_top: 8,
+			margin_bottom: 8,
+			margin_start: 8,
+			margin_end: 8
+		});
+		_addChildTo(this, mainFrame)
 
-			const mainBox = new Gtk.Box({
-				orientation: Gtk.Orientation.VERTICAL,
-				spacing: 12,
-				margin_top: 12,
-				margin_bottom: 12,
-				margin_start: 12,
-				margin_end: 12
-			});
-			_addChildTo(mainFrame, mainBox)
+		const mainBox = new Gtk.Box({
+			orientation: Gtk.Orientation.VERTICAL,
+			spacing: 12,
+			margin_top: 12,
+			margin_bottom: 12,
+			margin_start: 12,
+			margin_end: 12
+		});
+		_addChildTo(mainFrame, mainBox)
 
-			/* --- keybinding & name row --- */
+		/* --- keybinding & name row --- */
 
-			const topBox = new Gtk.Box({
-				orientation: Gtk.Orientation.HORIZONTAL,
-				homogeneous: true,
-				spacing: 12
-			});
-			_addChildTo(mainBox, topBox);
+		const topBox = new Gtk.Box({
+			orientation: Gtk.Orientation.HORIZONTAL,
+			homogeneous: true,
+			spacing: 12
+		});
+		_addChildTo(mainBox, topBox);
 
-			const keybindingFrame = new Gtk.Frame({margin_end: 8});
-			_addChildTo(topBox, keybindingFrame);
+		const keybindingFrame = new Gtk.Frame({margin_end: 8});
+		_addChildTo(topBox, keybindingFrame);
 
-			this.listStore = new Gtk.ListStore();
-			this.listStore.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
+		this.listStore = new Gtk.ListStore();
+		this.listStore.set_column_types([GObject.TYPE_INT, GObject.TYPE_INT]);
 
-			this.treeView = new Gtk.TreeView({
-				model: this.listStore,
-				halign: Gtk.Align.START,
+		this.treeView = new Gtk.TreeView({
+			model: this.listStore,
+			halign: Gtk.Align.START,
+			valign: Gtk.Align.CENTER,
+			headers_visible: false
+		});
+		_addChildTo(keybindingFrame, this.treeView);
+
+		this._nameEntry = new Gtk.Entry();
+		const layoutName = layout && layout.name;
+		layoutName && _setEntryText(this._nameEntry, layoutName);
+		!layoutName && this._nameEntry.set_placeholder_text("Layout name...");
+		_addChildTo(topBox, this._nameEntry);
+
+		/* --- rectangles entries and preview row --- */
+
+		const rectangleBox = new Gtk.Box({
+			orientation: Gtk.Orientation.HORIZONTAL,
+			homogeneous: true,
+			spacing: 12,
+			height_request: 175
+		});
+		_addChildTo(mainBox, rectangleBox);
+
+		// left column (rectangle entries)
+		const rectangleEntriesWindow = new Gtk.ScrolledWindow({vscrollbar_policy: Gtk.PolicyType.ALWAYS});
+		_addChildTo(rectangleBox, rectangleEntriesWindow);
+
+		const rectangleLeftBox = new Gtk.Box({
+			orientation: Gtk.Orientation.VERTICAL,
+			spacing: 8,
+			margin_end: 8
+		})
+		_addChildTo(rectangleEntriesWindow, rectangleLeftBox);
+
+		this.entriesContainer = new Gtk.Box({
+			orientation: Gtk.Orientation.VERTICAL,
+			spacing: 8,
+		});
+		_addChildTo(rectangleLeftBox, this.entriesContainer);
+
+		layout && layout.rects.forEach(rect => this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`));
+		this._addRectangleEntry();
+
+		const rectangleAddButton = new Gtk.Button();
+		if (shellVersion < 40) {
+			rectangleAddButton.set_always_show_image(true);
+			rectangleAddButton.set_image(new Gtk.Image({icon_name: "list-add-symbolic"}));
+		} else {
+			rectangleAddButton.set_icon_name("list-add-symbolic");
+		}
+		_addChildTo(rectangleLeftBox, rectangleAddButton);
+		rectangleAddButton.connect("clicked", () => this._addRectangleEntry());
+
+		// right column (layout preview)
+		const errorOverlay = new Gtk.Overlay();
+		_addChildTo(rectangleBox, errorOverlay);
+
+		const rectangleFrame = new Gtk.Frame();
+		_addChildTo(errorOverlay, rectangleFrame);
+
+		const [layoutIsValid, errMsg] = this._layoutIsValid(layout);
+		if (layoutIsValid) {
+			const drawingArea = new Gtk.DrawingArea();
+			_addChildTo(rectangleFrame, drawingArea);
+			shellVersion < 40 ? drawingArea.connect("draw", (widget, cr) => this._drawPreview(layout, widget, cr))
+					: drawingArea.set_draw_func(this._drawPreview.bind(this, layout));
+
+		} else {
+			const errorLabel = new Gtk.Label({
+				label: errMsg,
+				halign: Gtk.Align.CENTER,
 				valign: Gtk.Align.CENTER,
-				headers_visible: false
+				visible: true,
+				wrap: true
 			});
-			_addChildTo(keybindingFrame, this.treeView);
-
-			this._nameEntry = new Gtk.Entry();
-			const layoutName = layout && layout.name;
-			layoutName && _setEntryText(this._nameEntry, layoutName);
-			!layoutName && this._nameEntry.set_placeholder_text("Layout name...");
-			_addChildTo(topBox, this._nameEntry);
-
-			/* --- rectangles entries and preview row --- */
-
-			const rectangleBox = new Gtk.Box({
-				orientation: Gtk.Orientation.HORIZONTAL,
-				homogeneous: true,
-				spacing: 12,
-				height_request: 175
-			});
-			_addChildTo(mainBox, rectangleBox);
-
-			// left column (rectangle entries)
-			const rectangleEntriesWindow = new Gtk.ScrolledWindow({vscrollbar_policy: Gtk.PolicyType.ALWAYS});
-			_addChildTo(rectangleBox, rectangleEntriesWindow);
-
-			const rectangleLeftBox = new Gtk.Box({
-				orientation: Gtk.Orientation.VERTICAL,
-				spacing: 8,
-				margin_end: 8
-			})
-			_addChildTo(rectangleEntriesWindow, rectangleLeftBox);
-
-			this.entriesContainer = new Gtk.Box({
-				orientation: Gtk.Orientation.VERTICAL,
-				spacing: 8,
-			});
-			_addChildTo(rectangleLeftBox, this.entriesContainer);
-
-			layout && layout.rects.forEach(rect => this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`));
-			this._addRectangleEntry();
-
-			const rectangleAddButton = new Gtk.Button();
-			if (shellVersion < 40) {
-				rectangleAddButton.set_always_show_image(true);
-				rectangleAddButton.set_image(new Gtk.Image({icon_name: "list-add-symbolic"}));
-			} else {
-				rectangleAddButton.set_icon_name("list-add-symbolic");
-			}
-			_addChildTo(rectangleLeftBox, rectangleAddButton);
-			rectangleAddButton.connect("clicked", () => this._addRectangleEntry());
-
-			// right column (layout preview)
-			const errorOverlay = new Gtk.Overlay();
-			_addChildTo(rectangleBox, errorOverlay);
-
-			const rectangleFrame = new Gtk.Frame();
-			_addChildTo(errorOverlay, rectangleFrame);
-
-			const [layoutIsValid, errMsg] = this._layoutIsValid(layout);
-			if (layoutIsValid) {
-				const drawingArea = new Gtk.DrawingArea();
-				_addChildTo(rectangleFrame, drawingArea);
-				shellVersion < 40 ? drawingArea.connect("draw", (widget, cr) => this._drawPreview(layout, widget, cr))
-						: drawingArea.set_draw_func(this._drawPreview.bind(this, layout));
-
-			} else {
-				const errorLabel = new Gtk.Label({
-					label: errMsg,
-					halign: Gtk.Align.CENTER,
-					valign: Gtk.Align.CENTER,
-					visible: true,
-					wrap: true
-				});
-				errorOverlay.add_overlay(errorLabel);
-			}
-
-			/* --- button row --- */
-
-			const deleteButton = new Gtk.Button();
-			if (shellVersion < 40) {
-				deleteButton.set_always_show_image(true);
-				deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
-			} else {
-				deleteButton.set_icon_name("edit-delete-symbolic");
-			}
-			_addChildTo(mainBox, deleteButton);
-			deleteButton.connect("clicked", button => this.destroy());
-
-			shellVersion < 40 && this.show_all();
+			errorOverlay.add_overlay(errorLabel);
 		}
 
-		destroy() {
-			shellVersion < 40 ? super.destroy() : this.get_parent().remove(this);
+		/* --- button row --- */
+
+		const deleteButton = new Gtk.Button();
+		if (shellVersion < 40) {
+			deleteButton.set_always_show_image(true);
+			deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
+		} else {
+			deleteButton.set_icon_name("edit-delete-symbolic");
 		}
+		_addChildTo(mainBox, deleteButton);
+		deleteButton.connect("clicked", button => this.destroy());
 
-		getLayoutName() {
-			return _getEntryText(this._nameEntry);
-		}
+		shellVersion < 40 && this.show_all();
+	}
 
-		_addRectangleEntry(text) {
-			const entryBox = new Gtk.Box({
-				orientation: Gtk.Orientation.HORIZONTAL,
-				spacing: 8
-			});
-			_addChildTo(this.entriesContainer, entryBox);
+	destroy() {
+		shellVersion < 40 ? super.destroy() : this.get_parent().remove(this);
+	}
 
-			const entryCount = _getChildCount(this.entriesContainer);
-			const entryLabel = new Gtk.Label({label: `${entryCount}:`});
-			_addChildTo(entryBox, entryLabel);
+	getLayoutName() {
+		return _getEntryText(this._nameEntry);
+	}
 
-			const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
+	_addRectangleEntry(text) {
+		const entryBox = new Gtk.Box({
+			orientation: Gtk.Orientation.HORIZONTAL,
+			spacing: 8
+		});
+		_addChildTo(this.entriesContainer, entryBox);
+
+		const entryCount = _getChildCount(this.entriesContainer);
+		const entryLabel = new Gtk.Label({label: `${entryCount}:`});
+		_addChildTo(entryBox, entryLabel);
+
+		const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
 The right column shows a preview of your layouts (after saving). Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
 The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner."
-			const rectEntry = new Gtk.Entry({
-				tooltip_text: tooltip,
-				hexpand: true
-			});
-			!text && entryCount <= 1 && rectEntry.set_placeholder_text("tooltip for help...");
-			text && _setEntryText(rectEntry, text);
-			_addChildTo(entryBox, rectEntry);
+		const rectEntry = new Gtk.Entry({
+			tooltip_text: tooltip,
+			hexpand: true
+		});
+		!text && entryCount <= 1 && rectEntry.set_placeholder_text("tooltip for help...");
+		text && _setEntryText(rectEntry, text);
+		_addChildTo(entryBox, rectEntry);
 
-			shellVersion < 40 && entryBox.show_all();
-		}
-
-		_drawPreview(layout, drawingArea, cr) {
-			const color = new Gdk.RGBA();
-			const width = drawingArea.get_allocated_width();
-			const height = drawingArea.get_allocated_height();
-
-			cr.setLineWidth(1.0);
-
-			layout.rects.forEach(rect => {
-				// 1px outline for rect in transparent white
-				// 5 px gaps between rects
-				color.parse("rgba(255, 255, 255, .2)");
-				Gdk.cairo_set_source_rgba(cr, color);
-				cr.moveTo(rect.x * width + 5, rect.y * height + 5);
-				cr.lineTo((rect.x + rect.width) * width - 5, rect.y * height + 5);
-				cr.lineTo((rect.x + rect.width) * width - 5, (rect.y + rect.height) * height - 5);
-				cr.lineTo(rect.x * width + 5, (rect.y + rect.height) * height - 5);
-				cr.lineTo(rect.x * width + 5, rect.y * height + 5);
-				cr.strokePreserve();
-
-				// fill rect in transparent black
-				color.parse("rgba(0, 0, 0, .15)");
-				Gdk.cairo_set_source_rgba(cr, color);
-				cr.fill();
-			});
-
-			cr.$dispose();
-		}
-
-		_layoutIsValid(layout) {
-			if (!layout)
-				return [false, "No preview..."];
-
-			// calculate the surface area of an overlap
-			const rectsOverlap = function(r1, r2) {
-				return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
-						* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
-			}
-
-			for (let i = 0; i < layout.rects.length; i++) {
-				const rect = layout.rects[i];
-				// rects is/reaches outside of screen (i. e. > 1)
-				if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
-					return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
-
-				for (let j = i + 1; j < layout.rects.length; j++) {
-					if (rectsOverlap(rect, layout.rects[j]))
-						return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
-				}
-			}
-
-			return [true, ""];
-		}
+		shellVersion < 40 && entryBox.show_all();
 	}
-);
+
+	_drawPreview(layout, drawingArea, cr) {
+		const color = new Gdk.RGBA();
+		const width = drawingArea.get_allocated_width();
+		const height = drawingArea.get_allocated_height();
+
+		cr.setLineWidth(1.0);
+
+		layout.rects.forEach(rect => {
+			// 1px outline for rect in transparent white
+			// 5 px gaps between rects
+			color.parse("rgba(255, 255, 255, .2)");
+			Gdk.cairo_set_source_rgba(cr, color);
+			cr.moveTo(rect.x * width + 5, rect.y * height + 5);
+			cr.lineTo((rect.x + rect.width) * width - 5, rect.y * height + 5);
+			cr.lineTo((rect.x + rect.width) * width - 5, (rect.y + rect.height) * height - 5);
+			cr.lineTo(rect.x * width + 5, (rect.y + rect.height) * height - 5);
+			cr.lineTo(rect.x * width + 5, rect.y * height + 5);
+			cr.strokePreserve();
+
+			// fill rect in transparent black
+			color.parse("rgba(0, 0, 0, .15)");
+			Gdk.cairo_set_source_rgba(cr, color);
+			cr.fill();
+		});
+
+		cr.$dispose();
+	}
+
+	_layoutIsValid(layout) {
+		if (!layout)
+			return [false, "No preview..."];
+
+		// calculate the surface area of an overlap
+		const rectsOverlap = function(r1, r2) {
+			return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
+					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+		}
+
+		for (let i = 0; i < layout.rects.length; i++) {
+			const rect = layout.rects[i];
+			// rects is/reaches outside of screen (i. e. > 1)
+			if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
+				return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
+
+			for (let j = i + 1; j < layout.rects.length; j++) {
+				if (rectsOverlap(rect, layout.rects[j]))
+					return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
+			}
+		}
+
+		return [true, ""];
+	}
+});
+
+const PieMenuRow = GObject.registerClass(class PieMenuRow extends Gtk.ListBoxRow {
+	_init(options) {
+		super._init();
+
+		const mainBox = new Gtk.Box({
+			orientation: Gtk.Orientation.HORIZONTAL,
+			spacing: 6
+		});
+		_addChildTo(this, mainBox);
+
+		this._comboBox = new Gtk.ComboBoxText({
+			popup_fixed_width: true,
+			hexpand: true
+		});
+		options.forEach((option, idx) => this._comboBox.append(idx.toString(), option));
+		_addChildTo(mainBox, this._comboBox);
+
+		const deleteButton = new Gtk.Button();
+		if (shellVersion < 40) {
+			deleteButton.set_always_show_image(true);
+			deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
+		} else {
+			deleteButton.set_icon_name("edit-delete-symbolic");
+		}
+		_addChildTo(mainBox, deleteButton);
+		deleteButton.connect("clicked", () => this.destroy());
+
+		shellVersion < 40 && this.show_all();
+	}
+
+	destroy() {
+		shellVersion < 40 ? super.destroy() : this.get_parent().remove(this);
+	}
+
+	setActiveId(id) {
+		this._comboBox.set_active_id(id);
+	}
+
+	getActiveId() {
+		return this._comboBox.get_active_id();
+	}
+});
 
 /* --- GTK 4 compatibility --- */
 

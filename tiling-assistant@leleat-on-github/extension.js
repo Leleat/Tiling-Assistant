@@ -18,7 +18,7 @@
 
 "use strict";
 
-const {main, panel, windowManager} = imports.ui;
+const {main, panel, windowManager, windowMenu} = imports.ui;
 const {Clutter, GLib, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -26,13 +26,14 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
+const PieMenu = Me.imports.tilingPieMenu;
 
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	// EDIT_MODE: "tile-edit-mode",
+	EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -94,6 +95,12 @@ function enable() {
 					&& stageX > rect.x && stageX < rect.x + rect.width;
 		});
 	};
+
+	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
+	main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
+		Util.isModPressed(Clutter.ModifierType.MOD4_MASK) ? new PieMenu.PieMenu()
+				: windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
+	};
 };
 
 function disable() {
@@ -119,6 +126,7 @@ function disable() {
 
 	// restore old functions
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
+	main.wm._windowMenuManager.showWindowMenuForWindow = this.oldShowWindowMenu;
 
 	// delete custom properties
 	const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
@@ -183,7 +191,7 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// tile edit mode: resize & swap tiled windows and tile a non-tiled window
 	} else if (shortcutName === TILING.EDIT_MODE) {
-		; // TODO
+		// TODO
 
 	// tile window
 	} else {

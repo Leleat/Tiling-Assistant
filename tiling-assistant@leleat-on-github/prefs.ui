@@ -2,6 +2,17 @@
 <!-- Generated with glade 3.38.2 -->
 <interface>
   <requires lib="gtk+" version="3.24"/>
+  <object class="GtkImage" id="add-image">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="pixel-size">16</property>
+    <property name="icon-name">list-add-symbolic</property>
+  </object>
+  <object class="GtkImage" id="add-image1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">list-add-symbolic</property>
+  </object>
   <object class="GtkListStore" id="auto-tile-liststore">
     <columns>
       <!-- column-name key -->
@@ -73,12 +84,6 @@
     <property name="step-increment">5</property>
     <property name="page-increment">10</property>
   </object>
-  <object class="GtkImage" id="image1">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="pixel-size">16</property>
-    <property name="icon-name">list-add-symbolic</property>
-  </object>
   <object class="GtkListStore" id="layouts-overview-liststore">
     <columns>
       <!-- column-name key -->
@@ -124,7 +129,17 @@
     <property name="can-focus">False</property>
     <property name="icon-name">view-refresh-symbolic</property>
   </object>
+  <object class="GtkImage" id="reload-image1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">view-refresh-symbolic</property>
+  </object>
   <object class="GtkImage" id="save-image">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">media-floppy-symbolic</property>
+  </object>
+  <object class="GtkImage" id="save-image1">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
     <property name="icon-name">media-floppy-symbolic</property>
@@ -687,7 +702,54 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                               </packing>
                             </child>
                             <child>
-                              <placeholder/>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">False</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <property name="margin-top">8</property>
+                                <property name="margin-bottom">8</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">False</property>
+                                    <property name="valign">center</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Tiling Edit Mode</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">0</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeView" id="tile-edit-mode-treeview">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="model">tile-edit-mode-liststore</property>
+                                    <property name="headers-visible">False</property>
+                                    <property name="enable-search">False</property>
+                                    <property name="search-column">0</property>
+                                    <property name="activate-on-single-click">True</property>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection"/>
+                                    </child>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">1</property>
+                                  </packing>
+                                </child>
+                              </object>
+                              <packing>
+                                <property name="expand">False</property>
+                                <property name="fill">True</property>
+                                <property name="position">1</property>
+                              </packing>
                             </child>
                             <child>
                               <object class="GtkBox">
@@ -1473,7 +1535,7 @@ If there is no space, the window will either untile or maximize depending on wet
             <property name="margin-start">8</property>
             <property name="margin-end">8</property>
             <property name="margin-top">12</property>
-            <property name="image">image1</property>
+            <property name="image">add-image</property>
             <property name="always-show-image">True</property>
           </object>
           <packing>
@@ -1500,6 +1562,186 @@ If there is no space, the window will either untile or maximize depending on wet
       </object>
       <packing>
         <property name="position">2</property>
+        <property name="tab-fill">False</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkListBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">16</property>
+        <property name="margin-bottom">16</property>
+        <property name="selection-mode">none</property>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="label" translatable="yes">Pie Menu</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="enable-pie-menu">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="active">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="can-focus">False</property>
+            <child>
+              <object class="GtkSeparator">
+                <property name="visible">True</property>
+                <property name="sensitive">False</property>
+                <property name="can-focus">False</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="width-request">250</property>
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="margin-start">20</property>
+                <property name="margin-end">20</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="orientation">vertical</property>
+                <child>
+                  <object class="GtkListBox" id="pie-menu-listbox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="selection-mode">none</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">0</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkButton" id="add-pie-menu-item-button">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
+                    <property name="margin-top">8</property>
+                    <property name="hexpand">True</property>
+                    <property name="image">add-image1</property>
+                    <property name="always-show-image">True</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
+                  <object class="GtkBox">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="margin-top">8</property>
+                    <property name="spacing">13</property>
+                    <child>
+                      <object class="GtkButton" id="save-pie-menu-button">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="image">save-image1</property>
+                        <property name="always-show-image">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">0</property>
+                      </packing>
+                    </child>
+                    <child>
+                      <object class="GtkButton" id="reload-pie-menu-button">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="receives-default">True</property>
+                        <property name="hexpand">True</property>
+                        <property name="image">reload-image1</property>
+                        <property name="always-show-image">True</property>
+                      </object>
+                      <packing>
+                        <property name="expand">False</property>
+                        <property name="fill">True</property>
+                        <property name="position">1</property>
+                      </packing>
+                    </child>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">2</property>
+                  </packing>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+      <packing>
+        <property name="position">3</property>
+      </packing>
+    </child>
+    <child type="tab">
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        <property name="label" translatable="yes">Pie Menu</property>
+      </object>
+      <packing>
+        <property name="position">3</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
@@ -1709,13 +1951,57 @@ The layout selector enables you to search for layouts by name. That means you do
                     </child>
                   </object>
                 </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">start</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">8</property>
+                        <property name="margin-end">8</property>
+                        <property name="margin-top">8</property>
+                        <property name="margin-bottom">8</property>
+                        <property name="label-xalign">0.5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">16</property>
+                            <property name="margin-bottom">16</property>
+                            <property name="label" translatable="yes">&lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;RMB&lt;/tt&gt; on a window will open a pie menu. Moving the mouse into a direction and then releasing the right-click will perform that action. The pie menu items will be inserted in a circle clockwise starting with the north side.</property>
+                            <property name="use-markup">True</property>
+                            <property name="wrap">True</property>
+                            <property name="wrap-mode">word-char</property>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    Pie Menu    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
           </object>
         </child>
       </object>
       <packing>
-        <property name="position">3</property>
+        <property name="position">4</property>
       </packing>
     </child>
     <child type="tab">
@@ -1730,7 +2016,7 @@ The layout selector enables you to search for layouts by name. That means you do
         <property name="label" translatable="yes">User Guide</property>
       </object>
       <packing>
-        <property name="position">3</property>
+        <property name="position">4</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
@@ -1753,6 +2039,51 @@ The layout selector enables you to search for layouts by name. That means you do
                 <property name="hexpand">True</property>
                 <property name="vexpand">True</property>
                 <property name="activate-on-single-click">False</property>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="hexpand">True</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">8</property>
+                        <property name="margin-end">8</property>
+                        <property name="margin-top">8</property>
+                        <property name="margin-bottom">8</property>
+                        <property name="label-xalign">0.5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="halign">start</property>
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">16</property>
+                            <property name="margin-bottom">16</property>
+                            <property name="label" translatable="yes">- pie menu when Super + RMBing a window</property>
+                            <property name="use-markup">True</property>
+                            <property name="wrap">True</property>
+                            <property name="wrap-mode">word-char</property>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    v16    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
                 <child>
                   <object class="GtkListBoxRow">
                     <property name="visible">True</property>
@@ -1819,7 +2150,7 @@ The layout selector enables you to search for layouts by name. That means you do
         </child>
       </object>
       <packing>
-        <property name="position">4</property>
+        <property name="position">5</property>
       </packing>
     </child>
     <child type="tab">
@@ -1834,7 +2165,7 @@ The layout selector enables you to search for layouts by name. That means you do
         <property name="label" translatable="yes">Changelog</property>
       </object>
       <packing>
-        <property name="position">4</property>
+        <property name="position">5</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
@@ -1929,7 +2260,7 @@ please open an issue on Github.</property>
         </child>
       </object>
       <packing>
-        <property name="position">5</property>
+        <property name="position">6</property>
       </packing>
     </child>
     <child type="tab">
@@ -1944,7 +2275,7 @@ please open an issue on Github.</property>
         <property name="label" translatable="yes">Help</property>
       </object>
       <packing>
-        <property name="position">5</property>
+        <property name="position">6</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
@@ -2325,7 +2656,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
         </child>
       </object>
       <packing>
-        <property name="position">6</property>
+        <property name="position">7</property>
       </packing>
     </child>
     <child type="tab">
@@ -2340,7 +2671,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
         <property name="margin-bottom">8</property>
       </object>
       <packing>
-        <property name="position">6</property>
+        <property name="position">7</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
