@@ -95,11 +95,16 @@ function isModPressed(modMask) {
 	return modifiers & modMask;
 };
 
+function windowIsMaximized(window) {
+	const workArea = window.get_work_area_current_monitor();
+	return window.get_maximized() === Meta.MaximizeFlags.BOTH || (window.tiledRect && window.tiledRect.equal(workArea));
+}
+
 function getOpenWindows() {
 	const openWindows = global.workspace_manager.get_active_workspace().list_windows();
 	const orderedOpenWindows = global.display.sort_windows_by_stacking(openWindows).reverse();
 	return orderedOpenWindows.filter(w => w.get_window_type() === Meta.WindowType.NORMAL
-			&& !w.is_skip_taskbar() && ((w.allows_move() && w.allows_resize()) || w.get_maximized() === Meta.MaximizeFlags.BOTH));
+			&& !w.is_skip_taskbar() && ((w.allows_move() && w.allows_resize()) || windowIsMaximized(w)));
 };
 
 // get the top most tiled windows in a group i. e. they complement each other and dont intersect.
@@ -138,7 +143,7 @@ function getTopTileGroup(ignoreTopWindow = true) {
 
 		} else {
 			// window is maximized, so all windows below it cant belong to this group
-			if (window.get_maximized() === Meta.MaximizeFlags.BOTH)
+			if (windowIsMaximized(window))
 				break;
 
 			notGroupedWindows.push(window);
@@ -299,7 +304,7 @@ function getTileRectFor(position, workArea) {
 
 function toggleTileState(window, tileRect) {
 	const workArea = window.get_work_area_current_monitor();
-	(window.isTiled && tileRect.equal(window.tiledRect)) || (tileRect.equal(workArea) && window.get_maximized() === Meta.MaximizeFlags.BOTH)
+	(window.isTiled && tileRect.equal(window.tiledRect)) || (tileRect.equal(workArea) && windowIsMaximized(window))
 			? restoreWindowSize(window) : tileWindow(window, tileRect);
 };
 
@@ -322,24 +327,25 @@ function tileWindow(window, newRect, openTilingPopup = true) {
 	dissolveTileGroupFor(window);
 
 	const oldRect = window.get_frame_rect();
+	const gap = MainExtension.settings.get_int("window-gap");
+	const workArea = window.get_work_area_for_monitor(window.get_monitor());
+	const maximize = newRect.equal(workArea);
+
+	window.isTiled = !maximize;
 	if (!window.untiledRect)
 		window.untiledRect = oldRect;
 
-	const workArea = window.get_work_area_for_monitor(window.get_monitor());
-	if (newRect.equal(workArea)) {
-		window.isTiled = false;
+	if (maximize && (!gap || !MainExtension.settings.get_boolean("maximize-with-gap"))) {
 		window.tiledRect = null;
 		window.maximize(Meta.MaximizeFlags.BOTH);
 		return; // no anim needed or anything else when maximizing both
 	}
 
-	window.isTiled = true;
 	// save the intended tile rect for accurate operations later.
 	// workaround for windows which cant be resized freely...
 	// for ex. which only resize in full rows/columns like gnome-terminal
 	window.tiledRect = newRect.copy();
 
-	const gap = MainExtension.settings.get_int("window-gap");
 	const x = newRect.x + (gap - (workArea.x === newRect.x ? 0 : gap / 2));
 	const y = newRect.y + (gap - (workArea.y === newRect.y ? 0 : gap / 2));
 	// lessen gap by half when the window isn't on the left or the right edge of the screen respectively
@@ -379,6 +385,9 @@ function tileWindow(window, newRect, openTilingPopup = true) {
 	Meta.is_wayland_compositor() && window.move_frame(false, x, y);
 	// user_op as false needed for some apps
 	window.move_resize_frame(false, x, y, width, height);
+
+	if (maximize)
+		return;
 
 	// setup (new) tileGroup to raise tiled windows as a group
 	const topTileGroup = getTopTileGroup(false);

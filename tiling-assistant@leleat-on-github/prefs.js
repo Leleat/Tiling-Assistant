@@ -68,7 +68,8 @@ const MyPrefsWidget = new GObject.Class({
 	_bindWidgetsToSettings: function(settingsKeys) {
 		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"];
 		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
-				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"];
+				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"
+				, "enable-pie-menu", "maximize-with-gap"];
 		const enums = ["restore-window-size-on"];
 
 		const getBindProperty = function(key) {
@@ -282,7 +283,7 @@ const MyPrefsWidget = new GObject.Class({
 		const options = [ // make sure this has the same order as tilingPieMenu.js
 				"Toggle 'Maximize'", "Minimize window", "Close window", "Move to previous workspace", "Move to next workspace"
 				, "Move to top monitor", "Move to bottom monitor", "Move to left monitor", "Move to right monitor"
-				, "Toggle fullscreen", "Always on top", "Tile left", "Tile right", "Tile top", "Tile bottom"
+				, "Toggle fullscreen", "Toggle 'Always on top'", "Tile left", "Tile right", "Tile top", "Tile bottom"
 				, "Tile top-left", "Tile top-right", "Tile bottom-left", "Tile bottom-right"
 		];
 		const row = new PieMenuRow(options);

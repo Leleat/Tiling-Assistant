@@ -91,15 +91,16 @@ function enable() {
 			return metaWindow.is_on_primary_monitor()
 					&& metaWindow.showing_on_its_workspace()
 					&& metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
-					&& (metaWindow.maximized_vertically || (metaWindow.isTiled && metaWindow.tiledRect.y === workArea.y))
+					&& (metaWindow.maximized_vertically || (metaWindow.tiledRect && metaWindow.tiledRect.y === workArea.y))
 					&& stageX > rect.x && stageX < rect.x + rect.width;
 		});
 	};
 
 	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
+	const that = this;
 	main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
-		Util.isModPressed(Clutter.ModifierType.MOD4_MASK) ? new PieMenu.PieMenu()
-				: windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
+		Util.isModPressed(Clutter.ModifierType.MOD4_MASK) && that.settings.get_boolean("enable-pie-menu")
+				? new PieMenu.PieMenu() : windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
 	};
 };
 

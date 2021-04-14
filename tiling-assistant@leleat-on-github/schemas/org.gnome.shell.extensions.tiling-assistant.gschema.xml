@@ -20,6 +20,9 @@
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
+		<key name="maximize-with-gap" type="b">
+	  		<default>false</default>
+		</key>
 		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
 			<default>"Grab Start"</default>
 		</key>

@@ -55,7 +55,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		if (!this.tilePreview._showing) {
 			// restore window size & restart the grab after having artificially ended it,
 			// so the mouse is at the correct position
-			if (window.isTiled || this._windowWasMaximized) {
+			if (window.tiledRect || this._windowWasMaximized) {
 				// timer needed because for some apps the grab will overwrite the size changes of restoreWindowSize
 				// so far I only noticed this behaviour with firefox
 				GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE + 10, 1, () => {
@@ -170,7 +170,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		// restore @window's size, if it's tiled. Try for @windowWasMaximized as well
 		// since @window may have been tiled before it was maximized. .onMoveFinished restarts the grab
 		// so the mouse is at the correct position, if the grab started in the panel
-		if ((window.isTiled || this._windowWasMaximized) && !this.isArtificalGrab) {
+		if ((window.tiledRect || this._windowWasMaximized) && !this.isArtificalGrab) {
 			this._grabStartX = eventX;
 			this._grabStartY = eventY;
 			global.display.end_grab_op(global.get_current_time());
