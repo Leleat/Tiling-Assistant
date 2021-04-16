@@ -100,42 +100,50 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 					return;
 
 				const isVertical = this.tilePreview._rect.width > this.tilePreview._rect.height;
-				const prop = isVertical ? "y" : "x";
+				const [posProp, dimensionProp] = isVertical ? ["y", "height"] : ["x", "width"];
 				// "before preview" means only the width/height of the window will change
 				// i. e. window is bordering on the left/top of the tile preview
-				const isBeforePreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] < previewRect[prop];
+				const isBeforePreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[posProp] < previewRect[posProp];
 				// "after preview" is the opposite (bottom/right of the tile preview)
-				const isAfterPreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[prop] >= previewRect[prop];
-				const resizeAmount = isVertical ? 250 : 350;
-				let pushedInW, pushedOutW;
+				const isAfterPreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[posProp] >= previewRect[posProp];
 
-				topTileGroup.forEach(w => {
-					if(isBeforePreview(w)) {
-						pushedInW = w;
-						Util.tileWindow(w, new Meta.Rectangle({
-							x: w.tiledRect.x,
-							y: w.tiledRect.y,
-							width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
-							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
-						}), false);
+				const windowsBeforePreview = [];
+				const windowsAfterPreview = [];
+				const smallestWindow = topTileGroup.reduce((smallest, w) => {
+					const isBefore = isBeforePreview(w);
+					const isAfter = isAfterPreview(w);
+					isBefore && windowsBeforePreview.push(w);
+					isAfter && windowsAfterPreview.push(w);
+					return (isBefore || isAfter) && smallest && smallest[dimensionProp] < w[dimensionProp] ? smallest : w;
+				}, null);
+				const resizeAmount = Math.floor(smallestWindow.tiledRect[dimensionProp]
+							/ (windowsBeforePreview.length && windowsAfterPreview.length ? 3 : 2));
 
-					} else if (isAfterPreview(w)) {
-						pushedOutW = w;
-						Util.tileWindow(w, new Meta.Rectangle({
-							x: isVertical ? w.tiledRect.x : w.tiledRect.x + resizeAmount,
-							y: isVertical ? w.tiledRect.y + resizeAmount : w.tiledRect.y,
-							width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
-							height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
-						}), false);
-					}
+				windowsBeforePreview.forEach(w => {
+					Util.tileWindow(w, new Meta.Rectangle({
+						x: w.tiledRect.x,
+						y: w.tiledRect.y,
+						width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
+						height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
+					}), false);
+				});
+				windowsAfterPreview.forEach(w => {
+					Util.tileWindow(w, new Meta.Rectangle({
+						x: isVertical ? w.tiledRect.x : w.tiledRect.x + resizeAmount,
+						y: isVertical ? w.tiledRect.y + resizeAmount : w.tiledRect.y,
+						width: isVertical ? w.tiledRect.width : w.tiledRect.width - resizeAmount,
+						height: isVertical ? w.tiledRect.height - resizeAmount : w.tiledRect.height,
+					}), false);
 				});
 
 				const workArea = window.get_work_area_for_monitor(window.get_monitor());
+				const beforeWindow = windowsBeforePreview[0];
+				const afterWindow = windowsAfterPreview[0];
 				Util.tileWindow(window, new Meta.Rectangle({
-					x: isVertical ? previewRect.x : (pushedInW ? pushedInW.tiledRect.x + pushedInW.tiledRect.width : workArea.x),
-					y: isVertical ? (pushedInW ? pushedInW.tiledRect.y + pushedInW.tiledRect.height : workArea.y) : previewRect.y,
-					width: isVertical ? previewRect.width : resizeAmount * (pushedInW && pushedOutW ? 2 : 1),
-					height: isVertical ? resizeAmount * (pushedInW && pushedOutW ? 2 : 1) : previewRect.height
+					x: isVertical ? previewRect.x : (beforeWindow ? beforeWindow.tiledRect.x + beforeWindow.tiledRect.width : workArea.x),
+					y: isVertical ? (beforeWindow ? beforeWindow.tiledRect.y + beforeWindow.tiledRect.height : workArea.y) : previewRect.y,
+					width: isVertical ? previewRect.width : resizeAmount * (beforeWindow && afterWindow ? 2 : 1),
+					height: isVertical ? resizeAmount * (beforeWindow && afterWindow ? 2 : 1) : previewRect.height
 				}));
 				break;
 
