@@ -160,7 +160,7 @@ const MyPrefsWidget = new GObject.Class({
 
 	_setupPieMenu() {
 		this._loadPieMenu();
-		
+
 		const saveButton = this.builder.get_object("save-pie-menu-button");
 		saveButton.connect("clicked", button => {
 			this._savePieMenu();
@@ -251,16 +251,8 @@ const MyPrefsWidget = new GObject.Class({
 		const pieMenuListBox = this.builder.get_object("pie-menu-listbox");
 		_forEachChild(this, pieMenuListBox, row => row.destroy());
 
-		const path = GLib.build_filenamev([Me.dir.get_path(), ".pieMenu.json"]);
-		const file = Gio.File.new_for_path(path);
-		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-
-		const [success, contents] = file.load_contents(null);
-		if (!success)
-			return;
-
-		const pieMenuItemIds = contents.length ? JSON.parse(contents) : [];
-		pieMenuItemIds.length && pieMenuItemIds.forEach(activeId => this._createPieMenuRow(activeId));
+		const pieMenuItemIds = this.settings.get_strv("pie-menu-options");
+		pieMenuItemIds.forEach(activeId => this._createPieMenuRow(activeId));
 	},
 
 	_savePieMenu: function() {
@@ -270,13 +262,7 @@ const MyPrefsWidget = new GObject.Class({
 			const id = row.getActiveId();
 			id && selectedIds.push(id);
 		});
-
-		const path = GLib.build_filenamev([Me.dir.get_path(), ".pieMenu.json"]);
-		const file = Gio.File.new_for_path(path);
-		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-
-		const [success] = file.replace_contents(JSON.stringify(selectedIds), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-		return success;
+		this.settings.set_strv("pie-menu-options", selectedIds);
 	},
 
 	_createPieMenuRow: function(activeId) {

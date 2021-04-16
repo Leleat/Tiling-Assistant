@@ -52,12 +52,17 @@ var PieMenu = GObject.registerClass(
 			this._clickPos = {x: mX, y: mY};
 			this._highlightedItem = null;
 			this._items = [];
-			this._deadZoneRadius = 60;
+			this._deadZoneRadius = 55;
 			this._itemRadius = this._deadZoneRadius + 35;
 
 			// menu items
 			let angle = 270; // 0 - 360° clockwise from x-axis;
-			const actionIds = this._getActionIds();
+			const actionIds = MainExtension.settings.get_strv("pie-menu-options");
+			if (!actionIds.length) {
+				this.destroy();
+				return;
+			}
+
 			for (const id of actionIds) {
 				const item = new PieMenuItem(ACTIONS[id], angle);
 				this._items.push(item);
@@ -121,21 +126,6 @@ var PieMenu = GObject.registerClass(
 						|| (item.angle + pieSize / 2 > 360 && angle <= (item.angle + pieSize / 2) % 360);
 			});
 			this._highlightedItem.setFocus(true);
-		}
-
-		_getActionIds() {
-			const path = GLib.build_filenamev([Me.dir.get_path(), ".pieMenu.json"]);
-			const pieMenuFile = Gio.File.new_for_path(path);
-
-			try {pieMenuFile.create(Gio.FileCreateFlags.NONE, null)} catch (entry) {}
-			const [success, contents] = pieMenuFile.load_contents(null);
-			if (success && contents.length) {
-				const selectedIds = JSON.parse(contents);
-				if (selectedIds.length)
-					return selectedIds;
-			}
-
-			return [];
 		}
 
 		_setItemPos(item, angle) {
