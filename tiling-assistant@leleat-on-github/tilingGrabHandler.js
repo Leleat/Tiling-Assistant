@@ -64,7 +64,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 
 					} else {
 						if (this.isArtificalGrab) { // var used to restore window size on grab end
-							!this._windowWasMaximized && Util.restoreWindowSize(window, false, this._grabStartX);
+							!this._windowWasMaximized && Util.restoreWindowSize(window, false, this._lastCoord.x);
 							this.isArtificalGrab = false;
 							return;
 						}
@@ -166,6 +166,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			return;
 
 		const [eventX, eventY] = event.get_coords();
+		this._lastCoord = {x: eventX, y: eventY};
 
 		// restore @window's size, if it's tiled. Try for @windowWasMaximized as well
 		// since @window may have been tiled before it was maximized. .onMoveFinished restarts the grab
