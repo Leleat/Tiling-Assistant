@@ -10,6 +10,14 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="debugging-free-rects-liststore">
+    <columns>
+      <!-- column-name key -->
+      <column type="gint"/>
+      <!-- column-name mods -->
+      <column type="gint"/>
+    </columns>
+  </object>
   <object class="GtkListStore" id="debugging-show-tiled-rects-liststore">
     <columns>
       <!-- column-name key -->
@@ -80,6 +88,20 @@
       <!-- column-name mods -->
       <column type="gint"/>
     </columns>
+  </object>
+  <object class="GtkAdjustment" id="pie-menu-deadzone-radius-adjustment">
+    <property name="lower">20</property>
+    <property name="upper">200</property>
+    <property name="value">55</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
+  </object>
+  <object class="GtkAdjustment" id="pie-menu-item-radius-adjustment">
+    <property name="lower">10</property>
+    <property name="upper">200</property>
+    <property name="value">35</property>
+    <property name="step-increment">1</property>
+    <property name="page-increment">10</property>
   </object>
   <object class="GtkListStore" id="push-tile-down-liststore">
     <columns>
@@ -329,7 +351,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Dynamic Tiling</property>
+                    <property name="label" translatable="yes">Focus and Tiling</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -337,7 +359,7 @@
                   <object class="GtkImage">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="tooltip-text" translatable="yes">If this setting is enabled, the shortcuts to maximize and tile to the top, bottom, left, and right will tile the window, if it isn't tiled.
+                    <property name="tooltip-text" translatable="yes">The shortcuts to maximize and tile to the top, bottom, left, and right will tile the window, if it isn't tiled.
 Otherwise it will switch focus to the closest tiled window, if there is one.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
@@ -373,7 +395,40 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Tiled Window Gaps</property>
+                    <property name="label" translatable="yes">Auto-Tile when  Closing a Tiled Window </property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSwitch" id="auto-tile-on-close">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Window Gaps</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -399,7 +454,7 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
             <child>
               <object class="GtkBox">
                 <property name="visible">True</property>
-                <property name="can-focus">true</property>
+                <property name="can-focus">True</property>
                 <property name="margin-start">12</property>
                 <property name="margin-end">12</property>
                 <property name="margin-top">12</property>
@@ -407,7 +462,7 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                 <child>
                   <object class="GtkLabel">
                     <property name="visible">True</property>
-                    <property name="can-focus">true</property>
+                    <property name="can-focus">True</property>
                     <property name="valign">center</property>
                     <property name="label" translatable="yes">Gaps on Maximized Windows</property>
                     <property name="xalign">0</property>
@@ -451,7 +506,7 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="tooltip-text" translatable="yes">This setting is intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
-                    If that is the case, you can try 'Restore Window Size on Grab End' instead.</property>
+If that is the case, you can try 'Restore Window Size on Grab End' instead.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
                   </object>
@@ -677,41 +732,6 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">Tiling Edit Mode</property>
-                                    <property name="xalign">0</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkTreeView" id="tile-edit-mode-treeview">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="model">tile-edit-mode-liststore</property>
-                                    <property name="headers-visible">False</property>
-                                    <property name="enable-search">False</property>
-                                    <property name="search-column">0</property>
-                                    <property name="activate-on-single-click">True</property>
-                                    <child internal-child="selection">
-                                      <object class="GtkTreeSelection"/>
-                                    </child>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="visible">True</property>
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">8</property>
-                                <property name="margin-bottom">8</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="valign">center</property>
-                                    <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">Layout Selector</property>
                                     <property name="xalign">0</property>
                                   </object>
@@ -754,7 +774,7 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                                   <object class="GtkImage">
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
-                                    <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space based on the tiled windows around it.
+                                    <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space as good as possible based on the tiled windows around it.
 If there is no space, the window will either untile or maximize depending on wether it's currently tiled.</property>
                                     <property name="margin-start">12</property>
                                     <property name="icon-name">dialog-information-symbolic</property>
@@ -1341,6 +1361,80 @@ If there is no space, the window will either untile or maximize depending on wet
           </object>
         </child>
         <child>
+          <object class="GtkListBoxRow" id="pie-menu-deadzone-listboxrow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Deadzone Radius</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="pie-menu-deadzone-radius">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="text" translatable="yes">0</property>
+                    <property name="adjustment">pie-menu-deadzone-radius-adjustment</property>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="update-policy">if-valid</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow" id="pie-menu-item-radius-listboxrow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Item Circle Radius</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkSpinButton" id="pie-menu-item-radius">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="text" translatable="yes">0</property>
+                    <property name="adjustment">pie-menu-item-radius-adjustment</property>
+                    <property name="snap-to-ticks">True</property>
+                    <property name="update-policy">if-valid</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
           <object class="GtkListBoxRow">
             <property name="visible">True</property>
             <property name="sensitive">False</property>
@@ -1749,8 +1843,11 @@ The layout selector enables you to search for layouts by name. That means you do
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">- pie menu when Super + RMBing a window
-- setting: gaps on maximized windows
-- setting: 'restore window size on grab end' (workaround for Wayland)</property>
+
+- setting: gaps on maximized windows  - off by default
+- setting: 'restore window size on grab end' - workaround for Wayland
+
+- setting: auto-tile rest of the tiled windows, if a tiled window is closed - off by default</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
@@ -1795,18 +1892,21 @@ The layout selector enables you to search for layouts by name. That means you do
                             <property name="margin-end">12</property>
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">- dynamic tiling
+                            <property name="label" translatable="yes">- dynamic tiling ('focus and tiling')
 
 - ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
 
 - inverse top screen edge action (by c-ridgway)
+
 - multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
+
 - default keybindings with the numpad for tiling (by c-ridgway)
 
 - dynamic numbers of layouts &amp; layout selector
 
 - add 'User Guide' and 'Changelog' settings tab
 - other minor settings additions/removals/changes
+
 - refactor and minor bugfixes</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
@@ -2081,7 +2181,7 @@ please open an issue on Github.</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Vertical Tile Preview Area</property>
+                    <property name="label" translatable="yes">Vertical Tile Preview Trigger Area</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -2118,7 +2218,7 @@ please open an issue on Github.</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
                     <property name="hexpand">True</property>
-                    <property name="label" translatable="yes">Horizontal Tile Preview Area</property>
+                    <property name="label" translatable="yes">Horizontal Tile Preview Trigger Area</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -2165,6 +2265,47 @@ please open an issue on Github.</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
                     <property name="model">debugging-show-tiled-rects-liststore</property>
+                    <property name="headers-visible">False</property>
+                    <property name="enable-search">False</property>
+                    <property name="search-column">0</property>
+                    <property name="activate-on-single-click">True</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection"/>
+                    </child>
+                  </object>
+                </child>
+              </object>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkListBoxRow">
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <child>
+              <object class="GtkBox">
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">16</property>
+                <property name="margin-bottom">16</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="valign">center</property>
+                    <property name="label" translatable="yes">Debugging: Free Screen Rects</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeView" id="debugging-free-rects-treeview">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">end</property>
+                    <property name="hexpand">True</property>
+                    <property name="model">debugging-free-rects-liststore</property>
                     <property name="headers-visible">False</property>
                     <property name="enable-search">False</property>
                     <property name="search-column">0</property>

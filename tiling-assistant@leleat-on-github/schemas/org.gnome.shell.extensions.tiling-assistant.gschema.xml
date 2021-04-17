@@ -14,8 +14,17 @@
 		<key name="enable-dynamic-tiling" type="b">
 	  		<default>false</default>
 		</key>
+		<key name="auto-tile-on-close" type="b">
+	  		<default>false</default>
+		</key>
 		<key name="enable-pie-menu" type="b">
 	  		<default>true</default>
+		</key>
+		<key name="pie-menu-deadzone-radius" type="i">
+	  		<default>50</default>
+		</key>
+		<key name="pie-menu-item-radius" type="i">
+	  		<default>30</default>
 		</key>
 		<key name="pie-menu-options" type="as">
 			<default><![CDATA[['0','4','2','3']]]></default>
@@ -90,6 +99,9 @@
 			<default>15</default>
 		</key>
 		<key name="debugging-show-tiled-rects" type="as">
+			<default>[]</default>
+		</key>
+		<key name="debugging-free-rects" type="as">
 			<default>[]</default>
 		</key>
 		<key name="activate-layout0" type="as">

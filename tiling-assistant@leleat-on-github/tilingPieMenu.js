@@ -44,16 +44,18 @@ var PieMenu = GObject.registerClass(
 
 			if (!main.pushModal(this)) {
 				// Probably someone else has a pointer grab, try again with keyboard only
-				if (!main.pushModal(this, {options: Meta.ModalOptions.POINTER_ALREADY_GRABBED}))
+				if (!main.pushModal(this, {options: Meta.ModalOptions.POINTER_ALREADY_GRABBED})) {
 					super.destroy();
+					return;
+				}
 			}
 
 			const [mX, mY] = global.get_pointer();
 			this._clickPos = {x: mX, y: mY};
 			this._highlightedItem = null;
 			this._items = [];
-			this._deadZoneRadius = 55;
-			this._itemRadius = this._deadZoneRadius + 35;
+			this._deadZoneRadius = MainExtension.settings.get_int("pie-menu-deadzone-radius");
+			this._itemRadius = this._deadZoneRadius + MainExtension.settings.get_int("pie-menu-item-radius");
 
 			// menu items
 			let angle = 270; // 0 - 360° clockwise from x-axis;

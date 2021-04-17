@@ -16,7 +16,7 @@ function equalApprox(value, value2, margin = MainExtension.settings.get_int("win
 // if @rectB is substracted from it. The result is an array of 0 - 4 rects depending on @rectA/B's position.
 //
 // idea from https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference (Java implementation)
-// no license is given... only the general CC-BY-AS (for text) is mentioned in the footer. 
+// no license is given... only the general CC-BY-AS (for text) is mentioned in the footer.
 // Since I've translated it to JS, my function now is only based on the original principle -- they implemented it in a way,
 // which made the vertical rects (top and bottom) bigger than horizontal rects (left and right),
 // I prefered the horizontal rects since screen's are mostly horizontal -- and the algorithm itself is fairly generic
@@ -243,6 +243,44 @@ function getClosestWindow(currWindow, windowList, direction) {
 	}, null);
 };
 
+function getBestFitTiledRect(window, topTileGroup = null) {
+	if (!window.isTiled) {
+		topTileGroup = topTileGroup || getTopTileGroup();
+		const freeScreenSpace = getFreeScreenSpace(topTileGroup);
+		return freeScreenSpace || window.get_work_area_current_monitor();
+
+	} else {
+		// check if the freeScreenRect borders the tiledRect and
+		// if the bordering side of the freeScreenRect is bigger than the one of the tiledWindow
+		const tileBordersFreeRect = function(freeRect, tiledRect) {
+			const v = (freeRect.vert_overlap(tiledRect) && freeRect.y <= tiledRect.y && freeRect.y + freeRect.height >= tiledRect.y + tiledRect.height
+					&& (freeRect.x === tiledRect.x + tiledRect.width || freeRect.x + freeRect.width === tiledRect.x));
+			const h = (freeRect.horiz_overlap(tiledRect) && freeRect.x <= tiledRect.x && freeRect.x + freeRect.width >= tiledRect.x + tiledRect.width
+					&& (freeRect.y === tiledRect.y + tiledRect.height || freeRect.y + freeRect.height === tiledRect.y))
+			return v || h;
+		}
+
+		topTileGroup = topTileGroup || getTopTileGroup(false);
+		const freeSpace = getFreeScreenSpace(topTileGroup);
+		const freeScreenRects = freeSpace ? [freeSpace] : getFreeScreenRects(topTileGroup);
+		const tileRect = window.tiledRect;
+		for (const rect of freeScreenRects) {
+			if (tileBordersFreeRect(rect, tileRect)) {
+				const hOverlap = rect.horiz_overlap(tileRect);
+				const vOverlap = rect.vert_overlap(tileRect);
+				return new Meta.Rectangle({
+					x: vOverlap && rect.x <= tileRect.x ? rect.x : tileRect.x,
+					y: hOverlap && rect.y <= tileRect.y ? rect.y : tileRect.y,
+					width: tileRect.width + (vOverlap ? rect.width : 0),
+					height: tileRect.height + (hOverlap ? rect.height : 0),
+				});
+			}
+		}
+
+		return tileRect;
+	}
+};
+
 function getTileRectFor(position, workArea) {
 	const topTileGroup = getTopTileGroup();
 	const screenRects = topTileGroup.map(w => w.tiledRect).concat(getFreeScreenRects(topTileGroup));
@@ -254,50 +292,50 @@ function getTileRectFor(position, workArea) {
 
 		case MainExtension.TILING.LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: workArea.height});
 
 		case MainExtension.TILING.RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width,height: workArea.height});
 
 		case MainExtension.TILING.TOP:
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width: workArea.width, height});
 
 		case MainExtension.TILING.BOTTOM:
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width: workArea.width, height});
 
 		case MainExtension.TILING.TOP_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: height});
 
 		case MainExtension.TILING.TOP_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width, height});
 
 		case MainExtension.TILING.BOTTOM_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width, height});
 
 		case MainExtension.TILING.BOTTOM_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
-			width = rect ? rect.width : Math.round(workArea.width / 2);
+			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
-			height = rect ? rect.height : Math.round(workArea.height / 2);
+			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y + workArea.height - height, width, height});
 	}
 };
@@ -479,7 +517,28 @@ function updateTileGroup(tileGroup) {
 			focusedWindow.raise();
 		});
 
-		window.unManagingDissolvedId = window.connect("unmanaging", (w) => dissolveTileGroupFor(w));
+		window.unmanagingDissolvedId && window.disconnect(window.unmanagingDissolvedId);
+		window.unmanagingDissolvedId = window.connect("unmanaging", w => {
+			dissolveTileGroupFor(w);
+
+			// automatically resize remaining tiled windows, if a tiled window is closed
+			if (!MainExtension.settings.get_boolean("auto-tile-on-close"))
+				return;
+
+			const topTileGroup = getTopTileGroup(false);
+			topTileGroup.sort((w1, w2) => w1.tiledRect.area() - w2.tiledRect.area());
+
+			for (let foundAFit = true; foundAFit; ) {
+				foundAFit = false;
+				topTileGroup.forEach(w => {
+					const tileRect = getBestFitTiledRect(w, topTileGroup);
+					if (w.tiledRect && !w.tiledRect.equal(tileRect) && (!tileRect.equal(w.get_work_area_current_monitor()) || topTileGroup.length === 1)) {
+						tileWindow(w, tileRect, false);
+						foundAFit = true;
+					}
+				});
+			}
+		});
 	});
 };
 
@@ -494,9 +553,9 @@ function dissolveTileGroupFor(window) {
 		window.groupFocusID = 0;
 	}
 
-	if (window.unManagingDissolvedId) {
-		window.disconnect(window.unManagingDissolvedId);
-		window.unManagingDissolvedId = 0;
+	if (window.unmanagingDissolvedId) {
+		window.disconnect(window.unmanagingDissolvedId);
+		window.unmanagingDissolvedId = 0;
 	}
 
 	window.tileGroup.forEach(otherWindow => {
@@ -521,6 +580,26 @@ function ___debugShowTiledRects() {
 			opacity: 160,
 			x: w.tiledRect.x, y: w.tiledRect.y,
 			width: w.tiledRect.width, height: w.tiledRect.height
+		});
+		main.uiGroup.add_child(indicator);
+		indicators.push(indicator);
+	});
+
+	return indicators;
+};
+
+function ___debugShowFreeScreenRects() {
+	const topTileGroup = getTopTileGroup(false);
+	const freeScreenRects = getFreeScreenRects(topTileGroup);
+	const freeScreenSpace = getFreeScreenSpace(topTileGroup);
+	const rects = freeScreenSpace ? [freeScreenSpace] : freeScreenRects;
+
+	const indicators = [];
+	rects.forEach(rect => {
+		const indicator = new St.Widget({
+			style_class: "tile-preview",
+			x: rect.x, y: rect.y,
+			width: rect.width, height: rect.height
 		});
 		main.uiGroup.add_child(indicator);
 		indicators.push(indicator);

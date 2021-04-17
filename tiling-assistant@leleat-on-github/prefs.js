@@ -6,10 +6,11 @@ const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 const TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
+	DEBUGGING_FREE_RECTS: "debugging-free-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	EDIT_MODE: "tile-edit-mode",
+	// EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -59,6 +60,7 @@ const MyPrefsWidget = new GObject.Class({
 		this._setupPieMenu();
 
 		this._bindWidgetsToSettings(settingsSchema.list_keys());
+		this._bindWidgetsTogether();
 		this._bindKeybindings();
 
 		this.connect("destroy", () => this.settings.run_dispose());
@@ -66,10 +68,11 @@ const MyPrefsWidget = new GObject.Class({
 
 	// widgets in prefs.ui need to have same ID as the keys in the gschema.xml file
 	_bindWidgetsToSettings: function(settingsKeys) {
-		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"];
+		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"
+				, "pie-menu-deadzone-radius", "pie-menu-item-radius"];
 		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
 				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"
-				, "enable-pie-menu", "maximize-with-gap"];
+				, "enable-pie-menu", "maximize-with-gap", "auto-tile-on-close"];
 		const enums = ["restore-window-size-on"];
 
 		const getBindProperty = function(key) {
@@ -95,6 +98,19 @@ const MyPrefsWidget = new GObject.Class({
 			widget.set_active(this.settings.get_enum(key));
 			widget.connect("changed", src => this.settings.set_enum(key, widget.get_active()));
 		});
+	},
+
+	_bindWidgetsTogether: function() {
+		const pieMenuToggle = this.builder.get_object("enable-pie-menu");
+		const pieDisabled = pieMenuToggle.get_active();
+
+		const deadzoneRow = this.builder.get_object("pie-menu-deadzone-listboxrow");
+		deadzoneRow.set_sensitive(pieDisabled);
+		pieMenuToggle.bind_property("active", deadzoneRow, "sensitive", GObject.BindingFlags.DEFAULT);
+
+		const itemRadiusRow = this.builder.get_object("pie-menu-item-radius-listboxrow");
+		itemRadiusRow.set_sensitive(pieDisabled);
+		pieMenuToggle.bind_property("active", itemRadiusRow, "sensitive", GObject.BindingFlags.DEFAULT);
 	},
 
 	_bindKeybindings: function() {

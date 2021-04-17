@@ -103,9 +103,14 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 				const [posProp, dimensionProp] = isVertical ? ["y", "height"] : ["x", "width"];
 				// "before preview" means only the width/height of the window will change
 				// i. e. window is bordering on the left/top of the tile preview
-				const isBeforePreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[posProp] < previewRect[posProp];
+				const isBeforePreview = window => {
+					const p2 = window.tiledRect[posProp] + window.tiledRect[dimensionProp];
+					return window.tiledRect.overlap(previewRect) && p2 >= previewRect[posProp] && p2 <= previewRect[posProp] + previewRect[dimensionProp];
+				};
 				// "after preview" is the opposite (bottom/right of the tile preview)
-				const isAfterPreview = window => window.tiledRect.overlap(previewRect) && window.tiledRect[posProp] >= previewRect[posProp];
+				const isAfterPreview = window => {
+					return window.tiledRect.overlap(previewRect) && window.tiledRect[posProp] >= previewRect[posProp] && window.tiledRect[posProp] <= previewRect[posProp] + previewRect[dimensionProp];
+				};
 
 				const windowsBeforePreview = [];
 				const windowsAfterPreview = [];
@@ -325,10 +330,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		const splitHorizontally = atLeft || atRight;
 
 		const previewRect = new Meta.Rectangle({
-			x: hoveredRect.x + (atRight && !splitVertically ? Math.round(hoveredRect.width / 2) : 0),
-			y: hoveredRect.y + (atBottom ? Math.round(hoveredRect.height / 2) : 0),
-			width: Math.round(hoveredRect.width / (splitHorizontally && !splitVertically ? 2 : 1)),
-			height: Math.round(hoveredRect.height / (splitVertically ? 2 : 1))
+			x: hoveredRect.x + (atRight && !splitVertically ? Math.floor(hoveredRect.width / 2) : 0),
+			y: hoveredRect.y + (atBottom ? Math.floor(hoveredRect.height / 2) : 0),
+			width: Math.ceil(hoveredRect.width / (splitHorizontally && !splitVertically ? 2 : 1)),
+			height: Math.ceil(hoveredRect.height / (splitVertically ? 2 : 1))
 		});
 		this.tilePreview.open(window, previewRect, global.display.get_current_monitor());
 	}

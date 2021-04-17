@@ -30,10 +30,11 @@ const PieMenu = Me.imports.tilingPieMenu;
 
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
+	DEBUGGING_FREE_RECTS: "debugging-free-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	EDIT_MODE: "tile-edit-mode",
+	// EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -143,8 +144,8 @@ function disable() {
 		delete w.grabSignalID;
 		w.groupFocusID && w.disconnect(w.groupFocusID);
 		delete w.groupFocusID;
-		w.unManagingDissolvedId && w.disconnect(w.unManagingDissolvedId);
-		delete w.unManagingDissolvedId;
+		w.unmanagingDissolvedId && w.disconnect(w.unmanagingDissolvedId);
+		delete w.unmanagingDissolvedId;
 	});
 
 	settings.run_dispose();
@@ -153,12 +154,13 @@ function disable() {
 
 function onCustomKeybindingPressed(shortcutName) {
 	// debugging
-	if (shortcutName === TILING.DEBUGGING) {
+	if (shortcutName === TILING.DEBUGGING || shortcutName === TILING.DEBUGGING_FREE_RECTS) {
 		if (this.debuggingIndicators) {
 			this.debuggingIndicators.forEach(i => i.destroy());
 			this.debuggingIndicators = null;
 		} else {
-			this.debuggingIndicators = Util.___debugShowTiledRects();
+			const func = shortcutName === TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects; 
+			this.debuggingIndicators = func.call(this);
 		}
 		return;
 
@@ -186,8 +188,7 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// auto tile: tile to empty space. If there's no empty space: untile, if it's already tiled else maximize
 	if (shortcutName === TILING.AUTO) {
-		const freeScreenSpace = Util.getFreeScreenSpace(Util.getTopTileGroup());
-		const tileRect = freeScreenSpace || window.get_work_area_current_monitor();
+		const tileRect = Util.getBestFitTiledRect(window);
 		Util.toggleTileState(window, tileRect);
 
 	// tile edit mode: resize & swap tiled windows and tile a non-tiled window

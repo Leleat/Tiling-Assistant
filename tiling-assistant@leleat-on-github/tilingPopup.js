@@ -280,18 +280,18 @@ var TilingSwitcherPopup = GObject.registerClass({
 			if (isAltPressed) { // halve to right or bottom
 				// prefer vertical tiling more (because of horizontal screen orientation)
 				if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25) {
-					this.freeScreenRect.x = this.freeScreenRect.x + Math.round(this.freeScreenRect.width / 2);
+					this.freeScreenRect.x = this.freeScreenRect.x + Math.floor(this.freeScreenRect.width / 2);
 					this.freeScreenRect.width = this.freeScreenRect.width / 2;
 				} else {
-					this.freeScreenRect.y = this.freeScreenRect.y + Math.round(this.freeScreenRect.height / 2);
-					this.freeScreenRect.height = Math.round(this.freeScreenRect.height / 2);
+					this.freeScreenRect.y = this.freeScreenRect.y + Math.floor(this.freeScreenRect.height / 2);
+					this.freeScreenRect.height = Math.ceil(this.freeScreenRect.height / 2);
 				}
 
 			} else if (isShiftPressed) { // halve to left or top
 				if (this.freeScreenRect.width >= this.freeScreenRect.height * 1.25)
-					this.freeScreenRect.width = Math.round(this.freeScreenRect.width / 2);
+					this.freeScreenRect.width = Math.ceil(this.freeScreenRect.width / 2);
 				else
-					this.freeScreenRect.height = Math.round(this.freeScreenRect.height / 2);
+					this.freeScreenRect.height = Math.ceil(this.freeScreenRect.height / 2);
 			}
 
 			this.tiledWindow = window;
