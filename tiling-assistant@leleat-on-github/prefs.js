@@ -10,7 +10,7 @@ const TILING = { // keybindings
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	// EDIT_MODE: "tile-edit-mode",
+	EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -72,9 +72,10 @@ const MyPrefsWidget = new GObject.Class({
 				, "pie-menu-deadzone-radius", "pie-menu-item-radius"];
 		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
 				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"
-				, "enable-pie-menu", "maximize-with-gap", "auto-tile-on-close"];
+				, "enable-pie-menu", "maximize-with-gap"];
 		const enums = ["restore-window-size-on"];
-
+		const colors = ["tile-editing-mode-color"];
+		
 		const getBindProperty = function(key) {
 			if (ints.includes(key))
 				return "value"; // Gtk.Spinbox.value
@@ -97,6 +98,15 @@ const MyPrefsWidget = new GObject.Class({
 			const widget = this.builder.get_object(key);
 			widget.set_active(this.settings.get_enum(key));
 			widget.connect("changed", src => this.settings.set_enum(key, widget.get_active()));
+		});
+
+		// color buttons settings
+		colors.forEach(key => {
+			const widget = this.builder.get_object(key);
+			const color = new Gdk.RGBA();
+			color.parse(this.settings.get_string(key));
+			widget.set_rgba(color);
+			widget.connect("color-set", w => this.settings.set_string(key, w.get_rgba().to_string()));
 		});
 	},
 

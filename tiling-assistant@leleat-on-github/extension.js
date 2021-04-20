@@ -27,6 +27,7 @@ const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 const PieMenu = Me.imports.tilingPieMenu;
+const TileEditing = Me.imports.tilingEditingMode;
 
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
@@ -34,7 +35,7 @@ var TILING = { // keybindings
 	TOGGLE_POPUP: "toggle-tiling-popup",
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
-	// EDIT_MODE: "tile-edit-mode",
+	EDIT_MODE: "tile-edit-mode",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -191,9 +192,15 @@ function onCustomKeybindingPressed(shortcutName) {
 		const tileRect = Util.getBestFitTiledRect(window);
 		Util.toggleTileState(window, tileRect);
 
-	// tile edit mode: resize & swap tiled windows and tile a non-tiled window
+	// tile editing mode
 	} else if (shortcutName === TILING.EDIT_MODE) {
-		// TODO
+		if (!window.isTiled) {
+			main.notify("Tiling Assistant", "Can't enter 'Tile Editing Mode', if the focused window isn't tiled.");
+			return;
+		}
+
+		const tileEditor = new TileEditing.TileEditor();
+		tileEditor.open(window);
 
 	// tile window
 	} else {
@@ -206,12 +213,13 @@ function _dynamicTiling(window, shortcutName) {
 	const topTileGroup = Util.getTopTileGroup(false);
 	// switch focus between topTileGroup
 	if (window.isTiled && topTileGroup.length > 1) {
-		const closestTiledWindow = Util.getClosestWindow(window, topTileGroup, shortcutName)
-		if (!closestTiledWindow) {
+		const closestTiledRect = Util.getClosestRect(window.tiledRect, topTileGroup.map(w => w.tiledRect), shortcutName);
+		if (!closestTiledRect) {
 			Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
 			return;
 		}
 
+		const closestTiledWindow = topTileGroup.find(w => w.tiledRect.equal(closestTiledRect));
 		closestTiledWindow.activate(global.get_current_time());
 
 		// animate for visibilty

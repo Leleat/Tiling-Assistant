@@ -14,8 +14,8 @@
 		<key name="enable-dynamic-tiling" type="b">
 	  		<default>false</default>
 		</key>
-		<key name="auto-tile-on-close" type="b">
-	  		<default>false</default>
+		<key name="tile-editing-mode-color" type="s">
+	  		<default>"rgb(27, 106, 203)"</default>
 		</key>
 		<key name="enable-pie-menu" type="b">
 	  		<default>true</default>

@@ -395,14 +395,15 @@ Otherwise it will switch focus to the closest tiled window, if there is one.</pr
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Auto-Tile when  Closing a Tiled Window </property>
+                    <property name="label" translatable="yes">Tile Editing Mode: Focus Color</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSwitch" id="auto-tile-on-close">
+                  <object class="GtkColorButton" id="tile-editing-mode-color">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
+                    <property name="receives-default">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
                   </object>
@@ -707,6 +708,41 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="halign">end</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">toggle-tiling-popup-liststore</property>
+                                    <property name="headers-visible">False</property>
+                                    <property name="enable-search">False</property>
+                                    <property name="search-column">0</property>
+                                    <property name="activate-on-single-click">True</property>
+                                    <child internal-child="selection">
+                                      <object class="GtkTreeSelection"/>
+                                    </child>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="visible">True</property>
+                                <property name="can-focus">True</property>
+                                <property name="margin-start">12</property>
+                                <property name="margin-end">12</property>
+                                <property name="margin-top">8</property>
+                                <property name="margin-bottom">8</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="valign">center</property>
+                                    <property name="hexpand">True</property>
+                                    <property name="label" translatable="yes">Tile Editing Mode</property>
+                                    <property name="xalign">0</property>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkTreeView" id="tile-edit-mode-treeview">
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="halign">end</property>
+                                    <property name="model">tile-edit-mode-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
@@ -1715,6 +1751,61 @@ The group raising can be disabled with a setting. The group resizing can be esca
                             <property name="margin-end">12</property>
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
+                            <property name="label" translatable="yes">This is a special mode to manage your tiled windows.
+
+You can navigate focus with the direction (&lt;tt&gt;WASD&lt;/tt&gt;, &lt;tt&gt;hjkl&lt;/tt&gt; or the &lt;tt&gt;arrow&lt;/tt&gt;) keys. Holding &lt;tt&gt;Ctrl&lt;/tt&gt; while moving the focus and then releasing &lt;tt&gt;Ctrl&lt;/tt&gt; will swap the highlighted windows.
+
+&lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;Directions&lt;/tt&gt; will resize the selected window on the E or S side. Holding &lt;tt&gt;Shift&lt;/tt&gt; will resize the window on the W or N side.
+
+When a window is highlighted, press &lt;tt&gt;Q&lt;/tt&gt; to [q]uit it, &lt;tt&gt;U&lt;/tt&gt; to [u]ntile, and &lt;tt&gt;E&lt;/tt&gt; to [e]xpand it to fill the available space.
+
+Pressing &lt;tt&gt;Esc&lt;/tt&gt;, &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will open the Tiling Popup instead.
+
+Pressing &lt;tt&gt;H&lt;/tt&gt; or &lt;tt&gt;V&lt;/tt&gt; while holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; will halve the selected window (see &lt;i&gt;Tiling Popup&lt;/i&gt; for more information).
+</property>
+                            <property name="use-markup">True</property>
+                            <property name="wrap">True</property>
+                            <property name="wrap-mode">word-char</property>
+                          </object>
+                        </child>
+                        <child type="label">
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="label" translatable="yes">&lt;b&gt;    Tile Editing Mode    &lt;/b&gt;</property>
+                            <property name="use-markup">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <property name="halign">start</property>
+                    <property name="margin-start">8</property>
+                    <property name="margin-end">8</property>
+                    <property name="activatable">False</property>
+                    <property name="selectable">False</property>
+                    <child>
+                      <object class="GtkFrame">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="margin-start">8</property>
+                        <property name="margin-end">8</property>
+                        <property name="margin-top">8</property>
+                        <property name="margin-bottom">8</property>
+                        <property name="label-xalign">0.5</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">16</property>
+                            <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">A layout consists of a list of arbitrary rectangles. When activating a layout the tiling popup will ask you which of the open windows you want in which rectangle of your layout.
 
 The layout selector enables you to search for layouts by name. That means you don't have to remember their keybindings. </property>
@@ -1842,12 +1933,12 @@ The layout selector enables you to search for layouts by name. That means you do
                             <property name="margin-end">12</property>
                             <property name="margin-top">16</property>
                             <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">- pie menu when Super + RMBing a window
+                            <property name="label" translatable="yes">- experimental Tile Editing Mode
+
+- pie menu when Super + RMBing a window
 
 - setting: gaps on maximized windows  - off by default
-- setting: 'restore window size on grab end' - workaround for Wayland
-
-- setting: auto-tile rest of the tiled windows, if a tiled window is closed - off by default</property>
+- setting: 'restore window size on grab end' - workaround for Wayland</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
@@ -1897,16 +1988,13 @@ The layout selector enables you to search for layouts by name. That means you do
 - ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
 
 - inverse top screen edge action (by c-ridgway)
-
 - multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
-
 - default keybindings with the numpad for tiling (by c-ridgway)
 
 - dynamic numbers of layouts &amp; layout selector
 
 - add 'User Guide' and 'Changelog' settings tab
 - other minor settings additions/removals/changes
-
 - refactor and minor bugfixes</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
