@@ -194,13 +194,16 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// tile editing mode
 	} else if (shortcutName === TILING.EDIT_MODE) {
-		if (!window.isTiled) {
+		if (!Util.getTopTileGroup(!window.isTiled).length) {
 			main.notify("Tiling Assistant", "Can't enter 'Tile Editing Mode', if the focused window isn't tiled.");
 			return;
 		}
 
+		!window.isTiled && window.lower();
+		const openWindows = Util.getOpenWindows();
+
 		const tileEditor = new TileEditing.TileEditor();
-		tileEditor.open(window);
+		tileEditor.open(openWindows[0]);
 
 	// tile window
 	} else {
