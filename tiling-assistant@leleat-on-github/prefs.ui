@@ -2200,15 +2200,13 @@ The group raising can be disabled with a setting. The group resizing can be esca
                             <property name="margin-bottom">16</property>
                             <property name="label" translatable="yes">This is a special mode to manage your tiled windows. 
 
-You can navigate focus with the direction (&lt;tt&gt;WASD&lt;/tt&gt;, &lt;tt&gt;hjkl&lt;/tt&gt; or the &lt;tt&gt;arrow&lt;/tt&gt;) keys. Holding &lt;tt&gt;Ctrl&lt;/tt&gt; while moving the focus and then releasing &lt;tt&gt;Ctrl&lt;/tt&gt; will swap the highlighted windows.
+You can navigate focus with the direction keys (&lt;tt&gt;WASD&lt;/tt&gt;, &lt;tt&gt;hjkl&lt;/tt&gt; or the &lt;tt&gt;arrows&lt;/tt&gt;). Holding &lt;tt&gt;Ctrl&lt;/tt&gt; while moving the focus and then releasing &lt;tt&gt;Ctrl&lt;/tt&gt; will swap the highlighted windows.
 
 &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;Directions&lt;/tt&gt; will resize the selected window on the E or S side. Additionally holding &lt;tt&gt;Shift&lt;/tt&gt; will resize the window on the W or N side.
 
-When a window is highlighted, press &lt;tt&gt;Q&lt;/tt&gt; to [q]uit it, &lt;tt&gt;U&lt;/tt&gt; to [u]ntile, and &lt;tt&gt;E&lt;/tt&gt; to [e]xpand it to fill the available space.
+When a window is highlighted, press &lt;tt&gt;Q&lt;/tt&gt; to [q]uit it, &lt;tt&gt;R&lt;/tt&gt; to [r]estore a window's size, and &lt;tt&gt;E&lt;/tt&gt; to [e]xpand it to fill the available space. Press &lt;tt&gt;C&lt;/tt&gt; to [c]ycle through 'halve' states of a window.
 
-Pressing &lt;tt&gt;Esc&lt;/tt&gt;, &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will open the Tiling Popup instead.
-
-Pressing &lt;tt&gt;H&lt;/tt&gt; or &lt;tt&gt;V&lt;/tt&gt; while holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; will halve the selected window (see &lt;i&gt;Tiling Popup&lt;/i&gt; for more information).</property>
+Pressing &lt;tt&gt;Esc&lt;/tt&gt;, &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will open the Tiling Popup instead.</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
