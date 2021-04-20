@@ -31,12 +31,12 @@ const ACTIONS = [
 var PieMenu = GObject.registerClass(
 	class PieMenu extends St.Widget {
 		_init() {
-			const workArea = global.display.focus_window.get_work_area_current_monitor();
+			const display = global.display.get_monitor_geometry(global.display.get_current_monitor());
 			super._init({
-				x: workArea.x,
-				y: workArea.y,
-				width: workArea.width,
-				height: workArea.height,
+				x: display.x,
+				y: display.y,
+				width: display.width,
+				height: display.height,
 				reactive: true,
 				opacity: 0
 			});
