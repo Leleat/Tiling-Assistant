@@ -196,51 +196,104 @@ function getFreeScreenSpace(tileGroup) {
 	return null;
 };
 
-function getClosestWindow(currWindow, windowList, direction) {
-	const currWRect = currWindow.get_frame_rect();
-	return windowList.reduce((closestWindow, window) => {
-		const wRect = window.get_frame_rect();
-		// first make sure the window is roughly & completely on the side we want to move to.
-		// E. g. if the user wants to focus a window towards the left,
-		// **any** window that is to the left of the focused window will be further checked
-		if (((direction === MainExtension.TILING.TOP || direction === MainExtension.TILING.MAXIMIZE) && wRect.y + wRect.height <= currWRect.y)
-				|| (direction === MainExtension.TILING.BOTTOM && currWRect.y + currWRect.height <= wRect.y)
-				|| (direction === MainExtension.TILING.LEFT && wRect.x + wRect.width <= currWRect.x)
-				|| (direction === MainExtension.TILING.RIGHT && currWRect.x + currWRect.width <= wRect.x)) {
+function getClosestRect(currRect, rectList, direction, wrapAround = false) {
+	// get closest rect WITHOUT wrapping around
+	let closestRect = rectList.reduce((closest, rect) => {
+		// first make sure the tested rect is roughly & completely on the side we want to move to.
+		// E. g. if you want to get a rect towards the left,
+		// **any** rect that is to the left of the @currRect will be further checked
+		if (((direction === MainExtension.TILING.TOP || direction === MainExtension.TILING.MAXIMIZE) && rect.y + rect.height <= currRect.y)
+				|| (direction === MainExtension.TILING.BOTTOM && currRect.y + currRect.height <= rect.y)
+				|| (direction === MainExtension.TILING.LEFT && rect.x + rect.width <= currRect.x)
+				|| (direction === MainExtension.TILING.RIGHT && currRect.x + currRect.width <= rect.x)) {
 
-			if (!closestWindow)
-				return window;
+			if (!closest)
+				return rect;
 
-			// calculate the distance between the center of the edge in the direction the focus should move to
-			// of the current window and the center of the opposite site of the rect. For ex.: Move focus up:
-			// calculate the distance between the center of the top edge of the focused window
-			// and the center of the bottom edge of the other windows
-			const dist2currWindow = function(rect) {
+			// calculate the distance between the center of the edge in the direction to
+			// of the @currRect and the center of the opposite site of the rect. For ex.: Move up:
+			// calculate the distance between the center of the top edge of the @currRect
+			// and the center of the bottom edge of the other rect
+			const dist2currRect = function(rect) {
 				switch (direction) {
 					case MainExtension.TILING.TOP:
 					case MainExtension.TILING.MAXIMIZE:
 						return distBetween2Points({x: rect.x + rect.width / 2, y: rect.y + rect.height}
-								, {x: currWRect.x + currWRect.width / 2, y: currWRect.y});
+								, {x: currRect.x + currRect.width / 2, y: currRect.y});
 
 					case MainExtension.TILING.BOTTOM:
 						return distBetween2Points({x: rect.x + rect.width / 2, y: rect.y}
-								, {x: currWRect.x + currWRect.width / 2, y: currWRect.y + currWRect.height});
+								, {x: currRect.x + currRect.width / 2, y: currRect.y + currRect.height});
 
 					case MainExtension.TILING.LEFT:
 						return distBetween2Points({x: rect.x + rect.width, y: rect.y + rect.height / 2}
-								, {x: currWRect.x, y: currWRect.y + currWRect.height / 2});
+								, {x: currRect.x, y: currRect.y + currRect.height / 2});
 
 					case MainExtension.TILING.RIGHT:
 						return distBetween2Points({x: rect.x, y: rect.y + rect.height / 2}
-								, {x: currWRect.x + currWRect.width, y: currWRect.y + currWRect.height / 2});
+								, {x: currRect.x + currRect.width, y: currRect.y + currRect.height / 2});
 				}
 			}
 
-			return dist2currWindow(wRect) < dist2currWindow(closestWindow.get_frame_rect()) ? window : closestWindow;
+			return dist2currRect(rect) < dist2currRect(closest) ? rect : closest;
 		}
 
-		return closestWindow;
+		return closest;
 	}, null);
+
+	// wrap around, if needed
+	if (!closestRect && wrapAround) {
+		// first: look for the rects, which are furthest on the opposite direction
+		const closestRects = rectList.reduce((closests, rect) => {
+			if (!closests.length)
+				return [rect];
+
+			switch (direction) {
+				case MainExtension.TILING.TOP:
+				case MainExtension.TILING.MAXIMIZE:
+					if (closests[0].y + closests[0].height === rect.y + rect.height)
+						return [...closests, rect];
+					else
+						return closests[0].y + closests[0].height > rect.y + rect.height
+								? closests : [rect];
+
+				case MainExtension.TILING.BOTTOM:
+					if (closests[0].y === rect.y)
+						return [...closests, rect];
+					else
+						return closests[0].y < rect.y ? closests : [rect];
+
+				case MainExtension.TILING.LEFT:
+					if (closests[0].x + closests[0].width === rect.x + rect.width)
+						return [...closests, rect];
+					else
+						return closests[0].x + closests[0].width > rect.x + rect.width
+								? closests : [rect];
+
+				case MainExtension.TILING.RIGHT:
+					if (closests[0].x === rect.x)
+						return [...closests, rect];
+					else
+						return closests[0].x < rect.x ? closests : [rect];
+			}
+		}, []);
+
+		// second: prefer the rect closest to the @currRect's h/v axis
+		closestRect = closestRects.reduce((closest, rect) => {
+			switch (direction) {
+				case MainExtension.TILING.TOP:
+				case MainExtension.TILING.MAXIMIZE:
+				case MainExtension.TILING.BOTTOM:
+					return Math.abs(closest.x - currRect.x) < Math.abs(rect.x - currRect.x) ? closest : rect;
+
+				case MainExtension.TILING.LEFT:
+				case MainExtension.TILING.RIGHT:
+					return Math.abs(closest.y - currRect.y) < Math.abs(rect.y - currRect.y) ? closest : rect;
+			}
+		});
+	}
+
+	return closestRect;
 };
 
 function getBestFitTiledRect(window, topTileGroup = null) {
@@ -518,36 +571,13 @@ function updateTileGroup(tileGroup) {
 		});
 
 		window.unmanagingDissolvedId && window.disconnect(window.unmanagingDissolvedId);
-		window.unmanagingDissolvedId = window.connect("unmanaging", w => {
-			dissolveTileGroupFor(w);
-
-			// automatically resize remaining tiled windows, if a tiled window is closed
-			if (!MainExtension.settings.get_boolean("auto-tile-on-close"))
-				return;
-
-			const topTileGroup = getTopTileGroup(false);
-			topTileGroup.sort((w1, w2) => w1.tiledRect.area() - w2.tiledRect.area());
-
-			for (let foundAFit = true; foundAFit; ) {
-				foundAFit = false;
-				topTileGroup.forEach(w => {
-					const tileRect = getBestFitTiledRect(w, topTileGroup);
-					if (w.tiledRect && !w.tiledRect.equal(tileRect) && (!tileRect.equal(w.get_work_area_current_monitor()) || topTileGroup.length === 1)) {
-						tileWindow(w, tileRect, false);
-						foundAFit = true;
-					}
-				});
-			}
-		});
+		window.unmanagingDissolvedId = window.connect("unmanaging", w => dissolveTileGroupFor(w));
 	});
 };
 
 // delete the tileGroup of @window for group-raising and
 // remove the @window from the tileGroup of other tiled windows
 function dissolveTileGroupFor(window) {
-	if (!window.tileGroup)
-		return;
-
 	if (window.groupFocusID) {
 		window.disconnect(window.groupFocusID);
 		window.groupFocusID = 0;
@@ -557,6 +587,9 @@ function dissolveTileGroupFor(window) {
 		window.disconnect(window.unmanagingDissolvedId);
 		window.unmanagingDissolvedId = 0;
 	}
+
+	if (!window.tileGroup)
+		return;
 
 	window.tileGroup.forEach(otherWindow => {
 		const idx = otherWindow.tileGroup.indexOf(window);
@@ -605,5 +638,5 @@ function ___debugShowFreeScreenRects() {
 		indicators.push(indicator);
 	});
 
-	return indicators;
+	return indicators.length ? indicators : null;
 };
