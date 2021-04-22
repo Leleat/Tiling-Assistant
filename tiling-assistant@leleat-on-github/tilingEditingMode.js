@@ -98,11 +98,15 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 				return;
 
 			const tileRect = Util.getBestFitTiledRect(window, this._topTileGroup);
-			if (window.tiledRect.equal(tileRect) || tileRect.equal(window.get_work_area_current_monitor()))
+			if (window.tiledRect.equal(tileRect))
+				return;
+
+			const maximize = tileRect.equal(window.get_work_area_current_monitor());
+			if (maximize && this._topTileGroup.length > 1)
 				return;
 
 			Util.tileWindow(window, tileRect, false);
-			this.select(window.tiledRect, window);
+			maximize ? this.close() : this.select(window.tiledRect, window);
 
 		// [C]ycle through halves of the available space of the window
 		} else if ((keySym === Clutter.KEY_c || keySym === Clutter.KEY_C)) {
@@ -277,10 +281,19 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		};
 
 		this._topTileGroup.forEach(w => {
-			if (resizeSide(w.tiledRect, resizedRect, false))
-				Util.tileWindow(w, getResizedRect(w.tiledRect, !isShiftPressed, changeDir), false);
-			else if (resizeSide(w.tiledRect, resizedRect, true))
-				Util.tileWindow(w, getResizedRect(w.tiledRect, isShiftPressed, -changeDir), false);
+			if (resizeSide(w.tiledRect, resizedRect, false)) {
+				const tileRect = getResizedRect(w.tiledRect, !isShiftPressed, changeDir);
+				if (tileRect.equal(w.get_work_area_current_monitor()))
+					return;
+
+				Util.tileWindow(w, tileRect, false);
+			} else if (resizeSide(w.tiledRect, resizedRect, true)) {
+				const tileRect = getResizedRect(w.tiledRect, isShiftPressed, -changeDir);
+				if (tileRect.equal(w.get_work_area_current_monitor()))
+					return;
+
+				Util.tileWindow(w, tileRect, false);
+			}
 		});
 		this.select(window.tiledRect, window);
 	}
