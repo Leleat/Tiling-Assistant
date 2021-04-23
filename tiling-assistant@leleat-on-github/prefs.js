@@ -53,7 +53,7 @@ const MyPrefsWidget = new GObject.Class({
 		const mainPrefs = this.builder.get_object("main_prefs");
 		_addChildTo(this, mainPrefs);
 
-		this.set_min_content_width(650);
+		this.set_min_content_width(700);
 		this.set_min_content_height(650);
 
 		this._setupLayouts();
@@ -223,6 +223,7 @@ const MyPrefsWidget = new GObject.Class({
 		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_forEachChild(this, layoutsListBox, row => {
 			const layoutRects = [];
+			const appIds = [];
 			_forEachChild(this, row.entriesContainer, entryBox => {
 				const entry = shellVersion < 40 ? entryBox.get_children()[1]
 						: entryBox.get_first_child().get_next_sibling();
@@ -245,11 +246,14 @@ const MyPrefsWidget = new GObject.Class({
 					rect[property] = value;
 				});
 
-				rectIsValid && layoutRects.push(rect);
+				if (rectIsValid) {
+					layoutRects.push(rect);
+					appIds.push(row.appIds[_getChildIndex(row.entriesContainer, entryBox)]);
+				}
 			});
 
 			const layoutName = row.getLayoutName();
-			const layout = {name: layoutName, rects: layoutRects};
+			const layout = {name: layoutName, rects: layoutRects, apps: appIds};
 			layoutRects.length && allLayouts.push(layout);
 		});
 
@@ -310,6 +314,8 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 			selectable: false,
 			margin_bottom: 12
 		});
+
+		this.appIds = (layout && layout.apps) || [];
 
 		const mainFrame = new Gtk.Frame({
 			label: `    Layout ${idx + 1}    `,
@@ -387,18 +393,19 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		});
 		_addChildTo(rectangleLeftBox, this.entriesContainer);
 
-		layout && layout.rects.forEach(rect => this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`));
+		layout && layout.rects.forEach((rect, idx) => {
+			const appId = this.appIds[idx];
+			const appInfo = appId && Gio.DesktopAppInfo.new(appId);
+			this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`, appInfo);
+		});
 		this._addRectangleEntry();
 
-		const rectangleAddButton = new Gtk.Button();
-		if (shellVersion < 40) {
-			rectangleAddButton.set_always_show_image(true);
-			rectangleAddButton.set_image(new Gtk.Image({icon_name: "list-add-symbolic"}));
-		} else {
-			rectangleAddButton.set_icon_name("list-add-symbolic");
-		}
+		const rectangleAddButton = _makeButton(new Gtk.Image({icon_name: "list-add-symbolic"}), "list-add-symbolic");
 		_addChildTo(rectangleLeftBox, rectangleAddButton);
-		rectangleAddButton.connect("clicked", () => this._addRectangleEntry());
+		rectangleAddButton.connect("clicked", () => {
+			this._addRectangleEntry();
+			this.appIds.push("");
+		});
 
 		// right column (layout preview)
 		const errorOverlay = new Gtk.Overlay();
@@ -427,13 +434,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 
 		/* --- button row --- */
 
-		const deleteButton = new Gtk.Button();
-		if (shellVersion < 40) {
-			deleteButton.set_always_show_image(true);
-			deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
-		} else {
-			deleteButton.set_icon_name("edit-delete-symbolic");
-		}
+		const deleteButton = _makeButton(new Gtk.Image({icon_name: "edit-delete-symbolic"}), "edit-delete-symbolic");
 		_addChildTo(mainBox, deleteButton);
 		deleteButton.connect("clicked", button => this.destroy());
 
@@ -448,7 +449,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		return _getEntryText(this._nameEntry);
 	}
 
-	_addRectangleEntry(text) {
+	_addRectangleEntry(text, appInfo) {
 		const entryBox = new Gtk.Box({
 			orientation: Gtk.Orientation.HORIZONTAL,
 			spacing: 8
@@ -461,7 +462,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 
 		const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
 The right column shows a preview of your layouts (after saving). Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
-The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner."
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner. You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout."
 		const rectEntry = new Gtk.Entry({
 			tooltip_text: tooltip,
 			hexpand: true
@@ -470,7 +471,42 @@ The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (
 		text && _setEntryText(rectEntry, text);
 		_addChildTo(entryBox, rectEntry);
 
+		const addAppButton = appInfo ? _makeButton(new Gtk.Image({gicon: appInfo.get_icon()}), appInfo.get_icon().to_string())
+				: _makeButton(new Gtk.Image({icon_name: "list-add-symbolic"}), "list-add-symbolic");
+		_addChildTo(entryBox, addAppButton);
+		addAppButton.connect("clicked", this._onAddAppButtonClicked.bind(this));
+
 		shellVersion < 40 && entryBox.show_all();
+	}
+
+	_onAddAppButtonClicked(addAppButton) {
+		const entryBox = addAppButton.get_parent();
+		const idx = _getChildIndex(entryBox.get_parent(), entryBox);
+		const appId = this.appIds[idx];
+		// reset attached app
+		if (appId) {
+			this.appIds[idx] = "";
+			shellVersion < 40 ? addAppButton.set_image(new Gtk.Image({icon_name: "list-add-symbolic"}))
+					: addAppButton.set_icon_name("list-add-symbolic");
+
+		// attach app
+		} else {
+			const chooserDialog = new Gtk.AppChooserDialog({modal: true});
+			chooserDialog.get_widget().set({
+				show_all: true,
+				show_other: true
+			});
+			chooserDialog.connect("response", (dlg, id) => {
+				if (id === Gtk.ResponseType.OK) {
+					const appInfo = chooserDialog.get_widget().get_app_info();
+					shellVersion < 40 ? addAppButton.set_image(new Gtk.Image({gicon: appInfo.get_icon()}))
+							: addAppButton.set_icon_name(appInfo.get_icon().to_string());
+					this.appIds[idx] = appInfo.get_id();
+				}
+				chooserDialog.destroy();
+			});
+			chooserDialog.show();
+		}
 	}
 
 	_drawPreview(layout, drawingArea, cr) {
@@ -544,13 +580,7 @@ const PieMenuRow = GObject.registerClass(class PieMenuRow extends Gtk.ListBoxRow
 		options.forEach((option, idx) => this._comboBox.append(idx.toString(), option));
 		_addChildTo(mainBox, this._comboBox);
 
-		const deleteButton = new Gtk.Button();
-		if (shellVersion < 40) {
-			deleteButton.set_always_show_image(true);
-			deleteButton.set_image(new Gtk.Image({icon_name: "edit-delete-symbolic"}));
-		} else {
-			deleteButton.set_icon_name("edit-delete-symbolic");
-		}
+		const deleteButton = _makeButton(new Gtk.Image({icon_name: "edit-delete-symbolic"}), "edit-delete-symbolic");
 		_addChildTo(mainBox, deleteButton);
 		deleteButton.connect("clicked", () => this.destroy());
 
@@ -580,6 +610,17 @@ function _setEntryText(entry, text) {
 	shellVersion < 40 ? entry.set_text(text) : entry.get_buffer().set_text(text, -1);
 }
 
+function _makeButton(GtkImage, iconName) {
+	const button = new Gtk.Button();
+	if (shellVersion < 40) {
+		button.set_always_show_image(true);
+		button.set_image(GtkImage);
+	} else {
+		button.set_icon_name(iconName);
+	}
+	return button;
+}
+
 function _getChildCount(container) {
 	if (shellVersion < 40)
 		return container.get_children().length;
@@ -588,6 +629,19 @@ function _getChildCount(container) {
 	for (let child = container.get_first_child(); !!child; child = child.get_next_sibling())
 		childCount++;
 	return childCount;
+}
+
+function _getChildIndex(container, child) {
+	if (shellVersion < 40) {
+		return container.get_children().indexOf(child);
+
+	} else {
+		for (let i = 0, c = container.get_first_child(); !!c; c = c.get_next_sibling(), i++) {
+			if (c === child)
+				return i;
+		}
+		return -1;
+	}
 }
 
 function _forEachChild(that, container, callback) {

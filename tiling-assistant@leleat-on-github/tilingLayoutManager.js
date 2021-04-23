@@ -1,7 +1,7 @@
 "use strict";
 
 const {main} = imports.ui;
-const {Clutter, Gio, GLib, GObject, Meta, St} = imports.gi;
+const {Clutter, Gio, GLib, GObject, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -21,18 +21,13 @@ var LayoutManager = class TilingLayoutManager {
 	}
 
 	// start a layout via keybinding from extension.js.
-	// a layout is an object with a name and an array of rectangles.
+	// a layout is an object with a name, an array of rectangles, and an array of appIds.
 	// the rectangle's properties *should* range from 0 to 1 (relative scale to monitor).
 	// but may not... prefs.js only ensures that the layout has the proper format but not
 	// wether the numbers are in the correct range of if the rects overlap each other
 	// (this is so the user can still fix mistakes without having to start from scratch)
 	startTilingToLayout(layoutIndex) {
 		const openWindows = Util.getOpenWindows();
-		if (!openWindows.length) {
-			this._finishTilingToLayout();
-			return;
-		}
-
 		const layouts = this._getLayouts();
 		const layout = layouts[layoutIndex];
 		if (!this._layoutIsValid(layout)) {
@@ -42,6 +37,7 @@ var LayoutManager = class TilingLayoutManager {
 		}
 
 		this.currentLayoutRects = layout.rects;
+		this.currentLayoutAppIds = layout.apps;
 		this.cachedOpenWindows = openWindows;
 
 		this._tileNextRect();
@@ -97,25 +93,85 @@ var LayoutManager = class TilingLayoutManager {
 	}
 
 	_tileNextRect() {
+		if (!this.currentLayoutRects.length) {
+			this._finishTilingToLayout();
+			return;
+		}
+
 		const rect = this.currentLayoutRects.shift();
-		const workArea = this.cachedOpenWindows[0].get_work_area_current_monitor();
+		const appId = this.currentLayoutAppIds && this.currentLayoutAppIds.shift();
+		const activeWs = global.workspace_manager.get_active_workspace();
+		const workArea = activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
+		const winTracker = Shell.WindowTracker.get_default();
 		const tileRect = new Meta.Rectangle({
 			x: workArea.x + Math.floor(rect.x * workArea.width),
 			y: workArea.y + Math.floor(rect.y * workArea.height),
 			width: Math.floor(rect.width * workArea.width),
-			height: Math.floor(rect.height * workArea.height),
+			height: Math.floor(rect.height * workArea.height)
 		});
 
-		this._createTilingPreview(tileRect);
+		// automatically open an app in the rectangle spot
+		if (appId) {
+			const app = Shell.AppSystem.get_default().lookup_app(appId);
+			if (!app)
+				return;
 
-		const tilingPopup = new TilingPopup.TilingSwitcherPopup(this.cachedOpenWindows, tileRect, !this.currentLayoutRects.length);
-		const tileGroupByStacking = global.display.sort_windows_by_stacking(this.tiledViaLayout).reverse();
-		if (!tilingPopup.show(tileGroupByStacking)) {
-			tilingPopup.destroy();
-			this._finishTilingToLayout();
+			if (app.can_open_new_window()) {
+				let sId = global.display.connect("window-created", (display, window) => {
+					const firstFrameId = window.get_compositor_private().connect("first-frame", () => {
+						window.get_compositor_private().disconnect(firstFrameId);
+						const disconnectWindowCreateSignal = () => {
+							global.display.disconnect(sId);
+							sId = 0;
+						};
+
+						const openedWindowApp = winTracker.get_window_app(window);
+						// check, if the created window is from the app and if it allows to be moved and resized
+						// because (for example) Steam uses a WindowType.Normal window for their loading screen,
+						// which we don't want to trigger the tiling for
+						if (openedWindowApp && openedWindowApp.get_id() === appId && ((window.allows_resize() && window.allows_move()) || window.get_maximized())) {
+							if (!sId)
+								return;
+							disconnectWindowCreateSignal();
+							Util.tileWindow(window, tileRect, false, true);
+						}
+
+						// don't immediately disconnect the signal in case the launched window doesn't match the original app
+						// since it may be a loading screen or the user started an app inbetween etc... (see above)
+						// but in case the check above fails disconnect signal after 1 min at the latest
+						GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
+							sId && disconnectWindowCreateSignal();
+							return GLib.SOURCE_REMOVE;
+						});
+					});
+				});
+				app.open_new_window(-1);
+
+			} else {
+				const window = this.cachedOpenWindows.find(w => app === winTracker.get_window_app(w));
+				window && Util.tileWindow(window, tileRect, false, true);
+			}
+
+			this._tileNextRect();
+
+		// tiling popup to ask what window to tile to the rectangle spot
+		} else {
+			if (!this.cachedOpenWindows.length) {
+				this._tileNextRect();
+				return;
+			}
+
+			this._createTilingPreview(tileRect);
+
+			const tilingPopup = new TilingPopup.TilingSwitcherPopup(this.cachedOpenWindows, tileRect, !this.currentLayoutRects.length);
+			const tileGroupByStacking = global.display.sort_windows_by_stacking(this.tiledViaLayout).reverse();
+			if (!tilingPopup.show(tileGroupByStacking)) {
+				tilingPopup.destroy();
+				this._finishTilingToLayout();
+			}
+
+			tilingPopup.connect("tiling-finished", this._onTiledWithTilingPopup.bind(this));
 		}
-
-		tilingPopup.connect("tiling-finished", this._onTilingFinished.bind(this));
 	}
 
 	_createTilingPreview(rect) {
@@ -134,7 +190,7 @@ var LayoutManager = class TilingLayoutManager {
 		});
 	}
 
-	_onTilingFinished(tilingPopup, tilingCanceled) {
+	_onTiledWithTilingPopup(tilingPopup, tilingCanceled) {
 		if (tilingCanceled) {
 			this._finishTilingToLayout();
 			return;
@@ -143,7 +199,7 @@ var LayoutManager = class TilingLayoutManager {
 		const {tiledWindow} = tilingPopup;
 		this.tiledViaLayout.push(tiledWindow);
 		this.cachedOpenWindows.splice(this.cachedOpenWindows.indexOf(tiledWindow), 1);
-		this.currentLayoutRects.length && this.cachedOpenWindows.length ? this._tileNextRect() : this._finishTilingToLayout();
+		this._tileNextRect();
 	}
 
 	openLayoutSelector() {
@@ -273,15 +329,13 @@ const LayoutSelector = GObject.registerClass({
 	}
 )
 
-const SelectorMenuItem = GObject.registerClass(
-	class SelectorMenuItem extends St.Label {
-		_init(text, fontSize) {
-			super._init({
-				text: text || "No name...",
-				style: `font-size: ${fontSize}px;\
-						text-align: left;\
-						padding: 8px`,
-			});
-		}
+const SelectorMenuItem = GObject.registerClass(class SelectorMenuItem extends St.Label {
+	_init(text, fontSize) {
+		super._init({
+			text: text || "No name...",
+			style: `font-size: ${fontSize}px;\
+					text-align: left;\
+					padding: 8px`,
+		});
 	}
-)
+})

@@ -399,7 +399,7 @@ function toggleTileState(window, tileRect) {
 			? restoreWindowSize(window) : tileWindow(window, tileRect);
 };
 
-function tileWindow(window, newRect, openTilingPopup = true) {
+function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 	if (!window || window.is_skip_taskbar())
 		return;
 
@@ -444,7 +444,7 @@ function tileWindow(window, newRect, openTilingPopup = true) {
 	const height = newRect.height - (2 * gap - (workArea.y === newRect.y ? 0 : gap / 2) - (workArea.y + workArea.height === newRect.y + newRect.height ? 0 : gap / 2));
 
 	// animations
-	if (MainExtension.settings.get_boolean("enable-tile-animations")) {
+	if (MainExtension.settings.get_boolean("enable-tile-animations") && !skipAnim) {
 		const wActor = window.get_compositor_private();
 		const onlyMove = oldRect.width === width && oldRect.height === height;
 		if (onlyMove) { // custom anim because they dont exist
