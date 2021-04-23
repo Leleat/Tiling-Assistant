@@ -31,12 +31,9 @@ const ACTIONS = [
 var PieMenu = GObject.registerClass(
 	class PieMenu extends St.Widget {
 		_init() {
-			const display = global.display.get_monitor_geometry(global.display.get_current_monitor());
+			const {x, y, width, height} = global.display.get_monitor_geometry(global.display.get_current_monitor());
 			super._init({
-				x: display.x,
-				y: display.y,
-				width: display.width,
-				height: display.height,
+				x, y, width, height,
 				reactive: true,
 				opacity: 0
 			});
@@ -75,6 +72,8 @@ var PieMenu = GObject.registerClass(
 
 			// deadzone circle
 			this._deadZone = new St.Widget({
+				x: this._clickPos.x - this._deadZoneRadius,
+				y: this._clickPos.y - this._deadZoneRadius,
 				style_class: "resize-popup",
 				style: "border-radius: 999px;",
 				width: this._deadZoneRadius * 2,
@@ -83,7 +82,6 @@ var PieMenu = GObject.registerClass(
 				track_hover: true
 			});
 			this.add_child(this._deadZone);
-			this._deadZone.set_position(this._clickPos.x - this._deadZone.width / 2, this._clickPos.y - this._deadZone.height / 2);
 
 			// delay visual to prevent a flicker for fast activation
 			this.ease({
@@ -116,9 +114,9 @@ var PieMenu = GObject.registerClass(
 				return;
 
 			const {x, y} = motionEvent;
-			const relativex = x - this._clickPos.x;
-			const relativey = y - this._clickPos.y;
-			let angle = Math.atan2(relativey, relativex) * 180 / Math.PI;
+			const relativeX = x - this._clickPos.x;
+			const relativeY = y - this._clickPos.y;
+			let angle = Math.atan2(relativeY, relativeX) * 180 / Math.PI;
 			angle = (angle < 0 ? 360 : 0) + angle; // 0 - 360° clockwise from x-axis
 			const pieSize = 360 / this._items.length;
 			this._highlightedItem = this._items.find(item => {
