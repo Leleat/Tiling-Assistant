@@ -75,7 +75,7 @@ const MyPrefsWidget = new GObject.Class({
 				, "enable-pie-menu", "maximize-with-gap"];
 		const enums = ["restore-window-size-on"];
 		const colors = ["tile-editing-mode-color"];
-		
+
 		const getBindProperty = function(key) {
 			if (ints.includes(key))
 				return "value"; // Gtk.Spinbox.value
@@ -202,9 +202,10 @@ const MyPrefsWidget = new GObject.Class({
 		const layoutsListBox = this.builder.get_object("layouts-listbox");
 		_forEachChild(this, layoutsListBox, row => row.destroy());
 
-		const path = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
-		const file = Gio.File.new_for_path(path);
-		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+
+		// TODO delete next version
+		const file = this.__compatibilityLoading();
+
 
 		const [success, contents] = file.load_contents(null);
 		if (!success)
@@ -215,6 +216,25 @@ const MyPrefsWidget = new GObject.Class({
 
 		if (!layouts.length) // make sure there is at least 1 empty row
 			this._createLayoutRow(0);
+	},
+
+	__compatibilityLoading() {
+		const newPath = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
+		const newFile = Gio.File.new_for_path(newPath);
+		let file;
+		if (newFile.query_exists(null)) {
+			const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
+			try {parentDir.make_directory_with_parents(null)} catch (e) {}
+			const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
+			file = Gio.File.new_for_path(path);
+			try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+		} else {
+			const oldPath = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
+			file = Gio.File.new_for_path(oldPath);
+			try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+		}
+
+		return file;
 	},
 
 	_saveLayouts: function() {
@@ -257,7 +277,9 @@ const MyPrefsWidget = new GObject.Class({
 			layoutRects.length && allLayouts.push(layout);
 		});
 
-		const path = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
+		const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
+		try {parentDir.make_directory_with_parents(null)} catch (e) {}
+		const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
 		const file = Gio.File.new_for_path(path);
 		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
 
@@ -384,7 +406,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 			orientation: Gtk.Orientation.VERTICAL,
 			spacing: 8,
 			margin_end: 8
-		})
+		});
 		_addChildTo(rectangleEntriesWindow, rectangleLeftBox);
 
 		this.entriesContainer = new Gtk.Box({
@@ -461,8 +483,10 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		_addChildTo(entryBox, entryLabel);
 
 		const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
-The right column shows a preview of your layouts (after saving). Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
-The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner. You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout."
+The right column shows a preview of your layouts (after saving). The layouts file is saved in $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n\
+Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner.\n\n\
+You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout. This is experimental and may not work reliably (especially on Wayland)."
 		const rectEntry = new Gtk.Entry({
 			tooltip_text: tooltip,
 			hexpand: true

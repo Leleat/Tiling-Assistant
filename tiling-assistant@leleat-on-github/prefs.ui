@@ -2389,7 +2389,8 @@ The layout selector enables you to search for layouts by name. That means you do
 - pie menu when Super + RMBing a window
 
 - setting: gaps on maximized windows  - off by default
-- setting: 'restore window size on grab end' - workaround for Wayland</property>
+- setting: 'restore window size on grab end' - workaround for Wayland
+- layouts: move layouts file from the extension folder to $XDG_CONFIG_HOME/tiling-assistant/layouts.json (#68)</property>
                             <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
