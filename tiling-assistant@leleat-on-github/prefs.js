@@ -1,6 +1,7 @@
 "use strict";
 
 const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
+const ByteArray = imports.byteArray;
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
@@ -211,7 +212,7 @@ const MyPrefsWidget = new GObject.Class({
 		if (!success)
 			return;
 
-		const layouts = contents.length ? JSON.parse(contents) : [];
+		const layouts = contents.length ? JSON.parse(ByteArray.toString(contents)) : [];
 		layouts.length && layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
 
 		if (!layouts.length) // make sure there is at least 1 empty row
@@ -219,21 +220,14 @@ const MyPrefsWidget = new GObject.Class({
 	},
 
 	__compatibilityLoading() {
+		const newParentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
+		try {newParentDir.make_directory_with_parents(null)} catch (e) {}
 		const newPath = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
 		const newFile = Gio.File.new_for_path(newPath);
-		let file;
-		if (newFile.query_exists(null)) {
-			const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
-			try {parentDir.make_directory_with_parents(null)} catch (e) {}
-			const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
-			file = Gio.File.new_for_path(path);
-			try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-		} else {
-			const oldPath = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
-			file = Gio.File.new_for_path(oldPath);
-			try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-		}
-
+		const legacyPath = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
+		const legacyFile = Gio.File.new_for_path(legacyPath);
+		const file = !newFile.query_exists(null) && legacyFile.query_exists(null) ? legacyFile : newFile;
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
 		return file;
 	},
 

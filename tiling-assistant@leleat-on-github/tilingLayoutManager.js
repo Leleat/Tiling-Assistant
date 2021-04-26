@@ -2,6 +2,7 @@
 
 const {main} = imports.ui;
 const {Clutter, Gio, GLib, GObject, Meta, Shell, St} = imports.gi;
+const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -52,13 +53,18 @@ var LayoutManager = class TilingLayoutManager {
 	}
 
 	_getLayouts() {
-		const path = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
-		const layoutFile = Gio.File.new_for_path(path);
+		const newPath = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
+		const newFile = Gio.File.new_for_path(newPath);
+		const legacyPath = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
+		const legacyFile = Gio.File.new_for_path(legacyPath);
+		if (!newFile.query_exists(null) && !legacyFile.query_exists(null))
+			return null;
 
-		try {layoutFile.create(Gio.FileCreateFlags.NONE, null)} catch (entry) {}
-		const [success, contents] = layoutFile.load_contents(null);
+		const file = !newFile.query_exists(null) && legacyFile.query_exists(null) ? legacyFile : newFile;
+		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+		const [success, contents] = file.load_contents(null);
 		if (success && contents.length) {
-			const allLayouts = JSON.parse(contents);
+			const allLayouts = JSON.parse(ByteArray.toString(contents));
 			if (allLayouts.length)
 				return allLayouts;
 		}

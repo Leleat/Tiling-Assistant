@@ -2389,7 +2389,6 @@ The layout selector enables you to search for layouts by name. That means you do
                             <property name="label" translatable="yes">- experimental: app attachments to layouts
 
 - layouts: move layouts file from the extension folder to $XDG_CONFIG_HOME/tiling-assistant/layouts.json (#68)</property>
-                            <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
                           </object>
@@ -2439,7 +2438,6 @@ The layout selector enables you to search for layouts by name. That means you do
 
 - setting: gaps on maximized windows  - off by default
 - setting: 'restore window size on grab end' - workaround for Wayland</property>
-                            <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
                           </object>
@@ -2499,7 +2497,6 @@ The layout selector enables you to search for layouts by name. That means you do
 - other minor settings additions/removals/changes
 
 - refactor and minor bugfixes</property>
-                            <property name="use-markup">True</property>
                             <property name="wrap">True</property>
                             <property name="wrap-mode">word-char</property>
                           </object>
