@@ -53,14 +53,11 @@ var LayoutManager = class TilingLayoutManager {
 	}
 
 	_getLayouts() {
-		const newPath = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
-		const newFile = Gio.File.new_for_path(newPath);
-		const legacyPath = GLib.build_filenamev([Me.dir.get_path(), ".layouts.json"]);
-		const legacyFile = Gio.File.new_for_path(legacyPath);
-		if (!newFile.query_exists(null) && !legacyFile.query_exists(null))
+		const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/layouts.json"]);
+		const file = Gio.File.new_for_path(path);
+		if (!file.query_exists(null))
 			return null;
 
-		const file = !newFile.query_exists(null) && legacyFile.query_exists(null) ? legacyFile : newFile;
 		try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
 		const [success, contents] = file.load_contents(null);
 		if (success && contents.length) {
