@@ -415,7 +415,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 					!isCtrlPressed ? this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y, otherRect.y)
 							, Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height), false, false)
 							: this._setupResizeDir(otherWindow, false, Util.equalApprox(grabbedRect.y, otherRect.y + otherRect.height)
-									&& Util.equalApprox(grabbedRect.x, otherRect.x) && Util.equalApprox(grabbedRect.width, otherRect.width), false, false);
+									&& otherRect.x >= grabbedRect.x && otherRect.x + otherRect.width <= grabbedRect.x + grabbedRect.width, false, false);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, grabOp, null));
@@ -427,7 +427,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 					!isCtrlPressed ? this._setupResizeDir(otherWindow, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y + otherRect.height)
 							, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y), false, false)
 							: this._setupResizeDir(otherWindow, false, Util.equalApprox(grabbedRect.y + grabbedRect.height, otherRect.y)
-									&& Util.equalApprox(grabbedRect.x, otherRect.x) && Util.equalApprox(grabbedRect.width, otherRect.width), false, false);
+									&& otherRect.x >= grabbedRect.x && otherRect.x + otherRect.width <= grabbedRect.x + grabbedRect.width, false, false);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, grabOp, null));
@@ -439,7 +439,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x + otherRect.width)
 							, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x))
 							: this._setupResizeDir(otherWindow, false, false, false, Util.equalApprox(grabbedRect.x + grabbedRect.width, otherRect.x)
-									&& Util.equalApprox(grabbedRect.y, otherRect.y) && Util.equalApprox(grabbedRect.height, otherRect.height));
+									&& otherRect.y >= grabbedRect.y && otherRect.y + otherRect.height <= grabbedRect.y + grabbedRect.height);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, null, grabOp));
@@ -451,7 +451,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 					!isCtrlPressed ? this._setupResizeDir(otherWindow, false, false, Util.equalApprox(grabbedRect.x, otherRect.x)
 							, Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width))
 							: this._setupResizeDir(otherWindow, false, false, false, Util.equalApprox(grabbedRect.x, otherRect.x + otherRect.width)
-									&& Util.equalApprox(grabbedRect.y, otherRect.y) && Util.equalApprox(grabbedRect.height, otherRect.height));
+									&& otherRect.y >= grabbedRect.y && otherRect.y + otherRect.height <= grabbedRect.y + grabbedRect.height);
 				}
 
 				window.grabSignalID = window.connect("size-changed", this.onResizing.bind(this, window, topTileGroup, null, grabOp));
