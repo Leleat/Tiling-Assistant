@@ -6,6 +6,7 @@ const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 const TilingPopup = Me.imports.tilingPopup;
 
@@ -28,7 +29,7 @@ var LayoutManager = class TilingLayoutManager {
 	// wether the numbers are in the correct range of if the rects overlap each other
 	// (this is so the user can still fix mistakes without having to start from scratch)
 	startTilingToLayout(layoutIndex) {
-		const openWindows = Util.getOpenWindows();
+		const openWindows = Util.getOpenWindows(MainExtension.settings.get_boolean("tiling-popup-current-workspace-only"));
 		const layouts = this._getLayouts();
 		const layout = layouts[layoutIndex];
 		if (!this._layoutIsValid(layout)) {
@@ -116,40 +117,12 @@ var LayoutManager = class TilingLayoutManager {
 		// automatically open an app in the rectangle spot
 		if (appId) {
 			const app = Shell.AppSystem.get_default().lookup_app(appId);
-			if (!app)
+			if (!app) {
+				main.notify("Tiling Assistant", "Layouts: App not found.");
+				this._finishTilingToLayout();
 				return;
-
-			if (app.can_open_new_window()) {
-				let sId = global.display.connect("window-created", (display, window) => {
-					const firstFrameId = window.get_compositor_private().connect("first-frame", () => {
-						window.get_compositor_private().disconnect(firstFrameId);
-						const disconnectWindowCreateSignal = () => {
-							global.display.disconnect(sId);
-							sId = 0;
-						};
-
-						const openedWindowApp = winTracker.get_window_app(window);
-						// check, if the created window is from the app and if it allows to be moved and resized
-						// because (for example) Steam uses a WindowType.Normal window for their loading screen,
-						// which we don't want to trigger the tiling for
-						if (openedWindowApp && openedWindowApp.get_id() === appId && ((window.allows_resize() && window.allows_move()) || window.get_maximized())) {
-							if (!sId)
-								return;
-							disconnectWindowCreateSignal();
-							Util.tileWindow(window, tileRect, false, true);
-						}
-
-						// don't immediately disconnect the signal in case the launched window doesn't match the original app
-						// since it may be a loading screen or the user started an app inbetween etc... (see above)
-						// but in case the check above fails disconnect signal after 1 min at the latest
-						GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
-							sId && disconnectWindowCreateSignal();
-							return GLib.SOURCE_REMOVE;
-						});
-					});
-				});
-				app.open_new_window(-1);
-
+			} else if (app.can_open_new_window()) {
+				Util.openAppTiled(app, tileRect);
 			} else {
 				const window = this.cachedOpenWindows.find(w => app === winTracker.get_window_app(w));
 				window && Util.tileWindow(window, tileRect, false, true);

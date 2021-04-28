@@ -296,6 +296,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 
 			this.tiledWindow = window;
 
+			window.change_workspace(global.workspace_manager.get_active_workspace());
 			window.move_to_monitor(global.display.get_current_monitor());
 			Util.tileWindow(window, this.freeScreenRect, this.allowConsecutivePopup);
 			window.activate(global.get_current_time());

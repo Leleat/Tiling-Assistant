@@ -1,7 +1,7 @@
 "use strict";
 
-const {main} = imports.ui;
-const {Clutter, Meta, Shell, St} = imports.gi;
+const {altTab, main} = imports.ui;
+const {Clutter, GLib, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -100,11 +100,10 @@ function windowIsMaximized(window) {
 	return window.get_maximized() === Meta.MaximizeFlags.BOTH || (window.tiledRect && window.tiledRect.equal(workArea));
 }
 
-function getOpenWindows() {
-	const openWindows = global.workspace_manager.get_active_workspace().list_windows();
+function getOpenWindows(currentWorkspace = true) {
+	const openWindows = altTab.getWindows(currentWorkspace ? global.workspace_manager.get_active_workspace() : null);
 	const orderedOpenWindows = global.display.sort_windows_by_stacking(openWindows).reverse();
-	return orderedOpenWindows.filter(w => w.get_window_type() === Meta.WindowType.NORMAL
-			&& !w.is_skip_taskbar() && ((w.allows_move() && w.allows_resize()) || windowIsMaximized(w)));
+	return orderedOpenWindows.filter(w => (w.allows_move() && w.allows_resize()) || windowIsMaximized(w));
 };
 
 // get the top most tiled windows in a group i. e. they complement each other and dont intersect.
@@ -491,7 +490,7 @@ function tryOpeningTilingPopup() {
 	if (!MainExtension.settings.get_boolean("enable-tiling-popup"))
 		return;
 
-	const openWindows = getOpenWindows();
+	const openWindows = getOpenWindows(MainExtension.settings.get_boolean("tiling-popup-current-workspace-only"));
 	const topTileGroup = getTopTileGroup(false);
 	topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));
 	if (!openWindows.length)
@@ -597,6 +596,37 @@ function dissolveTileGroupFor(window) {
 	});
 
 	window.tileGroup = null;
+};
+
+function openAppTiled(app, rect, tryOpeningPopup = false) {
+	let sId = global.display.connect("window-created", (display, window) => {
+		const disconnectWindowCreateSignal = () => {
+			global.display.disconnect(sId);
+			sId = 0;
+		};
+
+		const firstFrameId = window.get_compositor_private().connect("first-frame", () => {
+			window.get_compositor_private().disconnect(firstFrameId);
+			const openedWindowApp = Shell.WindowTracker.get_default().get_window_app(window);
+			// check, if the created window is from the app and if it allows to be moved and resized
+			// because (for example) Steam uses a WindowType.Normal window for their loading screen,
+			// which we don't want to trigger the tiling for
+			if (sId && openedWindowApp && openedWindowApp === app
+					&& ((window.allows_resize() && window.allows_move()) || window.get_maximized())) {
+				disconnectWindowCreateSignal();
+				tileWindow(window, rect, tryOpeningPopup, true);
+			}
+		});
+
+		// don't immediately disconnect the signal in case the launched window doesn't match the original app
+		// since it may be a loading screen or the user started an app inbetween etc... (see above)
+		// but in case the check above fails disconnect signal after 1 min at the latest
+		GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
+			sId && disconnectWindowCreateSignal();
+			return GLib.SOURCE_REMOVE;
+		});
+	});
+	app.open_new_window(-1);
 };
 
 function ___debugShowTiledRects() {

@@ -191,7 +191,8 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
 			// open Tiling Popup, when activating an empty spot
 			} else {
-				const openWindows = Util.getOpenWindows().filter(w => !this._topTileGroup.includes(w));
+				const openWindows = Util.getOpenWindows(MainExtension.settings.get_boolean("tiling-popup-current-workspace-only"))
+						.filter(w => !this._topTileGroup.includes(w));
 				const rect = this._primaryIndicator.rect;
 				const tilingPopup = new TilingPopup.TilingSwitcherPopup(openWindows, rect, false);
 				if (!tilingPopup.show(this._topTileGroup)) {

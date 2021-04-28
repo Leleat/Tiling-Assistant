@@ -19,7 +19,7 @@
 "use strict";
 
 const {main, panel, windowManager, windowMenu} = imports.ui;
-const {Clutter, GLib, Meta, Shell, St} = imports.gi;
+const {Clutter, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -28,6 +28,7 @@ const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 const PieMenu = Me.imports.tilingPieMenu;
 const TileEditing = Me.imports.tilingEditingMode;
+const TiledWindowOpener = Me.imports.tilingWindowOpener;
 
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
@@ -45,6 +46,7 @@ var TILING = { // keybindings
 	TOP_RIGHT: "tile-topright-quarter",
 	BOTTOM_LEFT: "tile-bottomleft-quarter",
 	BOTTOM_RIGHT: "tile-bottomright-quarter",
+	TOGGLE_APP_SPLIT: "toggle-open-app-vertically"
 };
 
 var settings = null;
@@ -75,9 +77,10 @@ function enable() {
 	// keybindings
 	this.keyBindings = Object.values(TILING);
 	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
+	const bindingInOverview = [TILING.TOGGLE_POPUP, TILING.TOGGLE_APP_SPLIT];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
-				, onCustomKeybindingPressed.bind(this, key));
+				| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), onCustomKeybindingPressed.bind(this, key));
 	});
 
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
@@ -98,12 +101,16 @@ function enable() {
 		});
 	};
 
+	// pie menu when super + rmb'ing a window
 	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
 	const that = this;
 	main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
 		Util.isModPressed(Clutter.ModifierType.MOD4_MASK) && that.settings.get_boolean("enable-pie-menu")
 				? new PieMenu.PieMenu() : windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
 	};
+
+	// open apps tiled by holding Shift/Alt
+	this.tilingWindowOpener = new TiledWindowOpener.Handler();
 };
 
 function disable() {
@@ -115,6 +122,8 @@ function disable() {
 	this.tilingLayoutManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
+	this.tilingWindowOpener.destroy();
+	this.tilingWindowOpener = null;
 
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
@@ -160,7 +169,7 @@ function onCustomKeybindingPressed(shortcutName) {
 			this.debuggingIndicators.forEach(i => i.destroy());
 			this.debuggingIndicators = null;
 		} else {
-			const func = shortcutName === TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects; 
+			const func = shortcutName === TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects;
 			this.debuggingIndicators = func.call(this);
 		}
 		return;
@@ -180,6 +189,11 @@ function onCustomKeybindingPressed(shortcutName) {
 	// open the appDash consecutively to tile to a layout
 	} else if (shortcutName.startsWith("activate-layout")) {
 		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
+		return;
+
+	// toggle app split
+	} else if (shortcutName === TILING.TOGGLE_APP_SPLIT) {
+		this.tilingWindowOpener.toggleSplitMode();
 		return;
 	}
 

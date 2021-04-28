@@ -8,6 +8,15 @@
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
 		</key>
+		<key name="tiling-popup-current-workspace-only" type="b">
+			<default>true</default>
+		</key>
+		<key name="open-app-vertically" type="b">
+			<default>true</default>
+		</key>
+		<key name="toggle-open-app-vertically" type="as">
+			<default>[]</default>
+		</key>
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>
