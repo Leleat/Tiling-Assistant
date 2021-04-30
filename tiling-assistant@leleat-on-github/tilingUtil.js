@@ -548,25 +548,31 @@ function restoreWindowSize(window, restoreFullPos = true, grabXCoord = undefined
 };
 
 // raise tiled windows in a group:
-// each window saves its own tileGroup and raises the other windows, if it's focused.
+// each window saves its own tileGroup and raises the other windows, if it's raised.
 // this allows one window to be part of multiple groups
 function updateTileGroup(tileGroup) {
 	tileGroup.forEach(window => {
 		window.tileGroup = tileGroup;
-		window.groupFocusID && window.disconnect(window.groupFocusID);
-		window.groupFocusID = window.connect("focus", (focusedWindow) => {
-			focusedWindow.tileGroup.forEach(otherWindowInGroup => {
-				// update otherWindowInGroup's tileGroup with the current window.tileGroup
-				// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
-				// but the overlapped window will remember its old tile group to raise them as well, if it is focused
-				otherWindowInGroup.tileGroup = focusedWindow.tileGroup;
-				if (!MainExtension.settings.get_boolean("enable-raise-tile-group"))
-					return;
+		window.groupRaiseId && window.disconnect(window.groupRaiseId);
+		window.groupRaiseId = window.connect("raised", raisedWindow => {
+			if (MainExtension.settings.get_boolean("enable-raise-tile-group"))
+				raisedWindow.tileGroup.forEach(w => {
+					if (w === raisedWindow)
+						return;
 
-				otherWindowInGroup.raise();
-			});
+					// disconnect the raise signal first, so we don't end up
+					// in an infinite loop of windows raising each other
+					if (w.groupRaiseId) {
+						w.disconnect(w.groupRaiseId);
+						w.groupRaiseId = 0;
+					}
+					w.raise();
+				});
 
-			focusedWindow.raise();
+			// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple tileGroups:
+			// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
+			// but the overlapped window will remember its old tile group to raise them as well, if it is raised
+			updateTileGroup(raisedWindow.tileGroup);
 		});
 
 		window.unmanagingDissolvedId && window.disconnect(window.unmanagingDissolvedId);
@@ -577,9 +583,9 @@ function updateTileGroup(tileGroup) {
 // delete the tileGroup of @window for group-raising and
 // remove the @window from the tileGroup of other tiled windows
 function dissolveTileGroupFor(window) {
-	if (window.groupFocusID) {
-		window.disconnect(window.groupFocusID);
-		window.groupFocusID = 0;
+	if (window.groupRaiseId) {
+		window.disconnect(window.groupRaiseId);
+		window.groupRaiseId = 0;
 	}
 
 	if (window.unmanagingDissolvedId) {
