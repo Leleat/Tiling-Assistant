@@ -555,17 +555,21 @@ function updateTileGroup(tileGroup) {
 		window.tileGroup = tileGroup;
 		window.groupRaiseId && window.disconnect(window.groupRaiseId);
 		window.groupRaiseId = window.connect("raised", raisedWindow => {
-			if (MainExtension.settings.get_boolean("enable-raise-tile-group"))
+			if (MainExtension.settings.get_boolean("enable-raise-tile-group")) {
 				raisedWindow.tileGroup.forEach(w => {
-					if (w === raisedWindow)
-						return;
-
 					// disconnect the raise signal first, so we don't end up
 					// in an infinite loop of windows raising each other
-					w.disconnect(w.groupRaiseId);
-					w.groupRaiseId = 0;
+					if (w.groupRaiseId) {
+						w.disconnect(w.groupRaiseId);
+						w.groupRaiseId = 0;
+					}
 					w.raise();
 				});
+
+				// re-raise the just raised window so it may not be below other tiled window
+				// otherwise when untiling via keyboard it may be below other tiled windows
+				raisedWindow.raise();
+			}
 
 			// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple tileGroups:
 			// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
