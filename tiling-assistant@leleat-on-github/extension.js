@@ -110,7 +110,7 @@ function enable() {
 	};
 
 	// open apps tiled by holding Shift/Alt
-	// this.tilingWindowOpener = new TiledWindowOpener.Handler();
+	this.tilingWindowOpener = new TiledWindowOpener.Handler();
 };
 
 function disable() {
@@ -122,8 +122,8 @@ function disable() {
 	this.tilingLayoutManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
-	// this.tilingWindowOpener.destroy();
-	// this.tilingWindowOpener = null;
+	this.tilingWindowOpener.destroy();
+	this.tilingWindowOpener = null;
 
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
@@ -193,7 +193,7 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// toggle app split
 	} else if (shortcutName === TILING.TOGGLE_APP_SPLIT) {
-	// 	this.tilingWindowOpener.toggleSplitMode();
+		this.tilingWindowOpener.toggleSplitMode();
 		return;
 	}
 

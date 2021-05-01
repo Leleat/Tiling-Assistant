@@ -13,6 +13,11 @@ const Util = Me.imports.tilingUtil;
 var Handler = class TilingWindowOpener {
 	constructor() {
 		this._toggleButton = main.panel.addToStatusArea("open-tiled-direction-toggle", new DirectionToggleButton(), 1);
+		this._toggleButton.visible = MainExtension.settings.get_boolean("show-icon-open-app-vertically");
+
+		this.settingsSignalId = MainExtension.settings.connect("changed::show-icon-open-app-vertically", () => {
+			this._toggleButton.visible = !this._toggleButton.visible
+		});
 
 		// open apps in a tiled state by holding Shift/Alt when activating an AppIcon
 		this.oldAppActivateFunc = appDisplay.AppIcon.prototype.activate;
@@ -32,8 +37,8 @@ var Handler = class TilingWindowOpener {
 			if (openNewWindow) {
 				this.app.open_new_window(-1);
 
-			// relevant code:
-			} else if ((isShiftPressed || isAltPressed)) {
+			// main new code:
+			} else if (isShiftPressed || isAltPressed) {
 				if (!this.app.can_open_new_window())
 					return;
 
@@ -72,6 +77,7 @@ var Handler = class TilingWindowOpener {
 	}
 
 	destroy() {
+		MainExtension.settings.disconnect(this.settingsSignalId);
 		this._toggleButton.destroy();
 		appDisplay.AppIcon.prototype.activate = this.oldAppActivateFunc;
 	}

@@ -17,6 +17,9 @@
 		<key name="toggle-open-app-vertically" type="as">
 			<default>[]</default>
 		</key>
+		<key name="show-icon-open-app-vertically" type="b">
+			<default>false</default>
+		</key>
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>

@@ -562,10 +562,8 @@ function updateTileGroup(tileGroup) {
 
 					// disconnect the raise signal first, so we don't end up
 					// in an infinite loop of windows raising each other
-					if (w.groupRaiseId) {
-						w.disconnect(w.groupRaiseId);
-						w.groupRaiseId = 0;
-					}
+					w.disconnect(w.groupRaiseId);
+					w.groupRaiseId = 0;
 					w.raise();
 				});
 
@@ -605,6 +603,9 @@ function dissolveTileGroupFor(window) {
 };
 
 function openAppTiled(app, rect, tryOpeningPopup = false) {
+	if (!app.can_open_new_window())
+		return;
+
 	let sId = global.display.connect("window-created", (display, window) => {
 		const disconnectWindowCreateSignal = () => {
 			global.display.disconnect(sId);
