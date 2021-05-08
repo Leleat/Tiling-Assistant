@@ -30,6 +30,10 @@ const PieMenu = Me.imports.tilingPieMenu;
 const TileEditing = Me.imports.tilingEditingMode;
 const TiledWindowOpener = Me.imports.tilingWindowOpener;
 
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
+
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
 	DEBUGGING_FREE_RECTS: "debugging-free-rects",
@@ -56,6 +60,7 @@ var settings = null;
 // 2. tiled via Grab => onGrabStarted()
 
 function init() {
+	ExtensionUtils.initTranslations(Me.metadata.uuid);
 };
 
 function enable() {
@@ -178,7 +183,8 @@ function onCustomKeybindingPressed(shortcutName) {
 	} else if (shortcutName === TILING.TOGGLE_POPUP) {
 		const toggleTo = !settings.get_boolean("enable-tiling-popup");
 		settings.set_boolean("enable-tiling-popup", toggleTo);
-		main.notify("Tiling Assistant", "Tiling-assistant's popup " + (toggleTo ? "enabled" : "was disabled"));
+		const message = toggleTo ? _("Tiling-assistant's popup enabled") : _("Tiling-assistant's popup was disabled");
+		main.notify("Tiling Assistant", message);
 		return;
 
 	// layout overview
@@ -209,7 +215,7 @@ function onCustomKeybindingPressed(shortcutName) {
 	// tile editing mode
 	} else if (shortcutName === TILING.EDIT_MODE) {
 		if (!Util.getTopTileGroup(!window.isTiled).length) {
-			main.notify("Tiling Assistant", "Can't enter 'Tile Editing Mode', if the focused window isn't tiled.");
+			main.notify("Tiling Assistant", _("Can't enter 'Tile Editing Mode', if the focused window isn't tiled."));
 			return;
 		}
 

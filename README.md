@@ -32,6 +32,12 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download `tiling-assistant@leleat-on-github` and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`. After moving the folder to the correct location, restart the GNOME shell (`Alt`+`F2` -> enter `r`. On **Wayland** you need to logout).
 
+## Translations
+
+Translations (even just partial ones) are very welcome!
+If you are already familiar with how it works, feel free to directly open a pull request with a `YOUR_LANG.po` file at `tiling-assistant@leleat-on-github/po/`.
+Don't worry, in case you don't know how to create a `.po` file. Just open an issue and I'll set everything up. You'll only need a text editor and your language skills :)
+
 ## License
 
 This extension is distributed under the terms of the GNU General Public License, version 2 or later. See the license file for details.

@@ -2,8 +2,13 @@
 
 const {Gdk, Gio, GLib, Gtk, GObject} = imports.gi;
 const ByteArray = imports.byteArray;
-const Me = imports.misc.extensionUtils.getCurrentExtension();
+const ExtensionUtils = imports.misc.extensionUtils;
+const Me = ExtensionUtils.getCurrentExtension();
 const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
+
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
 
 const TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
@@ -25,6 +30,7 @@ const TILING = { // keybindings
 };
 
 function init() {
+	ExtensionUtils.initTranslations(Me.metadata.uuid);
 };
 
 function buildPrefsWidget() {
@@ -303,10 +309,10 @@ const MyPrefsWidget = new GObject.Class({
 
 	_createPieMenuRow: function(activeId) {
 		const options = [ // make sure this has the same order as tilingPieMenu.js
-				"Toggle 'Maximize'", "Minimize window", "Close window", "Move to previous workspace", "Move to next workspace"
-				, "Move to top monitor", "Move to bottom monitor", "Move to left monitor", "Move to right monitor"
-				, "Toggle fullscreen", "Toggle 'Always on top'", "Tile left", "Tile right", "Tile top", "Tile bottom"
-				, "Tile top-left", "Tile top-right", "Tile bottom-left", "Tile bottom-right"
+				_("Toggle 'Maximize'"), _("Minimize window"), _("Close window"), _("Move to previous workspace"), _("Move to next workspace")
+				, _("Move to top monitor"), _("Move to bottom monitor"), _("Move to left monitor"), _("Move to right monitor")
+				, _("Toggle fullscreen"), _("Toggle 'Always on top'"), _("Tile left"), _("Tile right"), _("Tile top"), _("Tile bottom")
+				, _("Tile top-left"), _("Tile top-right"), _("Tile bottom-left"), _("Tile bottom-right")
 		];
 		const row = new PieMenuRow(options);
 		activeId && row.setActiveId(activeId);
@@ -369,7 +375,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		this._nameEntry = new Gtk.Entry();
 		const layoutName = layout && layout.name;
 		layoutName && _setEntryText(this._nameEntry, layoutName);
-		!layoutName && this._nameEntry.set_placeholder_text("Layout name...");
+		!layoutName && this._nameEntry.set_placeholder_text(_("Layout name..."));
 		_addChildTo(topBox, this._nameEntry);
 
 		/* --- rectangles entries and preview row --- */
@@ -466,11 +472,11 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		const entryLabel = new Gtk.Label({label: `${entryCount}:`});
 		_addChildTo(entryBox, entryLabel);
 
-		const tooltip = "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
+		const tooltip = _("Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
 The right column shows a preview of your layouts (after saving). The layouts file is saved in $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n\
 Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
 The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner.\n\n\
-You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout. This is experimental and may not work reliably (especially on Wayland)."
+You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout. This is experimental and may not work reliably (especially on Wayland).");
 		const rectEntry = new Gtk.Entry({
 			tooltip_text: tooltip,
 			hexpand: true
@@ -547,7 +553,7 @@ You can attach an app to the rectangle row. If you do that, a new instance of th
 
 	_layoutIsValid(layout) {
 		if (!layout)
-			return [false, "No preview..."];
+			return [false, _("No layout preview...")];
 
 		// calculate the surface area of an overlap
 		const rectsOverlap = function(r1, r2) {
@@ -559,11 +565,11 @@ You can attach an app to the rectangle row. If you do that, a new instance of th
 			const rect = layout.rects[i];
 			// rects is/reaches outside of screen (i. e. > 1)
 			if (rect.x < 0 || rect.y < 0 || rect.width <= 0 || rect.height <= 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
-				return [false, `Rectangle ${i + 1} is (partly) outside of the screen.`];
+				return [false, _(`Rectangle ${i + 1} is (partly) outside of the screen.`)];
 
 			for (let j = i + 1; j < layout.rects.length; j++) {
 				if (rectsOverlap(rect, layout.rects[j]))
-					return [false, `Rectangles ${i + 1} and ${j + 1} overlap.`];
+					return [false, _(`Rectangles ${i + 1} and ${j + 1} overlap.`)];
 			}
 		}
 

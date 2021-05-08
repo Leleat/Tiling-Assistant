@@ -10,6 +10,10 @@ const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 const TilingPopup = Me.imports.tilingPopup;
 
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
+
 var LayoutManager = class TilingLayoutManager {
 	constructor() {
 		this.currentLayout = {};
@@ -34,7 +38,7 @@ var LayoutManager = class TilingLayoutManager {
 		const layout = layouts[layoutIndex];
 		if (!this._layoutIsValid(layout)) {
 			this._finishTilingToLayout();
-			main.notify("Tiling Assistant", `Layout ${layoutIndex + 1} is not valid.`);
+			main.notify("Tiling Assistant", _(`Layout ${layoutIndex + 1} is not valid.`));
 			return;
 		}
 
@@ -118,7 +122,7 @@ var LayoutManager = class TilingLayoutManager {
 		if (appId) {
 			const app = Shell.AppSystem.get_default().lookup_app(appId);
 			if (!app) {
-				main.notify("Tiling Assistant", "Layouts: App not found.");
+				main.notify("Tiling Assistant", _("Layouts: App not found."));
 				this._finishTilingToLayout();
 				return;
 			} else if (app.can_open_new_window()) {
@@ -181,7 +185,7 @@ var LayoutManager = class TilingLayoutManager {
 	openLayoutSelector() {
 		const layouts = this._getLayouts();
 		if (!layouts) {
-			main.notify("Tiling Assistant", "No valid layouts defined.");
+			main.notify("Tiling Assistant", _("No valid layouts defined."));
 			return;
 		}
 
@@ -212,7 +216,7 @@ const LayoutSelector = GObject.registerClass({
 
 			const entry = new St.Entry({
 				style: `font-size: ${fontSize}px`,
-				hint_text: " Type to search..."
+				hint_text: _(" Type to search...")
 			});
 			this.add_child(entry);
 			entry.grab_key_focus();
@@ -308,7 +312,7 @@ const LayoutSelector = GObject.registerClass({
 const SelectorMenuItem = GObject.registerClass(class SelectorMenuItem extends St.Label {
 	_init(text, fontSize) {
 		super._init({
-			text: text || "No name...",
+			text: text || _("No layout name..."),
 			style: `font-size: ${fontSize}px;\
 					text-align: left;\
 					padding: 8px`,

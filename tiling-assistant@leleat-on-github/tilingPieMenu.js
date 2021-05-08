@@ -6,26 +6,30 @@ const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
+
 const ACTIONS = [
-	{name: "Toggle 'Maximize'", func: _toggleMaximize},
-	{name: "Minimize window", func: _minimizeWindow},
-	{name: "Close window", func: _closeWindow},
-	{name: "Move to previous workspace", func: _moveToPrevWorkspace},
-	{name: "Move to next workspace", func: _moveToNextWorkspace},
-	{name: "Move to top monitor", func: _moveToTopMonitor},
-	{name: "Move to bottom monitor", func: _moveToBottomMonitor},
-	{name: "Move to left monitor", func: _moveToLeftMonitor},
-	{name: "Move to right monitor", func: _moveToRightMonitor},
-	{name: "Toggle fullscreen", func: _toggleFullscreen},
-	{name: "Toggle 'Always on top'", func: _toggleAlwaysOnTop},
-	{name: "Tile to left", func: _tileLeft},
-	{name: "Tile to right", func: _tileRight},
-	{name: "Tile to top", func: _tileTop},
-	{name: "Tile to bottom", func: _tileBottom},
-	{name: "Tile to top-left", func: _tileTopLeft},
-	{name: "Tile to top-right", func: _tileTopRight},
-	{name: "Tile to bottom-left", func: _tileBottomLeft},
-	{name: "Tile to bottom-right", func: _tileBottomRight},
+	{name: _("Toggle 'Maximize'"), func: _toggleMaximize},
+	{name: _("Minimize window"), func: _minimizeWindow},
+	{name: _("Close window"), func: _closeWindow},
+	{name: _("Move to previous workspace"), func: _moveToPrevWorkspace},
+	{name: _("Move to next workspace"), func: _moveToNextWorkspace},
+	{name: _("Move to top monitor"), func: _moveToTopMonitor},
+	{name: _("Move to bottom monitor"), func: _moveToBottomMonitor},
+	{name: _("Move to left monitor"), func: _moveToLeftMonitor},
+	{name: _("Move to right monitor"), func: _moveToRightMonitor},
+	{name: _("Toggle fullscreen"), func: _toggleFullscreen},
+	{name: _("Toggle 'Always on top'"), func: _toggleAlwaysOnTop},
+	{name: _("Tile to left"), func: _tileLeft},
+	{name: _("Tile to right"), func: _tileRight},
+	{name: _("Tile to top"), func: _tileTop},
+	{name: _("Tile to bottom"), func: _tileBottom},
+	{name: _("Tile to top-left"), func: _tileTopLeft},
+	{name: _("Tile to top-right"), func: _tileTopRight},
+	{name: _("Tile to bottom-left"), func: _tileBottomLeft},
+	{name: _("Tile to bottom-right"), func: _tileBottomRight},
 ];
 
 var PieMenu = GObject.registerClass(

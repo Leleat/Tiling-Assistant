@@ -7,6 +7,10 @@ const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 const TilingPopup = Me.imports.tilingPopup;
 
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
+
 const MODES = {
 	SELECT: 1,
 	SWAP: 2,
@@ -256,7 +260,7 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 			resizeStep = Math.min(resizeStep, workArea.x + workArea.width - (resizedRect.x + resizedRect.width));
 
 		if (!resizeStep) {
-			main.notify("Tiling Assistant", "Can't resize into that direction. Super + Directions resizes on the S and E side. Super + Shift + Directions on the N and W side.");
+			main.notify("Tiling Assistant", _("Can't resize into that direction. Super + Directions resizes on the S and E side. Super + Shift + Directions on the N and W side."));
 			return;
 		}
 

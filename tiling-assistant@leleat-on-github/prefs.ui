@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- Generated with glade 3.38.2 -->
-<interface>
+<interface domain="tiling-assistant@leleat-on-github">
   <requires lib="gtk+" version="3.24"/>
   <object class="GtkImage" id="add-image">
     <property name="visible">True</property>
@@ -1828,7 +1828,7 @@ If there is no space, the window will either untile or maximize depending on wet
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="text" translatable="yes">0</property>
+                    <property name="text" translatable="no">0</property>
                     <property name="adjustment">pie-menu-deadzone-radius-adjustment</property>
                     <property name="snap-to-ticks">True</property>
                     <property name="update-policy">if-valid</property>
@@ -1875,7 +1875,7 @@ If there is no space, the window will either untile or maximize depending on wet
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="text" translatable="yes">0</property>
+                    <property name="text" translatable="no">0</property>
                     <property name="adjustment">pie-menu-item-radius-adjustment</property>
                     <property name="snap-to-ticks">True</property>
                     <property name="update-policy">if-valid</property>
@@ -2899,7 +2899,7 @@ please open an issue on Github.</property>
                   <object class="GtkSpinButton" id="vertical-preview-area">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="text" translatable="yes">750</property>
+                    <property name="text" translatable="no">750</property>
                     <property name="adjustment">vertical-preview-area-adjustment</property>
                     <property name="snap-to-ticks">True</property>
                     <property name="update-policy">if-valid</property>
@@ -2946,7 +2946,7 @@ please open an issue on Github.</property>
                   <object class="GtkSpinButton" id="horizontal-preview-area">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="text" translatable="yes">750</property>
+                    <property name="text" translatable="no">750</property>
                     <property name="adjustment">horizontal-preview-area-adjustment</property>
                     <property name="snap-to-ticks">True</property>
                     <property name="update-policy">if-valid</property>
