@@ -98,7 +98,7 @@ function isModPressed(modMask) {
 function windowIsMaximized(window) {
 	const workArea = window.get_work_area_current_monitor();
 	return window.get_maximized() === Meta.MaximizeFlags.BOTH || (window.tiledRect && window.tiledRect.equal(workArea));
-}
+};
 
 function getOpenWindows(currentWorkspace = true) {
 	const openWindows = altTab.getWindows(currentWorkspace ? global.workspace_manager.get_active_workspace() : null);

@@ -19,7 +19,8 @@
 "use strict";
 
 const {main, panel, windowManager, windowMenu} = imports.ui;
-const {Clutter, Meta, Shell, St} = imports.gi;
+const {Clutter, Gio, GLib, Meta, Shell, St} = imports.gi;
+const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -116,9 +117,15 @@ function enable() {
 
 	// open apps tiled by holding Shift/Alt
 	this.tilingWindowOpener = new TiledWindowOpener.Handler();
+
+	// restore window properties after session was unlocked
+	_loadAfterSessionLock();
 };
 
 function disable() {
+	// save window properties, if session was locked to restore after unlock
+	_saveBeforeSessionLock();
+
 	this.tilePreview.destroy();
 	this.tilePreview = null;
 	this.windowGrabHandler.destroy();
@@ -330,4 +337,85 @@ function _grabIsResizing(grabOp) {
 		default:
 			return false;
 	}
+};
+
+function _saveBeforeSessionLock() {
+	if (!main.sessionMode.isLocked)
+		return;
+
+	this.wasLocked = true;
+
+	const metaToStringRect = metaRect => metaRect && {x: metaRect.x, y: metaRect.y, width: metaRect.width, height: metaRect.height};
+	const savedWindows = [];
+	const openWindows = Util.getOpenWindows(false);
+	openWindows.forEach(window => {
+		// can't just check for isTiled because maximized windows may
+		// have an untiledRect as well in case window gaps are used
+		if (!window.untiledRect)
+			return;
+
+		savedWindows.push({
+			windowStableId: window.get_stable_sequence(),
+			isTiled: window.isTiled,
+			tiledRect: metaToStringRect(window.tiledRect),
+			untiledRect: metaToStringRect(window.untiledRect),
+			tileGroup: window.tileGroup && window.tileGroup.map(w => w.get_stable_sequence())
+		});
+	});
+
+	const parentDir = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]);
+	try {parentDir.make_directory_with_parents(null)} catch (e) {}
+	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
+	const file = Gio.File.new_for_path(path);
+	try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+	file.replace_contents(JSON.stringify(savedWindows), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+};
+
+function _loadAfterSessionLock() {
+	if (!this.wasLocked)
+		return;
+
+	this.wasLocked = false;
+
+	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
+	const file = Gio.File.new_for_path(path);
+	if (!file.query_exists(null))
+		return;
+
+	try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
+	const [success, contents] = file.load_contents(null);
+	if (!success || !contents.length)
+		return;
+
+	const openWindows = Util.getOpenWindows(false);
+	// array of 'property saving objects': [{windowStableId: Int, tiledRect: {x: , y: , width: , height: }, isTiled: bool
+	// , untiledRect: {x: , y: , width: , height: }, tileGroup: [windowId1, windowId2, ...]}, ...]
+	// maximized windows may just have an untiledRect and everything else being null
+	const windowObjects = JSON.parse(ByteArray.toString(contents));
+	windowObjects.forEach(wObj => {
+		const {windowStableId, isTiled, tiledRect, untiledRect, tileGroup} = wObj;
+		const windowIdx = openWindows.findIndex(w => w.get_stable_sequence() === windowStableId);
+		const window = openWindows[windowIdx];
+		if (!window)
+			return;
+
+		window.isTiled = isTiled;
+		window.tiledRect = tiledRect && new Meta.Rectangle({
+			x: tiledRect.x, y: tiledRect.y,
+			width: tiledRect.width, height: tiledRect.height
+		});
+		window.untiledRect = untiledRect && new Meta.Rectangle({
+			x: untiledRect.x, y: untiledRect.y,
+			width: untiledRect.width, height: untiledRect.height
+		});
+		if (tileGroup) {
+			window.tileGroup = [];
+			tileGroup.forEach(wId => {
+				const win = openWindows.find(w => w.get_stable_sequence() === wId);
+				win && window.tileGroup.push(win);
+			});
+		}
+
+		openWindows.splice(windowIdx, 1);
+	});
 };
