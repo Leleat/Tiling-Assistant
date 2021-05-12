@@ -234,6 +234,7 @@ const MyPrefsWidget = new GObject.Class({
 		_forEachChild(this, layoutsListBox, row => {
 			const layoutRects = [];
 			const appIds = [];
+			const loopModes = [];
 			_forEachChild(this, row.entriesContainer, entryBox => {
 				const entry = shellVersion < 40 ? entryBox.get_children()[1]
 						: entryBox.get_first_child().get_next_sibling();
@@ -243,8 +244,10 @@ const MyPrefsWidget = new GObject.Class({
 
 				const text = _getEntryText(entry);
 				const splits = text.split("--");
-				if (splits.length !== 4)
+				if (splits.length !== 4 && splits.length !== 5)
 					return;
+
+				loopModes.push(splits.length === 5 ? splits.pop() : "");
 
 				const rect = {};
 				let rectIsValid = true;
@@ -263,7 +266,7 @@ const MyPrefsWidget = new GObject.Class({
 			});
 
 			const layoutName = row.getLayoutName();
-			const layout = {name: layoutName, rects: layoutRects, apps: appIds};
+			const layout = {name: layoutName, rects: layoutRects, apps: appIds, loopModes: loopModes};
 			layoutRects.length && allLayouts.push(layout);
 		});
 
@@ -328,6 +331,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		});
 
 		this.appIds = (layout && layout.apps) || [];
+		this.loopModes = (layout && layout.loopModes) || [];
 
 		const mainFrame = new Gtk.Frame({
 			label: `    Layout ${idx + 1}    `,
@@ -408,7 +412,9 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		layout && layout.rects.forEach((rect, idx) => {
 			const appId = this.appIds[idx];
 			const appInfo = appId && Gio.DesktopAppInfo.new(appId);
-			this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}`, appInfo);
+			const loopMode = this.loopModes[idx];
+			const loopString = loopMode ? `${'--' + (loopMode === 'h' ? 'h' : 'v')}` : "";
+			this._addRectangleEntry(`${rect.x}--${rect.y}--${rect.width}--${rect.height}${loopString}`, appInfo);
 		});
 		this._addRectangleEntry();
 
@@ -474,8 +480,8 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 
 		const tooltip = _("Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
 The right column shows a preview of your layouts (after saving). The layouts file is saved in $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n\
-Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal\n\n\
-The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner.\n\n\
+Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal--dynamicSplit\n\n\
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of windows in that rectangle and they will share that space evenly.\n\n\
 You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout. This is experimental and may not work reliably (especially on Wayland).");
 		const rectEntry = new Gtk.Entry({
 			tooltip_text: tooltip,
@@ -530,7 +536,7 @@ You can attach an app to the rectangle row. If you do that, a new instance of th
 
 		cr.setLineWidth(1.0);
 
-		layout.rects.forEach(rect => {
+		layout.rects.forEach((rect, index) => {
 			// 1px outline for rect in transparent white
 			// 5 px gaps between rects
 			color.parse("rgba(255, 255, 255, .2)");
@@ -543,7 +549,7 @@ You can attach an app to the rectangle row. If you do that, a new instance of th
 			cr.strokePreserve();
 
 			// fill rect in transparent black
-			color.parse("rgba(0, 0, 0, .15)");
+			color.parse(`rgba(0, 0, 0, ${layout.loopModes[index] ? .1 : .3})`);
 			Gdk.cairo_set_source_rgba(cr, color);
 			cr.fill();
 		});

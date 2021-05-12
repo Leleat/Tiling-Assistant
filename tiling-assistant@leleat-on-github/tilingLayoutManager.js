@@ -16,10 +16,18 @@ const _ = Domain.gettext;
 
 var LayoutManager = class TilingLayoutManager {
 	constructor() {
-		this.currentLayout = {};
-		this.cachedOpenWindows = [];
-		this.tiledViaLayout = [];
-		this.layoutRectPreview = null;
+		this._layoutRects = [];
+		this._layoutAppIds = [];
+		this._layoutLoopModes = [];
+
+		this._currTileRect = null;
+		this._currAppId = "";
+		this._currLoopMode = "";
+
+		this._cachedOpenWindows = [];
+		this._tiledViaLayout = [];
+		this._tiledViaLoop = [];
+		this._layoutRectPreview = null;
 	}
 
 	destroy() {
@@ -27,11 +35,17 @@ var LayoutManager = class TilingLayoutManager {
 	}
 
 	// start a layout via keybinding from extension.js.
-	// a layout is an object with a name, an array of rectangles, and an array of appIds.
+	// a layout is an object with a name, an array of rectangles, an array of appIds and loopModes.
 	// the rectangle's properties *should* range from 0 to 1 (relative scale to monitor).
 	// but may not... prefs.js only ensures that the layout has the proper format but not
 	// wether the numbers are in the correct range of if the rects overlap each other
 	// (this is so the user can still fix mistakes without having to start from scratch)
+	////////////////
+	// there are 3 "modes": default, app attachment, looped
+	// default: tiling popup will ask, which window to tile in the rect; go to next rect
+	// app attachment: automatically open the attached app in the rect; go to next rect
+	// looped: evenly tile as many windows in the *current* rect as possible
+	// until user aborts or there aren't any open windows left
 	startTilingToLayout(layoutIndex) {
 		const openWindows = Util.getOpenWindows(MainExtension.settings.get_boolean("tiling-popup-current-workspace-only"));
 		const layouts = this._getLayouts();
@@ -42,19 +56,28 @@ var LayoutManager = class TilingLayoutManager {
 			return;
 		}
 
-		this.currentLayoutRects = layout.rects;
-		this.currentLayoutAppIds = layout.apps;
-		this.cachedOpenWindows = openWindows;
+		this._layoutRects = layout.rects;
+		this._layoutAppIds = layout.apps;
+		this._layoutLoopModes = layout.loopModes;
+		this._cachedOpenWindows = openWindows;
 
 		this._tileNextRect();
 	}
 
 	_finishTilingToLayout() {
-		this.currentLayout = {};
-		this.cachedOpenWindows = [];
-		this.tiledViaLayout = [];
-		this.layoutRectPreview && this.layoutRectPreview.destroy();
-		this.layoutRectPreview = null;
+		this._layoutRects = [];
+		this._layoutAppIds = [];
+		this._layoutLoopModes = [];
+
+		this._currTileRect = null;
+		this._currAppId = "";
+		this._currLoopMode = "";
+
+		this._cachedOpenWindows = [];
+		this._tiledViaLayout = [];
+		this._tiledViaLoop = [];
+		this._layoutRectPreview && this._layoutRectPreview.destroy();
+		this._layoutRectPreview = null;
 	}
 
 	_getLayouts() {
@@ -100,51 +123,45 @@ var LayoutManager = class TilingLayoutManager {
 		return true;
 	}
 
-	_tileNextRect() {
-		if (!this.currentLayoutRects.length) {
+	_tileNextRect(loopCurrTileRect = false) {
+		if (!this._layoutRects.length && !loopCurrTileRect) {
 			this._finishTilingToLayout();
 			return;
 		}
 
-		const rect = this.currentLayoutRects.shift();
-		const appId = this.currentLayoutAppIds && this.currentLayoutAppIds.shift();
-		const activeWs = global.workspace_manager.get_active_workspace();
-		const workArea = activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
-		const winTracker = Shell.WindowTracker.get_default();
-		const tileRect = new Meta.Rectangle({
-			x: workArea.x + Math.floor(rect.x * workArea.width),
-			y: workArea.y + Math.floor(rect.y * workArea.height),
-			width: Math.floor(rect.width * workArea.width),
-			height: Math.floor(rect.height * workArea.height)
-		});
+		if (!loopCurrTileRect)
+			this._startNextStep();
 
 		// automatically open an app in the rectangle spot
-		if (appId) {
-			const app = Shell.AppSystem.get_default().lookup_app(appId);
+		if (this._currAppId) {
+			const app = Shell.AppSystem.get_default().lookup_app(this._currAppId);
 			if (!app) {
 				main.notify("Tiling Assistant", _("Layouts: App not found."));
 				this._finishTilingToLayout();
 				return;
+
 			} else if (app.can_open_new_window()) {
-				Util.openAppTiled(app, tileRect);
+				Util.openAppTiled(app, this._currTileRect);
+
 			} else {
-				const window = this.cachedOpenWindows.find(w => app === winTracker.get_window_app(w));
-				window && Util.tileWindow(window, tileRect, false, true);
+				const winTracker = Shell.WindowTracker.get_default();
+				const window = this._cachedOpenWindows.find(w => app === winTracker.get_window_app(w));
+				window && Util.tileWindow(window, this._currTileRect, false, true);
 			}
 
 			this._tileNextRect();
 
 		// tiling popup to ask what window to tile to the rectangle spot
 		} else {
-			if (!this.cachedOpenWindows.length) {
+			if (!this._cachedOpenWindows.length) {
 				this._tileNextRect();
 				return;
 			}
 
-			this._createTilingPreview(tileRect);
+			this._createTilingPreview(this._currTileRect);
 
-			const tilingPopup = new TilingPopup.TilingSwitcherPopup(this.cachedOpenWindows, tileRect, !this.currentLayoutRects.length);
-			const tileGroupByStacking = global.display.sort_windows_by_stacking(this.tiledViaLayout).reverse();
+			const tilingPopup = new TilingPopup.TilingSwitcherPopup(this._cachedOpenWindows, this._currTileRect, !this._layoutRects.length && !this._currLoopMode);
+			const tileGroupByStacking = global.display.sort_windows_by_stacking(this._tiledViaLayout).reverse();
 			if (!tilingPopup.show(tileGroupByStacking)) {
 				tilingPopup.destroy();
 				this._finishTilingToLayout();
@@ -154,15 +171,30 @@ var LayoutManager = class TilingLayoutManager {
 		}
 	}
 
+	_startNextStep() {
+		const activeWs = global.workspace_manager.get_active_workspace();
+		const workArea = activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
+		const rectRatios = this._layoutRects.shift();
+
+		this._currTileRect = new Meta.Rectangle({
+			x: workArea.x + Math.floor(rectRatios.x * workArea.width),
+			y: workArea.y + Math.floor(rectRatios.y * workArea.height),
+			width: Math.floor(rectRatios.width * workArea.width),
+			height: Math.floor(rectRatios.height * workArea.height)
+		});
+		this._currAppId = this._layoutAppIds && this._layoutAppIds.shift();
+		this._currLoopMode = this._layoutLoopModes && this._layoutLoopModes.shift();
+	}
+
 	_createTilingPreview(rect) {
-		this.layoutRectPreview && this.layoutRectPreview.destroy();
-		this.layoutRectPreview = new St.Widget({
+		this._layoutRectPreview && this._layoutRectPreview.destroy();
+		this._layoutRectPreview = new St.Widget({
 			style_class: "tile-preview",
 			x: rect.x + rect.width / 2, y: rect.y + rect.height / 2
 		});
-		main.layoutManager.addChrome(this.layoutRectPreview);
+		main.layoutManager.addChrome(this._layoutRectPreview);
 
-		this.layoutRectPreview.ease({
+		this._layoutRectPreview.ease({
 			x: rect.x, y: rect.y,
 			width: rect.width, height: rect.height,
 			duration: 200,
@@ -170,16 +202,34 @@ var LayoutManager = class TilingLayoutManager {
 		});
 	}
 
-	_onTiledWithTilingPopup(tilingPopup, tilingCanceled) {
-		if (tilingCanceled) {
-			this._finishTilingToLayout();
-			return;
-		}
+	_onTiledWithTilingPopup(tilingPopup, popupCanceled) {
+		if (popupCanceled) {
+			if (this._currLoopMode) {
+				this._tiledViaLoop = [];
+				this._tileNextRect();
+			} else {
+				this._finishTilingToLayout();
+			}
 
-		const {tiledWindow} = tilingPopup;
-		this.tiledViaLayout.push(tiledWindow);
-		this.cachedOpenWindows.splice(this.cachedOpenWindows.indexOf(tiledWindow), 1);
-		this._tileNextRect();
+		} else {
+			const {tiledWindow} = tilingPopup;
+			this._tiledViaLayout.push(tiledWindow);
+			this._cachedOpenWindows.splice(this._cachedOpenWindows.indexOf(tiledWindow), 1);
+
+			// split the 'looped' tiled windows evenly in this._currTileRect
+			if (this._currLoopMode) {
+				this._tiledViaLoop.push(tiledWindow);
+				this._tiledViaLoop.forEach((w, index) => {
+					const rect = this._currTileRect.copy();
+					const [pos, dimension] = this._currLoopMode === "h" ? ["y", "height"] : ["x", "width"];
+					rect[dimension] = rect[dimension] / this._tiledViaLoop.length;
+					rect[pos] = rect[pos] + index * rect[dimension];
+					Util.tileWindow(w, rect, false, true);
+				});
+			}
+
+			this._tileNextRect(this._currLoopMode);
+		}
 	}
 
 	openLayoutSelector() {
@@ -281,7 +331,7 @@ const LayoutSelector = GObject.registerClass({
 
 		_onTextChanged(textActor) {
 			const filterText = textActor.get_text();
-			this._items.forEach(item => item.text.includes(filterText) ? item.show() : item.hide());
+			this._items.forEach(item => item.text.toLowerCase().includes(filterText.toLowerCase()) ? item.show() : item.hide());
 			this._focus(this._items.findIndex(item => item.visible));
 		}
 
