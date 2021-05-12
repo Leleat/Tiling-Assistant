@@ -409,13 +409,12 @@ function _loadAfterSessionLock() {
 			width: untiledRect.width, height: untiledRect.height
 		});
 		if (tileGroup) {
-			window.tileGroup = [];
+			const windowGroup = [];
 			tileGroup.forEach(wId => {
 				const win = openWindows.find(w => w.get_stable_sequence() === wId);
-				win && window.tileGroup.push(win);
+				win && windowGroup.push(win);
 			});
+			Util.updateTileGroup(windowGroup);
 		}
-
-		openWindows.splice(windowIdx, 1);
 	});
 };
