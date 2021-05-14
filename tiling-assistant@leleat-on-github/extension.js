@@ -29,7 +29,7 @@ const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 const PieMenu = Me.imports.tilingPieMenu;
 const TileEditing = Me.imports.tilingEditingMode;
-const TiledWindowOpener = Me.imports.tilingWindowOpener;
+const SemiAutoTilingMode = Me.imports.tilingSemiAutoMode;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -42,6 +42,8 @@ var TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
+	TILING_MODE_PRIMARY: "tiling-mode-primary",
+	TILING_MODE_SECONDARY: "tiling-mode-secondary",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -50,8 +52,7 @@ var TILING = { // keybindings
 	TOP_LEFT: "tile-topleft-quarter",
 	TOP_RIGHT: "tile-topright-quarter",
 	BOTTOM_LEFT: "tile-bottomleft-quarter",
-	BOTTOM_RIGHT: "tile-bottomright-quarter",
-	TOGGLE_APP_SPLIT: "toggle-open-app-vertically"
+	BOTTOM_RIGHT: "tile-bottomright-quarter"
 };
 
 var settings = null;
@@ -83,7 +84,7 @@ function enable() {
 	// keybindings
 	this.keyBindings = Object.values(TILING);
 	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
-	const bindingInOverview = [TILING.TOGGLE_POPUP, TILING.TOGGLE_APP_SPLIT];
+	const bindingInOverview = [TILING.TOGGLE_POPUP, TILING.TILING_MODE_PRIMARY, TILING.TILING_MODE_SECONDARY];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 				| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), onCustomKeybindingPressed.bind(this, key));
@@ -115,8 +116,8 @@ function enable() {
 				? new PieMenu.PieMenu() : windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
 	};
 
-	// open apps tiled by holding Shift/Alt
-	this.tilingWindowOpener = new TiledWindowOpener.Handler();
+	// open apps tiled by holding Shift when activating an AppIcon
+	this.semiAutoTiler = new SemiAutoTilingMode.Manager();
 
 	// restore window properties after session was unlocked
 	_loadAfterSessionLock();
@@ -134,8 +135,8 @@ function disable() {
 	this.tilingLayoutManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
-	this.tilingWindowOpener.destroy();
-	this.tilingWindowOpener = null;
+	this.semiAutoTiler.destroy();
+	this.semiAutoTiler = null;
 
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
@@ -204,9 +205,9 @@ function onCustomKeybindingPressed(shortcutName) {
 		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
 		return;
 
-	// toggle app split
-	} else if (shortcutName === TILING.TOGGLE_APP_SPLIT) {
-		this.tilingWindowOpener.toggleSplitMode();
+	// toggle the direction in which an app opens in a tiled state
+	} else if (shortcutName.startsWith("tiling-mode-")) {
+		this.semiAutoTiler.cycleTilingModes(shortcutName);
 		return;
 	}
 

@@ -11,17 +11,20 @@
 		<key name="tiling-popup-current-workspace-only" type="b">
 			<default>true</default>
 		</key>
-		<key name="open-app-vertically" type="b">
-			<default>true</default>
-		</key>
-		<key name="toggle-open-app-vertically" type="as">
-			<default>[]</default>
-		</key>
-		<key name="show-icon-open-app-vertically" type="b">
-			<default>false</default>
-		</key>
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
+		</key>
+		<key name="enable-tiling-mode" type="b">
+			<default>false</default>
+		</key>
+		<key name="current-tiling-mode" type="s">
+			<default>"right"</default>
+		</key>
+		<key name="tiling-mode-primary" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tiling-mode-secondary" type="as">
+			<default>[]</default>
 		</key>
 		<key name="enable-dynamic-tiling" type="b">
 	  		<default>false</default>

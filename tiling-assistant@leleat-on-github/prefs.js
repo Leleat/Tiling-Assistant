@@ -17,6 +17,8 @@ const TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
+	TILING_MODE_PRIMARY: "tiling-mode-primary",
+	TILING_MODE_SECONDARY: "tiling-mode-secondary",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -25,8 +27,7 @@ const TILING = { // keybindings
 	TOP_LEFT: "tile-topleft-quarter",
 	TOP_RIGHT: "tile-topright-quarter",
 	BOTTOM_LEFT: "tile-bottomleft-quarter",
-	BOTTOM_RIGHT: "tile-bottomright-quarter",
-	TOGGLE_APP_SPLIT: "toggle-open-app-vertically"
+	BOTTOM_RIGHT: "tile-bottomright-quarter"
 };
 
 function init() {
@@ -80,7 +81,7 @@ const MyPrefsWidget = new GObject.Class({
 				, "pie-menu-deadzone-radius", "pie-menu-item-radius"];
 		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
 				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"
-				, "enable-pie-menu", "maximize-with-gap", "tiling-popup-current-workspace-only", "show-icon-open-app-vertically"];
+				, "enable-pie-menu", "maximize-with-gap", "tiling-popup-current-workspace-only", "enable-tiling-mode"];
 		const enums = ["restore-window-size-on"];
 		const colors = ["tile-editing-mode-color"];
 
