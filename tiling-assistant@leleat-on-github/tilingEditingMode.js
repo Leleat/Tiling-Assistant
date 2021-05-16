@@ -118,7 +118,7 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 			if (!window)
 				return;
 
-			const getCenterPoint = rect => {return {x: rect.x + rect.width / 2, y: rect.y + rect.height / 2}};
+			const getCenterPoint = rect => ({x: rect.x + rect.width / 2, y: rect.y + rect.height / 2});
 			const fullRect = Util.getBestFitTiledRect(window, this._topTileGroup);
 			const rects = [new Meta.Rectangle({
 				x: fullRect.x,
@@ -304,14 +304,56 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 	}
 
 	vfunc_key_release_event(keyEvent) {
-		const keySym = keyEvent.keyval;
-		// swap focused and secondary window(s)/rect
-		if (this.currMode === MODES.SWAP && [Clutter.KEY_Control_L, Clutter.KEY_Control_R].includes(keySym)) {
-			const primWindow = this._primaryIndicator.window;
-			const secWindow = this._secondaryIndicator.window;
-			primWindow && Util.tileWindow(primWindow, this._secondaryIndicator.rect, false);
-			secWindow && Util.tileWindow(secWindow, this._primaryIndicator.rect, false);
-			this.select(this._secondaryIndicator.rect, primWindow);
+		const primWindow = this._primaryIndicator.window;
+		const secWindow = this._secondaryIndicator.window;
+
+		if (this.currMode === MODES.SWAP && [Clutter.KEY_Control_L, Clutter.KEY_Control_R].includes(keyEvent.keyval)) {
+			// TODO kinda messy and difficult to use/activate since ctrl needs to be released first...
+			// try to [equalize] the size (width OR height) of the highlighted rectangles
+			// including the rectangles which are in the union of the 2 highlighted rects
+			if (keyEvent.modifier_state & Clutter.ModifierType.SHIFT_MASK) {
+				const equalize = function(pos, dimension) {
+					const unifiedRect = primWindow.tiledRect.union(secWindow.tiledRect);
+					const windowsToResize = Util.getTopTileGroup(false).filter(w => unifiedRect.contains_rect(w.tiledRect));
+					// only equalize for the perfect fit since gaps or other stuff may be too ambiguous to equalize
+					if (unifiedRect.area() !== windowsToResize.reduce((areaSum, w) => areaSum + w.tiledRect.area(), 0))
+						return;
+
+					const [beginnings, endings] = windowsToResize.reduce((array, w) => {
+						array[0].push(w.tiledRect[pos]);
+						array[1].push(w.tiledRect[pos] + w.tiledRect[dimension]);
+						return array;
+					}, [[], []]);
+					const uniqueBeginnings = [...new Set(beginnings)].sort((a, b) => a - b);
+					const uniqueEndings = [...new Set(endings)].sort((a, b) => a - b);
+					const newDimension = Math.ceil(unifiedRect[dimension] / uniqueEndings.length); // per row/column
+					windowsToResize.forEach(w => {
+						const rect = w.tiledRect.copy();
+						const begIdx = uniqueBeginnings.indexOf(w.tiledRect[pos]);
+						const endIdx = uniqueEndings.indexOf(w.tiledRect[pos] + w.tiledRect[dimension]);
+						rect[pos] = unifiedRect[pos] + begIdx * newDimension;
+						// last windows fill the rest of the unifiedRect to compensate rounding
+						rect[dimension] = w.tiledRect[pos] + w.tiledRect[dimension] === unifiedRect[pos] + unifiedRect[dimension]
+								? unifiedRect[pos] + unifiedRect[dimension] - rect[pos] : (endIdx - begIdx + 1) * newDimension;
+						Util.tileWindow(w, rect, false);
+					});
+				};
+
+				if (primWindow.tiledRect.x === secWindow.tiledRect.x || primWindow.tiledRect.x + primWindow.tiledRect.width
+							=== secWindow.tiledRect.x + secWindow.tiledRect.width)
+					equalize("y", "height");
+				else if (primWindow.tiledRect.y === secWindow.tiledRect.y || primWindow.tiledRect.y + primWindow.tiledRect.height
+							=== secWindow.tiledRect.y + secWindow.tiledRect.height)
+					equalize("x", "width");
+
+				this.select(secWindow.tiledRect, secWindow);
+
+			// [swap] focused and secondary window(s)/rect
+			} else {
+				primWindow && Util.tileWindow(primWindow, this._secondaryIndicator.rect, false);
+				secWindow && Util.tileWindow(secWindow, this._primaryIndicator.rect, false);
+				this.select(this._secondaryIndicator.rect, primWindow);
+			}
 		}
 	}
 });
