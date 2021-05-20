@@ -1787,6 +1787,20 @@ If there is no space, the window will either untile or maximize depending on wet
                   </packing>
                 </child>
                 <child>
+                  <object class="GtkImage">
+                    <property name="visible">True</property>
+                    <property name="can-focus">False</property>
+                    <property name="tooltip-markup" translatable="yes">&lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;RMB&lt;/tt&gt; on a window will open a simple pie menu. While holding the right click dragging the mouse in the direction of a menu item and releasing the click, will activate that menu item. The pie menu's appearance is slightly delayed. The pie menu doesn't need to be visible for a menu item to be activated.</property>
+                    <property name="margin-start">12</property>
+                    <property name="icon-name">dialog-information-symbolic</property>
+                  </object>
+                  <packing>
+                    <property name="expand">False</property>
+                    <property name="fill">True</property>
+                    <property name="position">1</property>
+                  </packing>
+                </child>
+                <child>
                   <object class="GtkSwitch" id="enable-pie-menu">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
@@ -1797,7 +1811,7 @@ If there is no space, the window will either untile or maximize depending on wet
                   <packing>
                     <property name="expand">False</property>
                     <property name="fill">True</property>
-                    <property name="position">1</property>
+                    <property name="position">2</property>
                   </packing>
                 </child>
               </object>
@@ -2028,534 +2042,6 @@ If there is no space, the window will either untile or maximize depending on wet
       </packing>
     </child>
     <child>
-      <object class="GtkScrolledWindow">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="hexpand">True</property>
-        <property name="vexpand">True</property>
-        <child>
-          <object class="GtkViewport">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
-            <child>
-              <object class="GtkListBox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-                <property name="activate-on-single-click">False</property>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">Dragging a window to the screen edges or quarters will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted.
-
-Holding &lt;tt&gt;Ctrl&lt;/tt&gt; when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space. Hovering at the very edges will affect multiple windows.
-
-The default keybindings for tiling are &lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;NUM_PAD&lt;/tt&gt;.</property>
-                            <property name="use-markup">True</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    General    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">This is the popup, which will open when you tile a window and there is (unambiguous) free screen space. It will list the open windows on the current workspace. 
-
-The popup's app icons can be activated with &lt;tt&gt;Space&lt;/tt&gt;, &lt;tt&gt;Enter&lt;/tt&gt;, and &lt;tt&gt;Right&lt;/tt&gt; or &lt;tt&gt;Middle Mouse Button&lt;/tt&gt;. Activating one of the popup's app icons will tile the corresponding window to the free screen space. 
-
-Holding &lt;tt&gt;Shift&lt;/tt&gt; or &lt;tt&gt;Alt&lt;/tt&gt; while activating an app icon, will tile the window to the top/left or bottom/right half of the free space depending on the space's orientation (spiral tiling).</property>
-                            <property name="use-markup">True</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Tiling Popup    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is focused. Resizing one of the windows will also affect the other windows in the group.
-
-The group raising can be disabled with a setting. The group resizing can be escaped by holding &lt;tt&gt;Ctrl&lt;/tt&gt; when starting the resize operation. This way only directly opposing windows will resize together.</property>
-                            <property name="use-markup">True</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Tile Groups    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">This is a special mode to manage your tiled windows. 
-
-You can navigate focus with the direction keys (&lt;tt&gt;WASD&lt;/tt&gt;, &lt;tt&gt;hjkl&lt;/tt&gt; or the &lt;tt&gt;arrows&lt;/tt&gt;). Holding &lt;tt&gt;Ctrl&lt;/tt&gt; while moving the focus and then releasing &lt;tt&gt;Ctrl&lt;/tt&gt; will swap the highlighted windows.
-
-&lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;Directions&lt;/tt&gt; will resize the selected window on the E or S side. Additionally holding &lt;tt&gt;Shift&lt;/tt&gt; will resize the window on the W or N side.
-
-When a window is highlighted, press &lt;tt&gt;Q&lt;/tt&gt; to [q]uit it, &lt;tt&gt;R&lt;/tt&gt; to [r]estore a window's size, and &lt;tt&gt;E&lt;/tt&gt; to [e]xpand it to fill the available space. Press &lt;tt&gt;C&lt;/tt&gt; to [c]ycle through 'halve' states of a window.
-
-Pressing &lt;tt&gt;Esc&lt;/tt&gt;, &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing &lt;tt&gt;Space&lt;/tt&gt; or &lt;tt&gt;Enter&lt;/tt&gt; will open the Tiling Popup instead.</property>
-                            <property name="use-markup">True</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Tile Editing Mode    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">A layout consists of a list of arbitrary rectangles. When activating a layout the tiling popup will ask you which of the open windows you want in which rectangle of your layout.
-
-The layout selector enables you to search for layouts by name. That means you don't have to remember their keybindings. </property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Layouts    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">&lt;tt&gt;Super&lt;/tt&gt; + &lt;tt&gt;RMB&lt;/tt&gt; on a window will open a pie menu. Moving the mouse into a direction and then releasing the right-click will perform that action. The pie menu items will be inserted in a circle clockwise starting with the north side.</property>
-                            <property name="use-markup">True</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    Pie Menu    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="position">4</property>
-      </packing>
-    </child>
-    <child type="tab">
-      <object class="GtkLabel">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="halign">start</property>
-        <property name="margin-start">8</property>
-        <property name="margin-end">8</property>
-        <property name="margin-top">8</property>
-        <property name="margin-bottom">8</property>
-        <property name="label" translatable="yes">User Guide</property>
-      </object>
-      <packing>
-        <property name="position">4</property>
-        <property name="tab-fill">False</property>
-      </packing>
-    </child>
-    <child>
-      <object class="GtkScrolledWindow">
-        <property name="visible">True</property>
-        <property name="can-focus">True</property>
-        <property name="hexpand">True</property>
-        <property name="vexpand">True</property>
-        <child>
-          <object class="GtkViewport">
-            <property name="visible">True</property>
-            <property name="can-focus">False</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
-            <child>
-              <object class="GtkListBox">
-                <property name="visible">True</property>
-                <property name="can-focus">False</property>
-                <property name="hexpand">True</property>
-                <property name="vexpand">True</property>
-                <property name="activate-on-single-click">False</property>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="hexpand">True</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="halign">start</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">- experimental: app attachments to layouts
-- bugfix: raise tileGroups with sloppy mouse focus mode
-
-- layouts: move layouts file from the extension folder to $XDG_CONFIG_HOME/tiling-assistant/layouts.json (#68)</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    v17 - 19    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="hexpand">True</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">- experimental Tile Editing Mode
-
-- pie menu when Super + RMBing a window
-
-- setting: gaps on maximized windows  - off by default
-- setting: 'restore window size on grab end' - workaround for Wayland</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    v16    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="margin-start">8</property>
-                    <property name="margin-end">8</property>
-                    <property name="hexpand">True</property>
-                    <property name="activatable">False</property>
-                    <property name="selectable">False</property>
-                    <child>
-                      <object class="GtkFrame">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">8</property>
-                        <property name="margin-end">8</property>
-                        <property name="margin-top">8</property>
-                        <property name="margin-bottom">8</property>
-                        <property name="label-xalign">0.5</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="halign">start</property>
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">16</property>
-                            <property name="margin-bottom">16</property>
-                            <property name="label" translatable="yes">- dynamic tiling ('focus and tiling')
-
-- ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
-
-- inverse top screen edge action (by c-ridgway)
-
-- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
-
-- default keybindings with the numpad for tiling (by c-ridgway)
-
-- dynamic numbers of layouts &amp; layout selector
-
-- add 'User Guide' and 'Changelog' settings tab
-- other minor settings additions/removals/changes
-
-- refactor and minor bugfixes</property>
-                            <property name="wrap">True</property>
-                            <property name="wrap-mode">word-char</property>
-                          </object>
-                        </child>
-                        <child type="label">
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="label" translatable="yes">&lt;b&gt;    v13 - 15    &lt;/b&gt;</property>
-                            <property name="use-markup">True</property>
-                          </object>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-      </object>
-      <packing>
-        <property name="position">5</property>
-      </packing>
-    </child>
-    <child type="tab">
-      <object class="GtkLabel">
-        <property name="visible">True</property>
-        <property name="can-focus">False</property>
-        <property name="halign">start</property>
-        <property name="margin-start">8</property>
-        <property name="margin-end">8</property>
-        <property name="margin-top">8</property>
-        <property name="margin-bottom">8</property>
-        <property name="label" translatable="yes">Changelog</property>
-      </object>
-      <packing>
-        <property name="position">5</property>
-        <property name="tab-fill">False</property>
-      </packing>
-    </child>
-    <child>
       <object class="GtkBox">
         <property name="visible">True</property>
         <property name="can-focus">False</property>
@@ -2609,6 +2095,8 @@ The layout selector enables you to search for layouts by name. That means you do
             <property name="visible">True</property>
             <property name="can-focus">False</property>
             <property name="halign">center</property>
+            <property name="valign">start</property>
+            <property name="vexpand">True</property>
             <property name="label" translatable="yes">If you want to report a bug or need help,
 please open an issue on Github.</property>
             <property name="use-markup">True</property>
@@ -2621,6 +2109,117 @@ please open an issue on Github.</property>
             <property name="expand">False</property>
             <property name="fill">True</property>
             <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">center</property>
+            <property name="vexpand">True</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;README&lt;/b&gt;&lt;/big&gt; offers a detailed
+explanation of every feature. </property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/Guide.md</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/Guide.md</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">20</property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;Changelog&lt;/b&gt;&lt;/big&gt; lists the changes
+made between each extension version. </property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/Changelog.md</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/Changelog.md</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
           </packing>
         </child>
         <child>
@@ -2641,7 +2240,7 @@ please open an issue on Github.</property>
           <packing>
             <property name="expand">False</property>
             <property name="fill">True</property>
-            <property name="position">3</property>
+            <property name="position">6</property>
           </packing>
         </child>
       </object>
@@ -2658,7 +2257,8 @@ please open an issue on Github.</property>
         <property name="margin-end">8</property>
         <property name="margin-top">8</property>
         <property name="margin-bottom">8</property>
-        <property name="label" translatable="yes">Help</property>
+        <property name="label" translatable="yes">Help and
+Changelog</property>
       </object>
       <packing>
         <property name="position">6</property>
@@ -3015,6 +2615,9 @@ please open an issue on Github.</property>
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
                             <property name="activate-on-single-click">True</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -3063,6 +2666,9 @@ please open an issue on Github.</property>
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
                             <property name="activate-on-single-click">True</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -3172,6 +2778,9 @@ The position of the newly opened window is indicated by the top panel icon. It c
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
                             <property name="activate-on-single-click">True</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>
@@ -3220,6 +2829,9 @@ The position of the newly opened window is indicated by the top panel icon. It c
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
                             <property name="activate-on-single-click">True</property>
+                            <child internal-child="selection">
+                              <object class="GtkTreeSelection"/>
+                            </child>
                           </object>
                           <packing>
                             <property name="expand">False</property>

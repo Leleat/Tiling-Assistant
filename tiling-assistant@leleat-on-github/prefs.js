@@ -342,7 +342,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 			margin_start: 8,
 			margin_end: 8
 		});
-		_addChildTo(this, mainFrame)
+		_addChildTo(this, mainFrame);
 
 		const mainBox = new Gtk.Box({
 			orientation: Gtk.Orientation.VERTICAL,
@@ -352,7 +352,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 			margin_start: 12,
 			margin_end: 12
 		});
-		_addChildTo(mainFrame, mainBox)
+		_addChildTo(mainFrame, mainBox);
 
 		/* --- keybinding & name row --- */
 
@@ -482,7 +482,7 @@ const LayoutsRow = GObject.registerClass(class LayoutsRow extends Gtk.ListBoxRow
 		const tooltip = _("Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of the rectangles for the layouts in the left column.\
 The right column shows a preview of your layouts (after saving). The layouts file is saved in $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n\
 Format for the rectangles:\n\nxVal--yVal--widthVal--heightVal--dynamicSplit\n\n\
-The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of windows in that rectangle and they will share that space evenly.\n\n\
+The values can range from 0 to 1. (0,0) is the top-left corner of your screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of windows in that rectangle and they will share that space evenly (for ex.: Master & Stack).\n\n\
 You can attach an app to the rectangle row. If you do that, a new instance of the app will be opened, when activating the layout. This is experimental and may not work reliably (especially on Wayland).");
 		const rectEntry = new Gtk.Entry({
 			tooltip_text: tooltip,

@@ -70,7 +70,7 @@ var Manager = class SemiAutoTilingMode {
 		if (this.app.state === Shell.AppState.STOPPED || openNewWindow || tilingMode)
 			this.animateLaunch();
 
-		if (tilingMode && isShiftPressed) {
+		if (isShiftPressed && tilingMode) {
 			const openAppSplit = (tileRectToSplit, windowToSplit) => {
 				const isSecondaryPos = [TILING_MODES.RIGHT, TILING_MODES.BOTTOM].includes(tilingMode);
 				const isVerticalSplit = [TILING_MODES.LEFT, TILING_MODES.RIGHT].includes(tilingMode);
