@@ -1,14 +1,18 @@
 # Changelog
 
+## v21
+**Bugfixes:**
+- reenable switching focus via keyboard on prefs40.ui
+
+
 ## v20
 **Features:**
 - Tile Editing Mode: add option to 'equalize' window sizes (see 6bfbc07)
 - Layouts: add dynamic rectangles to enable layouts like Master & Stack (see the tooltip in the `Layouts` tab of the settings)
 - Experimental: Semi Tiling Mode (see 'Hidden Settings')
 
-
 **Miscellaneous:**
-- remove ` User Guide` and `Changelog` tabs from the settings page (instead create .md files in repo)
+- remove `User Guide` and `Changelog` tabs from the settings page (instead create .md files in repo)
 - setup `translations/` for translations
 
 **Bugfixes:**

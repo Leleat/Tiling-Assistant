@@ -12,6 +12,7 @@
     - [Layouts](#Layouts)
     - [Pie Menu](#Pie-Menu)
     - [Semi Tiling Mode](#Semi-Tiling-Mode)
+    - [Hidden Settings](#Hidden-Settings)
 
 ## Usage
 
@@ -65,8 +66,12 @@ The layout selector enables you to search for layouts by name. That means you do
 
 ### Semi Tiling Mode
 
-This is an experimental feature and thus off by default. Provide feedback at [#70](/../../issues/70). It can be enabled in the Hidden Settings. This feature is inspired by manual tiling window managers.
+This is an experimental feature and thus off by default. Provide feedback at [#70](/../../issues/70). It can be enabled in the `Hidden Settings`. This feature is inspired by manual tiling window managers.
 
 The tiling won't happen automatically. You need to hold `Shift` when activating an AppIcon (from the Dash, AppGrid or Search Results). A new instance of the app will be opened.
 
 The newly opened window will try to fill the free unambiguous screen space. If there is none, they will share the space with the focused tiled window. The position of the new window is indicated by the top panel icon. It can be cycled with keyboard shortcuts or by clicking the panel icon.
+
+### Hidden Settings
+
+This is a 'hidden' (more specificly: nameless) tab under `Help and Changelog`. It contains minor (i. e. settings I don't expect the general user to ever need) or debugging and experimental settings.
