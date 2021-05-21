@@ -34,7 +34,7 @@ Please see the ![Guide](Guide.md) for a detailed explanation of every feature.
 
 ## Preview
 
-![Preview](preview.gif)
+![Preview](media/preview.gif)
 
 ## Installation
 
