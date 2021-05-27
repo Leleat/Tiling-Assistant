@@ -43,7 +43,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 
 		const topTileGroup = Util.getTopTileGroup();
-		window.grabSignalID = window.connect("position-changed", this.onMoving.bind(this, window
+		window.grabSignalID = window.connect("position-changed", this.onMoving.bind(this, grabOp, window
 				, topTileGroup, Util.getFreeScreenRects(topTileGroup)));
 	}
 
@@ -170,7 +170,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 	}
 
 	// called via @window's signal (position-changed)
-	onMoving(window, topTileGroup, freeScreenRects) {
+	onMoving(grabOp, window, topTileGroup, freeScreenRects) {
 		this._moveStarted = true;
 		// use the current event's coords instead of global.get_pointer to support touch.
 		// event === null when dnding a maximized window...?
@@ -178,7 +178,7 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		if (!event)
 			return;
 
-		const [eventX, eventY] = event.get_coords();
+		const [eventX, eventY] = grabOp === Meta.GrabOp.KEYBOARD_MOVING ? global.get_pointer() : event.get_coords();
 		this._lastCoord = {x: eventX, y: eventY};
 
 		// restore @window's size, if it's tiled. Try for @windowWasMaximized as well
