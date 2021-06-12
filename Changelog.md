@@ -2,7 +2,8 @@
 
 ## v21
 **Bugfixes:**
-- reenable switching focus via keyboard on prefs40.ui
+- reenable focus on prefs40.ui
+- correctly use pointer position when moving window with keyboard `Alt` + `F7` + `Arrow` keys (#76)
 
 
 ## v20
