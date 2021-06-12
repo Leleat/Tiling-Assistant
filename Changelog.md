@@ -1,5 +1,10 @@
 # Changelog
 
+## v22
+**Bugfixes:**
+- wrong tilePreview, if window was at the very top display edge
+
+
 ## v21
 **Bugfixes:**
 - reenable focus on prefs40.ui

@@ -231,9 +231,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		const pointerAtLeftEdge = eventX <= workArea.x + hDetectionSize;
 		const pointerAtRightEdge = eventX >= workArea.x + workArea.width - hDetectionSize;
 		// also use window's pos for top and bottom area detection for quarters
-		// because global.get_pointer's y isn't accurate (no idea why...)
-		// when slowly going from the left/right sides to the top/bottom corners
-		const windowAtTopEdge = wRect.y === workArea.y;
+		// because global.get_pointer's y isn't accurate (no idea why...) when grabbing on titlebar
+		// & slowly going from the left/right sides to the top/bottom corners
+		const titleBarGrabbed = eventY - wRect.y < 50; // random MagicNrs
+		const windowAtTopEdge = titleBarGrabbed && wRect.y === workArea.y;
 		const windowAtBottomEdge = wRect.y >= workArea.y + workArea.height - 75;
 		const tileTopLeftQuarter = pointerAtLeftEdge && (pointerAtTopEdge || windowAtTopEdge);
 		const tileTopRightQuarter = pointerAtRightEdge && (pointerAtTopEdge || windowAtTopEdge);
