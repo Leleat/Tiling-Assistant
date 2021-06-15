@@ -76,8 +76,8 @@ var PieMenu = GObject.registerClass(
 
 			// deadzone circle
 			this._deadZone = new St.Widget({
-				x: this._clickPos.x - this._deadZoneRadius,
-				y: this._clickPos.y - this._deadZoneRadius,
+				x: this._clickPos.x - this._deadZoneRadius - x,
+				y: this._clickPos.y - this._deadZoneRadius - y,
 				style_class: "resize-popup",
 				style: "border-radius: 999px;",
 				width: this._deadZoneRadius * 2,
@@ -133,8 +133,8 @@ var PieMenu = GObject.registerClass(
 		}
 
 		_setItemPos(item, angle) {
-			const centerX = this._clickPos.x + (this._itemRadius * Math.cos(angle * Math.PI / 180));
-			const centerY = this._clickPos.y + (this._itemRadius * Math.sin(angle * Math.PI / 180));
+			const centerX = this._clickPos.x + (this._itemRadius * Math.cos(angle * Math.PI / 180)) - this.x;
+			const centerY = this._clickPos.y + (this._itemRadius * Math.sin(angle * Math.PI / 180)) - this.y;
 			const x = centerX - item.width / 2;
 			const y = centerY - item.height / 2;
 			const isLeft = angle > 90 && angle < 270;
