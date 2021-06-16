@@ -67,6 +67,7 @@ function init() {
 
 function enable() {
 	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
+	this.settingsSignals = [];
 	this.tilePreview = new windowManager.TilePreview();
 	this.windowGrabHandler = new WindowGrabHandler.WindowGrabHandler();
 	this.tilingLayoutManager = new TilingLayoutManager.LayoutManager();
@@ -110,11 +111,18 @@ function enable() {
 
 	// pie menu when super + rmb'ing a window
 	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
-	const that = this;
-	main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
-		Util.isModPressed(Clutter.ModifierType.MOD4_MASK) && that.settings.get_boolean("enable-pie-menu")
-				? new PieMenu.PieMenu() : windowMenu.WindowMenuManager.prototype.showWindowMenuForWindow.apply(this, params);
+	const togglePieMenu = () => {
+		const that = this;
+		if (this.settings.get_boolean("enable-pie-menu"))
+			main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
+				Util.isModPressed(Clutter.ModifierType.MOD4_MASK)
+						? new PieMenu.PieMenu() : that.oldShowWindowMenu.apply(this, params);
+			}
+		else
+			main.wm._windowMenuManager.showWindowMenuForWindow = this.oldShowWindowMenu;
 	};
+	this.settingsSignals.push(this.settings.connect("changed::enable-pie-menu", togglePieMenu));
+	togglePieMenu();
 
 	// open apps tiled by holding Shift when activating an AppIcon
 	this.semiAutoTiler = new SemiAutoTilingMode.Manager();
@@ -141,6 +149,7 @@ function disable() {
 	// disconnect signals
 	global.display.disconnect(this.windowGrabBegin);
 	global.display.disconnect(this.windowGrabEnd);
+	this.settingsSignals.forEach(id => this.settings.disconnect(id));
 
 	// re-enable native tiling
 	this.gnome_mutter_settings.reset("edge-tiling");
@@ -390,7 +399,7 @@ function _loadAfterSessionLock() {
 
 	const openWindows = Util.getOpenWindows(false);
 	// array of 'property saving objects': [{windowStableId: Int, tiledRect: {x: , y: , width: , height: }, isTiled: bool
-	// , untiledRect: {x: , y: , width: , height: }, tileGroup: [windowId1, windowId2, ...]}, ...]
+	// , untiledRect: {x: , y: , width: , height: }, tileGroup: [windowStableId1, windowStableId2, ...]}, ...]
 	// maximized windows may just have an untiledRect and everything else being null
 	const windowObjects = JSON.parse(ByteArray.toString(contents));
 	windowObjects.forEach(wObj => {

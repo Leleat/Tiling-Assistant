@@ -1,7 +1,11 @@
 # Changelog
 
 ## v22
-**Bugfixes:**
+**Added**
+- link to a list of known incompatible apps/extensions (github issue #61)
+
+**Fixed**
+- correctly position PieMenu on multimonitor setup (#78)
 - wrong tilePreview, if window was at the very top display edge
 
 

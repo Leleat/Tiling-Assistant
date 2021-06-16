@@ -2134,8 +2134,7 @@ please open an issue on Github.</property>
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
                 <property name="halign">center</property>
-                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;README&lt;/b&gt;&lt;/big&gt; offers a detailed
-explanation of every feature. </property>
+                <property name="label" translatable="yes">List of known &lt;big&gt;&lt;b&gt;INCOMPATIBLE&lt;/b&gt;&lt;/big&gt; apps/extensions.</property>
                 <property name="use-markup">True</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
@@ -2146,6 +2145,43 @@ explanation of every feature. </property>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
                 <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">20</property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;GUIDE&lt;/b&gt;&lt;/big&gt; offers a detailed explanation of every feature.</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
               </packing>
             </child>
             <child>
@@ -2163,17 +2199,15 @@ explanation of every feature. </property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">1</property>
+                <property name="position">3</property>
               </packing>
             </child>
             <child>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">False</property>
-                <property name="halign">center</property>
                 <property name="margin-top">20</property>
-                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;Changelog&lt;/b&gt;&lt;/big&gt; lists the changes
-made between each extension version. </property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;CHANGELOG&lt;/b&gt;&lt;/big&gt; lists the differences between each extension version.</property>
                 <property name="use-markup">True</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
@@ -2183,7 +2217,7 @@ made between each extension version. </property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">2</property>
+                <property name="position">4</property>
               </packing>
             </child>
             <child>
@@ -2201,7 +2235,7 @@ made between each extension version. </property>
               <packing>
                 <property name="expand">False</property>
                 <property name="fill">True</property>
-                <property name="position">3</property>
+                <property name="position">5</property>
               </packing>
             </child>
           </object>
