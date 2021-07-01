@@ -1,0 +1,495 @@
+# Czech translations for PACKAGE package.
+# Copyright (C) 2021 THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Vojtěch Perník <translations@pervoj.cz>, 2021.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-05-20 17:03+0200\n"
+"PO-Revision-Date: 2021-07-01 17:18+0200\n"
+"Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
+"Language-Team: Czech <gnome-cs-list@gnome.org>\n"
+"Language: cs\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2\n"
+"X-Generator: Gtranslator 40.0\n"
+
+#: extension.js:194
+msgid "Tiling-assistant's popup enabled"
+msgstr "Vyskakovací okno Asistenta dlaždicování povoleno"
+
+#: extension.js:194
+msgid "Tiling-assistant's popup was disabled"
+msgstr "Vyskakovací okno Asistenta dlaždicování bylo zakázáno"
+
+#: extension.js:226
+msgid "Can't enter 'Tile Editing Mode', if the focused window isn't tiled."
+msgstr ""
+"Nelze přejít do režimu úprav dlaždic, pokud zaměřené okno není dlaždice."
+
+#: prefs.js:318 tilingPieMenu.js:14
+msgid "Toggle 'Maximize'"
+msgstr "Přepnout \"Maximalizovat\""
+
+#: prefs.js:318 tilingPieMenu.js:15
+msgid "Minimize window"
+msgstr "Minimalizovat okno"
+
+#: prefs.js:318 tilingPieMenu.js:16
+msgid "Close window"
+msgstr "Zavřít okno"
+
+#: prefs.js:318 tilingPieMenu.js:17
+msgid "Move to previous workspace"
+msgstr "Přesunout na předchozí pracovní plochu"
+
+#: prefs.js:318 tilingPieMenu.js:18
+msgid "Move to next workspace"
+msgstr "Přesunout na následující pracovní plochu"
+
+#: prefs.js:319 tilingPieMenu.js:19
+msgid "Move to top monitor"
+msgstr "Přesunout na horní monitor"
+
+#: prefs.js:319 tilingPieMenu.js:20
+msgid "Move to bottom monitor"
+msgstr "Přesunout na spodní monitor"
+
+#: prefs.js:319 tilingPieMenu.js:21
+msgid "Move to left monitor"
+msgstr "Přesunout na levý monitor"
+
+#: prefs.js:319 tilingPieMenu.js:22
+msgid "Move to right monitor"
+msgstr "Přesunout na pravý monitor"
+
+#: prefs.js:320 tilingPieMenu.js:23
+msgid "Toggle fullscreen"
+msgstr "Přepnout režim na celou obrazovku"
+
+#: prefs.js:320 tilingPieMenu.js:24
+msgid "Toggle 'Always on top'"
+msgstr "Přepnout \"Vždy nahoře\""
+
+#: prefs.js:320
+msgid "Tile left"
+msgstr "Dlaždice vlevo"
+
+#: prefs.js:320
+msgid "Tile right"
+msgstr "Dlaždice vpravo"
+
+#: prefs.js:320
+msgid "Tile top"
+msgstr "Dlaždice nahoře"
+
+#: prefs.js:320
+msgid "Tile bottom"
+msgstr "Dlaždice dole"
+
+#: prefs.js:321
+msgid "Tile top-left"
+msgstr "Dlaždice nahoře vlevo"
+
+#: prefs.js:321
+msgid "Tile top-right"
+msgstr "Dlaždice nahoře vpravo"
+
+#: prefs.js:321
+msgid "Tile bottom-left"
+msgstr "Dlaždice dole vlevo"
+
+#: prefs.js:321
+msgid "Tile bottom-right"
+msgstr "Dlaždice dole vpravo"
+
+#: prefs.js:391
+msgid "Layout name..."
+msgstr "Název rozložení..."
+
+#: prefs.js:490
+msgid ""
+"Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of "
+"the rectangles for the layouts in the left column.The right column shows a "
+"preview of your layouts (after saving). The layouts file is saved in "
+"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
+"Format for the rectangles:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
+"\n"
+"The values can range from 0 to 1. (0,0) is the top-left corner of your "
+"screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and "
+"can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of "
+"windows in that rectangle and they will share that space evenly (for ex.: "
+"Master & Stack).\n"
+"\n"
+"You can attach an app to the rectangle row. If you do that, a new instance "
+"of the app will be opened, when activating the layout. This is experimental "
+"and may not work reliably (especially on Wayland)."
+msgstr ""
+"Nastavte klávesovou zkratku kliknutím na text \"Disabled\". V levém sloupci "
+"zadejte rozměry obdélníků pro rozvržení.V pravém sloupci se zobrazí náhled "
+"vašich rozvržení (po uložení). Soubor s rozvrženími je uložen v adresáři "
+"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
+"Formát obdélníků:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
+"\n"
+"Hodnoty se mohou pohybovat od 0 do 1. (0,0) je levý horní roh obrazovky. "
+"(1,1) je pravý dolní roh. Parametr \"--dynamicSplit\" je nepovinný a může "
+"mít hodnotu \"--h\" nebo \"--v\". \"DynamicSplit\" znamená, že do tohoto "
+"obdélníku můžete rozdělit libovolný počet oken, která se o tento prostor "
+"rovnoměrně podělí (např.: Master & Stack).\n"
+"\n"
+"K řádku obdélníku můžete připojit aplikaci. Pokud to uděláte, při aktivaci "
+"rozložení se otevře nová instance aplikace. Jedná se o experimentální "
+"řešení, které nemusí fungovat spolehlivě (zejména v systému Wayland)."
+
+#: prefs.js:571
+msgid "No layout preview..."
+msgstr "Žádný náhled rozložení..."
+
+#: tilingEditingMode.js:263
+msgid ""
+"Can't resize into that direction. Super + Directions resizes on the S and E "
+"side. Super + Shift + Directions on the N and W side."
+msgstr ""
+"Nelze změnit velikost v tomto směru. Super + Směry mění velikost na J a V. "
+"Super + Shift + Směry na straně S a Z."
+
+#: tilingLayoutManager.js:139
+msgid "Layouts: App not found."
+msgstr "Rozložení: Aplikace nenalezena."
+
+#: tilingLayoutManager.js:238
+msgid "No valid layouts defined."
+msgstr "Nebylo definováno žádné validní rozložení."
+
+#: tilingLayoutManager.js:269
+msgid " Type to search..."
+msgstr "Vyhledávejte psaním..."
+
+#: tilingLayoutManager.js:365
+msgid "No layout name..."
+msgstr "Žádný název rozložení..."
+
+#: tilingPieMenu.js:25
+msgid "Tile to left"
+msgstr "Dlaždice vlevo"
+
+#: tilingPieMenu.js:26
+msgid "Tile to right"
+msgstr "Dlaždice vpravo"
+
+#: tilingPieMenu.js:27
+msgid "Tile to top"
+msgstr "Dlaždice nahoře"
+
+#: tilingPieMenu.js:28
+msgid "Tile to bottom"
+msgstr "Dlaždice dole"
+
+#: tilingPieMenu.js:29
+msgid "Tile to top-left"
+msgstr "Dlaždice nahoře vlevo"
+
+#: tilingPieMenu.js:30
+msgid "Tile to top-right"
+msgstr "Dlaždice nahoře vpravo"
+
+#: tilingPieMenu.js:31
+msgid "Tile to bottom-left"
+msgstr "Dlaždice dole vlevo"
+
+#: tilingPieMenu.js:32
+msgid "Tile to bottom-right"
+msgstr "Dlaždice dole vpravo"
+
+#: prefs40.ui:303 prefs.ui:334
+msgid "Tiling Popup"
+msgstr "Vyskakovací okno dlaždic"
+
+#: prefs40.ui:337 prefs.ui:378
+msgid "Raise Tile Groups together"
+msgstr "Zvedání skupin dlaždic dohromady"
+
+#: prefs40.ui:370 prefs.ui:421
+msgid "Focus and Tiling"
+msgstr "Zaměření a dlaždice"
+
+#: prefs40.ui:378 prefs.ui:434
+msgid ""
+"The shortcuts to maximize and tile to the top, bottom, left, and right will "
+"tile the window, if it isn't tiled.\n"
+"Otherwise it will switch focus to the closest tiled window, if there is one."
+msgstr ""
+"Klávesové zkratky pro maximalizaci a dlaždice nahoře, dole, vlevo a vpravo "
+"přepne okno na dlaždici, pokud ještě není dlaždicí.\n"
+"V opačném případě přepne zaměření na nejbližší dlaždicové okno, pokud nějaké "
+"existuje."
+
+#: prefs40.ui:414 prefs.ui:480
+msgid "Tile Editing Mode: Focus Color"
+msgstr "Režim úpravy dlaždic: Barva zaměření"
+
+#: prefs40.ui:448 prefs.ui:524
+msgid "Window Gaps"
+msgstr "Mezery mezi okny"
+
+#: prefs40.ui:484 prefs.ui:570
+msgid "Gaps on Maximized Windows"
+msgstr "Mezery kolem maximalizovaných oknen"
+
+#: prefs40.ui:517 prefs.ui:613
+msgid "Restore Window Size on"
+msgstr "Obnovit velikost okna na"
+
+#: prefs40.ui:525 prefs.ui:626
+msgid ""
+"This setting is intended for Wayland users. Tiled windows may not properly "
+"restore their size when they are being grabbed on Wayland.\n"
+"If that is the case, you can try 'Restore Window Size on Grab End' instead."
+msgstr ""
+"Toto nastavení je určeno pro uživatele systému Wayland. Dlaždicová okna "
+"nemusí správně obnovit svou velikost, když jsou uchopována na Waylandu.\n"
+"V takovém případě můžete místo toho vyzkoušet \"Obnovit velikost okna na "
+"konci uchopení\"."
+
+#: prefs40.ui:539 prefs.ui:645
+msgid "Grab Start"
+msgstr "začátku uchopení"
+
+#: prefs40.ui:540 prefs.ui:646
+msgid "Grab End"
+msgstr "konci uchopení"
+
+#: prefs40.ui:567 prefs.ui:678
+msgid "<u>Inverse Top Screen Edge Action:</u>"
+msgstr "<u>Inverzní akce horního okraje obrazovky:</u>"
+
+#: prefs40.ui:594 prefs.ui:710
+msgid "Landscape Displays"
+msgstr "Displeje na šířku"
+
+#: prefs40.ui:628 prefs.ui:754
+msgid "Portrait Displays"
+msgstr "Displeje na výšku"
+
+#: prefs40.ui:655 prefs.ui:791
+msgid "General"
+msgstr "Obecné"
+
+#: prefs40.ui:716 prefs.ui:855
+msgid "Toggle 'Tiling Popup'"
+msgstr "Přepnout \"Vyskakovací okno dlaždic\""
+
+#: prefs40.ui:752 prefs.ui:906
+msgid "Tile Editing Mode"
+msgstr "Režim úprav dlaždic"
+
+#: prefs40.ui:787 prefs.ui:956
+msgid "Layout Selector"
+msgstr "Výběr rozvržení"
+
+#: prefs40.ui:821 prefs.ui:1005
+msgid "Auto-Tile"
+msgstr "Automatické dlaždice"
+
+#: prefs40.ui:829 prefs.ui:1018
+msgid ""
+"The focused window will try to fill the free screen space as good as "
+"possible based on the tiled windows around it.\n"
+"If there is no space, the window will either untile or maximize depending on "
+"wether it's currently tiled."
+msgstr ""
+"Zaměřené okno se bude snažit co nejlépe vyplnit volný prostor na obrazovce "
+"na základě okolních oken s dlaždicemi.\n"
+"Pokud není místo, okno se buď přepne z dlaždice, nebo se maximalizuje v "
+"závislosti na tom, zda je právě dlaždicí."
+
+#: prefs40.ui:867 prefs.ui:1071
+msgid "Toggle Maximization"
+msgstr "Přepnout maximalizaci"
+
+#: prefs40.ui:894 prefs.ui:1113
+msgid "<b>    General    </b>"
+msgstr "<b>    Obecné    </b>"
+
+#: prefs40.ui:944 prefs.ui:1163
+msgid "Toggle to Top"
+msgstr "Přepnout nahoru"
+
+#: prefs40.ui:980 prefs.ui:1214
+msgid "Toggle to Bottom"
+msgstr "Přepnout dolů"
+
+#: prefs40.ui:1016 prefs.ui:1265
+msgid "Toggle to Left"
+msgstr "Přepnout vlevo"
+
+#: prefs40.ui:1052 prefs.ui:1316
+msgid "Toggle to Right"
+msgstr "Přepnout vpravo"
+
+#: prefs40.ui:1080 prefs.ui:1359
+msgid "<b>    Side Tiling    </b>"
+msgstr "<b>    Dlaždice na straně    </b>"
+
+#: prefs40.ui:1131 prefs.ui:1410
+msgid "Toggle to Top-Left"
+msgstr "Přepnout nahoru vlevo"
+
+#: prefs40.ui:1167 prefs.ui:1461
+msgid "Toggle to Top-Right"
+msgstr "Přepnout nahoru vpravo"
+
+#: prefs40.ui:1203 prefs.ui:1512
+msgid "Toggle to Bottom-Left"
+msgstr "Přepnout dolů vlevo"
+
+#: prefs40.ui:1239 prefs.ui:1563
+msgid "Toggle to Bottom-Right"
+msgstr "Přepnout dolů vpravo"
+
+#: prefs40.ui:1267 prefs.ui:1606
+msgid "<b>    Corner Tiling    </b>"
+msgstr "<b>    Dlaždice v rohu    </b>"
+
+#: prefs40.ui:1290 prefs.ui:1632
+msgid "Keybindings"
+msgstr "Klávesové zkratky"
+
+#: prefs40.ui:1371 prefs.ui:1749
+msgid "Layouts"
+msgstr "Rozložení"
+
+#: prefs40.ui:1399 prefs40.ui:1589 prefs.ui:1781 prefs.ui:2037
+msgid "Pie Menu"
+msgstr ""
+
+#: prefs40.ui:1406 prefs.ui:1793
+msgid ""
+"<tt>Super</tt> + <tt>RMB</tt> on a window will open a simple pie menu. While "
+"holding the right click dragging the mouse in the direction of a menu item "
+"and releasing the click, will activate that menu item. The pie menu's "
+"appearance is slightly delayed. The pie menu doesn't need to be visible for "
+"an menu item to be activated."
+msgstr ""
+
+#: prefs40.ui:1441 prefs.ui:1838
+msgid "Deadzone Radius"
+msgstr ""
+
+#: prefs40.ui:1478 prefs.ui:1885
+msgid "Item Circle Radius"
+msgstr ""
+
+#: prefs40.ui:1610 prefs.ui:2062
+msgid "Tiling Assistant"
+msgstr "Asistent dlaždicování"
+
+#: prefs40.ui:1638 prefs.ui:2100
+msgid ""
+"If you want to report a bug or need help,\n"
+"please open an issue on Github."
+msgstr ""
+"Pokud chcete nahlásit chybu, nebo potřebujete pomoc,\n"
+"prosím vytvořte issue na GitHubu."
+
+#: prefs40.ui:1665 prefs.ui:2137
+msgid ""
+"The <big><b>README</b></big> offers a detailed\n"
+"explaination of every setting and feature. "
+msgstr ""
+"<big><b>README</b></big> nabízí detailní\n"
+"vysvětlení každého nastavení a funkce. "
+
+#: prefs40.ui:1693 prefs.ui:2175
+msgid ""
+"The <big><b>Changelog</b></big> lists the changes\n"
+"made between each extension version. "
+msgstr ""
+"<big><b>Changelog</b></big> obsahuje seznam změn\n"
+"provedené mezi jednotlivými verzemi rozšíření. "
+
+#: prefs40.ui:1731 prefs.ui:2233
+msgid ""
+"<small>This extension is licensed under the <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
+"later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license "
+"can be found in the Github repository.</small>"
+msgstr ""
+"<small>Toto rozšíření je licencováno pod <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, verze 2 nebo "
+"novější</a> a není dodáváno s <u><b>ŽÁDNOU ZÁRUKOU</b></u>.  Kopii této "
+"licence naleznete v repozitáři na GitHubu.</small>"
+
+#: prefs40.ui:1750 prefs.ui:2260
+msgid ""
+"Help and\n"
+"Changelog"
+msgstr ""
+"Nápověda a\n"
+"Changelog"
+
+#: prefs40.ui:1789 prefs.ui:2303
+msgid "<u><b>Hidden Settings</b></u>"
+msgstr "<u><b>Skrytá nastavení</b></u>"
+
+#: prefs40.ui:1813 prefs.ui:2327
+msgid "Tiling Popup: Current Workspace only"
+msgstr "Vyskakovací okno dlaždic: Pouze aktuální pracovní plocha"
+
+#: prefs40.ui:1847 prefs.ui:2371
+msgid "Tile Animations"
+msgstr "Animace dlaždicování"
+
+#: prefs40.ui:1881 prefs.ui:2415
+msgid "Untile Animations"
+msgstr "Animace zrušení dlaždicování"
+
+#: prefs40.ui:1915 prefs.ui:2459
+msgid "Inverse Top Screen Edge Action Timer"
+msgstr "Inverzní časovač akce horního okraje obrazovky"
+
+#: prefs40.ui:1951 prefs.ui:2505
+msgid "Vertical Tile Preview Trigger Area"
+msgstr ""
+
+#: prefs40.ui:1988 prefs.ui:2552
+msgid "Horizontal Tile Preview Trigger Area"
+msgstr ""
+
+#: prefs40.ui:2024 prefs.ui:2598
+msgid "Debugging: Show Tiled Rects"
+msgstr ""
+
+#: prefs40.ui:2065 prefs.ui:2649
+msgid "Debugging: Show Free Screen Rects"
+msgstr ""
+
+#: prefs40.ui:2106 prefs.ui:2700
+msgid "Experimental: Semi Tiling Mode"
+msgstr ""
+
+#: prefs40.ui:2114 prefs.ui:2713
+msgid ""
+"Apps will open in a tiled state when an <b>AppIcon</b> is activated while "
+"holding <b>Shift</b>.\n"
+"They will try to fill the available space. If there is none, they will share "
+"the space with the focused tiled window.\n"
+"The position of the newly opened window is indicated by the top panel icon. "
+"It can be cycled with the keyboard shortcuts or by clicking the panel icon."
+msgstr ""
+
+#: prefs40.ui:2152 prefs.ui:2761
+msgid "Semi Tiling Mode: Cycle Tiling Modes (primary)"
+msgstr ""
+
+#: prefs40.ui:2193 prefs.ui:2812
+msgid "Semi Tiling Mode: Cycle Tiling Modes (secondary)"
+msgstr ""
