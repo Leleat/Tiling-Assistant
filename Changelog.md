@@ -3,10 +3,12 @@
 ## v22
 **Added**
 - link to a list of known incompatible apps/extensions (github issue #61)
+- Czech translation (by pervoj #81)
 
 **Fixed**
 - correctly position PieMenu on multimonitor setup (#78)
 - wrong tilePreview, if window was at the very top display edge
+- stop an extension crash, if ~/.config/tiling-assistant didn't exist, when the screen got locked
 
 
 ## v21

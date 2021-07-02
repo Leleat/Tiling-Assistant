@@ -373,7 +373,7 @@ function _saveBeforeSessionLock() {
 		});
 	});
 
-	const parentDir = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]);
+	const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
 	try {parentDir.make_directory_with_parents(null)} catch (e) {}
 	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
 	const file = Gio.File.new_for_path(path);
