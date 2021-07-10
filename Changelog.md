@@ -1,8 +1,8 @@
 # Changelog
 
 ## v23
-
-
+**Added**
+- partial Traditional Chinese translation for users in Taiwan (by laichiaheng #84)
 
 
 ## v22
