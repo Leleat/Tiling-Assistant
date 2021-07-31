@@ -30,7 +30,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 - ...
 
-Please see the ![Guide](Guide.md) for a detailed explanation of every feature.
+Please see the ![Guide](GUIDE.md) for a detailed explanation of every feature.
 
 ## Preview
 

@@ -6,6 +6,9 @@
 - added dynamic tiling options: disabled, focus & tiling states (#87)
 - added the 'layout selector' as an option for the pieMenu
 
+**Changed**
+- Moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
+
 
 ## v22
 **Added**
