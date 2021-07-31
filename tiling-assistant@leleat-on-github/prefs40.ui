@@ -422,40 +422,6 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Tile Editing Mode: Focus Color</property>
-                    <property name="xalign">0</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkColorButton" id="tile-editing-mode-color">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="receives-default">True</property>
-                    <property name="halign">end</property>
-                    <property name="hexpand">True</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-          </object>
-        </child>
-        <child>
-          <object class="GtkListBoxRow">
-            <property name="visible">True</property>
-            <property name="can-focus">True</property>
-            <child>
-              <object class="GtkBox">
-                <property name="visible">True</property>
-                <property name="can-focus">True</property>
-                <property name="margin-start">12</property>
-                <property name="margin-end">12</property>
-                <property name="margin-top">12</property>
-                <property name="margin-bottom">12</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <property name="valign">center</property>
                     <property name="label" translatable="yes">Window Gaps</property>
                     <property name="xalign">0</property>
                   </object>
@@ -1673,7 +1639,7 @@ please open an issue on Github.</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="halign">center</property>
-                <property name="label" translatable="yes">List of known &lt;big&gt;&lt;b&gt;INCOMPATIBLE&lt;/b&gt;&lt;/big&gt; apps/extensions.</property>
+                <property name="label" translatable="yes">List of known &lt;big&gt;&lt;b&gt;INCOMPATIBLE&lt;/b&gt;&lt;/big&gt; apps/extensions/limitations.</property>
                 <property name="use-markup">True</property>
                 <property name="justify">center</property>
                 <property name="wrap">True</property>
@@ -1710,7 +1676,7 @@ please open an issue on Github.</property>
             </child>
             <child>
               <object class="GtkLinkButton">
-                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/Guide.md</property>
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
@@ -1718,7 +1684,7 @@ please open an issue on Github.</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">15</property>
                 <property name="use-underline">True</property>
-                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/Guide.md</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
               </object>
             </child>
             <child>
@@ -1737,7 +1703,7 @@ please open an issue on Github.</property>
             </child>
             <child>
               <object class="GtkLinkButton">
-                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/Changelog.md</property>
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
                 <property name="receives-default">False</property>
@@ -1745,7 +1711,7 @@ please open an issue on Github.</property>
                 <property name="margin-top">5</property>
                 <property name="margin-bottom">15</property>
                 <property name="use-underline">True</property>
-                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/Changelog.md</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
               </object>
             </child>
           </object>
@@ -1856,6 +1822,40 @@ Changelog</property>
                             <property name="can-focus">True</property>
                             <property name="valign">center</property>
                             <property name="active">True</property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="valign">center</property>
+                            <property name="label" translatable="yes">Tile Editing Mode: Focus Color</property>
+                            <property name="xalign">0</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkColorButton" id="tile-editing-mode-color">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <property name="halign">end</property>
+                            <property name="hexpand">True</property>
                           </object>
                         </child>
                       </object>
