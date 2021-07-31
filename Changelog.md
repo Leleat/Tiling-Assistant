@@ -3,6 +3,7 @@
 ## v23
 **Added**
 - partial Traditional Chinese translation for users in Taiwan (by laichiaheng #84)
+- added dynamic tiling options: disabled, focus & tiling states (#87)
 
 
 ## v22

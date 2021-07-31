@@ -367,7 +367,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="valign">center</property>
-                    <property name="label" translatable="yes">Focus and Tiling</property>
+                    <property name="label" translatable="yes">Dynamic Keybinding Behaviour</property>
                     <property name="xalign">0</property>
                   </object>
                 </child>
@@ -375,19 +375,30 @@
                   <object class="GtkImage">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
-                    <property name="tooltip-text" translatable="yes">The shortcuts to maximize and tile to the top, bottom, left, and right will tile the window, if it isn't tiled.
-Otherwise it will switch focus to the closest tiled window, if there is one.</property>
+                    <property name="tooltip-markup" translatable="yes">The keyboard shortcuts to maximize and tile to the top, bottom, left, and right may change depending on the tiling state of the focused window.
+
+&lt;b&gt;Disabled&lt;/b&gt;: The shortcuts won't change their behaviour based on the window's tiling state.
+
+&lt;b&gt;Focus&lt;/b&gt;: If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window.
+
+&lt;b&gt;Tiling State&lt;/b&gt;: If the current window is tiled, it adapts to the pressed shortcut. For example, if the current window is tiled to the right half of your monitor and the shortcut to tile to the bottom is activated, the window will tile to the bottom-right quarter instead of the bottom half.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
                   </object>
                 </child>
                 <child>
-                  <object class="GtkSwitch" id="enable-dynamic-tiling">
+                  <object class="GtkComboBoxText" id="dynamic-keybinding-behaviour">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="halign">end</property>
                     <property name="hexpand">True</property>
-                    <property name="active">True</property>
+                    <property name="active">0</property>
+                    <property name="active-id">0</property>
+                    <items>
+                      <item id="0" translatable="yes">Disabled</item>
+                      <item id="1" translatable="yes">Focus</item>
+                      <item id="2" translatable="yes">Tiling State</item>
+                    </items>
                   </object>
                 </child>
               </object>

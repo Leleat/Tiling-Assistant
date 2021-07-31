@@ -4,6 +4,13 @@
 		<value value="0" nick="Grab Start"/>
 		<value value="1" nick="Grab End"/>
 	</enum>
+
+	<enum id="org.gnome.shell.extensions.tiling-assistant.dynamic-keybindings">
+		<value value="0" nick="Disabled"/>
+		<value value="1" nick="Focus"/>
+		<value value="2" nick="Tiling State"/>
+	</enum>
+
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
@@ -26,8 +33,8 @@
 		<key name="tiling-mode-secondary" type="as">
 			<default>[]</default>
 		</key>
-		<key name="enable-dynamic-tiling" type="b">
-	  		<default>false</default>
+		<key name="dynamic-keybinding-behaviour" enum="org.gnome.shell.extensions.tiling-assistant.dynamic-keybindings">
+			<default>"Disabled"</default>
 		</key>
 		<key name="tile-editing-mode-color" type="s">
 	  		<default>"rgb(27, 106, 203)"</default>
@@ -48,7 +55,7 @@
 			<default>0</default>
 		</key>
 		<key name="maximize-with-gap" type="b">
-	  		<default>false</default>
+			<default>false</default>
 		</key>
 		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
 			<default>"Grab Start"</default>

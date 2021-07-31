@@ -244,14 +244,21 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// tile window
 	} else {
-		settings.get_boolean("enable-dynamic-tiling") ? _dynamicTiling(window, shortcutName)
-				: Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
+		switch (settings.get_string("dynamic-keybinding-behaviour")) {
+			case "Focus":
+				_dynamicFocus(window, shortcutName);
+				break;
+			case "Tiling State":
+				_dynamicTilingState(window, shortcutName);
+				break;
+			default:
+				Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
+		}
 	}
 };
 
-function _dynamicTiling(window, shortcutName) {
+function _dynamicFocus(window, shortcutName) {
 	const topTileGroup = Util.getTopTileGroup(false);
-	// switch focus between topTileGroup
 	if (window.isTiled && topTileGroup.length > 1) {
 		const closestTiledRect = Util.getClosestRect(window.tiledRect, topTileGroup.map(w => w.tiledRect), shortcutName);
 		if (!closestTiledRect) {
@@ -290,6 +297,104 @@ function _dynamicTiling(window, shortcutName) {
 	} else {
 		Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
 	}
+};
+
+function _dynamicTilingState(window, shortcutName) {
+	if (!window.isTiled) {
+		Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
+		return;
+	}
+
+	const wRect = window.tiledRect;
+	const workArea = window.get_work_area_current_monitor();
+	const isLeftHalf = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width !== workArea.width && wRect.height === workArea.height;
+	const isRightHalf = wRect.x !== workArea.x && wRect.y === workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.height === workArea.height;
+	const isTopHalf = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width === workArea.width && wRect.height !== workArea.height;
+	const isBottomHalf = wRect.x === workArea.x && wRect.y !== workArea.y && wRect.width === workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
+	const isTopLeftQuarter = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width !== workArea.width && wRect.height !== workArea.height;
+	const isTopRightQuarter = wRect.x !== workArea.x && wRect.y === workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.height !== workArea.height;
+	const isBottomLeftQuarter = wRect.x === workArea.x && wRect.y !== workArea.y && wRect.width !== workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
+	const isBottomRightQuarter = wRect.x !== workArea.x && wRect.y !== workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
+
+	if (isLeftHalf) {
+		switch (shortcutName) {
+			case TILING.TOP:
+			case TILING.MAXIMIZE:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_LEFT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.BOTTOM:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isRightHalf) {
+		switch (shortcutName) {
+			case TILING.TOP:
+			case TILING.MAXIMIZE:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.BOTTOM:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isTopHalf) {
+		switch (shortcutName) {
+			case TILING.LEFT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_LEFT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.RIGHT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isBottomHalf) {
+		switch (shortcutName) {
+			case TILING.LEFT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.RIGHT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isTopLeftQuarter) {
+		switch (shortcutName) {
+			case TILING.RIGHT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP, window.get_work_area_current_monitor()));
+				return;
+			case TILING.BOTTOM:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.LEFT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isTopRightQuarter) {
+		switch (shortcutName) {
+			case TILING.LEFT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP, window.get_work_area_current_monitor()));
+				return;
+			case TILING.BOTTOM:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.RIGHT, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isBottomLeftQuarter) {
+		switch (shortcutName) {
+			case TILING.TOP:
+			case TILING.MAXIMIZE:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.LEFT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.RIGHT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
+				return;
+		}
+	} else if (isBottomRightQuarter) {
+		switch (shortcutName) {
+			case TILING.TOP:
+			case TILING.MAXIMIZE:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.RIGHT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.LEFT:
+				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
+				return;
+		}
+	}
+
+	Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
 };
 
 function onGrabStarted(...params) {

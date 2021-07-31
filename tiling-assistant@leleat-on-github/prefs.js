@@ -79,10 +79,10 @@ const MyPrefsWidget = new GObject.Class({
 	_bindWidgetsToSettings: function(settingsKeys) {
 		const ints = ["window-gap", "toggle-maximize-tophalf-timer", "vertical-preview-area", "horizontal-preview-area"
 				, "pie-menu-deadzone-radius", "pie-menu-item-radius"];
-		const bools = ["enable-tiling-popup", "enable-dynamic-tiling", "enable-tile-animations", "enable-untile-animations"
+		const bools = ["enable-tiling-popup", "enable-tile-animations", "enable-untile-animations"
 				, "enable-raise-tile-group", "enable-hold-maximize-inverse-landscape", "enable-hold-maximize-inverse-portrait"
 				, "enable-pie-menu", "maximize-with-gap", "tiling-popup-current-workspace-only", "enable-tiling-mode"];
-		const enums = ["restore-window-size-on"];
+		const enums = ["restore-window-size-on", "dynamic-keybinding-behaviour"];
 		const colors = ["tile-editing-mode-color"];
 
 		const getBindProperty = function(key) {
