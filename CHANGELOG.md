@@ -11,6 +11,7 @@
 
 **Fixed**
 - multimonitor: wrong position for the focus indicator of the tile editing mode
+- multimonitor: wrong position for the layout selector
 
 
 ## v22

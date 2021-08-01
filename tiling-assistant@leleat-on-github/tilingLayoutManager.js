@@ -272,7 +272,7 @@ const LayoutSelector = GObject.registerClass({
 
 			const activeWs = global.workspace_manager.get_active_workspace();
 			const workArea = activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
-			this.set_position(workArea.width / 2 - this.width / 2, workArea.height / 2 - this.height / 2);
+			this.set_position(workArea.x + workArea.width / 2 - this.width / 2, workArea.y + workArea.height / 2 - this.height / 2);
 
 			layouts.forEach(layout => this._items.push(this._createMenuItem(layout, fontSize)));
 			if (!this._items.length) {
