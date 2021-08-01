@@ -9,6 +9,9 @@
 **Changed**
 - Moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
 
+**Fixed**
+- multimonitor: wrong position for the focus indicator of the tile editing mode
+
 
 ## v22
 **Added**

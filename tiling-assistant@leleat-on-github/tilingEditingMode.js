@@ -360,9 +360,10 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
 const Indicator = GObject.registerClass(class TilingEditingModeIndicator extends St.Widget {
 	_init(window, style) {
+		const display = global.display.get_monitor_geometry(global.display.get_current_monitor());
 		super._init({
-			x: window.tiledRect.x + 100,
-			y: window.tiledRect.y + 100,
+			x: window.tiledRect.x + 100 - display.x,
+			y: window.tiledRect.y + 100 - display.y,
 			width: window.tiledRect.width - 200,
 			height: window.tiledRect.height - 200,
 			opacity: 0,
@@ -375,9 +376,10 @@ const Indicator = GObject.registerClass(class TilingEditingModeIndicator extends
 
 	select(rect, window) {
 		const gap = MainExtension.settings.get_int("window-gap");
+		const display = global.display.get_monitor_geometry(global.display.get_current_monitor());
 		this.ease({
-			x: rect.x + (gap - 2) / 2,
-			y: rect.y + (gap - 2) / 2,
+			x: rect.x + (gap - 2) / 2 - display.x,
+			y: rect.y + (gap - 2) / 2 - display.y,
 			width: rect.width - gap + 2,
 			height: rect.height - gap + 2,
 			opacity: 255,
