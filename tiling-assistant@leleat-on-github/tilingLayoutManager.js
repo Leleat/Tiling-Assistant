@@ -256,7 +256,7 @@ const LayoutSelector = GObject.registerClass({
 			super._init({
 				width: 500,
 				vertical: true,
-				style_class: "osd-window"
+				style_class: "osd-window",
 			});
 			main.uiGroup.add_child(this);
 
@@ -269,12 +269,6 @@ const LayoutSelector = GObject.registerClass({
 				hint_text: _(" Type to search...")
 			});
 			this.add_child(entry);
-			entry.grab_key_focus();
-
-			const entryClutterText = entry.get_clutter_text();
-			entryClutterText.connect("key-focus-out", () => this.destroy());
-			entryClutterText.connect("key-press-event", this._onKeyPressed.bind(this));
-			entryClutterText.connect("text-changed", this._onTextChanged.bind(this));
 
 			const activeWs = global.workspace_manager.get_active_workspace();
 			const workArea = activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
@@ -286,15 +280,29 @@ const LayoutSelector = GObject.registerClass({
 				return;
 			}
 
+			if (!main.pushModal(this)) {
+				// Probably someone else has a pointer grab, try again with keyboard only
+				if (!main.pushModal(this, {options: Meta.ModalOptions.POINTER_ALREADY_GRABBED})) {
+					this.destroy();
+					return;
+				}
+			}
+
+			this._haveModal = true;
 			this._focus(0);
+			entry.grab_key_focus();
+
+			const entryClutterText = entry.get_clutter_text();
+			entryClutterText.connect("key-press-event", this._onKeyPressed.bind(this));
+			entryClutterText.connect("text-changed", this._onTextChanged.bind(this));
 		}
 
 		destroy() {
-			// destroy may be called when activating a layout and when losing focus
-			if (this.alreadyDestroyed)
-				return;
+			if (this._haveModal) {
+				main.popModal(this);
+				this._haveModal = false;
+			}
 
-			this.alreadyDestroyed = true;
 			super.destroy();
 		}
 
@@ -303,6 +311,7 @@ const LayoutSelector = GObject.registerClass({
 				return;
 
 			const menuItem = new SelectorMenuItem(layout.name, fontSize);
+			menuItem.connect("button-press-event", this._onMenuItemClicked.bind(this));
 			this.add_child(menuItem);
 			return menuItem;
 		}
@@ -333,6 +342,11 @@ const LayoutSelector = GObject.registerClass({
 			const filterText = textActor.get_text();
 			this._items.forEach(item => item.text.toLowerCase().includes(filterText.toLowerCase()) ? item.show() : item.hide());
 			this._focus(this._items.findIndex(item => item.visible));
+		}
+
+		_onMenuItemClicked(menuItem, event) {
+			this._focusedIdx = this.get_children().indexOf(menuItem) - 1;
+			this._activateLayout();
 		}
 
 		_focusPrev() {
@@ -366,6 +380,7 @@ const SelectorMenuItem = GObject.registerClass(class SelectorMenuItem extends St
 			style: `font-size: ${fontSize}px;\
 					text-align: left;\
 					padding: 8px`,
+			reactive: true
 		});
 	}
 })

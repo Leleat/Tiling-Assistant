@@ -30,6 +30,7 @@ const ACTIONS = [
 	{name: _("Tile to top-right"), func: _tileTopRight},
 	{name: _("Tile to bottom-left"), func: _tileBottomLeft},
 	{name: _("Tile to bottom-right"), func: _tileBottomRight},
+	{name: _("Open Layout selector"), func: _openLayoutSelector},
 ];
 
 var PieMenu = GObject.registerClass(
@@ -97,6 +98,11 @@ var PieMenu = GObject.registerClass(
 		}
 
 		destroy() {
+			if (this._haveModal) {
+				main.popModal(this);
+				this._haveModal = false;
+			}
+
 			if (this._alreadyPopped)
 				return;
 
@@ -260,4 +266,8 @@ function _tileBottomLeft() {
 function _tileBottomRight() {
 	const window = global.display.focus_window;
 	Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+}
+
+function _openLayoutSelector() {
+	MainExtension.tilingLayoutManager.openLayoutSelector()
 }

@@ -316,7 +316,7 @@ const MyPrefsWidget = new GObject.Class({
 				_("Toggle 'Maximize'"), _("Minimize window"), _("Close window"), _("Move to previous workspace"), _("Move to next workspace")
 				, _("Move to top monitor"), _("Move to bottom monitor"), _("Move to left monitor"), _("Move to right monitor")
 				, _("Toggle fullscreen"), _("Toggle 'Always on top'"), _("Tile left"), _("Tile right"), _("Tile top"), _("Tile bottom")
-				, _("Tile top-left"), _("Tile top-right"), _("Tile bottom-left"), _("Tile bottom-right")
+				, _("Tile top-left"), _("Tile top-right"), _("Tile bottom-left"), _("Tile bottom-right"), _("Open Layout selector")
 		];
 		const row = new PieMenuRow(options);
 		activeId && row.setActiveId(activeId);
