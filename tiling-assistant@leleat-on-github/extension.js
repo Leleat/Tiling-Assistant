@@ -73,8 +73,6 @@ function enable() {
 	this.displaySignals = [];
 	this.displaySignals.push(global.display.connect("grab-op-begin", onGrabStarted.bind(this)));
 	this.displaySignals.push(global.display.connect("grab-op-end", onGrabFinished.bind(this)));
-	this.displaySignals.push(global.display.connect("window-entered-monitor", onWindowEnteredMonitor.bind(this)));
-	this.displaySignals.push(global.display.connect("window-left-monitor", onWindowLeftMonitor.bind(this)));
 
 	// disable native tiling
 	this.gnome_mutter_settings = ExtensionUtils.getSettings("org.gnome.mutter");
@@ -384,36 +382,6 @@ function _dynamicTilingState(window, shortcutName) {
 	}
 
 	Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-};
-
-function onWindowEnteredMonitor(display, idx, window) {
-	// if (!window.isTiled)
-	// 	return;
-
-	// if (this.potentionalMonitorChange && this.potentionalMonitorChange.stableSequence !== window.get_stable_sequence())
-	// 	return;
-
-	// const workArea = window.get_work_area_for_monitor(idx);
-	// Util.tileWindow(window, new Meta.Rectangle({
-	// 	x: workArea.x + Math.floor(workArea.width * this.potentionalMonitorChange.xRatio),
-	// 	y: workArea.y + Math.floor(workArea.height * this.potentionalMonitorChange.yRatio),
-	// 	width: Math.ceil(workArea.width * this.potentionalMonitorChange.widthRatio),
-	// 	height: Math.ceil(workArea.height * this.potentionalMonitorChange.heightRatio),
-	// }), false, true);
-};
-
-function onWindowLeftMonitor(display, idx, window) {
-	// if (!window.isTiled)
-	// 	return;
-
-	// const workArea = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(idx);
-	// this.potentionalMonitorChange = {
-	// 	stableSequence: window.get_stable_sequence(),
-	// 	xRatio: (window.tiledRect.x - workArea.x) / workArea.width,
-	// 	yRatio: (window.tiledRect.y - workArea.y) / workArea.height,
-	// 	widthRatio: window.tiledRect.width / workArea.width,
-	// 	heightRatio: window.tiledRect.height / workArea.height,
-	// };
 };
 
 function onGrabStarted(...params) {

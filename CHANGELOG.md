@@ -13,6 +13,7 @@
 **Fixed**
 - multimonitor: wrong position for the focus indicator of the tile editing mode
 - multimonitor: wrong position for the layout selector
+- multimonitor: inconsistent behaviour for tiling a window via DND within the 'grace period'
 
 
 ## v22

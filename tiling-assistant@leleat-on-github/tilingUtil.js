@@ -108,16 +108,16 @@ function getOpenWindows(currentWorkspace = true) {
 
 // get the top most tiled windows in a group i. e. they complement each other and dont intersect.
 // ignore the top window if DNDing or tiling via keybinding since that window may not be tiled yet
-function getTopTileGroup(ignoreTopWindow = true) {
+function getTopTileGroup(ignoreTopWindow = true, monitor = null) {
 	const openWindows = getOpenWindows();
 	const groupedWindows = [];
 	const notGroupedWindows = [];
-	const currMonitor = openWindows.length && openWindows[0].get_monitor();
 	let groupedWindowsArea = 0;
+	monitor = monitor !== null ? monitor : (openWindows.length && openWindows[0].get_monitor());
 
 	for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
 		const window = openWindows[i];
-		if (window.get_monitor() !== currMonitor)
+		if (window.get_monitor() !== monitor)
 			continue;
 
 		if (window.isTiled) {
@@ -333,8 +333,8 @@ function getBestFitTiledRect(window, topTileGroup = null) {
 	}
 };
 
-function getTileRectFor(position, workArea) {
-	const topTileGroup = getTopTileGroup();
+function getTileRectFor(position, workArea, monitor = null) {
+	const topTileGroup = getTopTileGroup(true, monitor);
 	const screenRects = topTileGroup.map(w => w.tiledRect).concat(getFreeScreenRects(topTileGroup));
 
 	let width, height, rect;
