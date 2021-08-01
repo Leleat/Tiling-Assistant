@@ -7,7 +7,8 @@
 - added the 'layout selector' as an option for the pieMenu
 
 **Changed**
-- Moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
+- moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
+- removed experimental semi-autotiling mode (#70)
 
 **Fixed**
 - multimonitor: wrong position for the focus indicator of the tile editing mode

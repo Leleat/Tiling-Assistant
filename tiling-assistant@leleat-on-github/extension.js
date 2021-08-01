@@ -29,7 +29,6 @@ const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TilingLayoutManager = Me.imports.tilingLayoutManager;
 const PieMenu = Me.imports.tilingPieMenu;
 const TileEditing = Me.imports.tilingEditingMode;
-const SemiAutoTilingMode = Me.imports.tilingSemiAutoMode;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -42,8 +41,6 @@ var TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
-	TILING_MODE_PRIMARY: "tiling-mode-primary",
-	TILING_MODE_SECONDARY: "tiling-mode-secondary",
 	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
@@ -88,7 +85,7 @@ function enable() {
 	// keybindings
 	this.keyBindings = Object.values(TILING);
 	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
-	const bindingInOverview = [TILING.TOGGLE_POPUP, TILING.TILING_MODE_PRIMARY, TILING.TILING_MODE_SECONDARY];
+	const bindingInOverview = [TILING.TOGGLE_POPUP];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 				| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), onCustomKeybindingPressed.bind(this, key));
@@ -127,9 +124,6 @@ function enable() {
 	this.settingsSignals.push(this.settings.connect("changed::enable-pie-menu", togglePieMenu));
 	togglePieMenu();
 
-	// open apps tiled by holding Shift when activating an AppIcon
-	this.semiAutoTiler = new SemiAutoTilingMode.Manager();
-
 	// restore window properties after session was unlocked
 	_loadAfterSessionLock();
 };
@@ -146,8 +140,6 @@ function disable() {
 	this.tilingLayoutManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
-	this.semiAutoTiler.destroy();
-	this.semiAutoTiler = null;
 
 	// disconnect signals
 	this.displaySignals.forEach(id => global.display.disconnect(id));
@@ -214,11 +206,6 @@ function onCustomKeybindingPressed(shortcutName) {
 	// open the appDash consecutively to tile to a layout
 	} else if (shortcutName.startsWith("activate-layout")) {
 		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
-		return;
-
-	// toggle the direction in which an app opens in a tiled state
-	} else if (shortcutName.startsWith("tiling-mode-")) {
-		this.semiAutoTiler.cycleTilingModes(shortcutName);
 		return;
 	}
 

@@ -11,7 +11,6 @@
     - [Tile Editing Mode](#Tile-Editing-Mode)
     - [Layouts](#Layouts)
     - [Pie Menu](#Pie-Menu)
-    - [Semi Tiling Mode](#Semi-Tiling-Mode)
     - [Hidden Settings](#Hidden-Settings)
 
 ## Usage
@@ -73,19 +72,6 @@ The `layout selector` enables you to search for layouts by name. That means you 
 `Super` + `RMB` on a window will open a pie menu. Moving the mouse into a direction and then releasing the right-click will perform that pie action. The pie menu's appearance is slightly delayed. However, the menu doesn't need to be visible for a pie action to be activated.
 
 ![](media/Guide_pieMenu.gif)
-
-### Semi Tiling Mode
-
-This is an experimental feature and thus off by default. Please provide feedback at [#70](/../../issues/70). It can be enabled in the [Hidden Settings](#Hidden-Settings). This feature is inspired by manual tiling window managers.
-
-The tiling won't happen automatically. You need to hold `Shift` when activating an AppIcon (from the Dash, AppGrid or Search Results). A new instance of the app will be opened.
-
-The newly opened window will try to fill the free unambiguous screen space. If there is none, they will share the space with the focused tiled window. The position of the new window is indicated by the top panel icon. It can be cycled with keyboard shortcuts or by clicking the panel icon.
-
-For example:
-
-![](media/Guide_semiTilingMode.png)
-
 
 ### Hidden Settings
 
