@@ -421,7 +421,9 @@
 
 &lt;b&gt;Focus&lt;/b&gt;: If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window.
 
-&lt;b&gt;Tiling State&lt;/b&gt;: If the current window is tiled, it adapts to the pressed shortcut. For example, if the current window is tiled to the right half of your monitor and the shortcut to tile to the bottom is activated, the window will tile to the bottom-right quarter instead of the bottom half.</property>
+&lt;b&gt;Tiling State&lt;/b&gt;: If the current window is tiled, it adapts to the pressed shortcut. For example, if the current window is tiled to the right half of your monitor and the shortcut to tile to the bottom is activated, the window will tile to the bottom-right quarter instead of the bottom half.
+
+&lt;b&gt;Tiling State (Windows)&lt;/b&gt;: Like 'Tiling State' but if the window is already at the bottom and the 'tile to bottom' shortcut is activated, minimize the window.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
                   </object>
@@ -443,6 +445,7 @@
                       <item id="0" translatable="yes">Disabled</item>
                       <item id="1" translatable="yes">Focus</item>
                       <item id="2" translatable="yes">Tiling State</item>
+                      <item id="3" translatable="yes">Tiling State (Windows)</item>
                     </items>
                   </object>
                   <packing>

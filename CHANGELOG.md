@@ -1,5 +1,10 @@
 # Changelog
 
+## v24
+**Added**
+- windows-like minimize option for the dynamic keybindings
+
+
 ## v23
 **Added**
 - partial Traditional Chinese translation for users in Taiwan (by laichiaheng #84)

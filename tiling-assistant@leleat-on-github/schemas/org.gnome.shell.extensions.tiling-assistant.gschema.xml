@@ -9,6 +9,7 @@
 		<value value="0" nick="Disabled"/>
 		<value value="1" nick="Focus"/>
 		<value value="2" nick="Tiling State"/>
+		<value value="3" nick="Tiling State (Windows)"/>
 	</enum>
 
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">

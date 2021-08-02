@@ -231,12 +231,14 @@ function onCustomKeybindingPressed(shortcutName) {
 
 	// tile window
 	} else {
-		switch (settings.get_string("dynamic-keybinding-behaviour")) {
+		const dynamicSetting = settings.get_string("dynamic-keybinding-behaviour");
+		switch (dynamicSetting) {
 			case "Focus":
 				_dynamicFocus(window, shortcutName);
 				break;
 			case "Tiling State":
-				_dynamicTilingState(window, shortcutName);
+			case "Tiling State (Windows)":
+				_dynamicTilingState(window, shortcutName, dynamicSetting === "Tiling State (Windows)");
 				break;
 			default:
 				Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
@@ -286,9 +288,16 @@ function _dynamicFocus(window, shortcutName) {
 	}
 };
 
-function _dynamicTilingState(window, shortcutName) {
+// @isWindowsStyle -> minimize when tiling state at bottom and 'tile to bottom' shortcut is pressed
+function _dynamicTilingState(window, shortcutName, isWindowsStyle) {
+	if (Util.windowIsMaximized(window) && [TILING.BOTTOM, TILING.TOP, TILING.MAXIMIZE].includes(shortcutName)) {
+		Util.restoreWindowSize(window);
+		return;
+	}
+
 	if (!window.isTiled) {
-		Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
+		isWindowsStyle && shortcutName === TILING.BOTTOM ? window.minimize()
+				: Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
 		return;
 	}
 
@@ -312,6 +321,9 @@ function _dynamicTilingState(window, shortcutName) {
 			case TILING.BOTTOM:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
 				return;
+			case TILING.RIGHT:
+				Util.restoreWindowSize(window);
+				return;
 		}
 	} else if (isRightHalf) {
 		switch (shortcutName) {
@@ -322,6 +334,9 @@ function _dynamicTilingState(window, shortcutName) {
 			case TILING.BOTTOM:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
 				return;
+			case TILING.LEFT:
+				Util.restoreWindowSize(window);
+				return;
 		}
 	} else if (isTopHalf) {
 		switch (shortcutName) {
@@ -331,6 +346,9 @@ function _dynamicTilingState(window, shortcutName) {
 			case TILING.RIGHT:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
 				return;
+			case TILING.BOTTOM:
+				Util.restoreWindowSize(window);
+				return;
 		}
 	} else if (isBottomHalf) {
 		switch (shortcutName) {
@@ -339,6 +357,14 @@ function _dynamicTilingState(window, shortcutName) {
 				return;
 			case TILING.RIGHT:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+				return;
+			case TILING.TOP:
+			case TILING.MAXIMIZE:
+				Util.restoreWindowSize(window);
+				return;
+			case TILING.BOTTOM:
+				isWindowsStyle ? window.minimize()
+						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
 				return;
 		}
 	} else if (isTopLeftQuarter) {
@@ -368,6 +394,10 @@ function _dynamicTilingState(window, shortcutName) {
 			case TILING.RIGHT:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
 				return;
+			case TILING.BOTTOM:
+				isWindowsStyle ? window.minimize()
+						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
+				return;
 		}
 	} else if (isBottomRightQuarter) {
 		switch (shortcutName) {
@@ -377,6 +407,10 @@ function _dynamicTilingState(window, shortcutName) {
 				return;
 			case TILING.LEFT:
 				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
+				return;
+			case TILING.BOTTOM:
+				isWindowsStyle ? window.minimize()
+						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
 				return;
 		}
 	}
