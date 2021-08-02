@@ -98,11 +98,6 @@ var PieMenu = GObject.registerClass(
 		}
 
 		destroy() {
-			if (this._haveModal) {
-				main.popModal(this);
-				this._haveModal = false;
-			}
-
 			if (this._alreadyPopped)
 				return;
 
