@@ -311,10 +311,10 @@ const MyPrefsWidget = new GObject.Class({
 
 	_createPieMenuRow: function(activeId) {
 		const options = [ // make sure this has the same order as tilingPieMenu.js
-				_("Toggle 'Maximize'"), _("Minimize window"), _("Close window"), _("Move to previous workspace"), _("Move to next workspace")
+				_("Toggle Maximization"), _("Minimize window"), _("Close window"), _("Move to previous workspace"), _("Move to next workspace")
 				, _("Move to top monitor"), _("Move to bottom monitor"), _("Move to left monitor"), _("Move to right monitor")
-				, _("Toggle fullscreen"), _("Toggle 'Always on top'"), _("Tile left"), _("Tile right"), _("Tile top"), _("Tile bottom")
-				, _("Tile top-left"), _("Tile top-right"), _("Tile bottom-left"), _("Tile bottom-right"), _("Open Layout selector")
+				, _("Toggle fullscreen"), _("Toggle 'Always on top'"), _("Tile to left"), _("Tile to right"), _("Tile to top"), _("Tile to bottom")
+				, _("Tile to top-left"), _("Tile to top-right"), _("Tile to bottom-left"), _("Tile to bottom-right"), _("Open Layout selector")
 		];
 		const row = new PieMenuRow(options);
 		activeId && row.setActiveId(activeId);

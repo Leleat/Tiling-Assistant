@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-20 17:03+0200\n"
+"POT-Creation-Date: 2021-08-02 01:15+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,99 +17,99 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: extension.js:194
+#: extension.js:195
 msgid "Tiling-assistant's popup enabled"
 msgstr ""
 
-#: extension.js:194
+#: extension.js:195
 msgid "Tiling-assistant's popup was disabled"
 msgstr ""
 
-#: extension.js:226
+#: extension.js:222
 msgid "Can't enter 'Tile Editing Mode', if the focused window isn't tiled."
 msgstr ""
 
-#: prefs.js:318 tilingPieMenu.js:14
-msgid "Toggle 'Maximize'"
-msgstr ""
-
-#: prefs.js:318 tilingPieMenu.js:15
+#: prefs.js:314 tilingPieMenu.js:15
 msgid "Minimize window"
 msgstr ""
 
-#: prefs.js:318 tilingPieMenu.js:16
+#: prefs.js:314 tilingPieMenu.js:16
 msgid "Close window"
 msgstr ""
 
-#: prefs.js:318 tilingPieMenu.js:17
+#: prefs.js:314 tilingPieMenu.js:17
 msgid "Move to previous workspace"
 msgstr ""
 
-#: prefs.js:318 tilingPieMenu.js:18
+#: prefs.js:314 tilingPieMenu.js:18
 msgid "Move to next workspace"
 msgstr ""
 
-#: prefs.js:319 tilingPieMenu.js:19
+#: prefs.js:315 tilingPieMenu.js:19
 msgid "Move to top monitor"
 msgstr ""
 
-#: prefs.js:319 tilingPieMenu.js:20
+#: prefs.js:315 tilingPieMenu.js:20
 msgid "Move to bottom monitor"
 msgstr ""
 
-#: prefs.js:319 tilingPieMenu.js:21
+#: prefs.js:315 tilingPieMenu.js:21
 msgid "Move to left monitor"
 msgstr ""
 
-#: prefs.js:319 tilingPieMenu.js:22
+#: prefs.js:315 tilingPieMenu.js:22
 msgid "Move to right monitor"
 msgstr ""
 
-#: prefs.js:320 tilingPieMenu.js:23
+#: prefs.js:316 tilingPieMenu.js:23
 msgid "Toggle fullscreen"
 msgstr ""
 
-#: prefs.js:320 tilingPieMenu.js:24
+#: prefs.js:316 tilingPieMenu.js:24
 msgid "Toggle 'Always on top'"
 msgstr ""
 
-#: prefs.js:320
-msgid "Tile left"
+#: prefs.js:316 tilingPieMenu.js:25 prefs40.ui:977 prefs.ui:1216
+msgid "Tile to left"
 msgstr ""
 
-#: prefs.js:320
-msgid "Tile right"
+#: prefs.js:316 tilingPieMenu.js:26 prefs40.ui:1013 prefs.ui:1267
+msgid "Tile to right"
 msgstr ""
 
-#: prefs.js:320
-msgid "Tile top"
+#: prefs.js:316 tilingPieMenu.js:27 prefs40.ui:905 prefs.ui:1114
+msgid "Tile to top"
 msgstr ""
 
-#: prefs.js:320
-msgid "Tile bottom"
+#: prefs.js:316 tilingPieMenu.js:28 prefs40.ui:941 prefs.ui:1165
+msgid "Tile to bottom"
 msgstr ""
 
-#: prefs.js:321
-msgid "Tile top-left"
+#: prefs.js:317 tilingPieMenu.js:29 prefs40.ui:1092 prefs.ui:1361
+msgid "Tile to top-left"
 msgstr ""
 
-#: prefs.js:321
-msgid "Tile top-right"
+#: prefs.js:317 tilingPieMenu.js:30 prefs40.ui:1128 prefs.ui:1412
+msgid "Tile to top-right"
 msgstr ""
 
-#: prefs.js:321
-msgid "Tile bottom-left"
+#: prefs.js:317 tilingPieMenu.js:31 prefs40.ui:1164 prefs.ui:1463
+msgid "Tile to bottom-left"
 msgstr ""
 
-#: prefs.js:321
-msgid "Tile bottom-right"
+#: prefs.js:317 tilingPieMenu.js:32 prefs40.ui:1200 prefs.ui:1514
+msgid "Tile to bottom-right"
 msgstr ""
 
-#: prefs.js:391
+#: prefs.js:317 tilingPieMenu.js:33
+msgid "Open Layout selector"
+msgstr ""
+
+#: prefs.js:381
 msgid "Layout name..."
 msgstr ""
 
-#: prefs.js:490
+#: prefs.js:480
 msgid ""
 "Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of "
 "the rectangles for the layouts in the left column.The right column shows a "
@@ -130,13 +130,13 @@ msgid ""
 "and may not work reliably (especially on Wayland)."
 msgstr ""
 
-#: prefs.js:571
+#: prefs.js:561
 msgid "No layout preview..."
 msgstr ""
 
 #: tilingEditingMode.js:263
 msgid ""
-"Can't resize into that direction. Super + Directions resizes on the S and E "
+"Can't resize in that direction. Super + Directions resizes on the S and E "
 "side. Super + Shift + Directions on the N and W side."
 msgstr ""
 
@@ -152,125 +152,112 @@ msgstr ""
 msgid " Type to search..."
 msgstr ""
 
-#: tilingLayoutManager.js:365
+#: tilingLayoutManager.js:379
 msgid "No layout name..."
 msgstr ""
 
-#: tilingPieMenu.js:25
-msgid "Tile to left"
-msgstr ""
-
-#: tilingPieMenu.js:26
-msgid "Tile to right"
-msgstr ""
-
-#: tilingPieMenu.js:27
-msgid "Tile to top"
-msgstr ""
-
-#: tilingPieMenu.js:28
-msgid "Tile to bottom"
-msgstr ""
-
-#: tilingPieMenu.js:29
-msgid "Tile to top-left"
-msgstr ""
-
-#: tilingPieMenu.js:30
-msgid "Tile to top-right"
-msgstr ""
-
-#: tilingPieMenu.js:31
-msgid "Tile to bottom-left"
-msgstr ""
-
-#: tilingPieMenu.js:32
-msgid "Tile to bottom-right"
-msgstr ""
-
-#: prefs40.ui:303 prefs.ui:334
+#: prefs40.ui:287 prefs.ui:318
 msgid "Tiling Popup"
 msgstr ""
 
-#: prefs40.ui:337 prefs.ui:378
+#: prefs40.ui:321 prefs.ui:362
 msgid "Raise Tile Groups together"
 msgstr ""
 
-#: prefs40.ui:370 prefs.ui:421
-msgid "Focus and Tiling"
+#: prefs40.ui:354 prefs.ui:405
+msgid "Dynamic Keybinding Behaviour"
 msgstr ""
 
-#: prefs40.ui:378 prefs.ui:434
+#: prefs40.ui:362 prefs.ui:418
 msgid ""
-"The shortcuts to maximize and tile to the top, bottom, left, and right will "
-"tile the window, if it isn't tiled.\n"
-"Otherwise it will switch focus to the closest tiled window, if there is one."
+"The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
+"right may change depending on the tiling state of the focused window.\n"
+"\n"
+"<b>Disabled</b>: The shortcuts won't change their behaviour based on the "
+"window's tiling state.\n"
+"\n"
+"<b>Focus</b>: If the current window is tiled and there is a tiled window in "
+"the direction of the shortcut, switch focus to that tiled window instead of "
+"tiling the current window.\n"
+"\n"
+"<b>Tiling State</b>: If the current window is tiled, it adapts to the "
+"pressed shortcut. For example, if the current window is tiled to the right "
+"half of your monitor and the shortcut to tile to the bottom is activated, "
+"the window will tile to the bottom-right quarter instead of the bottom half."
 msgstr ""
 
-#: prefs40.ui:414 prefs.ui:480
-msgid "Tile Editing Mode: Focus Color"
+#: prefs40.ui:382 prefs.ui:443
+msgid "Disabled"
 msgstr ""
 
-#: prefs40.ui:448 prefs.ui:524
+#: prefs40.ui:383 prefs.ui:444
+msgid "Focus"
+msgstr ""
+
+#: prefs40.ui:384 prefs.ui:445
+msgid "Tiling State"
+msgstr ""
+
+#: prefs40.ui:409 prefs.ui:475
 msgid "Window Gaps"
 msgstr ""
 
-#: prefs40.ui:484 prefs.ui:570
+#: prefs40.ui:445 prefs.ui:521
 msgid "Gaps on Maximized Windows"
 msgstr ""
 
-#: prefs40.ui:517 prefs.ui:613
+#: prefs40.ui:478 prefs.ui:564
 msgid "Restore Window Size on"
 msgstr ""
 
-#: prefs40.ui:525 prefs.ui:626
+#: prefs40.ui:486 prefs.ui:577
 msgid ""
 "This setting is intended for Wayland users. Tiled windows may not properly "
 "restore their size when they are being grabbed on Wayland.\n"
 "If that is the case, you can try 'Restore Window Size on Grab End' instead."
 msgstr ""
 
-#: prefs40.ui:539 prefs.ui:645
+#: prefs40.ui:500 prefs.ui:596
 msgid "Grab Start"
 msgstr ""
 
-#: prefs40.ui:540 prefs.ui:646
+#: prefs40.ui:501 prefs.ui:597
 msgid "Grab End"
 msgstr ""
 
-#: prefs40.ui:567 prefs.ui:678
+#: prefs40.ui:528 prefs.ui:629
 msgid "<u>Inverse Top Screen Edge Action:</u>"
 msgstr ""
 
-#: prefs40.ui:594 prefs.ui:710
+#: prefs40.ui:555 prefs.ui:661
 msgid "Landscape Displays"
 msgstr ""
 
-#: prefs40.ui:628 prefs.ui:754
+#: prefs40.ui:589 prefs.ui:705
 msgid "Portrait Displays"
 msgstr ""
 
-#: prefs40.ui:655 prefs.ui:791
+#: prefs40.ui:616 prefs.ui:742
 msgid "General"
 msgstr ""
 
-#: prefs40.ui:716 prefs.ui:855
+#: prefs40.ui:677 prefs.ui:806
 msgid "Toggle 'Tiling Popup'"
 msgstr ""
 
-#: prefs40.ui:752 prefs.ui:906
+#: prefs40.ui:713 prefs.ui:857
 msgid "Tile Editing Mode"
 msgstr ""
 
-#: prefs40.ui:787 prefs.ui:956
+#: prefs40.ui:748 prefs.ui:907
 msgid "Layout Selector"
 msgstr ""
 
-#: prefs40.ui:821 prefs.ui:1005
+#: prefs40.ui:782 prefs.ui:956
 msgid "Auto-Tile"
 msgstr ""
 
-#: prefs40.ui:829 prefs.ui:1018
+#: prefs40.ui:790 prefs.ui:969
 msgid ""
 "The focused window will try to fill the free screen space as good as "
 "possible based on the tiled windows around it.\n"
@@ -278,106 +265,78 @@ msgid ""
 "wether it's currently tiled."
 msgstr ""
 
-#: prefs40.ui:867 prefs.ui:1071
+#: prefs40.ui:828 prefs.ui:1022 prefs.js:314 tilingPieMenu.js:14
 msgid "Toggle Maximization"
 msgstr ""
 
-#: prefs40.ui:894 prefs.ui:1113
+#: prefs40.ui:855 prefs.ui:1064
 msgid "<b>    General    </b>"
 msgstr ""
 
-#: prefs40.ui:944 prefs.ui:1163
-msgid "Toggle to Top"
-msgstr ""
-
-#: prefs40.ui:980 prefs.ui:1214
-msgid "Toggle to Bottom"
-msgstr ""
-
-#: prefs40.ui:1016 prefs.ui:1265
-msgid "Toggle to Left"
-msgstr ""
-
-#: prefs40.ui:1052 prefs.ui:1316
-msgid "Toggle to Right"
-msgstr ""
-
-#: prefs40.ui:1080 prefs.ui:1359
+#: prefs40.ui:1041 prefs.ui:1310
 msgid "<b>    Side Tiling    </b>"
 msgstr ""
 
-#: prefs40.ui:1131 prefs.ui:1410
-msgid "Toggle to Top-Left"
-msgstr ""
-
-#: prefs40.ui:1167 prefs.ui:1461
-msgid "Toggle to Top-Right"
-msgstr ""
-
-#: prefs40.ui:1203 prefs.ui:1512
-msgid "Toggle to Bottom-Left"
-msgstr ""
-
-#: prefs40.ui:1239 prefs.ui:1563
-msgid "Toggle to Bottom-Right"
-msgstr ""
-
-#: prefs40.ui:1267 prefs.ui:1606
+#: prefs40.ui:1228 prefs.ui:1557
 msgid "<b>    Corner Tiling    </b>"
 msgstr ""
 
-#: prefs40.ui:1290 prefs.ui:1632
+#: prefs40.ui:1251 prefs.ui:1583
 msgid "Keybindings"
 msgstr ""
 
-#: prefs40.ui:1371 prefs.ui:1749
+#: prefs40.ui:1332 prefs.ui:1700
 msgid "Layouts"
 msgstr ""
 
-#: prefs40.ui:1399 prefs40.ui:1589 prefs.ui:1781 prefs.ui:2037
+#: prefs40.ui:1360 prefs40.ui:1550 prefs.ui:1732 prefs.ui:1988
 msgid "Pie Menu"
 msgstr ""
 
-#: prefs40.ui:1406 prefs.ui:1793
+#: prefs40.ui:1367 prefs.ui:1744
 msgid ""
 "<tt>Super</tt> + <tt>RMB</tt> on a window will open a simple pie menu. While "
 "holding the right click dragging the mouse in the direction of a menu item "
 "and releasing the click, will activate that menu item. The pie menu's "
 "appearance is slightly delayed. The pie menu doesn't need to be visible for "
-"an menu item to be activated."
+"a menu item to be activated."
 msgstr ""
 
-#: prefs40.ui:1441 prefs.ui:1838
+#: prefs40.ui:1402 prefs.ui:1789
 msgid "Deadzone Radius"
 msgstr ""
 
-#: prefs40.ui:1478 prefs.ui:1885
+#: prefs40.ui:1439 prefs.ui:1836
 msgid "Item Circle Radius"
 msgstr ""
 
-#: prefs40.ui:1610 prefs.ui:2062
+#: prefs40.ui:1571 prefs.ui:2013
 msgid "Tiling Assistant"
 msgstr ""
 
-#: prefs40.ui:1638 prefs.ui:2100
+#: prefs40.ui:1599 prefs.ui:2051
 msgid ""
 "If you want to report a bug or need help,\n"
 "please open an issue on Github."
 msgstr ""
 
-#: prefs40.ui:1665 prefs.ui:2137
+#: prefs40.ui:1626 prefs.ui:2088
 msgid ""
-"The <big><b>README</b></big> offers a detailed\n"
-"explaination of every setting and feature. "
+"List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
 msgstr ""
 
-#: prefs40.ui:1693 prefs.ui:2175
+#: prefs40.ui:1653 prefs.ui:2125
 msgid ""
-"The <big><b>Changelog</b></big> lists the changes\n"
-"made between each extension version. "
+"The <big><b>GUIDE</b></big> offers a detailed explanation of every feature."
 msgstr ""
 
-#: prefs40.ui:1731 prefs.ui:2233
+#: prefs40.ui:1680 prefs.ui:2161
+msgid ""
+"The <big><b>CHANGELOG</b></big> lists the differences between each extension "
+"version."
+msgstr ""
+
+#: prefs40.ui:1717 prefs.ui:2218
 msgid ""
 "<small>This extension is licensed under the <a href='https://www.gnu.org/"
 "licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
@@ -385,66 +344,48 @@ msgid ""
 "can be found in the Github repository.</small>"
 msgstr ""
 
-#: prefs40.ui:1750 prefs.ui:2260
+#: prefs40.ui:1736 prefs.ui:2245
 msgid ""
 "Help and\n"
 "Changelog"
 msgstr ""
 
-#: prefs40.ui:1789 prefs.ui:2303
+#: prefs40.ui:1775 prefs.ui:2288
 msgid "<u><b>Hidden Settings</b></u>"
 msgstr ""
 
-#: prefs40.ui:1813 prefs.ui:2327
+#: prefs40.ui:1799 prefs.ui:2312
 msgid "Tiling Popup: Current Workspace only"
 msgstr ""
 
-#: prefs40.ui:1847 prefs.ui:2371
+#: prefs40.ui:1832 prefs.ui:2355
+msgid "Tile Editing Mode: Focus Color"
+msgstr ""
+
+#: prefs40.ui:1867 prefs.ui:2400
 msgid "Tile Animations"
 msgstr ""
 
-#: prefs40.ui:1881 prefs.ui:2415
+#: prefs40.ui:1901 prefs.ui:2444
 msgid "Untile Animations"
 msgstr ""
 
-#: prefs40.ui:1915 prefs.ui:2459
+#: prefs40.ui:1935 prefs.ui:2488
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr ""
 
-#: prefs40.ui:1951 prefs.ui:2505
+#: prefs40.ui:1971 prefs.ui:2534
 msgid "Vertical Tile Preview Trigger Area"
 msgstr ""
 
-#: prefs40.ui:1988 prefs.ui:2552
+#: prefs40.ui:2008 prefs.ui:2581
 msgid "Horizontal Tile Preview Trigger Area"
 msgstr ""
 
-#: prefs40.ui:2024 prefs.ui:2598
+#: prefs40.ui:2044 prefs.ui:2627
 msgid "Debugging: Show Tiled Rects"
 msgstr ""
 
-#: prefs40.ui:2065 prefs.ui:2649
+#: prefs40.ui:2085 prefs.ui:2678
 msgid "Debugging: Show Free Screen Rects"
-msgstr ""
-
-#: prefs40.ui:2106 prefs.ui:2700
-msgid "Experimental: Semi Tiling Mode"
-msgstr ""
-
-#: prefs40.ui:2114 prefs.ui:2713
-msgid ""
-"Apps will open in a tiled state when an <b>AppIcon</b> is activated while "
-"holding <b>Shift</b>.\n"
-"They will try to fill the available space. If there is none, they will share "
-"the space with the focused tiled window.\n"
-"The position of the newly opened window is indicated by the top panel icon. "
-"It can be cycled with the keyboard shortcuts or by clicking the panel icon."
-msgstr ""
-
-#: prefs40.ui:2152 prefs.ui:2761
-msgid "Semi Tiling Mode: Cycle Tiling Modes (primary)"
-msgstr ""
-
-#: prefs40.ui:2193 prefs.ui:2812
-msgid "Semi Tiling Mode: Cycle Tiling Modes (secondary)"
 msgstr ""

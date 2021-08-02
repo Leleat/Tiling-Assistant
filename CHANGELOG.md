@@ -9,6 +9,7 @@
 **Changed**
 - moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
 - removed experimental semi-autotiling mode (#70)
+- simplify tl file (removed duplicates)
 
 **Fixed**
 - multimonitor: wrong position for the focus indicator of the tile editing mode

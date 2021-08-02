@@ -902,7 +902,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top</property>
+                                    <property name="label" translatable="yes">Tile to top</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -938,7 +938,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom</property>
+                                    <property name="label" translatable="yes">Tile to bottom</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -974,7 +974,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Left</property>
+                                    <property name="label" translatable="yes">Tile to left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -1010,7 +1010,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Right</property>
+                                    <property name="label" translatable="yes">Tile to right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -1089,7 +1089,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top-Left</property>
+                                    <property name="label" translatable="yes">Tile to top-left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -1125,7 +1125,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Top-Right</property>
+                                    <property name="label" translatable="yes">Tile to top-right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -1161,7 +1161,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom-Left</property>
+                                    <property name="label" translatable="yes">Tile to bottom-left</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>
@@ -1197,7 +1197,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="valign">center</property>
-                                    <property name="label" translatable="yes">Toggle to Bottom-Right</property>
+                                    <property name="label" translatable="yes">Tile to bottom-right</property>
                                     <property name="xalign">0</property>
                                   </object>
                                 </child>

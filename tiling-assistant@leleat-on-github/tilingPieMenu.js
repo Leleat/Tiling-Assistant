@@ -11,7 +11,7 @@ const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
 const ACTIONS = [
-	{name: _("Toggle 'Maximize'"), func: _toggleMaximize},
+	{name: _("Toggle Maximization"), func: _toggleMaximize},
 	{name: _("Minimize window"), func: _minimizeWindow},
 	{name: _("Close window"), func: _closeWindow},
 	{name: _("Move to previous workspace"), func: _moveToPrevWorkspace},
