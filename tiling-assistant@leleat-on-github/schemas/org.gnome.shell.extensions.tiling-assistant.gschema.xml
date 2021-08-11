@@ -12,6 +12,12 @@
 		<value value="3" nick="Tiling State (Windows)"/>
 	</enum>
 
+	<enum id="org.gnome.shell.extensions.tiling-assistant.secondary-tiling-preview-activators">
+		<value value="0" nick="Ctrl"/>
+		<value value="1" nick="Alt"/>
+		<value value="2" nick="RMB"/>
+	</enum>
+
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
@@ -99,6 +105,12 @@
 		</key>
 		<key name="enable-untile-animations" type="b">
 			<default>true</default>
+		</key>
+		<key name="secondary-tiling-preview-activator" enum="org.gnome.shell.extensions.tiling-assistant.secondary-tiling-preview-activators">
+			<default>"Ctrl"</default>
+		</key>
+		<key name="default-to-secondary-tiling-preview" type="b">
+			<default>false</default>
 		</key>
 		<key name="toggle-maximize-tophalf-timer" type="i">
 			<default>600</default>

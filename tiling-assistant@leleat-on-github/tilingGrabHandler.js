@@ -10,8 +10,8 @@ const Util = Me.imports.tilingUtil;
 
 const PREVIEW_STATE = {
 	DEFAULT: 1, // default screen edge/quarter tiling
-	SINGLE: 2, // hold Ctrl while hovering any screen rect
-	GROUP: 4 // hold Ctrl while hovering any screen rect at the very edges
+	SINGLE: 2, // secondary preview mode while hovering any screen rect
+	GROUP: 4 // secondary preview mode while hovering any screen rect at the very edges
 };
 
 // class to handle the grab of a window
@@ -153,9 +153,9 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 				break;
 
 			case PREVIEW_STATE.SINGLE:
-				if (this._ctrlHoveredWindow && !previewRect.equal(this._ctrlHoveredWindow.tiledRect)) {
-					const splitRect = Util.rectDiff(this._ctrlHoveredWindow.tiledRect, previewRect)[0];
-					Util.tileWindow(this._ctrlHoveredWindow, splitRect, false);
+				if (this._secondaryHoveredWindow && !previewRect.equal(this._secondaryHoveredWindow.tiledRect)) {
+					const splitRect = Util.rectDiff(this._secondaryHoveredWindow.tiledRect, previewRect)[0];
+					Util.tileWindow(this._secondaryHoveredWindow, splitRect, false);
 				}
 
 			case PREVIEW_STATE.DEFAULT:
@@ -163,8 +163,8 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 
 		// reset everything that may have been set
-		this._ctrlHoveredWindow = null;
-		this._ctrlHoveredRect = null;
+		this._secondaryHoveredWindow = null;
+		this._secondaryHoveredRect = null;
 
 		this.tilePreview.close();
 	}
@@ -192,9 +192,23 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 
 		// tile preview
-		Util.isModPressed(Clutter.ModifierType.CONTROL_MASK)
-				? this._ctrlPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY)
-				: this._previewTile(window, eventX, eventY);
+		const defaultToSecondaryMode = MainExtension.settings.get_boolean("default-to-secondary-tiling-preview");
+		let secondaryModeActivatorPressed = false;
+		switch (MainExtension.settings.get_string("secondary-tiling-preview-activator")) {
+			case "Ctrl":
+				secondaryModeActivatorPressed = Util.isModPressed(Clutter.ModifierType.CONTROL_MASK);
+				break;
+			case "Alt":
+				secondaryModeActivatorPressed = Util.isModPressed(Clutter.ModifierType.MOD1_MASK) || Util.isModPressed(Clutter.ModifierType.MOD5_MASK);
+				break;
+			case "RMB":
+				secondaryModeActivatorPressed = event.get_state() & Clutter.ModifierType.BUTTON3_MASK;
+		};
+
+		if ((!secondaryModeActivatorPressed && !defaultToSecondaryMode) || (secondaryModeActivatorPressed && defaultToSecondaryMode))
+			this._previewTile(window, eventX, eventY);
+		else
+			this._secondaryPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY)
 	}
 
 	_previewTile(window, eventX, eventY) {
@@ -290,9 +304,11 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		}
 	}
 
-	_ctrlPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY) {
-		if (!topTileGroup.length)
+	_secondaryPreviewTile(window, topTileGroup, freeScreenRects, eventX, eventY) {
+		if (!topTileGroup.length) {
+			this._previewTile(window, eventX, eventY);
 			return;
+		}
 
 		const pointerLocation = {x: eventX, y: eventY};
 		const screenRects = topTileGroup.map(w => w.tiledRect).concat(freeScreenRects);
@@ -303,8 +319,8 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 			return;
 		}
 
-		this._ctrlHoveredWindow = topTileGroup[index];
-		this._ctrlHoveredRect = hoveredRect;
+		this._secondaryHoveredWindow = topTileGroup[index];
+		this._secondaryHoveredRect = hoveredRect;
 
 		const edgeRadius = 40;
 		const atTopEdge = eventY < hoveredRect.y + edgeRadius;
@@ -314,13 +330,13 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 
 		// group: possibly push multiple windows away
 		if (atTopEdge || atBottomEdge || atLeftEdge || atRightEdge)
-			this._ctrlGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge);
+			this._secondaryGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge);
 		// single: push at max. 1 window away
 		else
-			this._ctrlSinglePreview(window, hoveredRect, eventX, eventY);
+			this._secondarySinglePreview(window, hoveredRect, eventX, eventY);
 	}
 
-	_ctrlSinglePreview(window, hoveredRect, eventX, eventY) {
+	_secondarySinglePreview(window, hoveredRect, eventX, eventY) {
 		this.tilePreview.state = PREVIEW_STATE.SINGLE;
 
 		const atTop = eventY < hoveredRect.y + hoveredRect.height * .25;
@@ -339,10 +355,10 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		this.tilePreview.open(window, previewRect, global.display.get_current_monitor());
 	}
 
-	_ctrlGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge) {
+	_secondaryGroupPreview(window, hoveredRect, topTileGroup, atTopEdge, atBottomEdge, atLeftEdge, atRightEdge) {
 		this.tilePreview.state = PREVIEW_STATE.GROUP;
 
-		if (!this._ctrlHoveredWindow) {
+		if (!this._secondaryHoveredWindow) {
 			this.tilePreview.close();
 			return;
 		}

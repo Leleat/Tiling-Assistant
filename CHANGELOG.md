@@ -4,6 +4,7 @@
 **Added**
 - partial japanese translation (by k-fog #89)
 - windows-like minimize option for the dynamic keybindings
+- hidden settings: choose secondary mode (tile preview) activator and option to default to secondary mode
 
 
 ## v23
