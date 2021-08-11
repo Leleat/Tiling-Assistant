@@ -2,6 +2,7 @@
 
 ## v24
 **Added**
+- partial japanese translation (by k-fog #89)
 - windows-like minimize option for the dynamic keybindings
 
 
