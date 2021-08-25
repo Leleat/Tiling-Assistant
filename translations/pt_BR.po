@@ -1,0 +1,418 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2021-08-02 01:15+0200\n"
+"PO-Revision-Date: 2021-08-25 01:14-0300\n"
+"Language: pt_BR\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Last-Translator: \n"
+"Language-Team: \n"
+"X-Generator: Poedit 3.0\n"
+
+#: extension.js:195
+msgid "Tiling-assistant's popup enabled"
+msgstr "Pop do assistente de ladrilho ativo"
+
+#: extension.js:195
+msgid "Tiling-assistant's popup was disabled"
+msgstr "Pop do assistente de ladrilho desaativado"
+
+#: extension.js:222
+msgid "Can't enter 'Tile Editing Mode', if the focused window isn't tiled."
+msgstr ""
+"Não é possível entrar em 'Modo de Edição de Tile' se a janela focada não "
+"estiver."
+
+#: prefs.js:314 tilingPieMenu.js:15
+msgid "Minimize window"
+msgstr "Minimizar Janela"
+
+#: prefs.js:314 tilingPieMenu.js:16
+msgid "Close window"
+msgstr "Fechar janela"
+
+#: prefs.js:314 tilingPieMenu.js:17
+msgid "Move to previous workspace"
+msgstr "Mover para desktop anterior"
+
+#: prefs.js:314 tilingPieMenu.js:18
+msgid "Move to next workspace"
+msgstr "Mover para próximo desktop"
+
+#: prefs.js:315 tilingPieMenu.js:19
+msgid "Move to top monitor"
+msgstr "Mover para monitor do topo"
+
+#: prefs.js:315 tilingPieMenu.js:20
+msgid "Move to bottom monitor"
+msgstr "Mover para monitor inferior"
+
+#: prefs.js:315 tilingPieMenu.js:21
+msgid "Move to left monitor"
+msgstr "Mover para monitor esquerdo"
+
+#: prefs.js:315 tilingPieMenu.js:22
+msgid "Move to right monitor"
+msgstr "Mover para monitor direito"
+
+#: prefs.js:316 tilingPieMenu.js:23
+msgid "Toggle fullscreen"
+msgstr "Alternar Tela cheia"
+
+#: prefs.js:316 tilingPieMenu.js:24
+msgid "Toggle 'Always on top'"
+msgstr "Alternar 'Sempre no topo'"
+
+#: prefs.js:316 tilingPieMenu.js:25 prefs40.ui:977 prefs.ui:1216
+msgid "Tile to left"
+msgstr "Ladrilhar para esquerda"
+
+#: prefs.js:316 tilingPieMenu.js:26 prefs40.ui:1013 prefs.ui:1267
+msgid "Tile to right"
+msgstr "Ladrilhar para direita"
+
+#: prefs.js:316 tilingPieMenu.js:27 prefs40.ui:905 prefs.ui:1114
+msgid "Tile to top"
+msgstr "Ladrilhar no topo"
+
+#: prefs.js:316 tilingPieMenu.js:28 prefs40.ui:941 prefs.ui:1165
+msgid "Tile to bottom"
+msgstr "Ladrilhar abaixo"
+
+#: prefs.js:317 tilingPieMenu.js:29 prefs40.ui:1092 prefs.ui:1361
+msgid "Tile to top-left"
+msgstr "Ladrilhar topo esquerdo"
+
+#: prefs.js:317 tilingPieMenu.js:30 prefs40.ui:1128 prefs.ui:1412
+msgid "Tile to top-right"
+msgstr "Ladrilhar topo direito"
+
+#: prefs.js:317 tilingPieMenu.js:31 prefs40.ui:1164 prefs.ui:1463
+msgid "Tile to bottom-left"
+msgstr "Ladrilhar abaixo e esquerda"
+
+#: prefs.js:317 tilingPieMenu.js:32 prefs40.ui:1200 prefs.ui:1514
+msgid "Tile to bottom-right"
+msgstr "Ladrilhar abaixo e direita"
+
+#: prefs.js:317 tilingPieMenu.js:33
+msgid "Open Layout selector"
+msgstr "Abrir seletor de layout"
+
+#: prefs.js:381
+msgid "Layout name..."
+msgstr "Nome do layout..."
+
+#: prefs.js:480
+msgid ""
+"Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of "
+"the rectangles for the layouts in the left column.The right column shows a "
+"preview of your layouts (after saving). The layouts file is saved in "
+"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
+"Format for the rectangles:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
+"\n"
+"The values can range from 0 to 1. (0,0) is the top-left corner of your "
+"screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and "
+"can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of "
+"windows in that rectangle and they will share that space evenly (for ex.: "
+"Master & Stack).\n"
+"\n"
+"You can attach an app to the rectangle row. If you do that, a new instance "
+"of the app will be opened, when activating the layout. This is experimental "
+"and may not work reliably (especially on Wayland)."
+msgstr ""
+"Definir uma combinação de teclas clicando no texto 'Disativado'. Entre com "
+"as dimensões dos retângulos para os layouts na coluna da esquerda. A coluna "
+"da direita mostra a prévia dos seus layouts (após salvar). O arquivo de "
+"layouts é salvo em $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
+"Formato para os retângulos:\n"
+"\n"
+"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
+"\n"
+"Os valores pode variar entre 0 e 1. (0,0) é o canto superior esquerdo de sua "
+"tela. (1,1) é o canto inferior direito. '--dynamicSplit' é opcicional e pode "
+"ser  '--h' or '--v'. 'dynamicSplit' significa que vc pode ladrilhar qualquer "
+"número de janelas naquele retângulo e elas compartilharão o espaço "
+"igualmente. (for ex.: Master & Stack).\n"
+"\n"
+"Você pode anexar um aplicativo à linha do retângulo. Se você fizer isso, uma "
+"nova instância do app abrirá, ao ativar o layout. Isto é experimental e "
+"talvez não funcione confiavelmente (especialmente no Wayland)."
+
+#: prefs.js:561
+msgid "No layout preview..."
+msgstr "Sem prévia de layout."
+
+#: tilingEditingMode.js:263
+msgid ""
+"Can't resize in that direction. Super + Directions resizes on the S and E "
+"side. Super + Shift + Directions on the N and W side."
+msgstr ""
+"Não pode redimensionar nessa direção. Super + Direções redimensionam no lado "
+"S e E. Super + Shift + Direções no lado N e W."
+
+#: tilingLayoutManager.js:139
+msgid "Layouts: App not found."
+msgstr "Layouts: App não encontrado."
+
+#: tilingLayoutManager.js:238
+msgid "No valid layouts defined."
+msgstr "Sem layouts vá definidos."
+
+#: tilingLayoutManager.js:269
+msgid " Type to search..."
+msgstr ""
+
+#: tilingLayoutManager.js:379
+msgid "No layout name..."
+msgstr "Sem nome de layout..."
+
+#: prefs40.ui:287 prefs.ui:318
+msgid "Tiling Popup"
+msgstr "Popup de ladrilhos"
+
+#: prefs40.ui:321 prefs.ui:362
+msgid "Raise Tile Groups together"
+msgstr "Elevar grupos de ladrilhos juntos"
+
+#: prefs40.ui:354 prefs.ui:405
+msgid "Dynamic Keybinding Behaviour"
+msgstr "Comportamento de atalhos de teclado dinâmico"
+
+#: prefs40.ui:382 prefs.ui:443
+msgid "Disabled"
+msgstr "Desativar"
+
+#: prefs40.ui:383 prefs.ui:444
+msgid "Focus"
+msgstr "Fóco"
+
+#: prefs40.ui:384 prefs.ui:445
+msgid "Tiling State"
+msgstr "Estado do ladrilho"
+
+#: prefs40.ui:409 prefs.ui:475
+msgid "Window Gaps"
+msgstr "Espaçamento de janelas"
+
+#: prefs40.ui:445 prefs.ui:521
+msgid "Gaps on Maximized Windows"
+msgstr "Separação nas Janelas Maximizadas"
+
+#: prefs40.ui:478 prefs.ui:564
+msgid "Restore Window Size on"
+msgstr "Restaurar Tamanho da Janela em"
+
+#: prefs40.ui:486 prefs.ui:577
+msgid ""
+"This setting is intended for Wayland users. Tiled windows may not properly "
+"restore their size when they are being grabbed on Wayland.\n"
+"If that is the case, you can try 'Restore Window Size on Grab End' instead."
+msgstr ""
+"Este configuração é destinada para usuários do Wayland. Janelas ladrilhadas "
+"talvez não restaurem corretamente seus tamanhos quando\n"
+"estiverem sendo seguradas. Se for este o caso, você pode tentar 'Restaurar "
+"Tamanho da Janela do Pegar no Final\" ao invés."
+
+#: prefs40.ui:500 prefs.ui:596
+msgid "Grab Start"
+msgstr "Pegar no Início"
+
+#: prefs40.ui:501 prefs.ui:597
+msgid "Grab End"
+msgstr "Pegar o Final"
+
+#: prefs40.ui:528 prefs.ui:629
+msgid "<u>Inverse Top Screen Edge Action:</u>"
+msgstr "<u>Inverter Ação de Canto de Topo de Tela:</u>"
+
+#: prefs40.ui:555 prefs.ui:661
+msgid "Landscape Displays"
+msgstr "Telas Paisagem"
+
+#: prefs40.ui:589 prefs.ui:705
+msgid "Portrait Displays"
+msgstr "Telas Retrato"
+
+#: prefs40.ui:616 prefs.ui:742
+msgid "General"
+msgstr "Geral"
+
+#: prefs40.ui:677 prefs.ui:806
+msgid "Toggle 'Tiling Popup'"
+msgstr "Alternar 'Popup de ladrilho'"
+
+#: prefs40.ui:713 prefs.ui:857
+msgid "Tile Editing Mode"
+msgstr "Modo de Edição de Ladrilho"
+
+#: prefs40.ui:748 prefs.ui:907
+msgid "Layout Selector"
+msgstr "Seletor de Layout"
+
+#: prefs40.ui:782 prefs.ui:956
+msgid "Auto-Tile"
+msgstr "Auto-Ladrilhar"
+
+#: prefs40.ui:790 prefs.ui:969
+msgid ""
+"The focused window will try to fill the free screen space as good as "
+"possible based on the tiled windows around it.\n"
+"If there is no space, the window will either untile or maximize depending on "
+"wether it's currently tiled."
+msgstr ""
+"A janela em foco tentará preencher o espaço livre da melhor forma possível "
+"baseando-se nas janelas ladrilhadas ao redor.\n"
+"Se não houver espaço, a janela tentará sair do modo ladrialho ou maximizar-"
+"se dependendo se estivar atualmente em ladrilho."
+
+#: prefs40.ui:828 prefs.ui:1022 prefs.js:314 tilingPieMenu.js:14
+msgid "Toggle Maximization"
+msgstr "Alternar Maximização"
+
+#: prefs40.ui:855 prefs.ui:1064
+msgid "<b>    General    </b>"
+msgstr "<b> Geral </b>"
+
+#: prefs40.ui:1041 prefs.ui:1310
+msgid "<b>    Side Tiling    </b>"
+msgstr "<b> Tiling por Deslize </b>"
+
+#: prefs40.ui:1228 prefs.ui:1557
+msgid "<b>    Corner Tiling    </b>"
+msgstr "<b>  Tiling de Canto  </b>"
+
+#: prefs40.ui:1251 prefs.ui:1583
+msgid "Keybindings"
+msgstr "Atalhos de teclado"
+
+#: prefs40.ui:1332 prefs.ui:1700
+msgid "Layouts"
+msgstr "Layouts"
+
+#: prefs40.ui:1360 prefs40.ui:1550 prefs.ui:1732 prefs.ui:1988
+msgid "Pie Menu"
+msgstr "Menu Pie"
+
+#: prefs40.ui:1367 prefs.ui:1744
+msgid ""
+"<tt>Super</tt> + <tt>RMB</tt> on a window will open a simple pie menu. While "
+"holding the right click dragging the mouse in the direction of a menu item "
+"and releasing the click, will activate that menu item. The pie menu's "
+"appearance is slightly delayed. The pie menu doesn't need to be visible for "
+"a menu item to be activated."
+msgstr ""
+"<tt>Super</tt> + <tt>RMB</tt> em uma janela abrirá um \"pie menu\". Enquanto "
+"segura o clique direito arrastando o mouse em uma direção de um item de menu "
+"e soltando o clique, ativará aquele item de menu. O surgimento do \"pie menu"
+"\" é ligeiramente atrasado. O \"pie menu\" não precisa estar visível para um "
+"item de menu ser ativado."
+
+#: prefs40.ui:1402 prefs.ui:1789
+msgid "Deadzone Radius"
+msgstr "Área zona-morta"
+
+#: prefs40.ui:1439 prefs.ui:1836
+msgid "Item Circle Radius"
+msgstr "Raio do Círculo do Item"
+
+#: prefs40.ui:1571 prefs.ui:2013
+msgid "Tiling Assistant"
+msgstr "Assistante de ladrilhos"
+
+#: prefs40.ui:1599 prefs.ui:2051
+msgid ""
+"If you want to report a bug or need help,\n"
+"please open an issue on Github."
+msgstr ""
+"Se você quer reportar um bug ou precisa de\n"
+"ajuda por favor abra uma \"issue\" no Github."
+
+#: prefs40.ui:1626 prefs.ui:2088
+msgid ""
+"List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
+msgstr "Lista de <big><b>INCOMPATÍVEIS</b></big> apps/extenções/limitações."
+
+#: prefs40.ui:1653 prefs.ui:2125
+msgid ""
+"The <big><b>GUIDE</b></big> offers a detailed explanation of every feature."
+msgstr ""
+"O <big><b>GUIA</b></big> oferece uma explicação detalhada para cada função."
+
+#: prefs40.ui:1680 prefs.ui:2161
+msgid ""
+"The <big><b>CHANGELOG</b></big> lists the differences between each extension "
+"version."
+msgstr ""
+"O <big><b>CHANGELOG</b></big> lista as diferenças entre cada versão da "
+"extensão."
+
+#: prefs40.ui:1717 prefs.ui:2218
+msgid ""
+"<small>This extension is licensed under the <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
+"later</a> and comes with <u><b>NO WARRANTY</b></u>.  A copy of this license "
+"can be found in the Github repository.</small>"
+msgstr ""
+"<small>Esta extensão é licenciada sob a <a href='https://www.gnu.org/"
+"licenses/old-licenses/gpl-2.0.html'>GNU General Public License, versão 2 ou "
+"posterior</a> e <u><b>NÃO VEM COM GARANTIAS</b></u>.  Uma cópia dessa "
+"licença pode ser encontrada no repositório do Github.</small>"
+
+#: prefs40.ui:1736 prefs.ui:2245
+msgid ""
+"Help and\n"
+"Changelog"
+msgstr ""
+"Ajuda e\n"
+"Changelog"
+
+#: prefs40.ui:1775 prefs.ui:2288
+msgid "<u><b>Hidden Settings</b></u>"
+msgstr "<u><b>Configurações Ocultas</b></u>"
+
+#: prefs40.ui:1799 prefs.ui:2312
+msgid "Tiling Popup: Current Workspace only"
+msgstr "Popup de ladrilhos: Somente espaço de trabalho atual"
+
+#: prefs40.ui:1832 prefs.ui:2355
+msgid "Tile Editing Mode: Focus Color"
+msgstr "Modo de Edição de Ladrilho: Cor de Fóco"
+
+#: prefs40.ui:1867 prefs.ui:2400
+msgid "Tile Animations"
+msgstr "Animações de ladrilhos"
+
+#: prefs40.ui:1901 prefs.ui:2444
+msgid "Untile Animations"
+msgstr "Animações de desladrilhamento"
+
+#: prefs40.ui:1935 prefs.ui:2488
+msgid "Inverse Top Screen Edge Action Timer"
+msgstr "Timer de ação inversa do canto superior da tela"
+
+#: prefs40.ui:1971 prefs.ui:2534
+msgid "Vertical Tile Preview Trigger Area"
+msgstr "Área de gatilho de prévia de ladrilho vertical"
+
+#: prefs40.ui:2008 prefs.ui:2581
+msgid "Horizontal Tile Preview Trigger Area"
+msgstr "Área de gatilho de previa de ladrilho horizontal"
+
+#: prefs40.ui:2044 prefs.ui:2627
+msgid "Debugging: Show Tiled Rects"
+msgstr "Depurando: Mostrar Retangulos Ladrilhados"
+
+#: prefs40.ui:2085 prefs.ui:2678
+msgid "Debugging: Show Free Screen Rects"
+msgstr "Depurando: Mostrar Retangulos de Tela Livre"
