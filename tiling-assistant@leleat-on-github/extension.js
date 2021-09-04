@@ -65,7 +65,6 @@ function init() {
 function enable() {
 	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
 	this.settingsSignals = [];
-	this.tilePreview = new windowManager.TilePreview();
 	this.windowGrabHandler = new WindowGrabHandler.WindowGrabHandler();
 	this.tilingLayoutManager = new TilingLayoutManager.LayoutManager();
 
@@ -130,8 +129,6 @@ function disable() {
 	// save window properties, if session was locked to restore after unlock
 	_saveBeforeSessionLock();
 
-	this.tilePreview.destroy();
-	this.tilePreview = null;
 	this.windowGrabHandler.destroy();
 	this.windowGrabHandler = null;
 	this.tilingLayoutManager.destroy();

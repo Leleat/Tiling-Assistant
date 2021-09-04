@@ -1,5 +1,5 @@
 const {main} = imports.ui;
-const {Clutter, GObject, Graphene, Meta, St} = imports.gi;
+const {Clutter, GObject, Meta, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
