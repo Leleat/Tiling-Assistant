@@ -49,7 +49,6 @@ var TilingSwitcherPopup = GObject.registerClass({
 		// when showing the tiling popup the background will be shaded for easier visibility.
 		// @tileGroup determines, which windows will be above the shading widget.
 		// when tiling "normally", the tileGroup is simply the same as Util.getTopTileGroup...
-		// when using layouts, the tileGroup consists of the windows, which were tiled by the layout
 		show(tileGroup) {
 			if (this._items.length === 0)
 				return false;

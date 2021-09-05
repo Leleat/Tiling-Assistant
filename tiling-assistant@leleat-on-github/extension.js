@@ -26,8 +26,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
-const TilingLayoutManager = Me.imports.tilingLayoutManager;
-const PieMenu = Me.imports.tilingPieMenu;
 const TileEditing = Me.imports.tilingEditingMode;
 
 const Gettext = imports.gettext;
@@ -41,7 +39,6 @@ var TILING = { // keybindings
 	AUTO: "auto-tile",
 	MAXIMIZE: "tile-maximize",
 	EDIT_MODE: "tile-edit-mode",
-	LAYOUTS_OVERVIEW: "layouts-overview",
 	RIGHT: "tile-right-half",
 	LEFT: "tile-left-half",
 	TOP: "tile-top-half",
@@ -66,7 +63,6 @@ function enable() {
 	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
 	this.settingsSignals = [];
 	this.windowGrabHandler = new WindowGrabHandler.WindowGrabHandler();
-	this.tilingLayoutManager = new TilingLayoutManager.LayoutManager();
 
 	// signal connections
 	this.displaySignals = [];
@@ -81,7 +77,6 @@ function enable() {
 
 	// keybindings
 	this.keyBindings = Object.values(TILING);
-	[...Array(30)].forEach((undef, idx) => this.keyBindings.push(`activate-layout${idx}`));
 	const bindingInOverview = [TILING.TOGGLE_POPUP];
 	this.keyBindings.forEach(key => {
 		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
@@ -106,21 +101,6 @@ function enable() {
 		});
 	};
 
-	// pie menu when super + rmb'ing a window
-	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
-	const togglePieMenu = () => {
-		const that = this;
-		if (this.settings.get_boolean("enable-pie-menu"))
-			main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
-				Util.isModPressed(Clutter.ModifierType.MOD4_MASK)
-						? new PieMenu.PieMenu() : that.oldShowWindowMenu.apply(this, params);
-			}
-		else
-			main.wm._windowMenuManager.showWindowMenuForWindow = this.oldShowWindowMenu;
-	};
-	this.settingsSignals.push(this.settings.connect("changed::enable-pie-menu", togglePieMenu));
-	togglePieMenu();
-
 	// restore window properties after session was unlocked
 	_loadAfterSessionLock();
 };
@@ -131,8 +111,6 @@ function disable() {
 
 	this.windowGrabHandler.destroy();
 	this.windowGrabHandler = null;
-	this.tilingLayoutManager.destroy();
-	this.tilingLayoutManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
 
@@ -191,16 +169,6 @@ function onCustomKeybindingPressed(shortcutName) {
 		settings.set_boolean("enable-tiling-popup", toggleTo);
 		const message = toggleTo ? _("Tiling-assistant's popup enabled") : _("Tiling-assistant's popup was disabled");
 		main.notify("Tiling Assistant", message);
-		return;
-
-	// layout overview
-	} else if (shortcutName === TILING.LAYOUTS_OVERVIEW) {
-		this.tilingLayoutManager.openLayoutSelector();
-		return;
-
-	// open the appDash consecutively to tile to a layout
-	} else if (shortcutName.startsWith("activate-layout")) {
-		this.tilingLayoutManager.startTilingToLayout(Number.parseInt(shortcutName.substring(15)));
 		return;
 	}
 

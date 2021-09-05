@@ -34,18 +34,6 @@
 		<key name="tile-editing-mode-color" type="s">
 	  		<default>"rgb(27, 106, 203)"</default>
 		</key>
-		<key name="enable-pie-menu" type="b">
-	  		<default>true</default>
-		</key>
-		<key name="pie-menu-deadzone-radius" type="i">
-	  		<default>50</default>
-		</key>
-		<key name="pie-menu-item-radius" type="i">
-	  		<default>30</default>
-		</key>
-		<key name="pie-menu-options" type="as">
-			<default><![CDATA[['0','4','2','3']]]></default>
-		</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
@@ -65,9 +53,6 @@
 			<default>[]</default>
 		</key>
 		<key name="tile-edit-mode" type="as">
-			<default>[]</default>
-		</key>
-		<key name="layouts-overview" type="as">
 			<default>[]</default>
 		</key>
 		<key name="tile-maximize" type="as">
@@ -125,96 +110,6 @@
 			<default>[]</default>
 		</key>
 		<key name="debugging-free-rects" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout0" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout1" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout2" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout3" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout4" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout5" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout6" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout7" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout8" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout9" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout10" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout11" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout12" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout13" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout14" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout15" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout16" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout17" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout18" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout19" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout20" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout21" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout22" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout23" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout24" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout25" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout26" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout27" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout28" type="as">
-			<default>[]</default>
-		</key>
-		<key name="activate-layout29" type="as">
 			<default>[]</default>
 		</key>
 	</schema>
