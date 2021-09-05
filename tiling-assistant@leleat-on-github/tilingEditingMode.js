@@ -65,12 +65,7 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		const window = this._primaryIndicator.window;
 		window && window.activate(global.get_current_time());
 
-		this.ease({
-			opacity: 0,
-			duration: 100,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-			onComplete: () => this.destroy()
-		});
+		Util.compatEase(this, {opacity: 0}, 100, Clutter.AnimationMode.EASE_OUT_QUAD, () => this.destroy());
 	}
 
 	select(rect, window) {
@@ -377,15 +372,13 @@ const Indicator = GObject.registerClass(class TilingEditingModeIndicator extends
 	select(rect, window) {
 		const gap = MainExtension.settings.get_int("window-gap");
 		const display = global.display.get_monitor_geometry(global.display.get_current_monitor());
-		this.ease({
+		Util.compatEase(this, {
 			x: rect.x + (gap - 2) / 2 - display.x,
 			y: rect.y + (gap - 2) / 2 - display.y,
 			width: rect.width - gap + 2,
 			height: rect.height - gap + 2,
-			opacity: 255,
-			duration: 150,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-		});
+			opacity: 255},
+			150)
 
 		this.rect = rect;
 		this.window = window;

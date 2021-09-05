@@ -3,6 +3,8 @@
   "description": "An extension which adds a Windows-like snap assist to GNOME. It also expands GNOME's 2 column tiling design and adds more features. Check out the settings on how use this extension or on how to get help.",
   "name": "Tiling Assistant",
   "shell-version": [
+    "3.32",
+    "3.34",
     "3.36",
     "3.38",
     "40",

@@ -143,8 +143,8 @@ function disable() {
 		delete w.grabSignalID;
 		w.groupRaiseId && w.disconnect(w.groupRaiseId);
 		delete w.groupRaiseId;
-		w.unmanagingDissolvedId && w.disconnect(w.unmanagingDissolvedId);
-		delete w.unmanagingDissolvedId;
+		w.unmanagedDissolvedId && w.disconnect(w.unmanagedDissolvedId);
+		delete w.unmanagedDissolvedId;
 	});
 
 	settings.run_dispose();
@@ -233,19 +233,15 @@ function _dynamicFocus(window, shortcutName) {
 		});
 		main.uiGroup.add_child(focusIndicator);
 		const toRect = closestTiledWindow.get_frame_rect();
-		focusIndicator.ease({
-			opacity: 255,
-			x: toRect.x, y: toRect.y,
-			width: toRect.width, height: toRect.height,
-			duration: 200,
-			mode: Clutter.AnimationMode.EASE_OUT_QUART,
-			onComplete: () => focusIndicator.ease({
+		Util.compatEase(focusIndicator, {
+				opacity: 255,
+				x: toRect.x, y: toRect.y,
+				width: toRect.width, height: toRect.height
+			}, 200
+			, Clutter.AnimationMode.EASE_OUT_QUART
+			, () => Util.compatEase(focusIndicator, {
 				opacity: 0,
-				delay: 100, duration: 200,
-				mode: Clutter.AnimationMode.EASE_IN_OUT_CIRC,
-				onComplete: () => focusIndicator.destroy()
-			})
-		});
+			}, 200, Clutter.AnimationMode.EASE_IN_OUT_CIRC, () => focusIndicator.destroy(), 100));
 
 	// toggle tile state window, if it isn't tiled or the only one which is
 	} else {

@@ -5,8 +5,7 @@ const {Clutter, GObject, Meta, Shell, St} = imports.gi;
 
 const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
-
-const isGnome3_36 = parseFloat(imports.misc.config.PACKAGE_VERSION) < 3.38;
+const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 // classes for the tiling popup, which opens when tiling a window
 // and there is free screen space to fill with other windows.
@@ -76,11 +75,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 
 			this._shadeBackground(tileGroup);
 			this.opacity = 0;
-			this.ease({
-				opacity: 255,
-				duration: 200,
-				mode: Clutter.AnimationMode.EASE_OUT_QUAD
-			});
+			Util.compatEase(this, {opacity: 255}, 200)
 
 			return true;
 		}
@@ -97,11 +92,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 				opacity: 0
 			});
 			global.window_group.add_child(this.shadeBG);
-			this.shadeBG.ease({
-				opacity: 180,
-				duration: 200,
-				mode: Clutter.AnimationMode.EASE_OUT_QUAD
-			});
+			Util.compatEase(this.shadeBG, {opacity: 180}, 200)
 
 			if (!lastTiledWindow)
 				return;
@@ -123,7 +114,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 		}
 
 		vfunc_allocate(box) {
-			isGnome3_36 ? this.set_allocation(box, Clutter.AllocationFlags.ALLOCATION_NONE)
+			GNOME_VERSION < 3.38 ? this.set_allocation(box, Clutter.AllocationFlags.ALLOCATION_NONE)
 					: this.set_allocation(box);
 
 			const freeScreenRect = this.freeScreenRect;
@@ -140,7 +131,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 			childBox.x2 = Math.min(freeScreenRect.x + freeScreenRect.width - rightPadding, childBox.x1 + childNaturalWidth);
 			childBox.y1 = freeScreenRect.y + Math.floor((freeScreenRect.height - childNaturalHeight) / 2);
 			childBox.y2 = childBox.y1 + childNaturalHeight;
-			isGnome3_36 ? this._switcherList.allocate(childBox, Clutter.AllocationFlags.ALLOCATION_NONE)
+			GNOME_VERSION < 3.38 ? this._switcherList.allocate(childBox, Clutter.AllocationFlags.ALLOCATION_NONE)
 					: this._switcherList.allocate(childBox);
 
 			if (this._thumbnails) {
@@ -173,7 +164,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 				this._thumbnails.addClones(monitor.y + monitor.height - bottomPadding - childBox.y1);
 				const [, childNaturalHeight] = this._thumbnails.get_preferred_height(-1);
 				childBox.y2 = childBox.y1 + childNaturalHeight;
-				isGnome3_36 ? this._thumbnails.allocate(childBox, Clutter.AllocationFlags.ALLOCATION_NONE)
+				GNOME_VERSION < 3.38 ? this._thumbnails.allocate(childBox, Clutter.AllocationFlags.ALLOCATION_NONE)
 						: this._thumbnails.allocate(childBox);
 			}
 		}

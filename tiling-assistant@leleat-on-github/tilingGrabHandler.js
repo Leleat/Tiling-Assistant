@@ -7,6 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
+const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 const PREVIEW_STATE = {
 	DEFAULT: 1, // default screen edge/quarter tiling
@@ -20,9 +21,14 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 	constructor() {
 		this.tilePreview = new windowManager.TilePreview();
 		this.tilePreview.state = PREVIEW_STATE.DEFAULT;
+
+		this.tilePreview.open = GNOME_VERSION < 3.36 ? this.tilePreview.show : this.tilePreview.open;
+		this.tilePreview.close = GNOME_VERSION < 3.36 ? this.tilePreview.hide : this.tilePreview.close;
+
 		// only use normal tile-preview style class and don't round corners
 		// because native rounding code doesnt fit my possible previews
-		this.tilePreview.style_class = "tile-preview";
+		const styleClasser = GNOME_VERSION < 3.36 ? this.tilePreview.actor : this.tilePreview;
+		styleClasser.style_class = "tile-preview";
 		this.tilePreview._updateStyle = () => {};
 	}
 

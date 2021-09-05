@@ -7,9 +7,37 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const TilingPopup = Me.imports.tilingPopup;
+const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
+const Tweener = GNOME_VERSION < 3.36 ? imports.ui.tweener : null;
 
 function equalApprox(value, value2, margin = MainExtension.settings.get_int("window-gap")) {
 	return value >= value2 - margin && value <= value2 + margin;
+};
+
+function compatEase(actor, params, duration, mode = Clutter.AnimationMode.EASE_OUT_QUAD, onComplete = () => {}, delay = 0) {
+	if (GNOME_VERSION < 3.36) {
+		let transition = "";
+		switch (mode) {
+			case Clutter.AnimationMode.EASE_OUT_QUART:
+				transition = "easeOutQuart";
+				break;
+			case Clutter.AnimationMode.EASE_IN_OUT_CIRC:
+				transition = "easeInOutCirc";
+				break;
+			case Clutter.AnimationMode.EASE_OUT_QUAD:
+				transition = "easeOutQuad";
+		}
+		Tweener.addTween(actor, {
+			...params,
+			time: duration / 1000.0,
+			transition,
+			delay : delay / 1000.0,
+			onComplete
+		});
+
+	} else {
+		actor.ease({...params, duration, mode, onComplete, delay});
+	}
 };
 
 // given @rectA and @rectB, calculate the rectangles which remain from @rectA,
@@ -454,15 +482,11 @@ function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 			main.uiGroup.add_child(clone);
 			wActor.hide();
 
-			clone.ease({
-				x, y, width, height,
-				duration: 250,
-				mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-				onComplete: () => {
-					wActor.show();
-					clone.destroy();
-				}
+			compatEase(clone, {x, y, width, height}, 250, Clutter.AnimationMode.EASE_OUT_QUAD, () => {
+				wActor.show();
+				clone.destroy();
 			});
+
 		} else if (wasMaximized) {
 
 		} else {
@@ -577,8 +601,8 @@ function updateTileGroup(tileGroup) {
 			updateTileGroup(raisedWindow.tileGroup);
 		});
 
-		window.unmanagingDissolvedId && window.disconnect(window.unmanagingDissolvedId);
-		window.unmanagingDissolvedId = window.connect("unmanaging", w => dissolveTileGroupFor(w));
+		window.unmanagedDissolvedId && window.disconnect(window.unmanagedDissolvedId);
+		window.unmanagedDissolvedId = window.connect("unmanaged", w => dissolveTileGroupFor(w));
 	});
 };
 
@@ -590,9 +614,9 @@ function dissolveTileGroupFor(window) {
 		window.groupRaiseId = 0;
 	}
 
-	if (window.unmanagingDissolvedId) {
-		window.disconnect(window.unmanagingDissolvedId);
-		window.unmanagingDissolvedId = 0;
+	if (window.unmanagedDissolvedId) {
+		window.disconnect(window.unmanagedDissolvedId);
+		window.unmanagedDissolvedId = 0;
 	}
 
 	if (!window.tileGroup)
