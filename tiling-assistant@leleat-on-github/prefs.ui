@@ -276,7 +276,7 @@
         <property name="vexpand">True</property>
         <property name="selection-mode">none</property>
         <child>
-          <object class="GtkListBoxRow">
+          <object class="GtkListBoxRow" id="TilingPopupGtkListBoxRow">
             <property name="visible">True</property>
             <property name="can-focus">True</property>
             <child>
@@ -772,7 +772,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                             <property name="orientation">vertical</property>
                             <property name="spacing">12</property>
                             <child>
-                              <object class="GtkBox">
+                              <object class="GtkBox" id="ToggleTilingPopupGtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="margin-start">12</property>
@@ -822,7 +822,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                               </packing>
                             </child>
                             <child>
-                              <object class="GtkBox">
+                              <object class="GtkBox" id="TileEditingModeGtkBox">
                                 <property name="visible">True</property>
                                 <property name="can-focus">False</property>
                                 <property name="margin-start">12</property>
@@ -1560,7 +1560,7 @@ If there is no space, the window will either untile or maximize depending on wet
                   </object>
                 </child>
                 <child>
-                  <object class="GtkListBoxRow">
+                  <object class="GtkListBoxRow" id="TilingPopupCurrentWorkspaceGtkListBoxRow">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <child>
@@ -1604,7 +1604,7 @@ If there is no space, the window will either untile or maximize depending on wet
                   </object>
                 </child>
                 <child>
-                  <object class="GtkListBoxRow">
+                  <object class="GtkListBoxRow" id="TileEditingModeFocusColorGtkListBoxRow">
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <child>

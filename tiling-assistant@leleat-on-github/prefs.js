@@ -32,9 +32,7 @@ function init() {
 };
 
 function buildPrefsWidget() {
-	const widget = new MyPrefsWidget();
-	shellVersion < 40 && widget.show_all();
-	return widget;
+	return new MyPrefsWidget();
 };
 
 const MyPrefsWidget = new GObject.Class({
@@ -67,6 +65,15 @@ const MyPrefsWidget = new GObject.Class({
 		this._bindKeybindings();
 
 		this.connect("destroy", () => this.settings.run_dispose());
+
+		shellVersion < 40 && this.show_all();
+
+		// hide certain widgets since some features are not supported on older versions
+		if (shellVersion < 3.36) {
+			const hiddenWidgetsPre336 = ["TilingPopupGtkListBoxRow", "ToggleTilingPopupGtkBox", "TileEditingModeGtkBox"
+					, "TilingPopupCurrentWorkspaceGtkListBoxRow", "TileEditingModeFocusColorGtkListBoxRow"];
+			hiddenWidgetsPre336.forEach(w => this.builder.get_object(w).set_visible(false));
+		}
 	},
 
 	// widgets in prefs.ui need to have same ID as the keys in the gschema.xml file
@@ -113,7 +120,7 @@ const MyPrefsWidget = new GObject.Class({
 	},
 
 	_bindWidgetsTogether: function() {
-		
+
 	},
 
 	_bindKeybindings: function() {

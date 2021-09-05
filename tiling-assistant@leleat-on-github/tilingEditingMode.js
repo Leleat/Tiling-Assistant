@@ -32,6 +32,10 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 	}
 
 	open(window) {
+		// don't enable for GNOME version lower than 3.36 because of bugs
+		if (GNOME_VERSION < 3.36)
+			return;
+
 		if (!main.pushModal(this)) {
 			// Probably someone else has a pointer grab, try again with keyboard only
 			if (!main.pushModal(this, {options: Meta.ModalOptions.POINTER_ALREADY_GRABBED})) {

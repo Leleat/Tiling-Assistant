@@ -49,6 +49,10 @@ var TilingSwitcherPopup = GObject.registerClass({
 		// @tileGroup determines, which windows will be above the shading widget.
 		// when tiling "normally", the tileGroup is simply the same as Util.getTopTileGroup...
 		show(tileGroup) {
+			// don't enable for GNOME version lower than 3.36 because of bugs
+			if (GNOME_VERSION < 3.36)
+				return false;
+
 			if (this._items.length === 0)
 				return false;
 
