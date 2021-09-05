@@ -6,6 +6,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const Util = Me.imports.tilingUtil;
 const TilingPopup = Me.imports.tilingPopup;
+const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
