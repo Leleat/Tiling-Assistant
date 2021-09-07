@@ -33,7 +33,9 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 	}
 
 	destroy() {
-		this.tilePreview.destroy();
+		const actor = GNOME_VERSION < 3.36 ? this.tilePreview.actor : this.tilePreview;
+		actor.destroy();
+		this.tilePreview = null;
 	}
 
 	// called via global.diplay's signal (grab-op-begin)
