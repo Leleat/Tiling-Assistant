@@ -27,11 +27,13 @@ const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const WindowGrabHandler = Me.imports.tilingGrabHandler;
 const TileEditing = Me.imports.tilingEditingMode;
+const TileGroupManager = Me.imports.tilingGroupManager;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
+var settings = null;
 var TILING = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
 	DEBUGGING_FREE_RECTS: "debugging-free-rects",
@@ -49,11 +51,11 @@ var TILING = { // keybindings
 	BOTTOM_RIGHT: "tile-bottomright-quarter"
 };
 
-var settings = null;
-
-// 2 entry points:
-// 1. tiled with keyboard shortcut => onCustomKeybindingPressed()
-// 2. tiled via Grab => onGrabStarted()
+/**
+ * 2 entry points:
+ * 	1. tiled with keyboard shortcut => onCustomKeybindingPressed()
+ * 	2. tiled via Grab => onGrabStarted()
+ */
 
 function init() {
 	ExtensionUtils.initTranslations(Me.metadata.uuid);
@@ -63,6 +65,7 @@ function enable() {
 	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
 	this.settingsSignals = [];
 	this.windowGrabHandler = new WindowGrabHandler.WindowGrabHandler();
+	this.tileGroupManager = new TileGroupManager.Manager();
 
 	// signal connections
 	this.displaySignals = [];
@@ -111,6 +114,8 @@ function disable() {
 
 	this.windowGrabHandler.destroy();
 	this.windowGrabHandler = null;
+	this.tileGroupManager.destroy();
+	this.tileGroupManager = null;
 	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
 	this.debuggingIndicators = null;
 
@@ -135,16 +140,11 @@ function disable() {
 		delete w.isTiled;
 		delete w.tiledRect;
 		delete w.untiledRect;
-		delete w.tileGroup;
 		delete w.preGrabRect;
 		delete w.resizeSameSideV;
 		delete w.resizeSameSideH;
 		w.grabSignalID && w.disconnect(w.grabSignalID);
 		delete w.grabSignalID;
-		w.groupRaiseId && w.disconnect(w.groupRaiseId);
-		delete w.groupRaiseId;
-		w.unmanagedDissolvedId && w.disconnect(w.unmanagedDissolvedId);
-		delete w.unmanagedDissolvedId;
 	});
 
 	settings.run_dispose();
@@ -451,12 +451,13 @@ function _saveBeforeSessionLock() {
 		if (!window.untiledRect)
 			return;
 
+		const tileGroup = this.tileGroupManager.getTileGroupFor(window);
 		savedWindows.push({
 			windowStableId: window.get_stable_sequence(),
 			isTiled: window.isTiled,
 			tiledRect: metaToStringRect(window.tiledRect),
 			untiledRect: metaToStringRect(window.untiledRect),
-			tileGroup: window.tileGroup && window.tileGroup.map(w => w.get_stable_sequence())
+			tileGroup: tileGroup.length && tileGroup.map(w => w.get_stable_sequence())
 		});
 	});
 
@@ -511,7 +512,8 @@ function _loadAfterSessionLock() {
 				const win = openWindows.find(w => w.get_stable_sequence() === wId);
 				win && windowGroup.push(win);
 			});
-			Util.updateTileGroup(windowGroup);
+
+			this.tileGroupManager.updateTileGroup(windowGroup);
 		}
 	});
 };

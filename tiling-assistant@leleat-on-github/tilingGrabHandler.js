@@ -578,7 +578,8 @@ var WindowGrabHandler = class TilingWindowGrabHandler {
 		const tiledRectDiffWidth = window.tiledRect.width - grabbedsOldTiledRect.width;
 		const tiledRectDiffHeight = window.tiledRect.height - grabbedsOldTiledRect.height;
 
-		for (const w of window.tileGroup) {
+		const tileGroup = MainExtension.tileGroupManager.getTileGroupFor(window);
+		for (const w of tileGroup) {
 			if (w === window)
 				continue;
 

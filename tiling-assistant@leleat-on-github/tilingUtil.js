@@ -135,6 +135,7 @@ function getOpenWindows(currentWorkspace = true) {
 };
 
 // get the top most tiled windows in a group i. e. they complement each other and dont intersect.
+// this may differ from the TileGroupManager's *tracked* tileGroups since floating windows may overlap some tiled windows atm.
 // ignore the top window if DNDing or tiling via keybinding since that window may not be tiled yet
 function getTopTileGroup(ignoreTopWindow = true, monitor = null) {
 	const openWindows = getOpenWindows();
@@ -442,7 +443,7 @@ function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 	window.raise();
 
 	// remove @window from other windows' tileGroups so it doesn't falsely get raised with them
-	dissolveTileGroupFor(window);
+	MainExtension.tileGroupManager.dissolveTileGroup(window.get_id());
 
 	const oldRect = window.get_frame_rect();
 	const gap = MainExtension.settings.get_int("window-gap");
@@ -505,7 +506,7 @@ function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 
 	// setup (new) tileGroup to raise tiled windows as a group
 	const topTileGroup = getTopTileGroup(false);
-	updateTileGroup(topTileGroup);
+	MainExtension.tileGroupManager.updateTileGroup(topTileGroup);
 
 	openTilingPopup && tryOpeningTilingPopup();
 };
@@ -565,69 +566,10 @@ function restoreWindowSize(window, restoreFullPos = true, grabXCoord = undefined
 		window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
 	}
 
-	dissolveTileGroupFor(window);
+	MainExtension.tileGroupManager.dissolveTileGroup(window.get_id());
 	window.isTiled = false;
 	window.tiledRect = null;
 	window.untiledRect = null;
-};
-
-// raise tiled windows in a group:
-// each window saves its own tileGroup and raises the other windows, if it's raised.
-// this allows one window to be part of multiple groups
-function updateTileGroup(tileGroup) {
-	tileGroup.forEach(window => {
-		window.tileGroup = tileGroup;
-		window.groupRaiseId && window.disconnect(window.groupRaiseId);
-		window.groupRaiseId = window.connect("raised", raisedWindow => {
-			if (MainExtension.settings.get_boolean("enable-raise-tile-group")) {
-				raisedWindow.tileGroup.forEach(w => {
-					// disconnect the raise signal first, so we don't end up
-					// in an infinite loop of windows raising each other
-					if (w.groupRaiseId) {
-						w.disconnect(w.groupRaiseId);
-						w.groupRaiseId = 0;
-					}
-					w.raise();
-				});
-
-				// re-raise the just raised window so it may not be below other tiled window
-				// otherwise when untiling via keyboard it may be below other tiled windows
-				raisedWindow.raise();
-			}
-
-			// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple tileGroups:
-			// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
-			// but the overlapped window will remember its old tile group to raise them as well, if it is raised
-			updateTileGroup(raisedWindow.tileGroup);
-		});
-
-		window.unmanagedDissolvedId && window.disconnect(window.unmanagedDissolvedId);
-		window.unmanagedDissolvedId = window.connect("unmanaged", w => dissolveTileGroupFor(w));
-	});
-};
-
-// delete the tileGroup of @window for group-raising and
-// remove the @window from the tileGroup of other tiled windows
-function dissolveTileGroupFor(window) {
-	if (window.groupRaiseId) {
-		window.disconnect(window.groupRaiseId);
-		window.groupRaiseId = 0;
-	}
-
-	if (window.unmanagedDissolvedId) {
-		window.disconnect(window.unmanagedDissolvedId);
-		window.unmanagedDissolvedId = 0;
-	}
-
-	if (!window.tileGroup)
-		return;
-
-	window.tileGroup.forEach(otherWindow => {
-		const idx = otherWindow.tileGroup.indexOf(window);
-		idx !== -1 && otherWindow.tileGroup.splice(idx, 1);
-	});
-
-	window.tileGroup = null;
 };
 
 function ___debugShowTiledRects() {
