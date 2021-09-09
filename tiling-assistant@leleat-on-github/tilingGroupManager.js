@@ -24,9 +24,8 @@ var Manager = class TilingGroupManager {
 		this._tileGroups = null;
 	}
 
-	// @tileGroup is an array of metaWindows
-	// each window saves its own tileGroup and raises the other windows, if it's raised.
-	// this allows one window to be part of multiple groups
+	// @tileGroup is an array of metaWindows.
+	// save the windowIds in the tracking Maps and connect to the raise signals to raise the tileGroup together
 	updateTileGroup(tileGroup) {
 		tileGroup.forEach(window => {
 			const windowId = window.get_id();

@@ -18,20 +18,17 @@
 
 "use strict";
 
-const {main, panel, windowManager, windowMenu} = imports.ui;
-const {Clutter, Gio, GLib, Meta, Shell, St} = imports.gi;
+const {main} = imports.ui;
+const {Gio, GLib, Meta, Shell} = imports.gi;
 const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
-const WindowGrabHandler = Me.imports.tilingGrabHandler;
-const TileEditing = Me.imports.tilingEditingMode;
+const MoveHandler = Me.imports.tilingMoveHandler;
+const ResizeHandler = Me.imports.tilingResizeHandler;
+const KeybindingHandler = Me.imports.tilingKeybindingHandler;
 const TileGroupManager = Me.imports.tilingGroupManager;
-
-const Gettext = imports.gettext;
-const Domain = Gettext.domain(Me.metadata.uuid);
-const _ = Domain.gettext;
 
 var settings = null;
 var TILING = { // keybindings
@@ -53,8 +50,11 @@ var TILING = { // keybindings
 
 /**
  * 2 entry points:
- * 	1. tiled with keyboard shortcut => onCustomKeybindingPressed()
- * 	2. tiled via Grab => onGrabStarted()
+ * 	1. keyboard shortcuts:
+ * 		=> tilingKeybindingHandler.js
+ * 	2. Grabbing a window:
+ * 		=> tilingMoveHandler.js (when moving a window)
+ * 		=> tilingResizeHandler.js (when resizing a window)
  */
 
 function init() {
@@ -64,27 +64,17 @@ function init() {
 function enable() {
 	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
 	this.settingsSignals = [];
-	this.windowGrabHandler = new WindowGrabHandler.WindowGrabHandler();
-	this.tileGroupManager = new TileGroupManager.Manager();
 
-	// signal connections
-	this.displaySignals = [];
-	this.displaySignals.push(global.display.connect("grab-op-begin", onGrabStarted.bind(this)));
-	this.displaySignals.push(global.display.connect("grab-op-end", onGrabFinished.bind(this)));
+	this.windowMoveHandler = new MoveHandler.Handler();
+	this.windowResizeHandler = new ResizeHandler.Handler();
+	this.keybindingHandler = new KeybindingHandler.Handler();
+	this.tileGroupManager = new TileGroupManager.Manager();
 
 	// disable native tiling
 	this.gnome_mutter_settings = ExtensionUtils.getSettings("org.gnome.mutter");
 	this.gnome_mutter_settings.set_boolean("edge-tiling", false);
 	this.gnome_shell_settings = ExtensionUtils.getSettings("org.gnome.shell.overrides");
 	this.gnome_shell_settings.set_boolean("edge-tiling", false);
-
-	// keybindings
-	this.keyBindings = Object.values(TILING);
-	const bindingInOverview = [TILING.TOGGLE_POPUP];
-	this.keyBindings.forEach(key => {
-		main.wm.addKeybinding(key, settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
-				| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), onCustomKeybindingPressed.bind(this, key));
-	});
 
 	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
 	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
@@ -112,27 +102,24 @@ function disable() {
 	// save window properties, if session was locked to restore after unlock
 	_saveBeforeSessionLock();
 
-	this.windowGrabHandler.destroy();
-	this.windowGrabHandler = null;
+	this.windowMoveHandler.destroy();
+	this.windowMoveHandler = null;
+	this.windowResizeHandler.destroy();
+	this.windowResizeHandler = null;
+	this.keybindingHandler.destroy();
+	this.keybindingHandler = null;
 	this.tileGroupManager.destroy();
 	this.tileGroupManager = null;
-	this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
-	this.debuggingIndicators = null;
 
 	// disconnect signals
-	this.displaySignals.forEach(id => global.display.disconnect(id));
 	this.settingsSignals.forEach(id => this.settings.disconnect(id));
 
 	// re-enable native tiling
 	this.gnome_mutter_settings.reset("edge-tiling");
 	this.gnome_shell_settings.reset("edge-tiling");
 
-	// remove keybindings
-	this.keyBindings.forEach(key => main.wm.removeKeybinding(key));
-
 	// restore old functions
 	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
-	main.wm._windowMenuManager.showWindowMenuForWindow = this.oldShowWindowMenu;
 
 	// delete custom properties
 	const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
@@ -149,291 +136,6 @@ function disable() {
 
 	settings.run_dispose();
 	settings = null;
-};
-
-function onCustomKeybindingPressed(shortcutName) {
-	// debugging
-	if (shortcutName === TILING.DEBUGGING || shortcutName === TILING.DEBUGGING_FREE_RECTS) {
-		if (this.debuggingIndicators) {
-			this.debuggingIndicators.forEach(i => i.destroy());
-			this.debuggingIndicators = null;
-		} else {
-			const func = shortcutName === TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects;
-			this.debuggingIndicators = func.call(this);
-		}
-		return;
-
-	// toggle the popup, which appears when a window is tiled and there's free screen space
-	} else if (shortcutName === TILING.TOGGLE_POPUP) {
-		const toggleTo = !settings.get_boolean("enable-tiling-popup");
-		settings.set_boolean("enable-tiling-popup", toggleTo);
-		const message = toggleTo ? _("Tiling-assistant's popup enabled") : _("Tiling-assistant's popup was disabled");
-		main.notify("Tiling Assistant", message);
-		return;
-	}
-
-	const window = global.display.focus_window;
-	if (!window)
-		return;
-
-	// auto tile: tile to empty space. If there's no empty space: untile, if it's already tiled else maximize
-	if (shortcutName === TILING.AUTO) {
-		const tileRect = Util.getBestFitTiledRect(window);
-		Util.toggleTileState(window, tileRect);
-
-	// tile editing mode
-	} else if (shortcutName === TILING.EDIT_MODE) {
-		if (!Util.getTopTileGroup(!window.isTiled).length) {
-			main.notify("Tiling Assistant", _("Can't enter 'Tile Editing Mode', if the focused window isn't tiled."));
-			return;
-		}
-
-		!window.isTiled && window.lower();
-		const openWindows = Util.getOpenWindows();
-
-		const tileEditor = new TileEditing.TileEditor();
-		tileEditor.open(openWindows[0]);
-
-	// tile window
-	} else {
-		const dynamicSetting = settings.get_string("dynamic-keybinding-behaviour");
-		switch (dynamicSetting) {
-			case "Focus":
-				_dynamicFocus(window, shortcutName);
-				break;
-			case "Tiling State":
-			case "Tiling State (Windows)":
-				_dynamicTilingState(window, shortcutName, dynamicSetting === "Tiling State (Windows)");
-				break;
-			default:
-				Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-		}
-	}
-};
-
-function _dynamicFocus(window, shortcutName) {
-	const topTileGroup = Util.getTopTileGroup(false);
-	if (window.isTiled && topTileGroup.length > 1) {
-		const closestTiledRect = Util.getClosestRect(window.tiledRect, topTileGroup.map(w => w.tiledRect), shortcutName);
-		if (!closestTiledRect) {
-			Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-			return;
-		}
-
-		const closestTiledWindow = topTileGroup.find(w => w.tiledRect.equal(closestTiledRect));
-		closestTiledWindow.activate(global.get_current_time());
-
-		// animate for visibilty
-		const fromRect = window.get_frame_rect();
-		const focusIndicator = new St.Widget({
-			style_class: "tile-preview",
-			opacity: 0,
-			x: fromRect.x, y: fromRect.y,
-			width: fromRect.width, height: fromRect.height
-		});
-		main.uiGroup.add_child(focusIndicator);
-		const toRect = closestTiledWindow.get_frame_rect();
-		Util.compatEase(focusIndicator, {
-				opacity: 255,
-				x: toRect.x, y: toRect.y,
-				width: toRect.width, height: toRect.height
-			}, 200
-			, Clutter.AnimationMode.EASE_OUT_QUART
-			, () => Util.compatEase(focusIndicator, {
-				opacity: 0,
-			}, 200, Clutter.AnimationMode.EASE_IN_OUT_CIRC, () => focusIndicator.destroy(), 100));
-
-	// toggle tile state window, if it isn't tiled or the only one which is
-	} else {
-		Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-	}
-};
-
-// @isWindowsStyle -> minimize when tiling state at bottom and 'tile to bottom' shortcut is pressed
-function _dynamicTilingState(window, shortcutName, isWindowsStyle) {
-	if (Util.windowIsMaximized(window) && [TILING.BOTTOM, TILING.TOP, TILING.MAXIMIZE].includes(shortcutName)) {
-		Util.restoreWindowSize(window);
-		return;
-	}
-
-	if (!window.isTiled) {
-		isWindowsStyle && shortcutName === TILING.BOTTOM ? window.minimize()
-				: Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-		return;
-	}
-
-	const wRect = window.tiledRect;
-	const workArea = window.get_work_area_current_monitor();
-	const isLeftHalf = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width !== workArea.width && wRect.height === workArea.height;
-	const isRightHalf = wRect.x !== workArea.x && wRect.y === workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.height === workArea.height;
-	const isTopHalf = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width === workArea.width && wRect.height !== workArea.height;
-	const isBottomHalf = wRect.x === workArea.x && wRect.y !== workArea.y && wRect.width === workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
-	const isTopLeftQuarter = wRect.x === workArea.x && wRect.y === workArea.y && wRect.width !== workArea.width && wRect.height !== workArea.height;
-	const isTopRightQuarter = wRect.x !== workArea.x && wRect.y === workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.height !== workArea.height;
-	const isBottomLeftQuarter = wRect.x === workArea.x && wRect.y !== workArea.y && wRect.width !== workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
-	const isBottomRightQuarter = wRect.x !== workArea.x && wRect.y !== workArea.y && wRect.x + wRect.width === workArea.x + workArea.width && wRect.y + wRect.height === workArea.y + workArea.height;
-
-	if (isLeftHalf) {
-		switch (shortcutName) {
-			case TILING.TOP:
-			case TILING.MAXIMIZE:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_LEFT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.RIGHT:
-				Util.restoreWindowSize(window);
-				return;
-		}
-	} else if (isRightHalf) {
-		switch (shortcutName) {
-			case TILING.TOP:
-			case TILING.MAXIMIZE:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.LEFT:
-				Util.restoreWindowSize(window);
-				return;
-		}
-	} else if (isTopHalf) {
-		switch (shortcutName) {
-			case TILING.LEFT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_LEFT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.RIGHT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				Util.restoreWindowSize(window);
-				return;
-		}
-	} else if (isBottomHalf) {
-		switch (shortcutName) {
-			case TILING.LEFT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.RIGHT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.TOP:
-			case TILING.MAXIMIZE:
-				Util.restoreWindowSize(window);
-				return;
-			case TILING.BOTTOM:
-				isWindowsStyle ? window.minimize()
-						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
-				return;
-		}
-	} else if (isTopLeftQuarter) {
-		switch (shortcutName) {
-			case TILING.RIGHT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.LEFT, window.get_work_area_current_monitor()));
-				return;
-		}
-	} else if (isTopRightQuarter) {
-		switch (shortcutName) {
-			case TILING.LEFT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.TOP, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.RIGHT, window.get_work_area_current_monitor()));
-				return;
-		}
-	} else if (isBottomLeftQuarter) {
-		switch (shortcutName) {
-			case TILING.TOP:
-			case TILING.MAXIMIZE:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.LEFT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.RIGHT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				isWindowsStyle ? window.minimize()
-						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
-				return;
-		}
-	} else if (isBottomRightQuarter) {
-		switch (shortcutName) {
-			case TILING.TOP:
-			case TILING.MAXIMIZE:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.RIGHT, window.get_work_area_current_monitor()));
-				return;
-			case TILING.LEFT:
-				Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
-				return;
-			case TILING.BOTTOM:
-				isWindowsStyle ? window.minimize()
-						: Util.toggleTileState(window, Util.getTileRectFor(TILING.BOTTOM, window.get_work_area_current_monitor()));
-				return;
-		}
-	}
-
-	Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
-};
-
-function onGrabStarted(...params) {
-	// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
-	const [grabbedWindow, grabOp] = [params[params.length - 2], params[params.length - 1]];
-	if (!grabbedWindow)
-		return;
-
-	if (_grabIsMoving(grabOp))
-		this.windowGrabHandler.onMoveStarted(grabbedWindow, grabOp);
-	else if (_grabIsResizing(grabOp))
-		this.windowGrabHandler.onResizeStarted(grabbedWindow, grabOp);
-};
-
-function onGrabFinished(...params) {
-	// pre-GNOME 40 the signal emitter was added as the first and second param; fixed with !1734 in mutter
-	const [grabbedWindow, grabOp] = [params[params.length - 2], params[params.length - 1]];
-	if (!grabbedWindow)
-		return;
-
-	if (grabbedWindow.grabSignalID) {
-		grabbedWindow.disconnect(grabbedWindow.grabSignalID);
-		grabbedWindow.grabSignalID = 0;
-	}
-
-	if (_grabIsMoving(grabOp))
-		this.windowGrabHandler.onMoveFinished(grabbedWindow);
-	else if (_grabIsResizing(grabOp))
-		this.windowGrabHandler.onResizeFinished(grabbedWindow, grabOp);
-};
-
-function _grabIsMoving(grabOp) {
-	switch (grabOp) {
-		case Meta.GrabOp.MOVING:
-		case Meta.GrabOp.KEYBOARD_MOVING:
-			return true;
-
-		default:
-			return false;
-	}
-};
-
-function _grabIsResizing(grabOp) {
-	switch (grabOp) {
-		case Meta.GrabOp.RESIZING_N:
-		case Meta.GrabOp.RESIZING_NW:
-		case Meta.GrabOp.RESIZING_NE:
-		case Meta.GrabOp.RESIZING_S:
-		case Meta.GrabOp.RESIZING_SW:
-		case Meta.GrabOp.RESIZING_SE:
-		case Meta.GrabOp.RESIZING_E:
-		case Meta.GrabOp.RESIZING_W:
-			return true;
-
-		default:
-			return false;
-	}
 };
 
 function _saveBeforeSessionLock() {

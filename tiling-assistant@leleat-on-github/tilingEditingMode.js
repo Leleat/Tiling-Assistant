@@ -17,6 +17,11 @@ const MODES = {
 	SWAP: 2,
 }
 
+/**
+ * Classes for keyboard-driven (and keyboard only) tiling management.
+ * It's entered via a keyboard shortcut (see settings).
+ */
+
 var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget {
 	_init() {
 		const display = global.display.get_monitor_geometry(global.display.get_current_monitor());

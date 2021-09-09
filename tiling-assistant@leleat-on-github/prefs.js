@@ -10,7 +10,7 @@ const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
-const TILING = { // keybindings
+const TILING = { // copy/paste from extension.js
 	DEBUGGING: "debugging-show-tiled-rects",
 	DEBUGGING_FREE_RECTS: "debugging-free-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",

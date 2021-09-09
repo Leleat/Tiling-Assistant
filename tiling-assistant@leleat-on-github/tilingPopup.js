@@ -7,9 +7,11 @@ const Me = imports.misc.extensionUtils.getCurrentExtension();
 const Util = Me.imports.tilingUtil;
 const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
-// classes for the tiling popup, which opens when tiling a window
-// and there is free screen space to fill with other windows.
-// mostly based on GNOME's altTab.js
+/**
+ * Classes for the tiling popup, which opens when tiling a window
+ * and there is free screen space to fill with other windows.
+ * Mostly based on GNOME's altTab.js
+ */
 
 var TilingSwitcherPopup = GObject.registerClass({
 	Signals: {
