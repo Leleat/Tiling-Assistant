@@ -16,7 +16,7 @@ const _ = Domain.gettext;
 /**
  * Class to handle keyboard shortcuts.
  */
-
+5
 var Handler = class TilingKeybindingHandler {
 
 	constructor() {
@@ -125,7 +125,10 @@ var Handler = class TilingKeybindingHandler {
 				, Clutter.AnimationMode.EASE_OUT_QUART
 				, () => Util.compatEase(focusIndicator, {
 					opacity: 0,
-				}, 200, Clutter.AnimationMode.EASE_IN_OUT_CIRC, () => focusIndicator.destroy(), 100));
+				}, 200, Clutter.AnimationMode.EASE_IN_OUT_CIRC, () => {
+					focusIndicator.destroy();
+				}, 100)
+			);
 
 		// toggle tile state window, if it isn't tiled or the only one which is
 		} else {

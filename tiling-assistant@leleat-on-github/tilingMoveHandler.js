@@ -22,26 +22,21 @@ const PREVIEW_STATE = {
 
 var Handler = class TilingMoveHandler {
 	constructor() {
-		this.displaySignals = [];
-		this.displaySignals.push(global.display.connect("grab-op-begin", (...params) => {
+		this._displaySignals = [];
+		this._displaySignals.push(global.display.connect("grab-op-begin", (...params) => {
 			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
 			const [grabbedWindow, grabOp] = [params[params.length - 2], params[params.length - 1]];
 			if (grabbedWindow && this._isMoving(grabOp))
 				this._onMoveStarted(grabbedWindow, grabOp);
 		}));
-		this.displaySignals.push(global.display.connect("grab-op-end", (...params) => {
+		this._displaySignals.push(global.display.connect("grab-op-end", (...params) => {
 			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
 			const [grabbedWindow, grabOp] = [params[params.length - 2], params[params.length - 1]];
-			if (!grabbedWindow || !this._isMoving(grabOp))
-				return;
-
-			if (grabbedWindow.grabSignalID) {
-				grabbedWindow.disconnect(grabbedWindow.grabSignalID);
-				grabbedWindow.grabSignalID = 0;
-			}
-
-			this._onMoveFinished(grabbedWindow);
+			if (grabbedWindow && this._isMoving(grabOp))
+				this._onMoveFinished(grabbedWindow);
 		}));
+
+		this._posChangedId = 0;
 
 		this.tilePreview = new windowManager.TilePreview();
 		this.tilePreview.state = PREVIEW_STATE.DEFAULT;
@@ -57,7 +52,7 @@ var Handler = class TilingMoveHandler {
 	}
 
 	destroy() {
-		this.displaySignals.forEach(sId => global.display.disconnect(sId));
+		this._displaySignals.forEach(sId => global.display.disconnect(sId));
 		const actor = GNOME_VERSION < 3.36 ? this.tilePreview.actor : this.tilePreview;
 		actor.destroy();
 		this.tilePreview = null;
@@ -74,7 +69,6 @@ var Handler = class TilingMoveHandler {
 		}
 	}
 
-	// called via global.diplay's signal (grab-op-begin)
 	_onMoveStarted(window, grabOp) {
 		this.monitorNr = global.display.get_current_monitor();
 		this.lastMonitorNr = this.monitorNr;
@@ -87,12 +81,16 @@ var Handler = class TilingMoveHandler {
 		}
 
 		const topTileGroup = Util.getTopTileGroup();
-		window.grabSignalID = window.connect("position-changed", this._onMoving.bind(this, grabOp, window
+		this._posChangedId = window.connect("position-changed", this._onMoving.bind(this, grabOp, window
 				, topTileGroup, Util.getFreeScreenRects(topTileGroup)));
 	}
 
-	// called via global.diplay's signal (grab-op-end)
 	_onMoveFinished(window) {
+		if (this._posChangedId) {
+			window.disconnect(this._posChangedId);
+			this._posChangedId = 0;
+		}
+
 		if (!this._moveStarted)
 			return;
 
@@ -213,7 +211,6 @@ var Handler = class TilingMoveHandler {
 		this.tilePreview.close();
 	}
 
-	// called via @window's signal (position-changed)
 	_onMoving(grabOp, window, topTileGroup, freeScreenRects) {
 		this._moveStarted = true;
 		// use the current event's coords instead of global.get_pointer to support touch.

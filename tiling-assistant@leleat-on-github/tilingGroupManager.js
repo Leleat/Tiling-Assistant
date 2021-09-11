@@ -13,15 +13,15 @@ const Util = Me.imports.tilingUtil;
 var Manager = class TilingGroupManager {
 
 	constructor() {
-		this._groupRaiseIds = new Map(); // {windowId1 : int, windowId2: int, ...}
-		this._unmanagedIds = new Map(); // {windowId1 : int, windowId2: int, ...}
-		this._tileGroups = new Map(); // {windowId1 : [windowIdX, windowIdY, ...], windowId2: [,,,]...}
+		this._groupRaiseIds = new Map(); // {windowId1: int, windowId2: int, ...}
+		this._unmanagedIds = new Map(); // {windowId1: int, windowId2: int, ...}
+		this._tileGroups = new Map(); // {windowId1: [windowIdX, windowIdY, ...], windowId2: [,,,]...}
 	}
 
 	destroy() {
-		this._groupRaiseIds = null;
-		this._unmanagedIds = null;
-		this._tileGroups = null;
+		this._groupRaiseIds.clear();
+		this._unmanagedIds.clear();
+		this._tileGroups.clear();
 	}
 
 	// @tileGroup is an array of metaWindows.
@@ -52,7 +52,7 @@ var Manager = class TilingGroupManager {
 					raisedWindow.raise();
 				}
 
-				// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple _tileGroups:
+				// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple tileGroups:
 				// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
 				// but the overlapped window will remember its old tile group to raise them as well, if it is raised
 				const raisedTileGroup = this._tileGroups.get(raisedWindowId);

@@ -172,61 +172,6 @@ const MyPrefsWidget = new GObject.Class({
 
 /* --- GTK 4 compatibility --- */
 
-function _getEntryText(entry) {
-	return shellVersion < 40 ? entry.get_text() : entry.get_buffer().get_text();
-}
-
-function _setEntryText(entry, text) {
-	shellVersion < 40 ? entry.set_text(text) : entry.get_buffer().set_text(text, -1);
-}
-
-function _makeButton(GtkImage, iconName) {
-	const button = new Gtk.Button();
-	if (shellVersion < 40) {
-		button.set_always_show_image(true);
-		button.set_image(GtkImage);
-	} else {
-		button.set_icon_name(iconName);
-	}
-	return button;
-}
-
-function _getChildCount(container) {
-	if (shellVersion < 40)
-		return container.get_children().length;
-
-	let childCount = 0;
-	for (let child = container.get_first_child(); !!child; child = child.get_next_sibling())
-		childCount++;
-	return childCount;
-}
-
-function _getChildIndex(container, child) {
-	if (shellVersion < 40) {
-		return container.get_children().indexOf(child);
-
-	} else {
-		for (let i = 0, c = container.get_first_child(); !!c; c = c.get_next_sibling(), i++) {
-			if (c === child)
-				return i;
-		}
-		return -1;
-	}
-}
-
-function _forEachChild(that, container, callback) {
-	if (shellVersion < 40) {
-		container.foreach(callback.bind(that));
-
-	} else {
-		for (let child = container.get_first_child(); !!child;) {
-			const nxtSibling = child.get_next_sibling();
-			callback.call(that, child);
-			child = nxtSibling;
-		}
-	}
-}
-
 function _addChildTo(parent, child) {
 	if (parent instanceof Gtk.Box || parent instanceof Gtk.ListBox)
 		shellVersion < 40 ? parent.add(child) : parent.append(child);

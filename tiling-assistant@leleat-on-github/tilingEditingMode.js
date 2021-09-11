@@ -18,8 +18,8 @@ const MODES = {
 }
 
 /**
- * Classes for keyboard-driven (and keyboard only) tiling management.
- * It's entered via a keyboard shortcut (see settings).
+ * Classes for keyboard-driven (and only) tiling management.
+ * It's entered via a keyboard shortcut.
  */
 
 var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget {
@@ -57,7 +57,9 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		const color = MainExtension.settings.get_string("tile-editing-mode-color"); // rgb(X,Y,Z)
 		this._primaryIndicator = new Indicator(window, `border: ${gap / 2 + 1}px solid ${color};`);
 		this.add_child(this._primaryIndicator);
-		// secondary indicator (for swapping with focused window)
+		// secondary indicator (for swapping with focused window).
+		// the primary and secondary indicator combined indicate the focus.
+		// the primary indicator is the thick border/outline and the seconday indicator the filling
 		const rgb = color.substring(color.indexOf("(") + 1, color.indexOf(")")).split(",");
 		this._secondaryIndicator = new Indicator(window, `background-color: rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, .3);`);
 		this._secondaryIndicator.set_opacity(100);
@@ -75,7 +77,9 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		const window = this._primaryIndicator.window;
 		window && window.activate(global.get_current_time());
 
-		Util.compatEase(this, {opacity: 0}, 100, Clutter.AnimationMode.EASE_OUT_QUAD, () => this.destroy());
+		Util.compatEase(this, {opacity: 0}, 100, Clutter.AnimationMode.EASE_OUT_QUAD, () => {
+			this.destroy();
+		});
 	}
 
 	select(rect, window) {
@@ -372,7 +376,7 @@ const Indicator = GObject.registerClass(class TilingEditingModeIndicator extends
 			width: window.tiledRect.width - 200,
 			height: window.tiledRect.height - 200,
 			opacity: 0,
-			style: style,
+			style,
 		});
 
 		this.rect = window.tiledRect;
@@ -388,7 +392,8 @@ const Indicator = GObject.registerClass(class TilingEditingModeIndicator extends
 			width: rect.width - gap + 2,
 			height: rect.height - gap + 2,
 			opacity: 255},
-			150)
+			150
+		);
 
 		this.rect = rect;
 		this.window = window;
