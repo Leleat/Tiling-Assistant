@@ -127,11 +127,6 @@ function disable() {
 		delete w.isTiled;
 		delete w.tiledRect;
 		delete w.untiledRect;
-		delete w.preGrabRect;
-		delete w.resizeSameSideV;
-		delete w.resizeSameSideH;
-		w.grabSignalID && w.disconnect(w.grabSignalID);
-		delete w.grabSignalID;
 	});
 
 	settings.run_dispose();
