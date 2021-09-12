@@ -148,22 +148,25 @@ function _saveBeforeSessionLock() {
 		if (!window.untiledRect)
 			return;
 
-		const tileGroup = this.tileGroupManager.getTileGroupFor(window);
 		savedWindows.push({
 			windowStableId: window.get_stable_sequence(),
 			isTiled: window.isTiled,
 			tiledRect: metaToStringRect(window.tiledRect),
 			untiledRect: metaToStringRect(window.untiledRect),
-			tileGroup: tileGroup.length && tileGroup.map(w => w.get_stable_sequence())
 		});
 	});
+
+	const saveObj = {
+		"windows": savedWindows,
+		"tileGroups": Array.from(this.tileGroupManager.getTileGroups())
+	};
 
 	const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
 	try {parentDir.make_directory_with_parents(null)} catch (e) {}
 	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
 	const file = Gio.File.new_for_path(path);
 	try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-	file.replace_contents(JSON.stringify(savedWindows), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+	file.replace_contents(JSON.stringify(saveObj), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 };
 
 function _loadAfterSessionLock() {
@@ -183,10 +186,9 @@ function _loadAfterSessionLock() {
 		return;
 
 	const openWindows = Util.getOpenWindows(false);
-	// array of 'property saving objects': [{windowStableId: Int, tiledRect: {x: , y: , width: , height: }, isTiled: bool
-	// , untiledRect: {x: , y: , width: , height: }, tileGroup: [windowStableId1, windowStableId2, ...]}, ...]
-	// maximized windows may just have an untiledRect and everything else being null
-	const windowObjects = JSON.parse(ByteArray.toString(contents));
+	const saveObj = JSON.parse(ByteArray.toString(contents));
+
+	const windowObjects = saveObj["windows"];
 	windowObjects.forEach(wObj => {
 		const {windowStableId, isTiled, tiledRect, untiledRect, tileGroup} = wObj;
 		const windowIdx = openWindows.findIndex(w => w.get_stable_sequence() === windowStableId);
@@ -203,14 +205,14 @@ function _loadAfterSessionLock() {
 			x: untiledRect.x, y: untiledRect.y,
 			width: untiledRect.width, height: untiledRect.height
 		});
-		if (tileGroup) {
-			const windowGroup = [];
-			tileGroup.forEach(wId => {
-				const win = openWindows.find(w => w.get_stable_sequence() === wId);
-				win && windowGroup.push(win);
-			});
+	});
 
-			this.tileGroupManager.updateTileGroup(windowGroup);
+	const tileGroups = new Map(saveObj["tileGroups"]);
+	this.tileGroupManager.setTileGroups(tileGroups);
+	openWindows.forEach(w => {
+		if (tileGroups.has(w.get_id())) {
+			const group = this.tileGroupManager.getTileGroupFor(w);
+			this.tileGroupManager.updateTileGroup(group);
 		}
 	});
 };

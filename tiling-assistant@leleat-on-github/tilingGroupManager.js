@@ -19,7 +19,9 @@ var Manager = class TilingGroupManager {
 	}
 
 	destroy() {
+		this._groupRaiseIds.forEach((signalId, windowId) => this._getWindow(windowId).disconnect(signalId));
 		this._groupRaiseIds.clear();
+		this._unmanagedIds.forEach((signalId, windowId) => this._getWindow(windowId).disconnect(signalId));
 		this._unmanagedIds.clear();
 		this._tileGroups.clear();
 	}
@@ -88,6 +90,14 @@ var Manager = class TilingGroupManager {
 			const idx = tileGroup.indexOf(windowId);
 			idx !== -1 && tileGroup.splice(idx, 1);
 		});
+	}
+
+	getTileGroups() {
+		return this._tileGroups;
+	}
+
+	setTileGroups(tileGroups) {
+		this._tileGroups = tileGroups;
 	}
 
 	getTileGroupFor(window) {
