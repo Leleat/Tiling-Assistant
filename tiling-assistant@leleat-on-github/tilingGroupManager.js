@@ -64,8 +64,8 @@ var Manager = class TilingGroupManager {
 		});
 	}
 
-	// delete the tileGroup of @window for group-raising and
-	// remove the @window from the tileGroup of other tiled windows
+	// delete the tileGroup of window with @windowId for group-raising and
+	// remove the window from the tileGroup of other tiled windows
 	dissolveTileGroup(windowId) {
 		const window = this._getWindow(windowId);
 		if (this._groupRaiseIds.has(windowId)) {

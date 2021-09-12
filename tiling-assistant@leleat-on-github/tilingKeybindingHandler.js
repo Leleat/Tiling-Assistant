@@ -16,34 +16,34 @@ const _ = Domain.gettext;
 /**
  * Class to handle keyboard shortcuts.
  */
-5
+
 var Handler = class TilingKeybindingHandler {
 
 	constructor() {
-		this.keyBindings = Object.values(MainExtension.TILING);
+		this._keyBindings = Object.values(MainExtension.TILING);
 		const bindingInOverview = [MainExtension.TILING.TOGGLE_POPUP];
-		this.keyBindings.forEach(key => {
+		this._keyBindings.forEach(key => {
 			main.wm.addKeybinding(key, MainExtension.settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 					| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), this._onCustomKeybindingPressed.bind(this, key));
 		});
 	}
 
 	destroy() {
-		this.keyBindings.forEach(key => main.wm.removeKeybinding(key));
+		this._keyBindings.forEach(key => main.wm.removeKeybinding(key));
 
-		this.debuggingIndicators && this.debuggingIndicators.forEach(i => i.destroy());
-		this.debuggingIndicators = null;
+		this._debuggingIndicators && this._debuggingIndicators.forEach(i => i.destroy());
+		this._debuggingIndicators = null;
 	}
 
 	_onCustomKeybindingPressed(shortcutName) {
 		// debugging
 		if (shortcutName === MainExtension.TILING.DEBUGGING || shortcutName === MainExtension.TILING.DEBUGGING_FREE_RECTS) {
-			if (this.debuggingIndicators) {
-				this.debuggingIndicators.forEach(i => i.destroy());
-				this.debuggingIndicators = null;
+			if (this._debuggingIndicators) {
+				this._debuggingIndicators.forEach(i => i.destroy());
+				this._debuggingIndicators = null;
 			} else {
 				const func = shortcutName === MainExtension.TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects;
-				this.debuggingIndicators = func.call(this);
+				this._debuggingIndicators = func.call(this);
 			}
 			return;
 
