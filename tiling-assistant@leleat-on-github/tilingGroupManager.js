@@ -1,9 +1,9 @@
 "use strict";
 
+const {Meta} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
-const Util = Me.imports.tilingUtil;
 
 /**
  * This class tracks the different tileGroups for each tiled window.
@@ -42,6 +42,11 @@ var Manager = class TilingGroupManager {
 						// disconnect the raise signal first, so we don't end up
 						// in an infinite loop of windows raising each other
 						const w = this._getWindow(wId);
+						if (!w) { // may be undefined, if @w was just closed
+							this.dissolveTileGroup(wId); // in case I missed/don't know about other cases where @w may be undefined
+							return;
+						}
+
 						if (this._groupRaiseIds.has(wId)) {
 							w.disconnect(this._groupRaiseIds.get(wId));
 							this._groupRaiseIds.delete(wId);
@@ -58,7 +63,7 @@ var Manager = class TilingGroupManager {
 				// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
 				// but the overlapped window will remember its old tile group to raise them as well, if it is raised
 				const raisedTileGroup = this._tileGroups.get(raisedWindowId);
-				this.updateTileGroup(Util.getOpenWindows().filter(w => raisedTileGroup.includes(w.get_id())));
+				this.updateTileGroup(this._getAllWindows().filter(w => raisedTileGroup.includes(w.get_id())));
 			}));
 
 			this._unmanagedIds.has(windowId) && window.disconnect(this._unmanagedIds.get(windowId));
@@ -102,10 +107,15 @@ var Manager = class TilingGroupManager {
 
 	getTileGroupFor(window) {
 		const tileGroup = this._tileGroups.get(window.get_id());
-		return Util.getOpenWindows().filter(w => tileGroup.includes(w.get_id()));
+		return this._getAllWindows().filter(w => tileGroup.includes(w.get_id()));
+	}
+
+	// the one used in tilingUtil is filtered for the tilingPopup
+	_getAllWindows() {
+		return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
 	}
 
 	_getWindow(windowId) {
-		return Util.getOpenWindows().find(w => w.get_id() === windowId);
+		return this._getAllWindows().find(w => w.get_id() === windowId);
 	}
 }
