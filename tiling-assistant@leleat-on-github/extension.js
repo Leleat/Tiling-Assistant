@@ -31,7 +31,6 @@ const ResizeHandler = Me.imports.tilingResizeHandler;
 const KeybindingHandler = Me.imports.tilingKeybindingHandler;
 const TileGroupManager = Me.imports.tilingGroupManager;
 const PieMenu = Me.imports.tilingPieMenu;
-const TileEditing = Me.imports.tilingEditingMode;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
