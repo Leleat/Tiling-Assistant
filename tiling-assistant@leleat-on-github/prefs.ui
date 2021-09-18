@@ -746,7 +746,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                 <child>
                                   <object class="GtkTreeView" id="toggle-tiling-popup-treeview">
                                     <property name="visible">True</property>
-                                    <property name="can-focus">True</property>
+                                    <property name="can-focus">False</property>
                                     <property name="halign">end</property>
                                     <property name="valign">center</property>
                                     <property name="hexpand">True</property>
@@ -754,6 +754,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -822,6 +823,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -906,6 +908,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -974,6 +977,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1083,6 +1087,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1151,6 +1156,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1219,6 +1225,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1287,6 +1294,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1397,6 +1405,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1465,6 +1474,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1533,6 +1543,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -1601,6 +1612,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
                                     <property name="search-column">0</property>
+                                    <property name="hover-selection">True</property>
                                     <property name="activate-on-single-click">True</property>
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
@@ -2419,6 +2431,7 @@ please open an issue on Github.</property>
                             <property name="headers-visible">False</property>
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
+                            <property name="hover-selection">True</property>
                             <property name="activate-on-single-click">True</property>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection"/>
@@ -2470,6 +2483,7 @@ please open an issue on Github.</property>
                             <property name="headers-visible">False</property>
                             <property name="enable-search">False</property>
                             <property name="search-column">0</property>
+                            <property name="hover-selection">True</property>
                             <property name="activate-on-single-click">True</property>
                             <child internal-child="selection">
                               <object class="GtkTreeSelection"/>

@@ -87,9 +87,8 @@ const MyPrefsWidget = new GObject.Class({
 				btn.set_sensitive(false);
 			});
 
-			this._settings.connect("changed::" + settingKey, () => {
-				this._settings.get_strv(settingKey)[0] && clearButton.set_sensitive(true);
-			});
+			this._settings.connect("changed::" + settingKey, () =>
+					clearButton.set_sensitive(this._settings.get_strv(settingKey)[0]));
 		};
 
 		// hide certain widgets since some features are not supported on older versions
