@@ -62,7 +62,7 @@ function init() {
 };
 
 function enable() {
-	settings = ExtensionUtils.getSettings("org.gnome.shell.extensions.tiling-assistant");
+	settings = ExtensionUtils.getSettings(Me.metadata["settings-schema"]);
 	this.settingsSignals = [];
 
 	this.windowMoveHandler = new MoveHandler.Handler();

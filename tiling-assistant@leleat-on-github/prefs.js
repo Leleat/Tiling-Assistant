@@ -47,24 +47,23 @@ const MyPrefsWidget = new GObject.Class({
 			, false
 		);
 
-		const settingsSchema = gschema.lookup("org.gnome.shell.extensions.tiling-assistant", true);
-		this.settings = new Gio.Settings({settings_schema: settingsSchema});
+		const settingsSchema = gschema.lookup(Me.metadata["settings-schema"], true);
+		this._settings = new Gio.Settings({settings_schema: settingsSchema});
 
 		this.parent(params);
 
-		this.builder = new Gtk.Builder();
-		this.builder.add_from_file(Me.path + `/prefs${shellVersion < 40 ? "" : "40"}.ui`);
-		const mainPrefs = this.builder.get_object("main_prefs");
+		this._builder = new Gtk.Builder();
+		this._builder.add_from_file(Me.path + `/prefs${shellVersion < 40 ? "" : "40"}.ui`);
+		const mainPrefs = this._builder.get_object("main_prefs");
 		_addChildTo(this, mainPrefs);
 
 		this.set_min_content_width(700);
 		this.set_min_content_height(650);
 
 		this._bindWidgetsToSettings(settingsSchema.list_keys());
-		this._bindWidgetsTogether();
 		this._bindKeybindings();
 
-		this.connect("destroy", () => this.settings.run_dispose());
+		this.connect("destroy", () => this._settings.run_dispose());
 
 		shellVersion < 40 && this.show_all();
 
@@ -72,7 +71,7 @@ const MyPrefsWidget = new GObject.Class({
 		if (shellVersion < 3.36) {
 			const hiddenWidgetsPre336 = ["TilingPopupGtkListBoxRow", "ToggleTilingPopupGtkBox", "TileEditingModeGtkBox"
 					, "TilingPopupCurrentWorkspaceGtkListBoxRow", "TileEditingModeFocusColorGtkListBoxRow"];
-			hiddenWidgetsPre336.forEach(w => this.builder.get_object(w).set_visible(false));
+			hiddenWidgetsPre336.forEach(w => this._builder.get_object(w).set_visible(false));
 		}
 	},
 
@@ -97,30 +96,26 @@ const MyPrefsWidget = new GObject.Class({
 		// int & bool settings
 		settingsKeys.forEach(key => {
 			const bindProperty = getBindProperty(key);
-			const widget = this.builder.get_object(key);
+			const widget = this._builder.get_object(key);
 			if (widget && bindProperty)
-				this.settings.bind(key, widget, bindProperty, Gio.SettingsBindFlags.DEFAULT);
+				this._settings.bind(key, widget, bindProperty, Gio.SettingsBindFlags.DEFAULT);
 		});
 
 		// enum settings
 		enums.forEach(key => {
-			const widget = this.builder.get_object(key);
-			widget.set_active(this.settings.get_enum(key));
-			widget.connect("changed", src => this.settings.set_enum(key, widget.get_active()));
+			const widget = this._builder.get_object(key);
+			widget.set_active(this._settings.get_enum(key));
+			widget.connect("changed", src => this._settings.set_enum(key, widget.get_active()));
 		});
 
 		// color buttons settings
 		colors.forEach(key => {
-			const widget = this.builder.get_object(key);
+			const widget = this._builder.get_object(key);
 			const color = new Gdk.RGBA();
-			color.parse(this.settings.get_string(key));
+			color.parse(this._settings.get_string(key));
 			widget.set_rgba(color);
-			widget.connect("color-set", w => this.settings.set_string(key, w.get_rgba().to_string()));
+			widget.connect("color-set", w => this._settings.set_string(key, w.get_rgba().to_string()));
 		});
-	},
-
-	_bindWidgetsTogether: function() {
-
 	},
 
 	_bindKeybindings: function() {
@@ -134,8 +129,8 @@ const MyPrefsWidget = new GObject.Class({
 		const COLUMN_KEY = 0;
 		const COLUMN_MODS = 1;
 
-		const view = treeView || this.builder.get_object(settingKey + "-treeview");
-		const store = listStore || this.builder.get_object(settingKey + "-liststore");
+		const view = treeView || this._builder.get_object(settingKey + "-treeview");
+		const store = listStore || this._builder.get_object(settingKey + "-liststore");
 		const iter = store.append();
 		const renderer = new Gtk.CellRendererAccel({xalign: 1, editable: true});
 		const column = new Gtk.TreeViewColumn();
@@ -154,19 +149,19 @@ const MyPrefsWidget = new GObject.Class({
 		renderer.connect("accel-edited", (renderer, path, key, mods, hwCode) => {
 			const accel = Gtk.accelerator_name(key, mods);
 			updateShortcutRow(accel);
-			this.settings.set_strv(settingKey, [accel]);
+			this._settings.set_strv(settingKey, [accel]);
 		});
 
 		renderer.connect("accel-cleared", () => {
 			updateShortcutRow(null);
-			this.settings.set_strv(settingKey, []);
+			this._settings.set_strv(settingKey, []);
 		});
 
-		this.settings.connect("changed::" + settingKey, () => {
-			updateShortcutRow(this.settings.get_strv(settingKey)[0]);
+		this._settings.connect("changed::" + settingKey, () => {
+			updateShortcutRow(this._settings.get_strv(settingKey)[0]);
 		});
 
-		updateShortcutRow(this.settings.get_strv(settingKey)[0]);
+		updateShortcutRow(this._settings.get_strv(settingKey)[0]);
 	}
 });
 
@@ -178,4 +173,4 @@ function _addChildTo(parent, child) {
 
 	else if (parent instanceof Gtk.ListBoxRow || parent instanceof Gtk.ScrolledWindow || parent instanceof Gtk.Frame || parent instanceof Gtk.Overlay)
 		shellVersion < 40 ? parent.add(child) : parent.set_child(child);
-}
+};

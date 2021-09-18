@@ -84,7 +84,7 @@ var Handler = class TilingMoveHandler {
 			});
 			// clean up in case my assumption mentioned above is wrong
 			// and the cursor never gets updated or something else...
-			GLib.timeout_add(GLib.PRIORITY_LOW, 300, () => {
+			GLib.timeout_add(GLib.PRIORITY_LOW, 400, () => {
 				cursorId && global.display.disconnect(cursorId);
 				cursorId = 0;
 				return GLib.SOURCE_REMOVE;
@@ -96,7 +96,7 @@ var Handler = class TilingMoveHandler {
 					return GLib.SOURCE_REMOVE;
 
 				counter += 10;
-				if (counter >= 200) {
+				if (counter >= 400) {
 					this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
 					return GLib.SOURCE_REMOVE;
 				}
