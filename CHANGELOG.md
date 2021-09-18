@@ -2,6 +2,7 @@
 
 ## v24
 **Added**
+- clear-keybindings button
 - Dutch translation (by Vistaus #95)
 - partial japanese translation (by k-fog #89)
 - added Brazillian Portuguese translation (by msmafra #92)
