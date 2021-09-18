@@ -487,6 +487,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">True</property>
                     <property name="tooltip-text" translatable="yes">This setting is intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
+
 If that is the case, you can try 'Restore Window Size on Grab End' instead.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
@@ -686,6 +687,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">toggle-tiling-popup-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -695,6 +697,16 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button1">
+                                    <property name="name">clear-button1</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -722,6 +734,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="model">tile-edit-mode-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
@@ -730,6 +743,16 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button2">
+                                    <property name="name">clear-button2</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -757,6 +780,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="model">layouts-overview-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
@@ -765,6 +789,16 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button3">
+                                    <property name="name">clear-button3</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -791,6 +825,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space as good as possible based on the tiled windows around it.
+
 If there is no space, the window will either untile or maximize depending on wether it's currently tiled.</property>
                                     <property name="margin-start">12</property>
                                     <property name="icon-name">dialog-information-symbolic</property>
@@ -801,6 +836,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">auto-tile-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -810,6 +846,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button4">
+                                    <property name="name">clear-button4</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -837,6 +883,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="model">tile-maximize-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
@@ -845,6 +892,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button5">
+                                    <property name="name">clear-button5</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -882,7 +939,6 @@ If there is no space, the window will either untile or maximize depending on wet
                         <property name="label-xalign">0.5</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="width-request">-1</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="margin-start">4</property>
@@ -891,7 +947,6 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="margin-bottom">8</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">12</property>
-                            <property name="homogeneous">True</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -914,6 +969,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-top-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -923,6 +979,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button6">
+                                    <property name="name">clear-button6</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -935,7 +1001,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -950,6 +1015,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottom-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -959,6 +1025,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button7">
+                                    <property name="name">clear-button7</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -971,7 +1047,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -986,6 +1061,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-left-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -995,6 +1071,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button8">
+                                    <property name="name">clear-button8</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1007,7 +1093,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1022,6 +1107,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-right-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1031,6 +1117,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button9">
+                                    <property name="name">clear-button9</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1068,7 +1164,6 @@ If there is no space, the window will either untile or maximize depending on wet
                         <property name="label-xalign">0.5</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="width-request">-1</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="margin-start">4</property>
@@ -1086,7 +1181,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1101,6 +1195,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-topleft-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1110,6 +1205,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button10">
+                                    <property name="name">clear-button10</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1122,7 +1227,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1137,6 +1241,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-topright-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1146,6 +1251,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button11">
+                                    <property name="name">clear-button11</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1158,7 +1273,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1173,6 +1287,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottomleft-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1182,6 +1297,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button12">
+                                    <property name="name">clear-button12</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1194,7 +1319,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1209,6 +1333,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottomright-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1218,6 +1343,16 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <child internal-child="selection">
                                       <object class="GtkTreeSelection"/>
                                     </child>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button13">
+                                    <property name="name">clear-button13</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -1600,6 +1735,7 @@ If there is no space, the window will either untile or maximize depending on wet
             <property name="valign">start</property>
             <property name="vexpand">True</property>
             <property name="label" translatable="yes">If you want to report a bug or need help,
+
 please open an issue on Github.</property>
             <property name="use-markup">True</property>
             <property name="justify">center</property>
@@ -1678,7 +1814,6 @@ please open an issue on Github.</property>
               <object class="GtkLabel">
                 <property name="visible">True</property>
                 <property name="can-focus">True</property>
-                <property name="halign">center</property>
                 <property name="margin-top">20</property>
                 <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;CHANGELOG&lt;/b&gt;&lt;/big&gt; lists the differences between each extension version.</property>
                 <property name="use-markup">True</property>

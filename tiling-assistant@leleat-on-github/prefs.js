@@ -133,6 +133,31 @@ const MyPrefsWidget = new GObject.Class({
 	_bindKeybindings: function() {
 		const shortcuts = Object.values(TILING);
 		shortcuts.forEach(sc => this._makeShortcutEdit(sc));
+
+		// clear bindings buttons:
+		// hardcode settingKeys and their order... I tried to use get_parent().get_child(x).get_name().split("-treeView")[0].
+		// it worked on GTK3 but on GTK4 it just returned the class name (GtkTreeView) and not the name/id for some reason
+		const keysToClear = [
+			TILING.TOGGLE_POPUP, TILING.EDIT_MODE, TILING.LAYOUTS_OVERVIEW, TILING.AUTO, TILING.MAXIMIZE
+			, TILING.TOP, TILING.BOTTOM, TILING.LEFT, TILING.RIGHT
+			, TILING.TOP_LEFT, TILING.TOP_RIGHT, TILING.BOTTOM_LEFT, TILING.BOTTOM_RIGHT
+		];
+		for (let idx = 1; idx <= 13; idx++) {
+			const clearButton = this.builder.get_object(`clear-button${idx}`);
+			shellVersion < 40 ? clearButton.set_relief(Gtk.ReliefStyle.NONE) : clearButton.set_has_frame(false);
+			const settingKey = keysToClear[idx - 1];
+
+			clearButton.set_sensitive(this.settings.get_strv(settingKey)[0]);
+
+			clearButton.connect("clicked", btn => {
+				this.settings.set_strv(settingKey, []);
+				btn.set_sensitive(false);
+			});
+
+			this.settings.connect("changed::" + settingKey, () => {
+				this.settings.get_strv(settingKey)[0] && clearButton.set_sensitive(true);
+			});
+		};
 	},
 
 	// taken from Overview-Improved by human.experience
@@ -660,6 +685,19 @@ function _getChildIndex(container, child) {
 				return i;
 		}
 		return -1;
+	}
+}
+
+function _getChildAt(container, idx) {
+	if (shellVersion < 40) {
+		return container.get_children()[idx];
+
+	} else {
+		for (let i = 0, c = container.get_first_child(); !!c; c = c.get_next_sibling(), i++) {
+			if (i === idx)
+				return c;
+		}
+		return null;
 	}
 }
 
