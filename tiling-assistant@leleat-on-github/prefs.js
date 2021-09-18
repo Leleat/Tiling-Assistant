@@ -67,6 +67,31 @@ const MyPrefsWidget = new GObject.Class({
 
 		shellVersion < 40 && this.show_all();
 
+		// clear keybindings buttons:
+		// hardcode settingKeys and their order... I tried to use get_parent().get_child(x).get_name().split("-treeView")[0].
+		// it worked on GTK3 but on GTK4 it just returned the class name (GtkTreeView) and not the name/id for some reason
+		const keysToClear = [
+			TILING.TOGGLE_POPUP, TILING.EDIT_MODE, TILING.AUTO, TILING.MAXIMIZE
+			, TILING.TOP, TILING.BOTTOM, TILING.LEFT, TILING.RIGHT
+			, TILING.TOP_LEFT, TILING.TOP_RIGHT, TILING.BOTTOM_LEFT, TILING.BOTTOM_RIGHT
+		];
+		for (let idx = 1; idx <= 12; idx++) {
+			const clearButton = this._builder.get_object(`clear-button${idx}`);
+			shellVersion < 40 ? clearButton.set_relief(Gtk.ReliefStyle.NONE) : clearButton.set_has_frame(false);
+			const settingKey = keysToClear[idx - 1];
+
+			clearButton.set_sensitive(this._settings.get_strv(settingKey)[0]);
+
+			clearButton.connect("clicked", btn => {
+				this._settings.set_strv(settingKey, []);
+				btn.set_sensitive(false);
+			});
+
+			this._settings.connect("changed::" + settingKey, () => {
+				this._settings.get_strv(settingKey)[0] && clearButton.set_sensitive(true);
+			});
+		};
+
 		// hide certain widgets since some features are not supported on older versions
 		if (shellVersion < 3.36) {
 			const hiddenWidgetsPre336 = ["TilingPopupGtkListBoxRow", "ToggleTilingPopupGtkBox", "TileEditingModeGtkBox"

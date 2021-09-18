@@ -2,17 +2,6 @@
 <!-- Generated with glade 3.38.2 -->
 <interface domain="tiling-assistant@leleat-on-github">
   <requires lib="gtk+" version="3.22"/>
-  <object class="GtkImage" id="add-image">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="pixel-size">16</property>
-    <property name="icon-name">list-add-symbolic</property>
-  </object>
-  <object class="GtkImage" id="add-image1">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">list-add-symbolic</property>
-  </object>
   <object class="GtkListStore" id="auto-tile-liststore">
     <columns>
       <!-- column-name key -->
@@ -20,6 +9,66 @@
       <!-- column-name mods -->
       <column type="gint"/>
     </columns>
+  </object>
+  <object class="GtkImage" id="clear-image1">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image10">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image11">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image12">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image2">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image3">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image4">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image5">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image6">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image7">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image8">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image9">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
   </object>
   <object class="GtkListStore" id="debugging-free-rects-liststore">
     <columns>
@@ -37,112 +86,12 @@
       <column type="gint"/>
     </columns>
   </object>
-  <object class="GtkListStore" id="focus-bottom-tile-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="focus-left-tile-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="focus-right-tile-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="focus-top-tile-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="half-horizontally-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="half-vertically-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
   <object class="GtkAdjustment" id="horizontal-preview-area-adjustment">
     <property name="lower">10</property>
     <property name="upper">100</property>
     <property name="value">40</property>
     <property name="step-increment">5</property>
     <property name="page-increment">10</property>
-  </object>
-  <object class="GtkListStore" id="push-tile-down-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="push-tile-left-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="push-tile-right-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkListStore" id="push-tile-up-liststore">
-    <columns>
-      <!-- column-name key -->
-      <column type="gint"/>
-      <!-- column-name mods -->
-      <column type="gint"/>
-    </columns>
-  </object>
-  <object class="GtkImage" id="reload-image">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">view-refresh-symbolic</property>
-  </object>
-  <object class="GtkImage" id="reload-image1">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">view-refresh-symbolic</property>
-  </object>
-  <object class="GtkImage" id="save-image">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">media-floppy-symbolic</property>
-  </object>
-  <object class="GtkImage" id="save-image1">
-    <property name="visible">True</property>
-    <property name="can-focus">False</property>
-    <property name="icon-name">media-floppy-symbolic</property>
   </object>
   <object class="GtkListStore" id="tile-bottom-half-liststore">
     <columns>
@@ -556,6 +505,7 @@
                     <property name="visible">True</property>
                     <property name="can-focus">False</property>
                     <property name="tooltip-text" translatable="yes">This setting is intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
+
 If that is the case, you can try 'Restore Window Size on Grab End' instead.</property>
                     <property name="margin-start">12</property>
                     <property name="icon-name">dialog-information-symbolic</property>
@@ -798,6 +748,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">toggle-tiling-popup-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -812,6 +763,23 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button1">
+                                    <property name="name">clear-button1</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image1</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -849,6 +817,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="model">tile-edit-mode-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
@@ -862,6 +831,23 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button2">
+                                    <property name="name">clear-button2</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image2</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -898,6 +884,7 @@ If that is the case, you can try 'Restore Window Size on Grab End' instead.</pro
                                     <property name="visible">True</property>
                                     <property name="can-focus">False</property>
                                     <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space as good as possible based on the tiled windows around it.
+
 If there is no space, the window will either untile or maximize depending on wether it's currently tiled.</property>
                                     <property name="margin-start">12</property>
                                     <property name="icon-name">dialog-information-symbolic</property>
@@ -913,6 +900,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">auto-tile-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -927,6 +915,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">2</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button3">
+                                    <property name="name">clear-button4</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image3</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">3</property>
                                   </packing>
                                 </child>
                               </object>
@@ -964,6 +969,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="model">tile-maximize-liststore</property>
                                     <property name="headers-visible">False</property>
                                     <property name="enable-search">False</property>
@@ -977,6 +983,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button4">
+                                    <property name="name">clear-button5</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image4</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1019,7 +1042,6 @@ If there is no space, the window will either untile or maximize depending on wet
                         <property name="label-xalign">0.5</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="width-request">-1</property>
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="margin-start">4</property>
@@ -1028,7 +1050,6 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="margin-bottom">8</property>
                             <property name="orientation">vertical</property>
                             <property name="spacing">12</property>
-                            <property name="homogeneous">True</property>
                             <child>
                               <object class="GtkBox">
                                 <property name="visible">True</property>
@@ -1056,6 +1077,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-top-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1070,6 +1092,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button5">
+                                    <property name="name">clear-button6</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image5</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1087,7 +1126,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1107,6 +1145,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottom-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1118,9 +1157,26 @@ If there is no space, the window will either untile or maximize depending on wet
                                     </child>
                                   </object>
                                   <packing>
-                                    <property name="expand">False</property>
+                                    <property name="expand">True</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button6">
+                                    <property name="name">clear-button7</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image6</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">False</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1138,7 +1194,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1158,6 +1213,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-left-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1172,6 +1228,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button7">
+                                    <property name="name">clear-button8</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image7</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1189,7 +1262,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1209,6 +1281,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-right-half-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1223,6 +1296,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button8">
+                                    <property name="name">clear-button9</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image8</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1265,7 +1355,6 @@ If there is no space, the window will either untile or maximize depending on wet
                         <property name="label-xalign">0.5</property>
                         <child>
                           <object class="GtkBox">
-                            <property name="width-request">-1</property>
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="margin-start">4</property>
@@ -1283,7 +1372,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1303,6 +1391,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-topleft-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1317,6 +1406,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button9">
+                                    <property name="name">clear-button10</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image9</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1334,7 +1440,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1354,6 +1459,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-topright-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1368,6 +1474,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button10">
+                                    <property name="name">clear-button11</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image10</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1385,7 +1508,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1405,6 +1527,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottomleft-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1419,6 +1542,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button11">
+                                    <property name="name">clear-button12</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image11</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1436,7 +1576,6 @@ If there is no space, the window will either untile or maximize depending on wet
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">8</property>
                                 <property name="margin-bottom">8</property>
-                                <property name="spacing">32</property>
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="visible">True</property>
@@ -1456,6 +1595,7 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="visible">True</property>
                                     <property name="can-focus">True</property>
                                     <property name="halign">end</property>
+                                    <property name="valign">center</property>
                                     <property name="hexpand">True</property>
                                     <property name="model">tile-bottomright-quarter-liststore</property>
                                     <property name="headers-visible">False</property>
@@ -1470,6 +1610,23 @@ If there is no space, the window will either untile or maximize depending on wet
                                     <property name="expand">False</property>
                                     <property name="fill">True</property>
                                     <property name="position">1</property>
+                                  </packing>
+                                </child>
+                                <child>
+                                  <object class="GtkButton" id="clear-button12">
+                                    <property name="name">clear-button13</property>
+                                    <property name="visible">True</property>
+                                    <property name="can-focus">True</property>
+                                    <property name="receives-default">True</property>
+                                    <property name="valign">start</property>
+                                    <property name="image">clear-image12</property>
+                                    <property name="relief">none</property>
+                                    <property name="always-show-image">True</property>
+                                  </object>
+                                  <packing>
+                                    <property name="expand">False</property>
+                                    <property name="fill">True</property>
+                                    <property name="position">2</property>
                                   </packing>
                                 </child>
                               </object>
@@ -1515,6 +1672,264 @@ If there is no space, the window will either untile or maximize depending on wet
       </object>
       <packing>
         <property name="position">1</property>
+        <property name="tab-fill">False</property>
+      </packing>
+    </child>
+    <child>
+      <object class="GtkBox">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">center</property>
+        <property name="margin-start">15</property>
+        <property name="margin-end">15</property>
+        <property name="margin-top">15</property>
+        <property name="margin-bottom">15</property>
+        <property name="hexpand">True</property>
+        <property name="vexpand">True</property>
+        <property name="orientation">vertical</property>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="label" translatable="yes">Tiling Assistant</property>
+            <property name="justify">center</property>
+            <attributes>
+              <attribute name="weight" value="ultrabold"/>
+              <attribute name="size" value="15360"/>
+            </attributes>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">0</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLinkButton">
+            <property name="label">https://github.com/Leleat/Tiling-Assistant</property>
+            <property name="visible">True</property>
+            <property name="can-focus">True</property>
+            <property name="receives-default">False</property>
+            <property name="halign">center</property>
+            <property name="margin-top">5</property>
+            <property name="margin-bottom">15</property>
+            <property name="use-underline">True</property>
+            <property name="uri">https://github.com/Leleat/Tiling-Assistant</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="valign">start</property>
+            <property name="vexpand">True</property>
+            <property name="label" translatable="yes">If you want to report a bug or need help,
+
+please open an issue on Github.</property>
+            <property name="use-markup">True</property>
+            <property name="justify">center</property>
+            <property name="wrap">True</property>
+            <property name="width-chars">27</property>
+            <property name="max-width-chars">47</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">2</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">3</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkBox">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="valign">center</property>
+            <property name="vexpand">True</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="label" translatable="yes">List of known &lt;big&gt;&lt;b&gt;INCOMPATIBLE&lt;/b&gt;&lt;/big&gt; apps/extensions/limitations.</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">20</property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;GUIDE&lt;/b&gt;&lt;/big&gt; offers a detailed explanation of every feature.</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel">
+                <property name="visible">True</property>
+                <property name="can-focus">False</property>
+                <property name="margin-top">20</property>
+                <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;CHANGELOG&lt;/b&gt;&lt;/big&gt; lists the differences between each extension version.</property>
+                <property name="use-markup">True</property>
+                <property name="justify">center</property>
+                <property name="wrap">True</property>
+                <property name="width-chars">27</property>
+                <property name="max-width-chars">47</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLinkButton">
+                <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+                <property name="visible">True</property>
+                <property name="can-focus">True</property>
+                <property name="receives-default">False</property>
+                <property name="halign">center</property>
+                <property name="margin-top">5</property>
+                <property name="margin-bottom">15</property>
+                <property name="use-underline">True</property>
+                <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+              </object>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">True</property>
+                <property name="position">5</property>
+              </packing>
+            </child>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">4</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkSeparator">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">5</property>
+          </packing>
+        </child>
+        <child>
+          <object class="GtkLabel">
+            <property name="visible">True</property>
+            <property name="can-focus">False</property>
+            <property name="halign">center</property>
+            <property name="valign">end</property>
+            <property name="margin-bottom">20</property>
+            <property name="vexpand">True</property>
+            <property name="label" translatable="yes">&lt;small&gt;This extension is licensed under the &lt;a href='https://www.gnu.org/licenses/old-licenses/gpl-2.0.html'&gt;GNU General Public License, version 2 or later&lt;/a&gt; and comes with &lt;u&gt;&lt;b&gt;NO WARRANTY&lt;/b&gt;&lt;/u&gt;.  A copy of this license can be found in the Github repository.&lt;/small&gt;</property>
+            <property name="use-markup">True</property>
+            <property name="justify">center</property>
+            <property name="wrap">True</property>
+            <property name="width-chars">40</property>
+            <property name="max-width-chars">0</property>
+          </object>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">True</property>
+            <property name="position">6</property>
+          </packing>
+        </child>
+      </object>
+      <packing>
+        <property name="position">2</property>
+      </packing>
+    </child>
+    <child type="tab">
+      <object class="GtkLabel">
+        <property name="visible">True</property>
+        <property name="can-focus">False</property>
+        <property name="halign">start</property>
+        <property name="margin-start">8</property>
+        <property name="margin-end">8</property>
+        <property name="margin-top">8</property>
+        <property name="margin-bottom">8</property>
+        <property name="label" translatable="yes">Help</property>
+      </object>
+      <packing>
+        <property name="position">2</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
@@ -1664,49 +2079,6 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="visible">True</property>
                             <property name="can-focus">False</property>
                             <property name="valign">center</property>
-                            <property name="hexpand">True</property>
-                            <property name="label" translatable="yes">Tile Preview: Default to Secondary Mode</property>
-                            <property name="xalign">0</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">0</property>
-                          </packing>
-                        </child>
-                        <child>
-                          <object class="GtkSwitch" id="default-to-secondary-tiling-preview">
-                            <property name="visible">True</property>
-                            <property name="can-focus">True</property>
-                            <property name="valign">center</property>
-                          </object>
-                          <packing>
-                            <property name="expand">False</property>
-                            <property name="fill">True</property>
-                            <property name="position">1</property>
-                          </packing>
-                        </child>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkListBoxRow">
-                    <property name="visible">True</property>
-                    <property name="can-focus">True</property>
-                    <child>
-                      <object class="GtkBox">
-                        <property name="visible">True</property>
-                        <property name="can-focus">False</property>
-                        <property name="margin-start">12</property>
-                        <property name="margin-end">12</property>
-                        <property name="margin-top">12</property>
-                        <property name="margin-bottom">12</property>
-                        <child>
-                          <object class="GtkLabel">
-                            <property name="visible">True</property>
-                            <property name="can-focus">False</property>
-                            <property name="valign">center</property>
                             <property name="label" translatable="yes">Tile Preview: Secondary Mode Activator</property>
                             <property name="xalign">0</property>
                           </object>
@@ -1734,6 +2106,49 @@ If there is no space, the window will either untile or maximize depending on wet
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">2</property>
+                          </packing>
+                        </child>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkListBoxRow">
+                    <property name="visible">True</property>
+                    <property name="can-focus">True</property>
+                    <child>
+                      <object class="GtkBox">
+                        <property name="visible">True</property>
+                        <property name="can-focus">False</property>
+                        <property name="margin-start">12</property>
+                        <property name="margin-end">12</property>
+                        <property name="margin-top">12</property>
+                        <property name="margin-bottom">12</property>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="visible">True</property>
+                            <property name="can-focus">False</property>
+                            <property name="valign">center</property>
+                            <property name="hexpand">True</property>
+                            <property name="label" translatable="yes">Tile Preview: Default to Secondary Mode</property>
+                            <property name="xalign">0</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">0</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkSwitch" id="default-to-secondary-tiling-preview">
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="valign">center</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">1</property>
                           </packing>
                         </child>
                       </object>
@@ -2076,7 +2491,7 @@ If there is no space, the window will either untile or maximize depending on wet
         </child>
       </object>
       <packing>
-        <property name="position">7</property>
+        <property name="position">3</property>
       </packing>
     </child>
     <child type="tab">
@@ -2091,7 +2506,7 @@ If there is no space, the window will either untile or maximize depending on wet
         <property name="margin-bottom">8</property>
       </object>
       <packing>
-        <property name="position">7</property>
+        <property name="position">3</property>
         <property name="tab-fill">False</property>
       </packing>
     </child>
