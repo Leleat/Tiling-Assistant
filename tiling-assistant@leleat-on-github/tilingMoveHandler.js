@@ -10,7 +10,7 @@ const Util = Me.imports.tilingUtil;
 const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 /**
- * This class gets to handle the move events of windows.
+ * This class gets to handle the move events (grab & monitor change) of windows.
  * If the moved window is tiled at the start of the grab, untile it. This is done by
  * releasing the grab via code, resizing the window, and then restarting the grab via code.
  * On wayland this may not be reliable. As a workaround there is a setting to restore
@@ -35,6 +35,30 @@ var Handler = class TilingMoveHandler {
 				this._onMoveFinished(window);
 		}));
 
+		// adapt the size of tiled windows when moving them the across monitors
+		this._displaySignals.push(global.display.connect("window-left-monitor", (display, monitorNr , window) => {
+			// use this._isGrabbing because when tiling the @window during the grace period
+			// on a monitor change, the @window will first be tiled and then moved
+			// to the old monitor, which fires another window-left/window-entered signal
+			if (this._isGrabbing || !window.untiledRect) // untiledRect -> also maximized windows with gaps
+				return;
+
+			const wsRect = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(monitorNr);
+			const windowRect = window.tiledRect || wsRect;
+			this._scaleFactors = {
+				x: (windowRect.x - wsRect.x) / wsRect.width,
+				y: (windowRect.y - wsRect.y) / wsRect.height,
+				width: windowRect.width / wsRect.width,
+				height: windowRect.height / wsRect.height,
+			};
+		}));
+		this._displaySignals.push(global.display.connect("window-entered-monitor", (display, monitorNr , window) => {
+			if (this._isGrabbing || !window.untiledRect)
+				return;
+
+			this._onMonitorChanged(window, monitorNr, this._scaleFactors);
+		}));
+
 		// save the windows, which need to make space for the grabbed window ("secondary mode")
 		// {window1: newTileRect1, window2: newTileRect2, ...}
 		this._splitRects = new Map();
@@ -43,7 +67,7 @@ var Handler = class TilingMoveHandler {
 		this._tilePreview.open = GNOME_VERSION < 3.36 ? this._tilePreview.show : this._tilePreview.open;
 		this._tilePreview.close = GNOME_VERSION < 3.36 ? this._tilePreview.hide : this._tilePreview.close;
 		this._tilePreview.needsUpdate = rect => !this._tilePreview._rect || !rect.equal(this._tilePreview._rect);
-		// don't use rounded corners since it doesn't all possible tilePreviews
+		// don't use rounded corners since it doesn't fit all possible tilePreviews
 		(GNOME_VERSION < 3.36 ? this._tilePreview.actor : this._tilePreview).style_class = "tile-preview";
 		this._tilePreview._updateStyle = () => {};
 	}
@@ -52,6 +76,51 @@ var Handler = class TilingMoveHandler {
 		this._displaySignals.forEach(sId => global.display.disconnect(sId));
 		(GNOME_VERSION < 3.36 ? this._tilePreview.actor : this._tilePreview).destroy();
 		this._tilePreview = null;
+	}
+
+	// windows, which are *way too* large for the new monitor, won't be moved
+	// ... bug or intentional design in mutter / gnome shell?
+	_onMonitorChanged(tiledWindow, newMonitorNr, scaleFactors) {
+		const wsRect = global.workspace_manager.get_active_workspace().get_work_area_for_monitor(newMonitorNr);
+		const newTiledRect = new Meta.Rectangle({
+			x: wsRect.x + (wsRect.width * scaleFactors.x),
+			y: wsRect.y + (wsRect.height * scaleFactors.y),
+			width: wsRect.width * scaleFactors.width,
+			height: wsRect.height * scaleFactors.height,
+		});
+
+		// try to stick the newTiledRect to other windows in case of rounding errors
+		const topTileGroup = Util.getTopTileGroup(true, newMonitorNr);
+		topTileGroup.forEach(w => {
+			if (Util.equalApprox(w.tiledRect.x + w.tiledRect.width, newTiledRect.x, 2))
+				newTiledRect.x = w.tiledRect.x + w.tiledRect.width;
+			if (Util.equalApprox(w.tiledRect.x, newTiledRect.x, 2))
+				newTiledRect.x = w.tiledRect.x;
+			if (Util.equalApprox(w.tiledRect.y + w.tiledRect.height, newTiledRect.y, 2))
+				newTiledRect.y = w.tiledRect.y + w.tiledRect.height;
+			if (Util.equalApprox(w.tiledRect.y, newTiledRect.y, 2))
+				newTiledRect.y = w.tiledRect.y;
+
+			if (Util.equalApprox(w.tiledRect.x, newTiledRect.x + newTiledRect.width, 2))
+				newTiledRect.width = w.tiledRect.x - newTiledRect.x;
+			if (Util.equalApprox(w.tiledRect.x + w.tiledRect.width, newTiledRect.x + newTiledRect.width, 2))
+				newTiledRect.width = w.tiledRect.x + w.tiledRect.width - newTiledRect.x;
+			if (Util.equalApprox(w.tiledRect.y, newTiledRect.y + newTiledRect.height, 2))
+				newTiledRect.height = w.tiledRect.y - newTiledRect.y;
+			if (Util.equalApprox(w.tiledRect.y + w.tiledRect.height, newTiledRect.y + newTiledRect.height, 2))
+				newTiledRect.height = w.tiledRect.y + w.tiledRect.height - newTiledRect.y;
+		});
+		// stick to workspace edges
+		if (Util.equalApprox(newTiledRect.x, wsRect.x, 2))
+			newTiledRect.x = wsRect.x;
+		if (Util.equalApprox(newTiledRect.y, wsRect.y, 2))
+			newTiledRect.y = wsRect.y;
+		if (Util.equalApprox(newTiledRect.x + newTiledRect.width, wsRect.x + wsRect.width, 2))
+			newTiledRect.width = wsRect.x + wsRect.width - newTiledRect.x;
+		if (Util.equalApprox(newTiledRect.y + newTiledRect.height, wsRect.y + wsRect.height, 2))
+			newTiledRect.height = wsRect.y + wsRect.height - newTiledRect.y;
+
+		Util.tileWindow(tiledWindow, newTiledRect, false, true);
 	}
 
 	_onMoveStarted(window, grabOp) {
@@ -200,16 +269,16 @@ var Handler = class TilingMoveHandler {
 		if (this._lastMonitorNr !== currMonitorNr) {
 			this._monitorNr = this._lastMonitorNr;
 			let timerId = 0;
-			this.latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
+			this._latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
 				// only update the monitorNr, if the latest timer timed out
-				if (timerId === this.latestMonitorLockTimerId) {
+				if (timerId === this._latestMonitorLockTimerId) {
 					this._monitorNr = global.display.get_current_monitor();
 					if (global.display.get_grab_op() === grabOp) // !
 						this._primaryPreviewTile(window, grabOp);
 				}
 				return GLib.SOURCE_REMOVE;
 			});
-			timerId = this.latestMonitorLockTimerId;
+			timerId = this._latestMonitorLockTimerId;
 		}
 		this._lastMonitorNr = currMonitorNr;
 
@@ -265,16 +334,16 @@ var Handler = class TilingMoveHandler {
 			this._tilePreview.open(window, this._tileRect, this._monitorNr);
 
 			let timerId = 0;
-			this.latestPreviewTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MainExtension.settings.get_int("toggle-maximize-tophalf-timer"), () => {
+			this._latestPreviewTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, MainExtension.settings.get_int("toggle-maximize-tophalf-timer"), () => {
 				// only open the alternative preview, if the timeouted timer is the same as the one which started last
-				if (timerId === this.latestPreviewTimerId && this._tilePreview._showing && this._tilePreview._rect.equal(tileRect)) {
+				if (timerId === this._latestPreviewTimerId && this._tilePreview._showing && this._tilePreview._rect.equal(tileRect)) {
 					this._tileRect = holdTileRect;
 					this._tilePreview.open(window, this._tileRect, this._monitorNr);
 				}
 
 				return GLib.SOURCE_REMOVE;
 			});
-			timerId = this.latestPreviewTimerId;
+			timerId = this._latestPreviewTimerId;
 
 		} else if (pointerAtBottomEdge) {
 			this._tileRect = Util.getTileRectFor(MainExtension.Tiling.BOTTOM, workArea, this._monitorNr);
