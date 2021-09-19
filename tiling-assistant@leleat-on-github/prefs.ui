@@ -30,6 +30,16 @@
     <property name="can-focus">False</property>
     <property name="icon-name">edit-delete-symbolic</property>
   </object>
+  <object class="GtkImage" id="clear-image13">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
+  <object class="GtkImage" id="clear-image14">
+    <property name="visible">True</property>
+    <property name="can-focus">False</property>
+    <property name="icon-name">edit-delete-symbolic</property>
+  </object>
   <object class="GtkImage" id="clear-image2">
     <property name="visible">True</property>
     <property name="can-focus">False</property>
@@ -2426,6 +2436,7 @@ please open an issue on Github.</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="halign">end</property>
+                            <property name="valign">center</property>
                             <property name="hexpand">True</property>
                             <property name="model">debugging-show-tiled-rects-liststore</property>
                             <property name="headers-visible">False</property>
@@ -2441,6 +2452,23 @@ please open an issue on Github.</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="clear-button13">
+                            <property name="name">clear-button1</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <property name="valign">start</property>
+                            <property name="image">clear-image13</property>
+                            <property name="relief">none</property>
+                            <property name="always-show-image">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>
@@ -2478,6 +2506,7 @@ please open an issue on Github.</property>
                             <property name="visible">True</property>
                             <property name="can-focus">True</property>
                             <property name="halign">end</property>
+                            <property name="valign">center</property>
                             <property name="hexpand">True</property>
                             <property name="model">debugging-free-rects-liststore</property>
                             <property name="headers-visible">False</property>
@@ -2493,6 +2522,23 @@ please open an issue on Github.</property>
                             <property name="expand">False</property>
                             <property name="fill">True</property>
                             <property name="position">1</property>
+                          </packing>
+                        </child>
+                        <child>
+                          <object class="GtkButton" id="clear-button14">
+                            <property name="name">clear-button1</property>
+                            <property name="visible">True</property>
+                            <property name="can-focus">True</property>
+                            <property name="receives-default">True</property>
+                            <property name="valign">start</property>
+                            <property name="image">clear-image14</property>
+                            <property name="relief">none</property>
+                            <property name="always-show-image">True</property>
+                          </object>
+                          <packing>
+                            <property name="expand">False</property>
+                            <property name="fill">True</property>
+                            <property name="position">2</property>
                           </packing>
                         </child>
                       </object>

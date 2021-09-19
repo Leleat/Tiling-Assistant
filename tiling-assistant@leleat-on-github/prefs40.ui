@@ -1825,6 +1825,7 @@ please open an issue on Github.</property>
 														<property name="visible">True</property>
 														<property name="can-focus">True</property>
 														<property name="halign">end</property>
+														<property name="valign">center</property>
 														<property name="hexpand">True</property>
 														<property name="model">debugging-show-tiled-rects-liststore</property>
 														<property name="headers-visible">False</property>
@@ -1835,6 +1836,16 @@ please open an issue on Github.</property>
 														<child internal-child="selection">
 															<object class="GtkTreeSelection"/>
 														</child>
+													</object>
+												</child>
+												<child>
+													<object class="GtkButton" id="clear-button13">
+														<property name="name">clear-button1</property>
+														<property name="visible">True</property>
+														<property name="can-focus">True</property>
+														<property name="receives-default">True</property>
+														<property name="valign">start</property>
+														<property name="icon-name">edit-delete-symbolic</property>
 													</object>
 												</child>
 											</object>
@@ -1867,6 +1878,7 @@ please open an issue on Github.</property>
 														<property name="visible">True</property>
 														<property name="can-focus">True</property>
 														<property name="halign">end</property>
+														<property name="valign">center</property>
 														<property name="hexpand">True</property>
 														<property name="model">debugging-free-rects-liststore</property>
 														<property name="headers-visible">False</property>
@@ -1877,6 +1889,16 @@ please open an issue on Github.</property>
 														<child internal-child="selection">
 															<object class="GtkTreeSelection"/>
 														</child>
+													</object>
+												</child>
+												<child>
+													<object class="GtkButton" id="clear-button14">
+														<property name="name">clear-button1</property>
+														<property name="visible">True</property>
+														<property name="can-focus">True</property>
+														<property name="receives-default">True</property>
+														<property name="valign">start</property>
+														<property name="icon-name">edit-delete-symbolic</property>
 													</object>
 												</child>
 											</object>

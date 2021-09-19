@@ -74,8 +74,9 @@ const MyPrefsWidget = new GObject.Class({
 			Tiling.TOGGLE_POPUP, Tiling.EDIT_MODE, Tiling.AUTO, Tiling.MAXIMIZE
 			, Tiling.TOP, Tiling.BOTTOM, Tiling.LEFT, Tiling.RIGHT
 			, Tiling.TOP_LEFT, Tiling.TOP_RIGHT, Tiling.BOTTOM_LEFT, Tiling.BOTTOM_RIGHT
+			, Tiling.DEBUGGING, Tiling.DEBUGGING_FREE_RECTS
 		];
-		for (let idx = 1; idx <= 12; idx++) {
+		for (let idx = 1; idx <= 14; idx++) {
 			const clearButton = this._builder.get_object(`clear-button${idx}`);
 			shellVersion < 40 ? clearButton.set_relief(Gtk.ReliefStyle.NONE) : clearButton.set_has_frame(false);
 			const settingKey = keysToClear[idx - 1];
