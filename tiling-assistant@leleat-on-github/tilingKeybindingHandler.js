@@ -20,8 +20,8 @@ const _ = Domain.gettext;
 var Handler = class TilingKeybindingHandler {
 
 	constructor() {
-		this._keyBindings = Object.values(MainExtension.TILING);
-		const bindingInOverview = [MainExtension.TILING.TOGGLE_POPUP];
+		this._keyBindings = Object.values(MainExtension.Tiling);
+		const bindingInOverview = [MainExtension.Tiling.TOGGLE_POPUP];
 		this._keyBindings.forEach(key => {
 			main.wm.addKeybinding(key, MainExtension.settings, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT, Shell.ActionMode.NORMAL
 					| (bindingInOverview.includes(key) ? Shell.ActionMode.OVERVIEW : 0), this._onCustomKeybindingPressed.bind(this, key));
@@ -37,18 +37,18 @@ var Handler = class TilingKeybindingHandler {
 
 	_onCustomKeybindingPressed(shortcutName) {
 		// debugging
-		if (shortcutName === MainExtension.TILING.DEBUGGING || shortcutName === MainExtension.TILING.DEBUGGING_FREE_RECTS) {
+		if (shortcutName === MainExtension.Tiling.DEBUGGING || shortcutName === MainExtension.Tiling.DEBUGGING_FREE_RECTS) {
 			if (this._debuggingIndicators) {
 				this._debuggingIndicators.forEach(i => i.destroy());
 				this._debuggingIndicators = null;
 			} else {
-				const func = shortcutName === MainExtension.TILING.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects;
+				const func = shortcutName === MainExtension.Tiling.DEBUGGING ? Util.___debugShowTiledRects : Util.___debugShowFreeScreenRects;
 				this._debuggingIndicators = func.call(this);
 			}
 			return;
 
 		// toggle the popup, which appears when a window is tiled and there's free screen space
-		} else if (shortcutName === MainExtension.TILING.TOGGLE_POPUP) {
+		} else if (shortcutName === MainExtension.Tiling.TOGGLE_POPUP) {
 			const toggleTo = !MainExtension.settings.get_boolean("enable-tiling-popup");
 			MainExtension.settings.set_boolean("enable-tiling-popup", toggleTo);
 			const message = toggleTo ? _("Tiling-assistant's popup enabled") : _("Tiling-assistant's popup was disabled");
@@ -61,12 +61,12 @@ var Handler = class TilingKeybindingHandler {
 			return;
 
 		// auto tile: tile to empty space. If there's no empty space: untile, if it's already tiled else maximize
-		if (shortcutName === MainExtension.TILING.AUTO) {
+		if (shortcutName === MainExtension.Tiling.AUTO) {
 			const tileRect = Util.getBestFitTiledRect(window);
 			Util.toggleTileState(window, tileRect);
 
 		// tile editing mode
-		} else if (shortcutName === MainExtension.TILING.EDIT_MODE) {
+		} else if (shortcutName === MainExtension.Tiling.EDIT_MODE) {
 			if (!Util.getTopTileGroup(!window.isTiled).length) {
 				main.notify(_("Tiling Assistant"), _("Can't enter 'Tile Editing Mode', if the focused window isn't tiled."));
 				return;
@@ -138,13 +138,13 @@ var Handler = class TilingKeybindingHandler {
 
 	// @isWindowsStyle -> minimize when tiling state at bottom and 'tile to bottom' shortcut is pressed
 	_dynamicTilingState(window, shortcutName, isWindowsStyle) {
-		if (Util.windowIsMaximized(window) && [MainExtension.TILING.BOTTOM, MainExtension.TILING.TOP, MainExtension.TILING.MAXIMIZE].includes(shortcutName)) {
+		if (Util.windowIsMaximized(window) && [MainExtension.Tiling.BOTTOM, MainExtension.Tiling.TOP, MainExtension.Tiling.MAXIMIZE].includes(shortcutName)) {
 			Util.restoreWindowSize(window);
 			return;
 		}
 
 		if (!window.isTiled) {
-			isWindowsStyle && shortcutName === MainExtension.TILING.BOTTOM ? window.minimize()
+			isWindowsStyle && shortcutName === MainExtension.Tiling.BOTTOM ? window.minimize()
 					: Util.toggleTileState(window, Util.getTileRectFor(shortcutName, window.get_work_area_current_monitor()));
 			return;
 		}
@@ -162,103 +162,103 @@ var Handler = class TilingKeybindingHandler {
 
 		if (isLeftHalf) {
 			switch (shortcutName) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP_LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP_LEFT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.BOTTOM:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM_LEFT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.RIGHT:
+				case MainExtension.Tiling.RIGHT:
 					Util.restoreWindowSize(window);
 					return;
 			}
 		} else if (isRightHalf) {
 			switch (shortcutName) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP_RIGHT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.BOTTOM:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.LEFT:
+				case MainExtension.Tiling.LEFT:
 					Util.restoreWindowSize(window);
 					return;
 			}
 		} else if (isTopHalf) {
 			switch (shortcutName) {
-				case MainExtension.TILING.LEFT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP_LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.LEFT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP_LEFT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.RIGHT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP_RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.RIGHT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP_RIGHT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.BOTTOM:
 					Util.restoreWindowSize(window);
 					return;
 			}
 		} else if (isBottomHalf) {
 			switch (shortcutName) {
-				case MainExtension.TILING.LEFT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM_LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.LEFT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM_LEFT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.RIGHT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.RIGHT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM_RIGHT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
 					Util.restoreWindowSize(window);
 					return;
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.BOTTOM:
 					isWindowsStyle ? window.minimize()
-							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM, window.get_work_area_current_monitor()));
+							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM, window.get_work_area_current_monitor()));
 					return;
 			}
 		} else if (isTopLeftQuarter) {
 			switch (shortcutName) {
-				case MainExtension.TILING.RIGHT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.RIGHT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.BOTTOM:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.LEFT, window.get_work_area_current_monitor()));
 					return;
 			}
 		} else if (isTopRightQuarter) {
 			switch (shortcutName) {
-				case MainExtension.TILING.LEFT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.TOP, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.LEFT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.TOP, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.BOTTOM:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.RIGHT, window.get_work_area_current_monitor()));
 					return;
 			}
 		} else if (isBottomLeftQuarter) {
 			switch (shortcutName) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.LEFT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.LEFT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.RIGHT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.RIGHT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.BOTTOM:
 					isWindowsStyle ? window.minimize()
-							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM, window.get_work_area_current_monitor()));
+							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM, window.get_work_area_current_monitor()));
 					return;
 			}
 		} else if (isBottomRightQuarter) {
 			switch (shortcutName) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.RIGHT, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.RIGHT, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.LEFT:
-					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM, window.get_work_area_current_monitor()));
+				case MainExtension.Tiling.LEFT:
+					Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM, window.get_work_area_current_monitor()));
 					return;
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.BOTTOM:
 					isWindowsStyle ? window.minimize()
-							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.TILING.BOTTOM, window.get_work_area_current_monitor()));
+							: Util.toggleTileState(window, Util.getTileRectFor(MainExtension.Tiling.BOTTOM, window.get_work_area_current_monitor()));
 					return;
 			}
 		}

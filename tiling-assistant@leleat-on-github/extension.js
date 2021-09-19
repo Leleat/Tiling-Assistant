@@ -31,7 +31,7 @@ const KeybindingHandler = Me.imports.tilingKeybindingHandler;
 const TileGroupManager = Me.imports.tilingGroupManager;
 
 var settings = null;
-var TILING = { // keybindings
+var Tiling = { // keybindings
 	DEBUGGING: "debugging-show-tiled-rects",
 	DEBUGGING_FREE_RECTS: "debugging-free-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",

@@ -230,10 +230,10 @@ function getClosestRect(currRect, rectList, direction, wrapAround = false) {
 		// first make sure the tested rect is roughly & completely on the side we want to move to.
 		// E. g. if you want to get a rect towards the left,
 		// **any** rect that is to the left of the @currRect will be further checked
-		if (((direction === MainExtension.TILING.TOP || direction === MainExtension.TILING.MAXIMIZE) && rect.y + rect.height <= currRect.y)
-				|| (direction === MainExtension.TILING.BOTTOM && currRect.y + currRect.height <= rect.y)
-				|| (direction === MainExtension.TILING.LEFT && rect.x + rect.width <= currRect.x)
-				|| (direction === MainExtension.TILING.RIGHT && currRect.x + currRect.width <= rect.x)) {
+		if (((direction === MainExtension.Tiling.TOP || direction === MainExtension.Tiling.MAXIMIZE) && rect.y + rect.height <= currRect.y)
+				|| (direction === MainExtension.Tiling.BOTTOM && currRect.y + currRect.height <= rect.y)
+				|| (direction === MainExtension.Tiling.LEFT && rect.x + rect.width <= currRect.x)
+				|| (direction === MainExtension.Tiling.RIGHT && currRect.x + currRect.width <= rect.x)) {
 
 			if (!closest)
 				return rect;
@@ -244,20 +244,20 @@ function getClosestRect(currRect, rectList, direction, wrapAround = false) {
 			// and the center of the bottom edge of the other rect
 			const dist2currRect = function(rect) {
 				switch (direction) {
-					case MainExtension.TILING.TOP:
-					case MainExtension.TILING.MAXIMIZE:
+					case MainExtension.Tiling.TOP:
+					case MainExtension.Tiling.MAXIMIZE:
 						return distBetween2Points({x: rect.x + rect.width / 2, y: rect.y + rect.height}
 								, {x: currRect.x + currRect.width / 2, y: currRect.y});
 
-					case MainExtension.TILING.BOTTOM:
+					case MainExtension.Tiling.BOTTOM:
 						return distBetween2Points({x: rect.x + rect.width / 2, y: rect.y}
 								, {x: currRect.x + currRect.width / 2, y: currRect.y + currRect.height});
 
-					case MainExtension.TILING.LEFT:
+					case MainExtension.Tiling.LEFT:
 						return distBetween2Points({x: rect.x + rect.width, y: rect.y + rect.height / 2}
 								, {x: currRect.x, y: currRect.y + currRect.height / 2});
 
-					case MainExtension.TILING.RIGHT:
+					case MainExtension.Tiling.RIGHT:
 						return distBetween2Points({x: rect.x, y: rect.y + rect.height / 2}
 								, {x: currRect.x + currRect.width, y: currRect.y + currRect.height / 2});
 				}
@@ -277,28 +277,28 @@ function getClosestRect(currRect, rectList, direction, wrapAround = false) {
 				return [rect];
 
 			switch (direction) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
 					if (closests[0].y + closests[0].height === rect.y + rect.height)
 						return [...closests, rect];
 					else
 						return closests[0].y + closests[0].height > rect.y + rect.height
 								? closests : [rect];
 
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.BOTTOM:
 					if (closests[0].y === rect.y)
 						return [...closests, rect];
 					else
 						return closests[0].y < rect.y ? closests : [rect];
 
-				case MainExtension.TILING.LEFT:
+				case MainExtension.Tiling.LEFT:
 					if (closests[0].x + closests[0].width === rect.x + rect.width)
 						return [...closests, rect];
 					else
 						return closests[0].x + closests[0].width > rect.x + rect.width
 								? closests : [rect];
 
-				case MainExtension.TILING.RIGHT:
+				case MainExtension.Tiling.RIGHT:
 					if (closests[0].x === rect.x)
 						return [...closests, rect];
 					else
@@ -309,13 +309,13 @@ function getClosestRect(currRect, rectList, direction, wrapAround = false) {
 		// second: prefer the rect closest to the @currRect's h/v axis
 		closestRect = closestRects.reduce((closest, rect) => {
 			switch (direction) {
-				case MainExtension.TILING.TOP:
-				case MainExtension.TILING.MAXIMIZE:
-				case MainExtension.TILING.BOTTOM:
+				case MainExtension.Tiling.TOP:
+				case MainExtension.Tiling.MAXIMIZE:
+				case MainExtension.Tiling.BOTTOM:
 					return Math.abs(closest.x - currRect.x) < Math.abs(rect.x - currRect.x) ? closest : rect;
 
-				case MainExtension.TILING.LEFT:
-				case MainExtension.TILING.RIGHT:
+				case MainExtension.Tiling.LEFT:
+				case MainExtension.Tiling.RIGHT:
 					return Math.abs(closest.y - currRect.y) < Math.abs(rect.y - currRect.y) ? closest : rect;
 			}
 		});
@@ -368,51 +368,51 @@ function getTileRectFor(position, workArea, monitor = null) {
 
 	let width, height, rect;
 	switch (position) {
-		case MainExtension.TILING.MAXIMIZE:
+		case MainExtension.Tiling.MAXIMIZE:
 			return workArea;
 
-		case MainExtension.TILING.LEFT:
+		case MainExtension.Tiling.LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: workArea.height});
 
-		case MainExtension.TILING.RIGHT:
+		case MainExtension.Tiling.RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width,height: workArea.height});
 
-		case MainExtension.TILING.TOP:
+		case MainExtension.Tiling.TOP:
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
 			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width: workArea.width, height});
 
-		case MainExtension.TILING.BOTTOM:
+		case MainExtension.Tiling.BOTTOM:
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
 			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width: workArea.width, height});
 
-		case MainExtension.TILING.TOP_LEFT:
+		case MainExtension.Tiling.TOP_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
 			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y, width, height: height});
 
-		case MainExtension.TILING.TOP_RIGHT:
+		case MainExtension.Tiling.TOP_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
 			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x + workArea.width - width, y: workArea.y, width, height});
 
-		case MainExtension.TILING.BOTTOM_LEFT:
+		case MainExtension.Tiling.BOTTOM_LEFT:
 			rect = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);
 			height = rect ? rect.height : Math.ceil(workArea.height / 2);
 			return new Meta.Rectangle({x: workArea.x, y: workArea.y + workArea.height - height, width, height});
 
-		case MainExtension.TILING.BOTTOM_RIGHT:
+		case MainExtension.Tiling.BOTTOM_RIGHT:
 			rect = screenRects.find(r => r.x + r.width === workArea.x + workArea.width && r.width !== workArea.width);
 			width = rect ? rect.width : Math.ceil(workArea.width / 2);
 			rect = screenRects.find(r => r.y + r.height === workArea.y + workArea.height && r.height !== workArea.height);

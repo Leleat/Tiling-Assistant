@@ -24,17 +24,34 @@ const Side = {
 var Handler = class TilingResizeHandler {
 
 	constructor() {
+		const isResizing = grabOp => {
+			switch (grabOp) {
+				case Meta.GrabOp.RESIZING_N:
+				case Meta.GrabOp.RESIZING_NW:
+				case Meta.GrabOp.RESIZING_NE:
+				case Meta.GrabOp.RESIZING_S:
+				case Meta.GrabOp.RESIZING_SW:
+				case Meta.GrabOp.RESIZING_SE:
+				case Meta.GrabOp.RESIZING_E:
+				case Meta.GrabOp.RESIZING_W:
+					return true;
+
+				default:
+					return false;
+			}
+		};
+
 		this._displaySignals = [];
 		this._displaySignals.push(global.display.connect("grab-op-begin", (...params) => {
 			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
 			const [window, grabOp] = [params[params.length - 2], params[params.length - 1]];
-			if (window && this._isResizing(grabOp))
+			if (window && isResizing(grabOp))
 				this._onResizeStarted(window, grabOp);
 		}));
 		this._displaySignals.push(global.display.connect("grab-op-end", (...params) => {
 			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
 			const [window, grabOp] = [params[params.length - 2], params[params.length - 1]];
-			if (window && this._isResizing(grabOp))
+			if (window && isResizing(grabOp))
 				this._onResizeFinished(window, grabOp);
 		}));
 
@@ -47,23 +64,6 @@ var Handler = class TilingResizeHandler {
 
 	destroy() {
 		this._displaySignals.forEach(sId => global.display.disconnect(sId));
-	}
-
-	_isResizing(grabOp) {
-		switch (grabOp) {
-			case Meta.GrabOp.RESIZING_N:
-			case Meta.GrabOp.RESIZING_NW:
-			case Meta.GrabOp.RESIZING_NE:
-			case Meta.GrabOp.RESIZING_S:
-			case Meta.GrabOp.RESIZING_SW:
-			case Meta.GrabOp.RESIZING_SE:
-			case Meta.GrabOp.RESIZING_E:
-			case Meta.GrabOp.RESIZING_W:
-				return true;
-
-			default:
-				return false;
-		}
 	}
 
 	_onResizeStarted(window, grabOp) {

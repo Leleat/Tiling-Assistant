@@ -10,7 +10,7 @@ const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
-const TILING = { // copy/paste from extension.js
+const Tiling = { // copy/paste from extension.js
 	DEBUGGING: "debugging-show-tiled-rects",
 	DEBUGGING_FREE_RECTS: "debugging-free-rects",
 	TOGGLE_POPUP: "toggle-tiling-popup",
@@ -71,9 +71,9 @@ const MyPrefsWidget = new GObject.Class({
 		// hardcode settingKeys and their order... I tried to use get_parent().get_child(x).get_name().split("-treeView")[0].
 		// it worked on GTK3 but on GTK4 it just returned the class name (GtkTreeView) and not the name/id for some reason
 		const keysToClear = [
-			TILING.TOGGLE_POPUP, TILING.EDIT_MODE, TILING.AUTO, TILING.MAXIMIZE
-			, TILING.TOP, TILING.BOTTOM, TILING.LEFT, TILING.RIGHT
-			, TILING.TOP_LEFT, TILING.TOP_RIGHT, TILING.BOTTOM_LEFT, TILING.BOTTOM_RIGHT
+			Tiling.TOGGLE_POPUP, Tiling.EDIT_MODE, Tiling.AUTO, Tiling.MAXIMIZE
+			, Tiling.TOP, Tiling.BOTTOM, Tiling.LEFT, Tiling.RIGHT
+			, Tiling.TOP_LEFT, Tiling.TOP_RIGHT, Tiling.BOTTOM_LEFT, Tiling.BOTTOM_RIGHT
 		];
 		for (let idx = 1; idx <= 12; idx++) {
 			const clearButton = this._builder.get_object(`clear-button${idx}`);
@@ -143,7 +143,7 @@ const MyPrefsWidget = new GObject.Class({
 	},
 
 	_bindKeybindings: function() {
-		const shortcuts = Object.values(TILING);
+		const shortcuts = Object.values(Tiling);
 		shortcuts.forEach(sc => this._makeShortcutEdit(sc));
 	},
 

@@ -225,20 +225,20 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
 		// [Direction] (WASD, hjkl or arrow keys)
 		} else if (Util.eventIsDirection(keySym, Meta.MotionDirection.UP)) {
-			isSuperPressed ? this._resize(MainExtension.TILING.TOP, isShiftPressed)
-					: this._selectTowards(MainExtension.TILING.TOP, isCtrlPressed);
+			isSuperPressed ? this._resize(MainExtension.Tiling.TOP, isShiftPressed)
+					: this._selectTowards(MainExtension.Tiling.TOP, isCtrlPressed);
 
 		} else if (Util.eventIsDirection(keySym, Meta.MotionDirection.DOWN)) {
-			isSuperPressed ? this._resize(MainExtension.TILING.BOTTOM, isShiftPressed)
-					: this._selectTowards(MainExtension.TILING.BOTTOM, isCtrlPressed);
+			isSuperPressed ? this._resize(MainExtension.Tiling.BOTTOM, isShiftPressed)
+					: this._selectTowards(MainExtension.Tiling.BOTTOM, isCtrlPressed);
 
 		} else if (Util.eventIsDirection(keySym, Meta.MotionDirection.LEFT)) {
-			isSuperPressed ? this._resize(MainExtension.TILING.LEFT, isShiftPressed)
-					: this._selectTowards(MainExtension.TILING.LEFT, isCtrlPressed);
+			isSuperPressed ? this._resize(MainExtension.Tiling.LEFT, isShiftPressed)
+					: this._selectTowards(MainExtension.Tiling.LEFT, isCtrlPressed);
 
 		} else if (Util.eventIsDirection(keySym, Meta.MotionDirection.RIGHT)) {
-			isSuperPressed ? this._resize(MainExtension.TILING.RIGHT, isShiftPressed)
-					: this._selectTowards(MainExtension.TILING.RIGHT, isCtrlPressed);
+			isSuperPressed ? this._resize(MainExtension.Tiling.RIGHT, isShiftPressed)
+					: this._selectTowards(MainExtension.Tiling.RIGHT, isCtrlPressed);
 		}
 	}
 
@@ -259,13 +259,13 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		const workArea = window.get_work_area_current_monitor();
 		let resizeStep = 100;
 		// limit resizeStep when trying to extend outside of the current screen
-		if (direction === MainExtension.TILING.TOP && isShiftPressed)
+		if (direction === MainExtension.Tiling.TOP && isShiftPressed)
 			resizeStep = Math.min(resizeStep, resizedRect.y - workArea.y);
-		else if (direction === MainExtension.TILING.BOTTOM && !isShiftPressed)
+		else if (direction === MainExtension.Tiling.BOTTOM && !isShiftPressed)
 			resizeStep = Math.min(resizeStep, workArea.y + workArea.height - (resizedRect.y + resizedRect.height));
-		else if (direction === MainExtension.TILING.LEFT && isShiftPressed)
+		else if (direction === MainExtension.Tiling.LEFT && isShiftPressed)
 			resizeStep = Math.min(resizeStep, resizedRect.x - workArea.x);
-		else if (direction === MainExtension.TILING.RIGHT && !isShiftPressed)
+		else if (direction === MainExtension.Tiling.RIGHT && !isShiftPressed)
 			resizeStep = Math.min(resizeStep, workArea.x + workArea.width - (resizedRect.x + resizedRect.width));
 
 		if (!resizeStep) {
@@ -273,8 +273,8 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 			return;
 		}
 
-		const isVertical = direction === MainExtension.TILING.TOP || direction === MainExtension.TILING.BOTTOM;
-		const changeDir = ((direction === MainExtension.TILING.BOTTOM || direction === MainExtension.TILING.RIGHT) ? 1 : -1)
+		const isVertical = direction === MainExtension.Tiling.TOP || direction === MainExtension.Tiling.BOTTOM;
+		const changeDir = ((direction === MainExtension.Tiling.BOTTOM || direction === MainExtension.Tiling.RIGHT) ? 1 : -1)
 				* (isShiftPressed ? -1 : 1);
 		const getResizedRect = function(rect, dimensionChangeOnly, dir) {
 			return new Meta.Rectangle({
