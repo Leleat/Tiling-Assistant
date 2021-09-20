@@ -506,6 +506,8 @@ function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 
 	// setup (new) tileGroup to raise tiled windows as a group
 	const topTileGroup = getTopTileGroup(false);
+	// only allow a window to be part of 1 tileGroup
+	topTileGroup.forEach(w => MainExtension.tileGroupManager.dissolveTileGroup(w.get_id()));
 	MainExtension.tileGroupManager.updateTileGroup(topTileGroup);
 
 	openTilingPopup && tryOpeningTilingPopup();

@@ -59,9 +59,6 @@ var Manager = class TilingGroupManager {
 					raisedWindow.raise();
 				}
 
-				// update the tileGroup (and reconnect the raised signals) to allow windows to be part of multiple tileGroups:
-				// for ex.: tiling a window over another tiled window will replace the overlapped window in the old tileGroup
-				// but the overlapped window will remember its old tile group to raise them as well, if it is raised
 				const raisedTileGroup = this._tileGroups.get(raisedWindowId);
 				this.updateTileGroup(this._getAllWindows().filter(w => raisedTileGroup.includes(w.get_id())));
 			}));
