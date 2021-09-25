@@ -102,7 +102,8 @@ var Handler = class TilingMoveHandler {
 				}
 
 				const [currX, currY] = global.get_pointer();
-				if (currX !== eventX || currY !== eventY) {
+				const moveDist = Util.distBetween2Points({x: currX, y: currY}, {x: eventX, y: eventY});
+				if (moveDist > 10) {
 					this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
 					return GLib.SOURCE_REMOVE;
 				}
