@@ -7,6 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const MainExtension = Me.imports.extension;
 const TilingPopup = Me.imports.tilingPopup;
+const shellVersion = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 function equalApprox(value, value2, margin = MainExtension.settings.get_int("window-gap")) {
 	return value >= value2 - margin && value <= value2 + margin;
@@ -449,8 +450,13 @@ function tileWindow(window, newRect, openTilingPopup = true, skipAnim = false) {
 		const onlyMove = oldRect.width === width && oldRect.height === height;
 		if (onlyMove) { // custom anim because they dont exist
 			const clone = new St.Widget({
-				content: Shell.util_get_content_for_window_actor(wActor, oldRect),
-				x: oldRect.x, y: oldRect.y, width: oldRect.width, height: oldRect.height
+				content: shellVersion < 41
+						? Shell.util_get_content_for_window_actor(wActor, oldRect)
+						: wActor.paint_to_content(oldRect),
+				x: oldRect.x,
+				y: oldRect.y,
+				width: oldRect.width,
+				height: oldRect.height
 			});
 			main.uiGroup.add_child(clone);
 			wActor.hide();

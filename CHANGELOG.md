@@ -9,6 +9,9 @@
 - windows-like minimize option for the dynamic keybindings
 - hidden settings: choose secondary mode (tile preview) activator and option to default to secondary mode (#90)
 
+**Fixed**
+- GNOME Shell 41: use new function, which got replaced in GS
+
 
 ## v23
 **Added**
