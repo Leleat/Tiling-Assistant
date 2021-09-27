@@ -57,20 +57,6 @@ Pressing `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free s
 
 ![](media/Guide_tileEditingMode.gif)
 
-### Layouts
-
-A layout consists of a list of arbitrary rectangles. When activating a layout, the tiling popup will ask you which of the open windows you want in which rectangle of your layout. Read the tooltip in the `Layouts` settings.
-
-The `layout selector` enables you to search for layouts by name. That means you don't have to remember their keybindings. 
-
-![](media/Guide_layouts.gif)
-
-### Pie Menu
-
-`Super` + `RMB` on a window will open a pie menu. Moving the mouse into a direction and then releasing the right-click will perform that pie action. The pie menu's appearance is slightly delayed. However, the menu doesn't need to be visible for a pie action to be activated.
-
-![](media/Guide_pieMenu.gif)
-
 ### Hidden Settings
 
 This is a 'hidden' (more specificly: nameless) tab under `Help and Changelog`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, and experimental settings.

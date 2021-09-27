@@ -12,9 +12,8 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 ## Supported GNOME Versions
 
-- 3.36
-- 3.38
 - 40
+- 41
 
 ## Usage and Features
 
@@ -23,10 +22,6 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 - **Tiling Popup**: This is the popup, which shows up when a window is tiled and there is an (unambiguous) free screen rectangle. It lists all open windows on the current workspace. Activating one of the popup's icons will tile the window to fill the remaining screen space.
 
 - **Tile Groups**: Tiled windows are considered in a group, if they don't overlap each other and aren't interrupted by non-tiled windows. If one of the windows is focused, the rest of the group will be raised to the foreground as well. A Tile Group also resizes together.
-
-- **Layouts**: A layout is a list of arbitrary rectangles. When activating one with its keybinding the Tiling Popup asks you which of the open windows you want at which spot of your layout. The `layout selector` is a popup, which will lists all defined layouts by name. This way you don't have to remember the layouts' keybindings.
-
-- **Pie Menu**: `Super` + `RMB` on a window will open a simple pie menu.
 
 - ...
 
