@@ -107,7 +107,7 @@ function enable() {
 	this.oldShowWindowMenu = main.wm._windowMenuManager.showWindowMenuForWindow;
 	const togglePieMenu = () => {
 		const that = this;
-		if (this.settings.get_boolean("enable-pie-menu"))
+		if (settings.get_boolean("enable-pie-menu"))
 			main.wm._windowMenuManager.showWindowMenuForWindow = function(...params) {
 				Util.isModPressed(Clutter.ModifierType.MOD4_MASK)
 						? new PieMenu.PieMenu() : that.oldShowWindowMenu.apply(this, params);
@@ -115,7 +115,7 @@ function enable() {
 		else
 			main.wm._windowMenuManager.showWindowMenuForWindow = this.oldShowWindowMenu;
 	};
-	this.settingsSignals.push(this.settings.connect("changed::enable-pie-menu", togglePieMenu));
+	this.settingsSignals.push(settings.connect("changed::enable-pie-menu", togglePieMenu));
 	togglePieMenu();
 
 	// restore window properties after session was unlocked
@@ -138,7 +138,7 @@ function disable() {
 	this.tileGroupManager = null;
 
 	// disconnect signals
-	this.settingsSignals.forEach(id => this.settings.disconnect(id));
+	this.settingsSignals.forEach(id => settings.disconnect(id));
 
 	// re-enable native tiling
 	this.gnome_mutter_settings.reset("edge-tiling");
