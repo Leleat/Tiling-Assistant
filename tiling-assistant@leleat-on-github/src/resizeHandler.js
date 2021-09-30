@@ -1,11 +1,11 @@
 "use strict";
 
-const {Clutter, Meta} = imports.gi;
+const {Meta} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const MainExtension = Me.imports.extension;
-const Util = Me.imports.tilingUtil;
+const {Settings} = Me.imports.src.common;
+const {Util} = Me.imports.src.utility;
 
 const Side = {
 	NONE: 0,
@@ -42,29 +42,26 @@ var Handler = class TilingResizeHandler {
 		};
 
 		this._displaySignals = [];
-		this._displaySignals.push(global.display.connect("grab-op-begin", (...params) => {
-			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
-			const [window, grabOp] = [params[params.length - 2], params[params.length - 1]];
+		this._displaySignals.push(global.display.connect("grab-op-begin", (display, window, grabOp) => {
 			if (window && isResizing(grabOp))
 				this._onResizeStarted(window, grabOp);
 		}));
-		this._displaySignals.push(global.display.connect("grab-op-end", (...params) => {
-			// pre GNOME 40 the signal emitter was added as the first and second param, fixed with !1734 in mutter
-			const [window, grabOp] = [params[params.length - 2], params[params.length - 1]];
+		this._displaySignals.push(global.display.connect("grab-op-end", (display, window, grabOp) => {
 			if (window && isResizing(grabOp))
 				this._onResizeFinished(window, grabOp);
 		}));
 
 		this._sizeChangedId = 0;
 		this._preGrabRects = new Map();
-		// save the windows, which are to be resized (passively) along the actively grabbed one, and a resizeOp.
-		// a resizeOp saves the side of the window, which will be passively resized, relative to the actively resized window
+		// save the windows, which are to be resized (passively) along the actively grabbed one,
+		// and a resizeOp. A resizeOp saves the side of the window, which will be passively resized
+		// , relative to the actively resized window
 		this._resizeOps = new Map();
-	}
+	};
 
 	destroy() {
 		this._displaySignals.forEach(sId => global.display.disconnect(sId));
-	}
+	};
 
 	_onResizeStarted(window, grabOp) {
 		if (!window.isTiled)
@@ -89,7 +86,8 @@ var Handler = class TilingResizeHandler {
 					resizeOp && this._resizeOps.set(otherWindow, resizeOp);
 				}
 
-				this._sizeChangedId = window.connect("size-changed", this._onResizing.bind(this, window, grabOp, null));
+				this._sizeChangedId = window.connect("size-changed"
+						, this._onResizing.bind(this, window, grabOp, null));
 				break;
 
 			case Meta.GrabOp.RESIZING_S:
@@ -104,7 +102,8 @@ var Handler = class TilingResizeHandler {
 					resizeOp && this._resizeOps.set(otherWindow, resizeOp);
 				}
 
-				this._sizeChangedId = window.connect("size-changed", this._onResizing.bind(this, window, grabOp, null));
+				this._sizeChangedId = window.connect("size-changed"
+						, this._onResizing.bind(this, window, grabOp, null));
 				break;
 
 			case Meta.GrabOp.RESIZING_E:
@@ -119,7 +118,8 @@ var Handler = class TilingResizeHandler {
 					resizeOp && this._resizeOps.set(otherWindow, resizeOp);
 				}
 
-				this._sizeChangedId = window.connect("size-changed", this._onResizing.bind(this, window, null, grabOp));
+				this._sizeChangedId = window.connect("size-changed"
+						, this._onResizing.bind(this, window, null, grabOp));
 				break;
 
 			case Meta.GrabOp.RESIZING_W:
@@ -134,7 +134,8 @@ var Handler = class TilingResizeHandler {
 					resizeOp && this._resizeOps.set(otherWindow, resizeOp);
 				}
 
-				this._sizeChangedId = window.connect("size-changed", this._onResizing.bind(this, window, null, grabOp));
+				this._sizeChangedId = window.connect("size-changed"
+						, this._onResizing.bind(this, window, null, grabOp));
 				break;
 
 			// resizing intercardinal directions:
@@ -201,7 +202,7 @@ var Handler = class TilingResizeHandler {
 				this._sizeChangedId = window.connect("size-changed"
 						, this._onResizing.bind(this, window, Meta.GrabOp.RESIZING_S, Meta.GrabOp.RESIZING_E));
 		}
-	}
+	};
 
 	// update the windows' tiledRects
 	_onResizeFinished(window, grabOp) {
@@ -213,12 +214,13 @@ var Handler = class TilingResizeHandler {
 		if (!window.isTiled)
 			return;
 
-		const gap = MainExtension.settings.get_int("window-gap");
+		const gap = Settings.getInt(Settings.WINDOW_GAP);
 		const workArea = window.get_work_area_for_monitor(window.get_monitor());
 
 		// first calculate the new tiledRect for @window:
 		// the new x/y coord for the @window's tiledRect can be calculated by a simple difference
-		// because resizing on the E/S side wont change x/y and resizing on the N or W side will translate into a 1:1 shift
+		// because resizing on the E/S side wont change x/y
+		// and resizing on the N or W side will translate into a 1:1 shift
 		const grabbedsNewRect = window.get_frame_rect();
 		const grabbedsOldRect = this._preGrabRects.get(window);
 
@@ -281,7 +283,7 @@ var Handler = class TilingResizeHandler {
 
 		this._preGrabRects.clear();
 		this._resizeOps.clear();
-	}
+	};
 
 	_onResizing(resizedWindow, grabOpV, grabOpH) {
 		this._resizeOps.forEach((resizeOp, window) => {
@@ -297,7 +299,7 @@ var Handler = class TilingResizeHandler {
 			else if (rectH)
 				window.move_resize_frame(false, ...rectH);
 		});
-	}
+	};
 
 	// get the rect for the non-grabbed ("passive") window adapted to the resized grabbed window
 	// *but* only adapted for 1 side (either vertically or horizontally) at a time
@@ -311,7 +313,7 @@ var Handler = class TilingResizeHandler {
 		const resizedRect = resizedWindow.get_frame_rect();
 		const wRect = window.get_frame_rect();
 		const preGrabRect = this._preGrabRects.get(window);
-		const gap = MainExtension.settings.get_int("window-gap");
+		const gap = Settings.getInt(Settings.WINDOW_GAP);
 
 		switch (grabOp) {
 			case Meta.GrabOp.RESIZING_N:
@@ -336,20 +338,22 @@ var Handler = class TilingResizeHandler {
 						? [wRect.x, wRect.y, resizedRect.x + resizedRect.width - preGrabRect.x, wRect.height]
 						: [resizedX2 + gap, wRect.y, preGrabRect.x + preGrabRect.width - resizedX2 - gap, wRect.height];
 		}
-	}
-}
+	};
+};
 
 class ResizeOp {
 
 	constructor(side) {
 		this.side = side;
-	}
+	};
 
 	// a non-grabbed window may resize along with the grabbed window.
 	// it can resize on the "same side", on the "opposing side" or not at all.
 	// for ex.: resizing the top-left quarter on the E side means
-	// the bottom-left quarter resizes on the same side (E) and the top/bottom-right quarters resize on the opposing side (W).
-	// if the bottom window wasn't quartered but instead had its width equal the workArea.width, then it wouldn't resize at all.
+	// the bottom-left quarter resizes on the same side (E)
+	// and the top/bottom-right quarters resize on the opposing side (W).
+	// if the bottom window wasn't quartered but instead had its width equal the workArea.width
+	// , then it wouldn't resize at all.
 	static createResizeOp(resizeOnSameSideV, resizeOnOpposingSideV, resizeOnSameSideH, resizeOnOpposingSideH) {
 		let verticalResizeSide = Side.NONE;
 		let horizontalResizeSide = Side.NONE;
@@ -366,5 +370,5 @@ class ResizeOp {
 
 		const resizeSide = verticalResizeSide | horizontalResizeSide;
 		return resizeSide ? new ResizeOp(resizeSide) : null;
-	}
-}
+	};
+};

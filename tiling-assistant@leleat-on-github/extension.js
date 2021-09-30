@@ -19,77 +19,56 @@
 "use strict";
 
 const {main} = imports.ui;
-const {Gio, GLib, Meta, Shell} = imports.gi;
-const ByteArray = imports.byteArray;
+const {Gio, GLib, Meta} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Util = Me.imports.tilingUtil;
-const MoveHandler = Me.imports.tilingMoveHandler;
-const ResizeHandler = Me.imports.tilingResizeHandler;
-const KeybindingHandler = Me.imports.tilingKeybindingHandler;
-const TileGroupManager = Me.imports.tilingGroupManager;
-
-var settings = null;
-var Tiling = { // keybindings
-	DEBUGGING: "debugging-show-tiled-rects",
-	DEBUGGING_FREE_RECTS: "debugging-free-rects",
-	TOGGLE_POPUP: "toggle-tiling-popup",
-	AUTO: "auto-tile",
-	MAXIMIZE: "tile-maximize",
-	EDIT_MODE: "tile-edit-mode",
-	RIGHT: "tile-right-half",
-	LEFT: "tile-left-half",
-	TOP: "tile-top-half",
-	BOTTOM: "tile-bottom-half",
-	TOP_LEFT: "tile-topleft-quarter",
-	TOP_RIGHT: "tile-topright-quarter",
-	BOTTOM_LEFT: "tile-bottomleft-quarter",
-	BOTTOM_RIGHT: "tile-bottomright-quarter"
-};
+const {Settings} = Me.imports.src.common;
+const {Util} = Me.imports.src.utility;
 
 /**
  * 2 entry points:
  * 	1. keyboard shortcuts:
- * 		=> tilingKeybindingHandler.js
+ * 		=> keybindingHandler.js
  * 	2. Grabbing a window:
- * 		=> tilingMoveHandler.js (when moving a window)
- * 		=> tilingResizeHandler.js (when resizing a window)
+ * 		=> moveHandler.js (when moving a window)
+ * 		=> resizeHandler.js (when resizing a window)
  */
 
 function init() {
-	ExtensionUtils.initTranslations(Me.metadata.uuid);
 };
 
 function enable() {
-	settings = ExtensionUtils.getSettings(Me.metadata["settings-schema"]);
-	this.settingsSignals = [];
+	Settings.initialize();
+	Util.initialize();
 
-	this.windowMoveHandler = new MoveHandler.Handler();
-	this.windowResizeHandler = new ResizeHandler.Handler();
-	this.keybindingHandler = new KeybindingHandler.Handler();
-	this.tileGroupManager = new TileGroupManager.Manager();
+	const MoveHandler = Me.imports.src.moveHandler;
+	this._moveHandler = new MoveHandler.Handler();
+	const ResizeHandler = Me.imports.src.resizeHandler;
+	this._resizeHandler = new ResizeHandler.Handler();
+	const KeybindingHandler = Me.imports.src.keybindingHandler;
+	this._keybindingHandler = new KeybindingHandler.Handler();
 
 	// disable native tiling
-	this.gnome_mutter_settings = ExtensionUtils.getSettings("org.gnome.mutter");
-	this.gnome_mutter_settings.set_boolean("edge-tiling", false);
-	this.gnome_shell_settings = ExtensionUtils.getSettings("org.gnome.shell.overrides");
-	this.gnome_shell_settings.set_boolean("edge-tiling", false);
+	this._gnomeMutterSettings = ExtensionUtils.getSettings("org.gnome.mutter");
+	this._gnomeMutterSettings.set_boolean("edge-tiling", false);
+	this._gnomeShellSettings = ExtensionUtils.getSettings("org.gnome.shell.overrides");
+	this._gnomeShellSettings.set_boolean("edge-tiling", false);
 
-	// change main.panel._getDraggableWindowForPosition to also include windows tiled with this extension
-	this.oldGetDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
+	// also include tiled windows when dragging from the top panel
+	this._getDraggableWindowForPosition = main.panel._getDraggableWindowForPosition;
 	main.panel._getDraggableWindowForPosition = function (stageX) {
 		const workspaceManager = global.workspace_manager;
 		const windows = workspaceManager.get_active_workspace().list_windows();
 		const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
 
-		return allWindowsByStacking.find(metaWindow => {
-			const rect = metaWindow.get_frame_rect();
-			const workArea = metaWindow.get_work_area_current_monitor();
-			return metaWindow.is_on_primary_monitor()
-					&& metaWindow.showing_on_its_workspace()
-					&& metaWindow.get_window_type() !== Meta.WindowType.DESKTOP
-					&& (metaWindow.maximized_vertically || (metaWindow.tiledRect && metaWindow.tiledRect.y === workArea.y))
+		return allWindowsByStacking.find(w => {
+			const rect = w.get_frame_rect();
+			const workArea = w.get_work_area_current_monitor();
+			return w.is_on_primary_monitor()
+					&& w.showing_on_its_workspace()
+					&& w.get_window_type() !== Meta.WindowType.DESKTOP
+					&& (w.maximized_vertically || (w.tiledRect && w.tiledRect.y === workArea.y))
 					&& stageX > rect.x && stageX < rect.x + rect.width;
 		});
 	};
@@ -102,24 +81,19 @@ function disable() {
 	// save window properties, if session was locked to restore after unlock
 	_saveBeforeSessionLock();
 
-	this.windowMoveHandler.destroy();
-	this.windowMoveHandler = null;
-	this.windowResizeHandler.destroy();
-	this.windowResizeHandler = null;
-	this.keybindingHandler.destroy();
-	this.keybindingHandler = null;
-	this.tileGroupManager.destroy();
-	this.tileGroupManager = null;
+	this._moveHandler.destroy();
+	this._resizeHandler.destroy();
+	this._keybindingHandler.destroy();
 
-	// disconnect signals
-	this.settingsSignals.forEach(id => this.settings.disconnect(id));
+	Util.destroy();
+	Settings.destroy();
 
 	// re-enable native tiling
-	this.gnome_mutter_settings.reset("edge-tiling");
-	this.gnome_shell_settings.reset("edge-tiling");
+	this._gnomeMutterSettings.reset("edge-tiling");
+	this._gnomeShellSettings.reset("edge-tiling");
 
 	// restore old functions
-	main.panel._getDraggableWindowForPosition = this.oldGetDraggableWindowForPosition;
+	main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
 
 	// delete custom properties
 	const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
@@ -128,54 +102,57 @@ function disable() {
 		delete w.tiledRect;
 		delete w.untiledRect;
 	});
-
-	settings.run_dispose();
-	settings = null;
 };
 
 function _saveBeforeSessionLock() {
 	if (!main.sessionMode.isLocked)
 		return;
 
-	this.wasLocked = true;
+	this._wasLocked = true;
 
-	const metaToStringRect = metaRect => metaRect && {x: metaRect.x, y: metaRect.y, width: metaRect.width, height: metaRect.height};
-	const savedWindows = [];
+	const metaToStringRect = metaRect => metaRect && {
+		x: metaRect.x,
+		y: metaRect.y,
+		width: metaRect.width,
+		height: metaRect.height
+	};
+
+	// can't just check for isTiled because maximized windows may
+	// have an untiledRect as well in case window gaps are used
 	const openWindows = Util.getOpenWindows(false);
-	openWindows.forEach(window => {
-		// can't just check for isTiled because maximized windows may
-		// have an untiledRect as well in case window gaps are used
-		if (!window.untiledRect)
-			return;
-
-		savedWindows.push({
-			windowStableId: window.get_stable_sequence(),
-			isTiled: window.isTiled,
-			tiledRect: metaToStringRect(window.tiledRect),
-			untiledRect: metaToStringRect(window.untiledRect),
-		});
+	const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
+		return {
+			windowStableId: w.get_stable_sequence(),
+			isTiled: w.isTiled,
+			tiledRect: metaToStringRect(w.tiledRect),
+			untiledRect: metaToStringRect(w.untiledRect)
+		}
 	});
 
 	const saveObj = {
 		"windows": savedWindows,
-		"tileGroups": Array.from(this.tileGroupManager.getTileGroups())
+		"tileGroups": Array.from(Util.getTileGroups())
 	};
 
-	const parentDir = Gio.File.new_for_path(GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant"]));
-	try {parentDir.make_directory_with_parents(null)} catch (e) {}
-	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
+	const userPath = GLib.get_user_config_dir();
+	const parentPath = GLib.build_filenamev([userPath, "/tiling-assistant"]);
+	const parent = Gio.File.new_for_path(parentPath);
+	try {parent.make_directory_with_parents(null)} catch (e) {}
+	const path = GLib.build_filenamev([parentPath, "/tiledSessionRestore.json"]);
 	const file = Gio.File.new_for_path(path);
 	try {file.create(Gio.FileCreateFlags.NONE, null)} catch (e) {}
-	file.replace_contents(JSON.stringify(saveObj), null, false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+	file.replace_contents(JSON.stringify(saveObj), null, false
+			, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 };
 
 function _loadAfterSessionLock() {
-	if (!this.wasLocked)
+	if (!this._wasLocked)
 		return;
 
-	this.wasLocked = false;
+	this._wasLocked = false;
 
-	const path = GLib.build_filenamev([GLib.get_user_config_dir(), "/tiling-assistant/tiledSessionRestore.json"]);
+	const userPath = GLib.get_user_config_dir();
+	const path = GLib.build_filenamev([userPath, "/tiling-assistant/tiledSessionRestore.json"]);
 	const file = Gio.File.new_for_path(path);
 	if (!file.query_exists(null))
 		return;
@@ -186,11 +163,11 @@ function _loadAfterSessionLock() {
 		return;
 
 	const openWindows = Util.getOpenWindows(false);
-	const saveObj = JSON.parse(ByteArray.toString(contents));
+	const saveObj = JSON.parse(new TextDecoder().decode(contents));
 
 	const windowObjects = saveObj["windows"];
 	windowObjects.forEach(wObj => {
-		const {windowStableId, isTiled, tiledRect, untiledRect, tileGroup} = wObj;
+		const {windowStableId, isTiled, tiledRect, untiledRect} = wObj;
 		const windowIdx = openWindows.findIndex(w => w.get_stable_sequence() === windowStableId);
 		const window = openWindows[windowIdx];
 		if (!window)
@@ -198,21 +175,25 @@ function _loadAfterSessionLock() {
 
 		window.isTiled = isTiled;
 		window.tiledRect = tiledRect && new Meta.Rectangle({
-			x: tiledRect.x, y: tiledRect.y,
-			width: tiledRect.width, height: tiledRect.height
+			x: tiledRect.x,
+			y: tiledRect.y,
+			width: tiledRect.width,
+			height: tiledRect.height
 		});
 		window.untiledRect = untiledRect && new Meta.Rectangle({
-			x: untiledRect.x, y: untiledRect.y,
-			width: untiledRect.width, height: untiledRect.height
+			x: untiledRect.x,
+			y: untiledRect.y,
+			width: untiledRect.width,
+			height: untiledRect.height
 		});
 	});
 
 	const tileGroups = new Map(saveObj["tileGroups"]);
-	this.tileGroupManager.setTileGroups(tileGroups);
+	Util.setupTileGroups(tileGroups);
 	openWindows.forEach(w => {
 		if (tileGroups.has(w.get_id())) {
-			const group = this.tileGroupManager.getTileGroupFor(w);
-			this.tileGroupManager.updateTileGroup(group);
+			const group = Util.getTileGroupFor(w);
+			Util.updateTileGroup(group);
 		}
 	});
 };

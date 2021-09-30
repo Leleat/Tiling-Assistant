@@ -7,355 +7,224 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-08-02 01:15+0200\n"
+"POT-Creation-Date: 2021-09-30 19:12+0200\n"
 "PO-Revision-Date: 2021-09-14 14:19+0200\n"
+"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Language-Team: \n"
+"Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: Poedit 3.0\n"
-"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"Language: nl\n"
 
-#: extension.js:195
-msgid "Tiling-assistant's popup enabled"
-msgstr "Het pop-upvenster van Tegelassistent is ingeschakeld"
-
-#: extension.js:195
-msgid "Tiling-assistant's popup was disabled"
-msgstr "Het pop-upvenster van Tegelassistent is uitgeschakeld"
-
-#: extension.js:222
-msgid "Can't enter 'Tile Editing Mode', if the focused window isn't tiled."
-msgstr ""
-"De tegelbewerkmodus kan niet worden gestart als er geen geopend, getegeld "
-"venster is."
-
-#: prefs.js:314 tilingPieMenu.js:15
-msgid "Minimize window"
-msgstr "Venster minimaliseren"
-
-#: prefs.js:314 tilingPieMenu.js:16
-msgid "Close window"
-msgstr "Venster sluiten"
-
-#: prefs.js:314 tilingPieMenu.js:17
-msgid "Move to previous workspace"
-msgstr "Verplaatsen naar vorig werkblad"
-
-#: prefs.js:314 tilingPieMenu.js:18
-msgid "Move to next workspace"
-msgstr "Verplaatsen naar volgend werkblad"
-
-#: prefs.js:315 tilingPieMenu.js:19
-msgid "Move to top monitor"
-msgstr "Verplaatsen naar bovenste beeldscherm"
-
-#: prefs.js:315 tilingPieMenu.js:20
-msgid "Move to bottom monitor"
-msgstr "Verplaatsen naar onderste beeldscherm"
-
-#: prefs.js:315 tilingPieMenu.js:21
-msgid "Move to left monitor"
-msgstr "Verplaatsen naar linkerbeeldscherm"
-
-#: prefs.js:315 tilingPieMenu.js:22
-msgid "Move to right monitor"
-msgstr "Verplaatsen naar rechterbeeldscherm"
-
-#: prefs.js:316 tilingPieMenu.js:23
-msgid "Toggle fullscreen"
-msgstr "Beeldvullende modus aan/uit"
-
-#: prefs.js:316 tilingPieMenu.js:24
-msgid "Toggle 'Always on top'"
-msgstr "Altijd bovenaan aan/uit"
-
-#: prefs.js:316 tilingPieMenu.js:25 prefs40.ui:977 prefs.ui:1216
-msgid "Tile to left"
-msgstr "Naar links tegelen"
-
-#: prefs.js:316 tilingPieMenu.js:26 prefs40.ui:1013 prefs.ui:1267
-msgid "Tile to right"
-msgstr "Naar rechts tegelen"
-
-#: prefs.js:316 tilingPieMenu.js:27 prefs40.ui:905 prefs.ui:1114
-msgid "Tile to top"
-msgstr "Naar boven tegelen"
-
-#: prefs.js:316 tilingPieMenu.js:28 prefs40.ui:941 prefs.ui:1165
-msgid "Tile to bottom"
-msgstr "Naar onder tegelen"
-
-#: prefs.js:317 tilingPieMenu.js:29 prefs40.ui:1092 prefs.ui:1361
-msgid "Tile to top-left"
-msgstr "Naar linksboven tegelen"
-
-#: prefs.js:317 tilingPieMenu.js:30 prefs40.ui:1128 prefs.ui:1412
-msgid "Tile to top-right"
-msgstr "Naar rechtsboven tegelen"
-
-#: prefs.js:317 tilingPieMenu.js:31 prefs40.ui:1164 prefs.ui:1463
-msgid "Tile to bottom-left"
-msgstr "Naar linksonder tegelen"
-
-#: prefs.js:317 tilingPieMenu.js:32 prefs40.ui:1200 prefs.ui:1514
-msgid "Tile to bottom-right"
-msgstr "Naar rechtsonder tegelen"
-
-#: prefs.js:317 tilingPieMenu.js:33
-msgid "Open Layout selector"
-msgstr "Indelingskeuze openen"
-
-#: prefs.js:381
-msgid "Layout name..."
-msgstr "Indelingsnaam…"
-
-#: prefs.js:480
-msgid ""
-"Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of "
-"the rectangles for the layouts in the left column.The right column shows a "
-"preview of your layouts (after saving). The layouts file is saved in "
-"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
-"Format for the rectangles:\n"
-"\n"
-"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
-"\n"
-"The values can range from 0 to 1. (0,0) is the top-left corner of your "
-"screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and "
-"can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of "
-"windows in that rectangle and they will share that space evenly (for ex.: "
-"Master & Stack).\n"
-"\n"
-"You can attach an app to the rectangle row. If you do that, a new instance "
-"of the app will be opened, when activating the layout. This is experimental "
-"and may not work reliably (especially on Wayland)."
-msgstr ""
-"Stel een sneltoets in door te klikken op ‘Uitgeschakeld’. Voer in de "
-"linkerkolom de afmetingen van de rechthoeken in. In de rechterkolom worden "
-"uw indelingen voorvertoond (na opslaan ervan). Het indelingsbestand wordt "
-"opgeslagen in $XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
-"Afmetingen van de rechthoeken:\n"
-"\n"
-"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
-"\n"
-"Waarden dienen tussen 0 en 1 te liggen. (0,0) is de linkerbovenhoek van het "
-"scherm; (1,1) is de rechteronderhoek. ‘--dynamicSplit’ is optioneel en kan "
-"‘--h’ of ‘--v’ bevatten. ‘dynamicSplit’ betekent dat u een oneindig aantal "
-"vensters kunt tegelen binnen een rechthoek en dat de ruimte gelijkwaardig "
-"wordt verdeeld (bijv. hoofdvenster en stapel).\n"
-"\n"
-"U kunt een toepassing toevoegen aan een rechthoek. Als u dat doet, dan wordt "
-"er een nieuw venster van de toepassing in kwestie geopend bij het activeren "
-"van de indeling. Let op: deze functie is experimenteel en werkt mogelijk "
-"niet naar behoren (vooral op Wayland)."
-
-#: prefs.js:561
-msgid "No layout preview..."
-msgstr "Geen voor te vertonen indelingen…"
-
-#: tilingEditingMode.js:263
-msgid ""
-"Can't resize in that direction. Super + Directions resizes on the S and E "
-"side. Super + Shift + Directions on the N and W side."
-msgstr ""
-"Vensters kunnen niet worden vergroot/verkleind in die richting. Super + "
-"richting vergroot/verkleint aan de zuid- en oostzijden; Super + Shift + "
-"richtig aan de noord- en westzijden."
-
-#: tilingLayoutManager.js:139
-msgid "Layouts: App not found."
-msgstr "Indelingen: de toepassing is niet aangetroffen."
-
-#: tilingLayoutManager.js:238
-msgid "No valid layouts defined."
-msgstr "Er zijn geen geldige indelingen ingesteld."
-
-#: tilingLayoutManager.js:269
-msgid " Type to search..."
-msgstr " Typ om te zoeken…"
-
-#: tilingLayoutManager.js:379
-msgid "No layout name..."
-msgstr "Geen indelingsnaam…"
-
-#: prefs40.ui:287 prefs.ui:318
+#: tiling-assistant@leleat-on-github/prefs.ui:140
 msgid "Tiling Popup"
 msgstr "Tegelpop-upvenster"
 
-#: prefs40.ui:321 prefs.ui:362
+#: tiling-assistant@leleat-on-github/prefs.ui:166
 msgid "Raise Tile Groups together"
 msgstr "Tegelgroepen tegelijk focussen"
 
-#: prefs40.ui:354 prefs.ui:405
+#: tiling-assistant@leleat-on-github/prefs.ui:191
 msgid "Dynamic Keybinding Behaviour"
 msgstr "Dynamisch sneltoetsgedrag"
 
-#: prefs40.ui:382 prefs.ui:443
+#: tiling-assistant@leleat-on-github/prefs.ui:197
+msgid ""
+"The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
+"right may change depending on the tiling state of the focused window.\n"
+"\n"
+"<b>Disabled</b>: The shortcuts won't change their behaviour based on the "
+"window's tiling state.\n"
+"\n"
+"<b>Focus</b>: If the current window is tiled and there is a tiled window in "
+"the direction of the shortcut, switch focus to that tiled window instead of "
+"tiling the current window.\n"
+"\n"
+"<b>Tiling State</b>: If the current window is tiled, it adapts to the "
+"pressed shortcut. For example, if the current window is tiled to the right "
+"half of your monitor and the shortcut to tile to the bottom is activated, "
+"the window will tile to the bottom-right quarter instead of the bottom "
+"half.\n"
+"\n"
+"<b>Tiling State (Windows)</b>: Like 'Tiling State' but if the window isn't "
+"tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is "
+"activated, minimize the window."
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:217
 msgid "Disabled"
 msgstr "Uitgeschakeld"
 
-#: prefs40.ui:383 prefs.ui:444
+#: tiling-assistant@leleat-on-github/prefs.ui:218
 msgid "Focus"
 msgstr "Focus"
 
-#: prefs40.ui:384 prefs.ui:445
+#: tiling-assistant@leleat-on-github/prefs.ui:219
 msgid "Tiling State"
 msgstr "Tegelstatus"
 
-#: prefs40.ui:409 prefs.ui:475
+#: tiling-assistant@leleat-on-github/prefs.ui:220
+msgid "Tiling State (Windows)"
+msgstr "Tegelstatus (Windows)"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:239
 msgid "Window Gaps"
 msgstr "Ruimte tussen vensters"
 
-#: prefs40.ui:445 prefs.ui:521
+#: tiling-assistant@leleat-on-github/prefs.ui:267
 msgid "Gaps on Maximized Windows"
 msgstr "Ruimte tussen gemaximaliseerde vensters"
 
-#: prefs40.ui:478 prefs.ui:564
+#: tiling-assistant@leleat-on-github/prefs.ui:292
 msgid "Restore Window Size on"
 msgstr "Vensterafmetingen herstellen bij"
 
-#: prefs40.ui:486 prefs.ui:577
+#: tiling-assistant@leleat-on-github/prefs.ui:298
 msgid ""
 "This setting is intended for Wayland users. Tiled windows may not properly "
 "restore their size when they are being grabbed on Wayland.\n"
+"\n"
 "If that is the case, you can try 'Restore Window Size on Grab End' instead."
 msgstr ""
 "Deze optie is bedoeld voor Wayland-gebruikers. Getegelde vensters worden "
 "mogelijk niet goed hersteld als ze door Wayland worden onderschept.\n"
+"\n"
 "Als dat het geval is, probeer dan de optie ‘Vensterafmetingen herstellen bij "
 "vastpakken van uiteinde’."
 
-#: prefs40.ui:500 prefs.ui:596
+#: tiling-assistant@leleat-on-github/prefs.ui:311
 msgid "Grab Start"
 msgstr "Vastpakpositie"
 
-#: prefs40.ui:501 prefs.ui:597
+#: tiling-assistant@leleat-on-github/prefs.ui:312
 msgid "Grab End"
 msgstr "Einde van vastpakpositie"
 
-#: prefs40.ui:528 prefs.ui:629
+#: tiling-assistant@leleat-on-github/prefs.ui:333
 msgid "<u>Inverse Top Screen Edge Action:</u>"
 msgstr "<u>Randactie op bovenste beeldscherm omdraaien:</u>"
 
-#: prefs40.ui:555 prefs.ui:661
+#: tiling-assistant@leleat-on-github/prefs.ui:354
 msgid "Landscape Displays"
 msgstr "Horizontale beeldschermen"
 
-#: prefs40.ui:589 prefs.ui:705
+#: tiling-assistant@leleat-on-github/prefs.ui:380
 msgid "Portrait Displays"
 msgstr "Verticale beeldschermen"
 
-#: prefs40.ui:616 prefs.ui:742
+#: tiling-assistant@leleat-on-github/prefs.ui:403
 msgid "General"
 msgstr "Algemeen"
 
-#: prefs40.ui:677 prefs.ui:806
+#: tiling-assistant@leleat-on-github/prefs.ui:452
 msgid "Toggle 'Tiling Popup'"
 msgstr "Tegelpop-upvenster tonen/verbergen"
 
-#: prefs40.ui:713 prefs.ui:857
+#: tiling-assistant@leleat-on-github/prefs.ui:493
 msgid "Tile Editing Mode"
 msgstr "Tegelbewerkmodus"
 
-#: prefs40.ui:748 prefs.ui:907
-msgid "Layout Selector"
-msgstr "Indelingskeuze"
-
-#: prefs40.ui:782 prefs.ui:956
+#: tiling-assistant@leleat-on-github/prefs.ui:532
 msgid "Auto-Tile"
 msgstr "Automatisch tegelen"
 
-#: prefs40.ui:790 prefs.ui:969
+#: tiling-assistant@leleat-on-github/prefs.ui:538
 msgid ""
 "The focused window will try to fill the free screen space as good as "
 "possible based on the tiled windows around it.\n"
+"\n"
 "If there is no space, the window will either untile or maximize depending on "
 "wether it's currently tiled."
 msgstr ""
 "Het gefocuste venster zal trachten de vrij schermruimte zo goed mogelijk te "
 "benutten op basis van naburige vensters.\n"
+"\n"
 "Als er geen ruimte is, dan wordt het venster onttegeld of gemaximaliseerd, "
 "afhankelijk van de tegelstatus."
 
-#: prefs40.ui:828 prefs.ui:1022 prefs.js:314 tilingPieMenu.js:14
+#: tiling-assistant@leleat-on-github/prefs.ui:583
 msgid "Toggle Maximization"
 msgstr "Maximaliseren aan/uit"
 
-#: prefs40.ui:855 prefs.ui:1064
+#: tiling-assistant@leleat-on-github/prefs.ui:617
 msgid "<b>    General    </b>"
 msgstr "<b>    Algemeen    </b>"
 
-#: prefs40.ui:1041 prefs.ui:1310
+#: tiling-assistant@leleat-on-github/prefs.ui:655
+msgid "Tile to top"
+msgstr "Naar boven tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:695
+msgid "Tile to bottom"
+msgstr "Naar onder tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:735
+msgid "Tile to left"
+msgstr "Naar links tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:775
+msgid "Tile to right"
+msgstr "Naar rechts tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:810
 msgid "<b>    Side Tiling    </b>"
 msgstr "<b>    Zijwaarts tegelen    </b>"
 
-#: prefs40.ui:1228 prefs.ui:1557
+#: tiling-assistant@leleat-on-github/prefs.ui:849
+msgid "Tile to top-left"
+msgstr "Naar linksboven tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:889
+msgid "Tile to top-right"
+msgstr "Naar rechtsboven tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:929
+msgid "Tile to bottom-left"
+msgstr "Naar linksonder tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:969
+msgid "Tile to bottom-right"
+msgstr "Naar rechtsonder tegelen"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1004
 msgid "<b>    Corner Tiling    </b>"
 msgstr "<b>    Hoektegelen    </b>"
 
-#: prefs40.ui:1251 prefs.ui:1583
+#: tiling-assistant@leleat-on-github/prefs.ui:1025
 msgid "Keybindings"
 msgstr "Sneltoetsen"
 
-#: prefs40.ui:1332 prefs.ui:1700
-msgid "Layouts"
-msgstr "Indelingen"
-
-#: prefs40.ui:1360 prefs40.ui:1550 prefs.ui:1732 prefs.ui:1988
-msgid "Pie Menu"
-msgstr "Taartmenu"
-
-#: prefs40.ui:1367 prefs.ui:1744
-msgid ""
-"<tt>Super</tt> + <tt>RMB</tt> on a window will open a simple pie menu. While "
-"holding the right click dragging the mouse in the direction of a menu item "
-"and releasing the click, will activate that menu item. The pie menu's "
-"appearance is slightly delayed. The pie menu doesn't need to be visible for "
-"a menu item to be activated."
-msgstr ""
-"Druk op <tt>Super</tt> + <tt>RMB</tt> op een geopend venster op een "
-"taartmenu te openen. Houd de rechtermuisknop ingedrukt en verplaats de "
-"cursor om een menu-item te activeren. Het taartmenu wordt na een korte "
-"wachttijd getoond en hoeft niet zichtbaar te zijn om een menu-item te kunnen "
-"activeren."
-
-#: prefs40.ui:1402 prefs.ui:1789
-msgid "Deadzone Radius"
-msgstr "Dodehoekstraal"
-
-#: prefs40.ui:1439 prefs.ui:1836
-msgid "Item Circle Radius"
-msgstr "Cirkelstraal van item"
-
-#: prefs40.ui:1571 prefs.ui:2013
+#: tiling-assistant@leleat-on-github/prefs.ui:1046
 msgid "Tiling Assistant"
 msgstr "Tegelassistent"
 
-#: prefs40.ui:1599 prefs.ui:2051
+#: tiling-assistant@leleat-on-github/prefs.ui:1069
 msgid ""
 "If you want to report a bug or need help,\n"
+"\n"
 "please open an issue on Github."
 msgstr ""
 "Als u een bug wilt melden of hulp wilt vragen,\n"
+"\n"
 "dan kunt u een ‘issue’ openen op GitHub."
 
-#: prefs40.ui:1626 prefs.ui:2088
+#: tiling-assistant@leleat-on-github/prefs.ui:1090
 msgid ""
 "List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
 msgstr ""
 "Lijst met bekende <big><b>INCOMPATIBELE</b></big> toepassingen/uitbreidingen/"
 "beperkingen."
 
-#: prefs40.ui:1653 prefs.ui:2125
+#: tiling-assistant@leleat-on-github/prefs.ui:1112
 msgid ""
 "The <big><b>GUIDE</b></big> offers a detailed explanation of every feature."
 msgstr ""
 "De <big><b>ZELFSTUDIEPAGINA</b></big> (Engelstalig) bevat uitgebreide hulp "
 "omtrent alle functies."
 
-#: prefs40.ui:1680 prefs.ui:2161
+#: tiling-assistant@leleat-on-github/prefs.ui:1133
 msgid ""
 "The <big><b>CHANGELOG</b></big> lists the differences between each extension "
 "version."
@@ -363,7 +232,7 @@ msgstr ""
 "Het <big><b>WIJZIGINGSLOG</b></big> toont de verschillen tussen elke "
 "uitbreidingsversie."
 
-#: prefs40.ui:1717 prefs.ui:2218
+#: tiling-assistant@leleat-on-github/prefs.ui:1162
 msgid ""
 "<small>This extension is licensed under the <a href='https://www.gnu.org/"
 "licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
@@ -376,50 +245,87 @@ msgstr ""
 "GARANTIE</b></u> geleverd.  Een kopie van deze licentie is te vinden in de "
 "GitHub-repo.</small>"
 
-#: prefs40.ui:1736 prefs.ui:2245
-msgid ""
-"Help and\n"
-"Changelog"
-msgstr ""
-"Hulp en\n"
-"wijzigingslog"
+#: tiling-assistant@leleat-on-github/prefs.ui:1179
+msgid "Help"
+msgstr "Hulp"
 
-#: prefs40.ui:1775 prefs.ui:2288
+#: tiling-assistant@leleat-on-github/prefs.ui:1211
 msgid "<u><b>Hidden Settings</b></u>"
 msgstr "<u><b>Verborgen voorkeuren</b></u>"
 
-#: prefs40.ui:1799 prefs.ui:2312
+#: tiling-assistant@leleat-on-github/prefs.ui:1229
 msgid "Tiling Popup: Current Workspace only"
 msgstr "Tegelpop-upvenster: alleen op huidige werkblad"
 
-#: prefs40.ui:1832 prefs.ui:2355
+#: tiling-assistant@leleat-on-github/prefs.ui:1254
 msgid "Tile Editing Mode: Focus Color"
 msgstr "Tegelbewerkmodus: focuskleur"
 
-#: prefs40.ui:1867 prefs.ui:2400
+#: tiling-assistant@leleat-on-github/prefs.ui:1280
+msgid "Tile Preview: Secondary Mode Activator"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1291
+msgid "Ctrl"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1292
+msgid "Alt"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1293
+msgid "RMB"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1313
+msgid "Tile Preview: Default to Secondary Mode"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1338
 msgid "Tile Animations"
 msgstr "Tegelanimaties"
 
-#: prefs40.ui:1901 prefs.ui:2444
+#: tiling-assistant@leleat-on-github/prefs.ui:1364
 msgid "Untile Animations"
 msgstr "Onttegelanimaties"
 
-#: prefs40.ui:1935 prefs.ui:2488
+#: tiling-assistant@leleat-on-github/prefs.ui:1390
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "Randactie op bovenste beeldscherm omdraaien - Tijdklok"
 
-#: prefs40.ui:1971 prefs.ui:2534
+#: tiling-assistant@leleat-on-github/prefs.ui:1418
 msgid "Vertical Tile Preview Trigger Area"
 msgstr "Verticale tegelvoorvertoning: actiegebied"
 
-#: prefs40.ui:2008 prefs.ui:2581
+#: tiling-assistant@leleat-on-github/prefs.ui:1447
 msgid "Horizontal Tile Preview Trigger Area"
 msgstr "Horizontale tegelvoorvertoning: actiegebied"
 
-#: prefs40.ui:2044 prefs.ui:2627
+#: tiling-assistant@leleat-on-github/prefs.ui:1475
 msgid "Debugging: Show Tiled Rects"
 msgstr "Foutopsporing: tegelrechthoeken tonen"
 
-#: prefs40.ui:2085 prefs.ui:2678
+#: tiling-assistant@leleat-on-github/prefs.ui:1519
 msgid "Debugging: Show Free Screen Rects"
 msgstr "Foutopsporing: vrije tegelrechthoeken tonen"
+
+#: tiling-assistant@leleat-on-github/src/keybindingHandler.js:57
+msgid "Tiling popup enabled"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/keybindingHandler.js:57
+msgid "Tiling popup was disabled"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/tileEditingMode.js:55
+msgid "Can't enter 'Tile Editing Mode', if there isn't a tileGroup."
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/tileEditingMode.js:308
+msgid ""
+"Can't resize in that direction. Super + Directions resizes on the S and E "
+"side. Super + Shift + Directions on the N and W side."
+msgstr ""
+"Vensters kunnen niet worden vergroot/verkleind in die richting. Super + "
+"richting vergroot/verkleint aan de zuid- en oostzijden; Super + Shift + "
+"richtig aan de noord- en westzijden."

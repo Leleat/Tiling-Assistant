@@ -1,6 +1,6 @@
-# Tiling assistant for GNOME
+# Tiling Assistant for GNOME
 
-An extension which adds a Windows-like snap assist to GNOME. It also changes GNOME's 2 column tiling design to a 2x2 grid (i.e. 4 quadrants) **and more**.
+An extension which adds a Windows-like snap assist to GNOME. It also changes GNOME's 2 column tiling design to a 2x2 grid (i.e. 4 quadrants) and *more*...
 
 ## Table of Contents
 - [Supported GNOME Versions](#Supported-GNOME-Versions)
@@ -25,7 +25,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 - ...
 
-Please see the ![Guide](GUIDE.md) for a detailed explanation of every feature.
+Please see the ![Guide](GUIDE.md) for an explanation of every feature.
 
 ## Preview
 
@@ -33,7 +33,7 @@ Please see the ![Guide](GUIDE.md) for a detailed explanation of every feature.
 
 ## Installation
 
-You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download `tiling-assistant@leleat-on-github` and move it to your extensions folder. Local extensions are in `~/.local/share/gnome-shell/extensions/`. After moving the folder to the correct location, restart the GNOME shell (`Alt`+`F2` -> enter `r`. On **Wayland** you need to logout).
+You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download / clone the repository and run the `scripts/build.sh` script with the `-i` flag.
 
 ## Translations
 

@@ -9,8 +9,7 @@
     - [Tiling Popup](#Tiling-Popup)
     - [Tile Groups](#Tile-Groups)
     - [Tile Editing Mode](#Tile-Editing-Mode)
-    - [Layouts](#Layouts)
-    - [Pie Menu](#Pie-Menu)
+    - [Popup Layouts](#Popup-Layouts)
     - [Hidden Settings](#Hidden-Settings)
 
 ## Usage
@@ -25,7 +24,7 @@ Holding `Ctrl` when moving a window over a tiled window, will make the grabbed w
 
 ### Keyboard-driven Workflow
 
-Use the the shortcuts from the `Keybindings` settings and the [Tile Editing Mode](#Tile-Editing-Mode). You can predefine [Layouts](#Layouts) to quickly create complex tiling designs.
+Use the the shortcuts from the `Keybindings` settings and the [Tile Editing Mode](#Tile-Editing-Mode).
 
 ## Terminology
 
@@ -45,7 +44,7 @@ When a window is tiled, the top-most tiled windows, which don't overlap each oth
 
 ### Tile Editing Mode
 
-This is a special mode to manage your tiled windows.
+This is a special mode to manage your tiled windows with your keyboard.
 
 You can navigate focus with the direction keys (`WASD`, `hjkl` or the `arrows`). Holding `Ctrl` while moving the focus and then releasing `Ctrl` will swap the highlighted windows. If you hold `Shift` as well instead of swapping the 2 highlighted windows, the sizes of the 2 windows and the windows between them will be equalized (*either* the width *or* the height based on the position of the 2 highlighted windows).
 
@@ -53,12 +52,22 @@ You can navigate focus with the direction keys (`WASD`, `hjkl` or the `arrows`).
 
 When a window is highlighted, press `Q` to [q]uit it, `R` to [r]estore its size, and `E` to [e]xpand it to fill the available space. Press `C` to [c]ycle through 'half' states of a window.
 
-Pressing `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing `Space` or `Enter` will open the Tiling Popup instead.
+Hitting `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free screen rectangle is highlighted, pressing `Space` or `Enter` will open the Tiling Popup instead.
 
 ![](media/Guide_tileEditingMode.gif)
 
+### Popup Layouts
+
+A Popup Layout consists of a list of arbitrary rectangles. When activating a popup layout, the tiling popup will ask you which of the open windows you want in which rectangle of your layout. Read the tooltip in the `Popup Layouts` settings to understand how to set them up.
+
+The `Popup Layout Selector` enables you to search for layouts by name. That means you don't have to remember their keybindings.
+
+The settings for the `Popup Layouts` are [hidden](#Hidden-Settings) by default.
+
+![](media/Guide_layouts.gif)
+
 ### Hidden Settings
 
-This is a 'hidden' (more specificly: nameless) tab under `Help and Changelog`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, and experimental settings.
+This is a 'hidden' (more specificly: nameless) tab under `Help`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, and experimental settings.
 
 ![](media/Guide_HiddenSettings.png)

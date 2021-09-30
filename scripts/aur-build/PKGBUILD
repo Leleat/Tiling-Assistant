@@ -1,0 +1,19 @@
+# Maintainer: Leleat
+pkgname='gnome-shell-extension-tiling-assistant'
+pkgver=25
+pkgrel=1
+pkgdesc="A GNOME Shell extension to expand GNOME's native 2 column design."
+arch=('x86_64')
+url="https://github.com/Leleat/Tiling-Assistant"
+license=('GPL')
+depends=('gnome-shell>=40')
+install='INSTALL'
+source=("${url}/archive/refs/tags/v${pkgver}.tar.gz")
+md5sums=('SKIP')
+
+package() {
+	# put extension in /usr/share/gnome-shell/extensions/
+	mkdir -p "$pkgdir/usr/share/gnome-shell/extensions/tiling-assistant@leleat-on-github/"
+	cp -r "$srcdir/Tiling-Assistant-$pkgver/tiling-assistant@leleat-on-github" \
+			"$pkgdir/usr/share/gnome-shell/extensions/"
+}

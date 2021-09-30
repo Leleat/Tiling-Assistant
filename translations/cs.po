@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-05-20 17:03+0200\n"
+"POT-Creation-Date: 2021-09-30 19:12+0200\n"
 "PO-Revision-Date: 2021-08-03 01:02+0200\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
@@ -18,334 +18,211 @@ msgstr ""
 "Plural-Forms: nplurals=3; plural=(n==1) ? 0 : (n>=2 && n<=4) ? 1 : 2;\n"
 "X-Generator: Poedit 2.4.3\n"
 
-#: extension.js:195
-msgid "Tiling-assistant's popup enabled"
-msgstr "Vyskakovací okno Asistenta dlaždicování povoleno"
-
-#: extension.js:195
-msgid "Tiling-assistant's popup was disabled"
-msgstr "Vyskakovací okno Asistenta dlaždicování bylo zakázáno"
-
-#: extension.js:222
-msgid "Can't enter 'Tile Editing Mode', if the focused window isn't tiled."
-msgstr ""
-"Nelze přejít do režimu úprav dlaždic, pokud zaměřené okno není dlaždice."
-
-#: prefs.js:314 tilingPieMenu.js:15
-msgid "Minimize window"
-msgstr "Minimalizovat okno"
-
-#: prefs.js:314 tilingPieMenu.js:16
-msgid "Close window"
-msgstr "Zavřít okno"
-
-#: prefs.js:314 tilingPieMenu.js:17
-msgid "Move to previous workspace"
-msgstr "Přesunout na předchozí pracovní plochu"
-
-#: prefs.js:314 tilingPieMenu.js:18
-msgid "Move to next workspace"
-msgstr "Přesunout na následující pracovní plochu"
-
-#: prefs.js:315 tilingPieMenu.js:19
-msgid "Move to top monitor"
-msgstr "Přesunout na horní monitor"
-
-#: prefs.js:315 tilingPieMenu.js:20
-msgid "Move to bottom monitor"
-msgstr "Přesunout na spodní monitor"
-
-#: prefs.js:315 tilingPieMenu.js:21
-msgid "Move to left monitor"
-msgstr "Přesunout na levý monitor"
-
-#: prefs.js:315 tilingPieMenu.js:22
-msgid "Move to right monitor"
-msgstr "Přesunout na pravý monitor"
-
-#: prefs.js:316 tilingPieMenu.js:23
-msgid "Toggle fullscreen"
-msgstr "Přepnout režim na celou obrazovku"
-
-#: prefs.js:316 tilingPieMenu.js:24
-msgid "Toggle 'Always on top'"
-msgstr "Přepnout \"Vždy nahoře\""
-
-#: prefs.js:316 tilingPieMenu.js:25 prefs40.ui:977 prefs.ui:1216
-msgid "Tile to left"
-msgstr "Dlaždice vlevo"
-
-#: prefs.js:316 tilingPieMenu.js:26 prefs40.ui:1013 prefs.ui:1267
-msgid "Tile to right"
-msgstr "Dlaždice vpravo"
-
-#: prefs.js:316 tilingPieMenu.js:27 prefs40.ui:905 prefs.ui:1114
-msgid "Tile to top"
-msgstr "Dlaždice nahoře"
-
-#: prefs.js:316 tilingPieMenu.js:28 prefs40.ui:941 prefs.ui:1165
-msgid "Tile to bottom"
-msgstr "Dlaždice dole"
-
-#: prefs.js:317 tilingPieMenu.js:29 prefs40.ui:1092 prefs.ui:1361
-msgid "Tile to top-left"
-msgstr "Dlaždice nahoře vlevo"
-
-#: prefs.js:317 tilingPieMenu.js:30 prefs40.ui:1128 prefs.ui:1412
-msgid "Tile to top-right"
-msgstr "Dlaždice nahoře vpravo"
-
-#: prefs.js:317 tilingPieMenu.js:31 prefs40.ui:1164 prefs.ui:1463
-msgid "Tile to bottom-left"
-msgstr "Dlaždice dole vlevo"
-
-#: prefs.js:317 tilingPieMenu.js:32 prefs40.ui:1200 prefs.ui:1514
-msgid "Tile to bottom-right"
-msgstr "Dlaždice dole vpravo"
-
-#: prefs.js:317 tilingPieMenu.js:33
-msgid "Open Layout selector"
-msgstr ""
-
-#: prefs.js:381
-msgid "Layout name..."
-msgstr "Název rozložení..."
-
-#: prefs.js:480
-msgid ""
-"Set a keybinding by clicking the 'Disabled' text. Enter the dimensions of "
-"the rectangles for the layouts in the left column.The right column shows a "
-"preview of your layouts (after saving). The layouts file is saved in "
-"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
-"Format for the rectangles:\n"
-"\n"
-"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
-"\n"
-"The values can range from 0 to 1. (0,0) is the top-left corner of your "
-"screen. (1,1) is the bottom-right corner. '--dynamicSplit' is optional and "
-"can be '--h' or '--v'. 'dynamicSplit' means you can tile any number of "
-"windows in that rectangle and they will share that space evenly (for ex.: "
-"Master & Stack).\n"
-"\n"
-"You can attach an app to the rectangle row. If you do that, a new instance "
-"of the app will be opened, when activating the layout. This is experimental "
-"and may not work reliably (especially on Wayland)."
-msgstr ""
-"Nastavte klávesovou zkratku kliknutím na text \"Disabled\". V levém sloupci "
-"zadejte rozměry obdélníků pro rozvržení.V pravém sloupci se zobrazí náhled "
-"vašich rozvržení (po uložení). Soubor s rozvrženími je uložen v adresáři "
-"$XDG_CONFIG_HOME/tiling-assistant/layouts.json.\n"
-"Formát obdélníků:\n"
-"\n"
-"xVal--yVal--widthVal--heightVal--dynamicSplit\n"
-"\n"
-"Hodnoty se mohou pohybovat od 0 do 1. (0,0) je levý horní roh obrazovky. "
-"(1,1) je pravý dolní roh. Parametr \"--dynamicSplit\" je nepovinný a může "
-"mít hodnotu \"--h\" nebo \"--v\". \"DynamicSplit\" znamená, že do tohoto "
-"obdélníku můžete rozdělit libovolný počet oken, která se o tento prostor "
-"rovnoměrně podělí (např.: Master & Stack).\n"
-"\n"
-"K řádku obdélníku můžete připojit aplikaci. Pokud to uděláte, při aktivaci "
-"rozložení se otevře nová instance aplikace. Jedná se o experimentální "
-"řešení, které nemusí fungovat spolehlivě (zejména v systému Wayland)."
-
-#: prefs.js:561
-msgid "No layout preview..."
-msgstr "Žádný náhled rozložení..."
-
-#: tilingEditingMode.js:263
-msgid ""
-"Can't resize in that direction. Super + Directions resizes on the S and E "
-"side. Super + Shift + Directions on the N and W side."
-msgstr ""
-"Nelze změnit velikost v tomto směru. Super + Směry mění velikost na J a V. "
-"Super + Shift + Směry na straně S a Z."
-
-#: tilingLayoutManager.js:139
-msgid "Layouts: App not found."
-msgstr "Rozložení: Aplikace nenalezena."
-
-#: tilingLayoutManager.js:238
-msgid "No valid layouts defined."
-msgstr "Nebylo definováno žádné validní rozložení."
-
-#: tilingLayoutManager.js:269
-msgid " Type to search..."
-msgstr " Vyhledávejte psaním..."
-
-#: tilingLayoutManager.js:379
-msgid "No layout name..."
-msgstr "Žádný název rozložení..."
-
-#: prefs40.ui:287 prefs.ui:318
+#: tiling-assistant@leleat-on-github/prefs.ui:140
 msgid "Tiling Popup"
 msgstr "Vyskakovací okno dlaždic"
 
-#: prefs40.ui:321 prefs.ui:362
+#: tiling-assistant@leleat-on-github/prefs.ui:166
 msgid "Raise Tile Groups together"
 msgstr "Zvedání skupin dlaždic dohromady"
 
-#: prefs40.ui:354 prefs.ui:405
+#: tiling-assistant@leleat-on-github/prefs.ui:191
 msgid "Dynamic Keybinding Behaviour"
 msgstr ""
 
-#: prefs40.ui:382 prefs.ui:443
+#: tiling-assistant@leleat-on-github/prefs.ui:197
+msgid ""
+"The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
+"right may change depending on the tiling state of the focused window.\n"
+"\n"
+"<b>Disabled</b>: The shortcuts won't change their behaviour based on the "
+"window's tiling state.\n"
+"\n"
+"<b>Focus</b>: If the current window is tiled and there is a tiled window in "
+"the direction of the shortcut, switch focus to that tiled window instead of "
+"tiling the current window.\n"
+"\n"
+"<b>Tiling State</b>: If the current window is tiled, it adapts to the "
+"pressed shortcut. For example, if the current window is tiled to the right "
+"half of your monitor and the shortcut to tile to the bottom is activated, "
+"the window will tile to the bottom-right quarter instead of the bottom "
+"half.\n"
+"\n"
+"<b>Tiling State (Windows)</b>: Like 'Tiling State' but if the window isn't "
+"tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is "
+"activated, minimize the window."
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:217
 msgid "Disabled"
 msgstr ""
 
-#: prefs40.ui:383 prefs.ui:444
+#: tiling-assistant@leleat-on-github/prefs.ui:218
 msgid "Focus"
 msgstr ""
 
-#: prefs40.ui:384 prefs.ui:445
+#: tiling-assistant@leleat-on-github/prefs.ui:219
 msgid "Tiling State"
 msgstr ""
 
-#: prefs40.ui:409 prefs.ui:475
+#: tiling-assistant@leleat-on-github/prefs.ui:220
+msgid "Tiling State (Windows)"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:239
 msgid "Window Gaps"
 msgstr "Mezery mezi okny"
 
-#: prefs40.ui:445 prefs.ui:521
+#: tiling-assistant@leleat-on-github/prefs.ui:267
 msgid "Gaps on Maximized Windows"
 msgstr "Mezery kolem maximalizovaných oknen"
 
-#: prefs40.ui:478 prefs.ui:564
+#: tiling-assistant@leleat-on-github/prefs.ui:292
 msgid "Restore Window Size on"
 msgstr "Obnovit velikost okna na"
 
-#: prefs40.ui:486 prefs.ui:577
+#: tiling-assistant@leleat-on-github/prefs.ui:298
 msgid ""
 "This setting is intended for Wayland users. Tiled windows may not properly "
 "restore their size when they are being grabbed on Wayland.\n"
+"\n"
 "If that is the case, you can try 'Restore Window Size on Grab End' instead."
 msgstr ""
 "Toto nastavení je určeno pro uživatele systému Wayland. Dlaždicová okna "
 "nemusí správně obnovit svou velikost, když jsou uchopována na Waylandu.\n"
+"\n"
 "V takovém případě můžete místo toho vyzkoušet \"Obnovit velikost okna na "
 "konci uchopení\"."
 
-#: prefs40.ui:500 prefs.ui:596
+#: tiling-assistant@leleat-on-github/prefs.ui:311
 msgid "Grab Start"
 msgstr "začátku uchopení"
 
-#: prefs40.ui:501 prefs.ui:597
+#: tiling-assistant@leleat-on-github/prefs.ui:312
 msgid "Grab End"
 msgstr "konci uchopení"
 
-#: prefs40.ui:528 prefs.ui:629
+#: tiling-assistant@leleat-on-github/prefs.ui:333
 msgid "<u>Inverse Top Screen Edge Action:</u>"
 msgstr "<u>Inverzní akce horního okraje obrazovky:</u>"
 
-#: prefs40.ui:555 prefs.ui:661
+#: tiling-assistant@leleat-on-github/prefs.ui:354
 msgid "Landscape Displays"
 msgstr "Displeje na šířku"
 
-#: prefs40.ui:589 prefs.ui:705
+#: tiling-assistant@leleat-on-github/prefs.ui:380
 msgid "Portrait Displays"
 msgstr "Displeje na výšku"
 
-#: prefs40.ui:616 prefs.ui:742
+#: tiling-assistant@leleat-on-github/prefs.ui:403
 msgid "General"
 msgstr "Obecné"
 
-#: prefs40.ui:677 prefs.ui:806
+#: tiling-assistant@leleat-on-github/prefs.ui:452
 msgid "Toggle 'Tiling Popup'"
 msgstr "Přepnout \"Vyskakovací okno dlaždic\""
 
-#: prefs40.ui:713 prefs.ui:857
+#: tiling-assistant@leleat-on-github/prefs.ui:493
 msgid "Tile Editing Mode"
 msgstr "Režim úprav dlaždic"
 
-#: prefs40.ui:748 prefs.ui:907
-msgid "Layout Selector"
-msgstr "Výběr rozvržení"
-
-#: prefs40.ui:782 prefs.ui:956
+#: tiling-assistant@leleat-on-github/prefs.ui:532
 msgid "Auto-Tile"
 msgstr "Automatické dlaždice"
 
-#: prefs40.ui:790 prefs.ui:969
+#: tiling-assistant@leleat-on-github/prefs.ui:538
 msgid ""
 "The focused window will try to fill the free screen space as good as "
 "possible based on the tiled windows around it.\n"
+"\n"
 "If there is no space, the window will either untile or maximize depending on "
 "wether it's currently tiled."
 msgstr ""
 "Zaměřené okno se bude snažit co nejlépe vyplnit volný prostor na obrazovce "
 "na základě okolních oken s dlaždicemi.\n"
+"\n"
 "Pokud není místo, okno se buď přepne z dlaždice, nebo se maximalizuje v "
 "závislosti na tom, zda je právě dlaždicí."
 
-#: prefs40.ui:828 prefs.ui:1022 prefs.js:314 tilingPieMenu.js:14
+#: tiling-assistant@leleat-on-github/prefs.ui:583
 msgid "Toggle Maximization"
 msgstr "Přepnout maximalizaci"
 
-#: prefs40.ui:855 prefs.ui:1064
+#: tiling-assistant@leleat-on-github/prefs.ui:617
 msgid "<b>    General    </b>"
 msgstr "<b>    Obecné    </b>"
 
-#: prefs40.ui:1041 prefs.ui:1310
+#: tiling-assistant@leleat-on-github/prefs.ui:655
+msgid "Tile to top"
+msgstr "Dlaždice nahoře"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:695
+msgid "Tile to bottom"
+msgstr "Dlaždice dole"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:735
+msgid "Tile to left"
+msgstr "Dlaždice vlevo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:775
+msgid "Tile to right"
+msgstr "Dlaždice vpravo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:810
 msgid "<b>    Side Tiling    </b>"
 msgstr "<b>    Dlaždice na straně    </b>"
 
-#: prefs40.ui:1228 prefs.ui:1557
+#: tiling-assistant@leleat-on-github/prefs.ui:849
+msgid "Tile to top-left"
+msgstr "Dlaždice nahoře vlevo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:889
+msgid "Tile to top-right"
+msgstr "Dlaždice nahoře vpravo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:929
+msgid "Tile to bottom-left"
+msgstr "Dlaždice dole vlevo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:969
+msgid "Tile to bottom-right"
+msgstr "Dlaždice dole vpravo"
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1004
 msgid "<b>    Corner Tiling    </b>"
 msgstr "<b>    Dlaždice v rohu    </b>"
 
-#: prefs40.ui:1251 prefs.ui:1583
+#: tiling-assistant@leleat-on-github/prefs.ui:1025
 msgid "Keybindings"
 msgstr "Klávesové zkratky"
 
-#: prefs40.ui:1332 prefs.ui:1700
-msgid "Layouts"
-msgstr "Rozložení"
-
-#: prefs40.ui:1360 prefs40.ui:1550 prefs.ui:1732 prefs.ui:1988
-msgid "Pie Menu"
-msgstr ""
-
-#: prefs40.ui:1367 prefs.ui:1744
-msgid ""
-"<tt>Super</tt> + <tt>RMB</tt> on a window will open a simple pie menu. While "
-"holding the right click dragging the mouse in the direction of a menu item "
-"and releasing the click, will activate that menu item. The pie menu's "
-"appearance is slightly delayed. The pie menu doesn't need to be visible for "
-"a menu item to be activated."
-msgstr ""
-
-#: prefs40.ui:1402 prefs.ui:1789
-msgid "Deadzone Radius"
-msgstr ""
-
-#: prefs40.ui:1439 prefs.ui:1836
-msgid "Item Circle Radius"
-msgstr ""
-
-#: prefs40.ui:1571 prefs.ui:2013
+#: tiling-assistant@leleat-on-github/prefs.ui:1046
 msgid "Tiling Assistant"
 msgstr "Asistent dlaždicování"
 
-#: prefs40.ui:1599 prefs.ui:2051
+#: tiling-assistant@leleat-on-github/prefs.ui:1069
 msgid ""
 "If you want to report a bug or need help,\n"
+"\n"
 "please open an issue on Github."
 msgstr ""
 "Pokud chcete nahlásit chybu, nebo potřebujete pomoc,\n"
+"\n"
 "prosím vytvořte issue na GitHubu."
 
-#: prefs40.ui:1626 prefs.ui:2088
+#: tiling-assistant@leleat-on-github/prefs.ui:1090
 msgid ""
 "List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
 msgstr ""
 
-#: prefs40.ui:1653 prefs.ui:2125
+#: tiling-assistant@leleat-on-github/prefs.ui:1112
 msgid ""
 "The <big><b>GUIDE</b></big> offers a detailed explanation of every feature."
 msgstr ""
 "<big><b>GUIDE</b></big> nabízí detailní vysvětlení každého nastavení a "
 "funkce."
 
-#: prefs40.ui:1680 prefs.ui:2161
+#: tiling-assistant@leleat-on-github/prefs.ui:1133
 msgid ""
 "The <big><b>CHANGELOG</b></big> lists the differences between each extension "
 "version."
@@ -353,7 +230,7 @@ msgstr ""
 "<big><b>CHANGELOG</b></big> obsahuje seznam změn provedené mezi jednotlivými "
 "verzemi rozšíření."
 
-#: prefs40.ui:1717 prefs.ui:2218
+#: tiling-assistant@leleat-on-github/prefs.ui:1162
 msgid ""
 "<small>This extension is licensed under the <a href='https://www.gnu.org/"
 "licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
@@ -365,50 +242,86 @@ msgstr ""
 "novější</a> a není dodáváno s <u><b>ŽÁDNOU ZÁRUKOU</b></u>.  Kopii této "
 "licence naleznete v repozitáři na GitHubu.</small>"
 
-#: prefs40.ui:1736 prefs.ui:2245
-msgid ""
-"Help and\n"
-"Changelog"
-msgstr ""
-"Nápověda a\n"
-"Changelog"
+#: tiling-assistant@leleat-on-github/prefs.ui:1179
+msgid "Help"
+msgstr "Nápověda"
 
-#: prefs40.ui:1775 prefs.ui:2288
+#: tiling-assistant@leleat-on-github/prefs.ui:1211
 msgid "<u><b>Hidden Settings</b></u>"
 msgstr "<u><b>Skrytá nastavení</b></u>"
 
-#: prefs40.ui:1799 prefs.ui:2312
+#: tiling-assistant@leleat-on-github/prefs.ui:1229
 msgid "Tiling Popup: Current Workspace only"
 msgstr "Vyskakovací okno dlaždic: Pouze aktuální pracovní plocha"
 
-#: prefs40.ui:1832 prefs.ui:2355
+#: tiling-assistant@leleat-on-github/prefs.ui:1254
 msgid "Tile Editing Mode: Focus Color"
 msgstr "Režim úpravy dlaždic: Barva zaměření"
 
-#: prefs40.ui:1867 prefs.ui:2400
+#: tiling-assistant@leleat-on-github/prefs.ui:1280
+msgid "Tile Preview: Secondary Mode Activator"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1291
+msgid "Ctrl"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1292
+msgid "Alt"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1293
+msgid "RMB"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1313
+msgid "Tile Preview: Default to Secondary Mode"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/prefs.ui:1338
 msgid "Tile Animations"
 msgstr "Animace dlaždicování"
 
-#: prefs40.ui:1901 prefs.ui:2444
+#: tiling-assistant@leleat-on-github/prefs.ui:1364
 msgid "Untile Animations"
 msgstr "Animace zrušení dlaždicování"
 
-#: prefs40.ui:1935 prefs.ui:2488
+#: tiling-assistant@leleat-on-github/prefs.ui:1390
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "Inverzní časovač akce horního okraje obrazovky"
 
-#: prefs40.ui:1971 prefs.ui:2534
+#: tiling-assistant@leleat-on-github/prefs.ui:1418
 msgid "Vertical Tile Preview Trigger Area"
 msgstr ""
 
-#: prefs40.ui:2008 prefs.ui:2581
+#: tiling-assistant@leleat-on-github/prefs.ui:1447
 msgid "Horizontal Tile Preview Trigger Area"
 msgstr ""
 
-#: prefs40.ui:2044 prefs.ui:2627
+#: tiling-assistant@leleat-on-github/prefs.ui:1475
 msgid "Debugging: Show Tiled Rects"
 msgstr ""
 
-#: prefs40.ui:2085 prefs.ui:2678
+#: tiling-assistant@leleat-on-github/prefs.ui:1519
 msgid "Debugging: Show Free Screen Rects"
 msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/keybindingHandler.js:57
+msgid "Tiling popup enabled"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/keybindingHandler.js:57
+msgid "Tiling popup was disabled"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/tileEditingMode.js:55
+msgid "Can't enter 'Tile Editing Mode', if there isn't a tileGroup."
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/tileEditingMode.js:308
+msgid ""
+"Can't resize in that direction. Super + Directions resizes on the S and E "
+"side. Super + Shift + Directions on the N and W side."
+msgstr ""
+"Nelze změnit velikost v tomto směru. Super + Směry mění velikost na J a V. "
+"Super + Shift + Směry na straně S a Z."

@@ -1,2 +1,5 @@
+locale/
+gschemas.compiled
+*.zip
+*~
 TODO.txt
-.layouts.json
