@@ -194,7 +194,10 @@ var Util = class Utility {
 				if (this.isMaximized(window))
 					break;
 
-				notGroupedWindows.push(window);
+				// ignore non-tiled windows, which are always-on-top, for the
+				// calculation since they are probably some utility apps etc.
+				if (!window.is_above())
+					notGroupedWindows.push(window);
 			}
 		}
 
