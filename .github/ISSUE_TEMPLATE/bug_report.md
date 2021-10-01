@@ -26,5 +26,8 @@ assignees: ''
 **Journalctl logs**
 <!-- Please provide the logs, if possible. To get them run `journalctl -fo cat /usr/bin/gnome-shell` in a Terminal. Then reproduce the bug. Ideally disable all other extensions and restart GNOME shell so that the logs don't get spammed with unrelated stuff.-->
 
+**List of other extensions**
+<!-- While unlikely, it's possible Tiling Assistant is conflicting with other extensions. So please provide a list of your installed extensions. -->
+
 **Additional context**
 <!-- Add any other context about the problem here.-->
