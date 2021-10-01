@@ -12,8 +12,7 @@ echo Packaging extension...
 gnome-extensions pack tiling-assistant@leleat-on-github \
     --force \
     --podir="../translations" \
-    --extra-source="src" \
-    --extra-source="prefs.ui"
+    --extra-source="src"
 echo Packaging complete.
 echo
 

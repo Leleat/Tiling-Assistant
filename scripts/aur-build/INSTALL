@@ -1,6 +1,6 @@
 ## arg 1:  the new package version
 post_install() {
-echo 
+	echo ""
 	echo -------------------------------------------------------------------------------
 	echo Reload GNOME Shell and enable the extension to finish the installation process.
 	echo -------------------------------------------------------------------------------
@@ -10,7 +10,7 @@ echo
 ## arg 1:  the new package version
 ## arg 2:  the old package version
 post_upgrade() {
-	echo 
+	echo ""
 	echo -------------------------------------------------
 	echo Reload GNOME Shell to finish the upgrade process.
 	echo -------------------------------------------------
@@ -19,14 +19,14 @@ post_upgrade() {
 
 ## arg 1:  the old package version
 post_remove() {
-	echo 
+	echo ""
 	echo ---------------------------------------------------------
 	echo Reload GNOME Shell to finish the uninstallation process.
-	echo 
+	echo ""
 	echo If you didn\'t disable the extension before removal, run
 	echo "'gsettings set org.gnome.mutter edge-tiling true ; \\"
 	echo gsettings set org.gnome.shell.overrides edge-tiling true\'
-	echo to reenable GNOME\'s native edge tiling.
+	echo to re-enable GNOME\'s native edge tiling.
 	echo ---------------------------------------------------------
 	echo
 }

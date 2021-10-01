@@ -9,11 +9,30 @@ license=('GPL')
 depends=('gnome-shell>=40')
 install='INSTALL'
 source=("${url}/archive/refs/tags/v${pkgver}.tar.gz")
+noextract=("*tiling-assistant@leleat-on-github*")
 md5sums=('SKIP')
 
+build() {
+	# cd into repo dir
+	cd "${srcdir}/Tiling-Assistant-${pkgver}"
+
+	# package extension to compile settings and translations
+	gnome-extensions pack tiling-assistant@leleat-on-github \
+		--force \
+		--podir="../translations" \
+		--extra-source="src"
+}
+
 package() {
-	# put extension in /usr/share/gnome-shell/extensions/
-	mkdir -p "$pkgdir/usr/share/gnome-shell/extensions/tiling-assistant@leleat-on-github/"
-	cp -r "$srcdir/Tiling-Assistant-$pkgver/tiling-assistant@leleat-on-github" \
-			"$pkgdir/usr/share/gnome-shell/extensions/"
+	# cd into repo dir
+	cd "${srcdir}/Tiling-Assistant-${pkgver}"
+
+	# instead of using gnome-extensions to install the extension package
+	# unzip to $pkgdir/usr/share/gnome-shell/extensions/ since gnome-extensions
+	# installs the extension locally while on Arch it seems like /usr/ is the
+	# convention
+	_UUID="tiling-assistant@leleat-on-github"
+	mkdir -p "${pkgdir}/usr/share/gnome-shell/extensions"
+	unzip ${_UUID}.shell-extension.zip \
+		-d "${pkgdir}/usr/share/gnome-shell/extensions/${_UUID}"
 }
