@@ -3,9 +3,12 @@
 const {Gdk, Gio, Gtk, GObject} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
+const LayoutPrefs = Me.imports.src.prefs.popupLayoutsPrefs.Prefs;
 const {Settings, Shortcuts} = Me.imports.src.common;
+const Util = Me.imports.src.prefs.utility.Util;
 
 function init() {
+	ExtensionUtils.initTranslations(Me.metadata.uuid);
 };
 
 function buildPrefsWidget() {
@@ -24,15 +27,20 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
 		this.connect("destroy", () => this._settings.run_dispose());
 
 		this._builder = new Gtk.Builder();
-		this._builder.add_from_file(Me.path + "/prefs.ui");
-		const mainPrefs = this._builder.get_object("main_prefs");
-		this.set_child(mainPrefs);
+		this._builder.add_from_file(Me.path + "/src/ui/prefs.ui");
+		this.set_child(this._builder.get_object("main-prefs"));
 
 		this.set_min_content_width(700);
 		this.set_min_content_height(650);
 
 		this._bindWidgets(Settings.getAllKeys());
 		this._bindKeybindings(Shortcuts.getAllKeys());
+
+		this._updateAdvancedSettingsVisibility();
+
+		// LayoutPrefs manages everything related (including the
+		// keyboard shortcuts) to popupLayouts on the prefs side
+		this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
 	};
 
 	// widgets in prefs.ui need to have same ID as the keys in the gschema.xml file
@@ -93,61 +101,53 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
 			const color = new Gdk.RGBA();
 			color.parse(this._settings.get_string(key));
 			widget.set_rgba(color);
-			widget.connect("color-set", w => this._settings.set_string(key, w.get_rgba().to_string()));
+			widget.connect("color-set", () =>
+					this._settings.set_string(key, widget.get_rgba().to_string()));
 		});
 	};
 
 	_bindKeybindings(shortcuts) {
-		// taken from Overview-Improved by human.experience
-		// https://extensions.gnome.org/extension/2802/overview-improved/
-		const bindShortcut = shortcutKey => {
-			const COLUMN_KEY = 0;
-			const COLUMN_MODS = 1;
-
-			const view = this._builder.get_object(shortcutKey + "-treeview");
-			const store =this._builder.get_object(shortcutKey + "-liststore");
-			const iter = store.append();
-			const renderer = new Gtk.CellRendererAccel({xalign: 1, editable: true});
-			const column = new Gtk.TreeViewColumn();
-			column.pack_start(renderer, true);
-			column.add_attribute(renderer, "accel-key", COLUMN_KEY);
-			column.add_attribute(renderer, "accel-mods", COLUMN_MODS);
-			view.append_column(column);
-
-			const updateShortcutRow = accel => {
-				const [, key, mods] = accel ? Gtk.accelerator_parse(accel) : [true, 0, 0];
-				store.set(iter, [COLUMN_KEY, COLUMN_MODS], [key, mods]);
-			};
-
-			renderer.connect("accel-edited", (renderer, path, key, mods, hwCode) => {
-				const accel = Gtk.accelerator_name(key, mods);
-				updateShortcutRow(accel);
-				this._settings.set_strv(shortcutKey, [accel]);
-			});
-
-			renderer.connect("accel-cleared", () => {
-				updateShortcutRow(null);
-				this._settings.set_strv(shortcutKey, []);
-			});
-
-			this._settings.connect("changed::" + shortcutKey, () => {
-				updateShortcutRow(this._settings.get_strv(shortcutKey)[0]);
-			});
-
-			updateShortcutRow(this._settings.get_strv(shortcutKey)[0]);
-		};
-
-		shortcuts.forEach((sc, idx) => {
+		shortcuts.forEach((key, idx) => {
 			// bind gui and gsettings
-			bindShortcut(sc);
+			const treeView = this._builder.get_object(key + "-treeview");
+			const listStore = this._builder.get_object(key + "-liststore");
+			Util.bindShortcut(this._settings, key, treeView, listStore);
 
 			// bind clear-shortcut-buttons
 			const clearButton = this._builder.get_object(`clear-button${idx + 1}`);
-			clearButton.set_sensitive(this._settings.get_strv(sc)[0]);
+			clearButton.set_sensitive(this._settings.get_strv(key)[0]);
 
-			clearButton.connect("clicked", () => this._settings.set_strv(sc, []));
-			this._settings.connect(`changed::${sc}`, () =>
-					clearButton.set_sensitive(this._settings.get_strv(sc)[0]));
+			clearButton.connect("clicked", () => this._settings.set_strv(key, []));
+			this._settings.connect(`changed::${key}`, () =>
+					clearButton.set_sensitive(this._settings.get_strv(key)[0]));
 		});
+	};
+
+	_updateAdvancedSettingsVisibility() {
+		const advancedWidgetIds = [
+			// popupLayouts settings tab
+			"popup-layouts", "popup-layouts-tab-label"
+		];
+		const advancedKey = Settings.ENABLE_ADV_EXP_SETTINGS;
+
+		const updateVisibility = () => {
+			const show = this._settings.get_boolean(advancedKey);
+			advancedWidgetIds.forEach(id => {
+				// TODO: for some reason, if the adv/exp setting is disabled and
+				// the prefs window is opened, changing the setting doesn't immediately
+				// update the visibilities. Only when changing the tab or toggling
+				// the adv/exp setting again, does the visbility update...
+				this._builder.get_object(id).set_visible(show);
+			});
+		};
+
+		// bind gui switch to gsetting
+		const advExpSwitch = this._builder.get_object(advancedKey);
+		this._settings.bind(advancedKey, advExpSwitch, "active", Gio.SettingsBindFlags.DEFAULT);
+
+		// update widget visibilities
+		this._settings.connect(`changed::${advancedKey}`, updateVisibility.bind(this));
+
+		updateVisibility();
 	};
 });

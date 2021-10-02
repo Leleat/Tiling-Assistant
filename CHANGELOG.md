@@ -1,11 +1,15 @@
 # Changelog
 
 ## v26
+**Added**
+- AUR package (#85)
+
 **Changed**
-- refactor
-- renamed `Layout` to `Popup Layout` since just `Layout` may be misleading and hide the setting behind an 'advanced setting' checkbox in the `Hidden Settings`
+- hid the `Layouts` behind the 'Advanced / Experimental Settings' switch (in `Hidden Settings`)
+- renamed `Layout` to `Popup Layout` since just `Layout` may be misleading
 - removed the PieMenu
 - removed support for GNOME < 40
+- refactored code & created scripts to automate stuff like building, updating translations...
 
 
 ## v25

@@ -5,7 +5,7 @@ const {Meta} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const {Settings} = Me.imports.src.common;
-const {Util} = Me.imports.src.utility;
+const {Util} = Me.imports.src.extension.utility;
 
 const Side = {
 	NONE: 0,
@@ -16,9 +16,10 @@ const Side = {
 };
 
 /**
- * This class gets to handle the resize events of windows (wether they are tiled or not).
- * If a window isn't tiled, nothing happens. If the resized window is tiled, auto-resize the complementing tiled windows.
- * Intercardinal resizing is split into its [H]orizontal and [V]ertical components.
+ * This class gets to handle the resize events of windows (wether they are
+ * tiled or not). If a window isn't tiled, nothing happens. If the resized
+ * window is tiled, auto-resize the complementing tiled windows. Intercardinal
+ * resizing is split into its [H]orizontal and [V]ertical components.
  */
 
 var Handler = class TilingResizeHandler {

@@ -6,14 +6,15 @@ const {Clutter, Meta, Shell, St} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const {DynamicKeybindings, Settings, Shortcuts} = Me.imports.src.common;
-const {Util} = Me.imports.src.utility;
+const {Util} = Me.imports.src.extension.utility;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
 /**
- * Class to handle keyboard shortcuts.
+ * Class to handle the keyboard shortcuts (on the extension side) except the
+ * ones related to the popupLayouts. For those, see popupLayoutsManager.js.
  */
 
 var Handler = class TilingKeybindingHandler {
@@ -70,7 +71,7 @@ var Handler = class TilingKeybindingHandler {
 
 		// tile editing mode
 		} else if (shortcutName === Shortcuts.EDIT_MODE) {
-			const TileEditingMode = Me.imports.src.tileEditingMode;
+			const TileEditingMode = Me.imports.src.extension.tileEditingMode;
 			const tileEditor = new TileEditingMode.TileEditor();
 			tileEditor.open();
 

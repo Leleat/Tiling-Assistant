@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="tiling-assistant@leleat-on-github">
-  <requires lib="gtk" version="4.0"/>
+  <requires lib="gtk+" version="3.24"/>
   <object class="GtkListStore" id="auto-tile-liststore">
     <columns>
       <column type="gint"/>
@@ -86,6 +86,12 @@
       <column type="gint"/>
     </columns>
   </object>
+  <object class="GtkListStore" id="search-popup-layout-liststore">
+    <columns>
+      <column type="gint"/>
+      <column type="gint"/>
+    </columns>
+  </object>
   <object class="GtkAdjustment" id="toggle-maximize-tophalf-timer-adjustment">
     <property name="lower">300</property>
     <property name="upper">1500</property>
@@ -110,7 +116,7 @@
     <property name="step-increment">2</property>
     <property name="page-increment">8</property>
   </object>
-  <object class="GtkNotebook" id="main_prefs">
+  <object class="GtkNotebook" id="main-prefs">
     <property name="vexpand">1</property>
     <property name="tab-pos">left</property>
     <property name="scrollable">1</property>
@@ -1030,6 +1036,124 @@ If there is no space, the window will either untile or maximize depending on wet
     <child>
       <object class="GtkNotebookPage">
         <property name="child">
+          <object class="GtkBox" id="popup-layouts">
+            <property name="visible">0</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">16</property>
+            <property name="margin-bottom">16</property>
+            <property name="orientation">vertical</property>
+            <child>
+              <object class="GtkBox">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">8</property>
+                <property name="margin-bottom">12</property>
+                <child>
+                  <object class="GtkLabel">
+                    <property name="valign">center</property>
+                    <property name="hexpand">1</property>
+                    <property name="label" translatable="yes">Search Popup Layout</property>
+                    <property name="xalign">0</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkTreeView" id="search-popup-layout-treeview">
+                    <property name="halign">end</property>
+                    <property name="valign">center</property>
+                    <property name="model">search-popup-layout-liststore</property>
+                    <property name="headers-visible">0</property>
+                    <property name="enable-search">0</property>
+                    <property name="search-column">0</property>
+                    <property name="hover-selection">1</property>
+                    <property name="activate-on-single-click">1</property>
+                    <child internal-child="selection">
+                      <object class="GtkTreeSelection"/>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="clear-button15">
+                    <property name="margin-start">4</property>
+                    <property name="has-frame">0</property>
+                    <property name="receives-default">1</property>
+                    <property name="valign">start</property>
+                    <property name="icon-name">edit-delete-symbolic</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkBox">
+                <property name="margin-start">12</property>
+                <property name="margin-end">12</property>
+                <property name="margin-top">12</property>
+                <property name="margin-bottom">12</property>
+                <property name="spacing">12</property>
+                <property name="homogeneous">1</property>
+                <child>
+                  <object class="GtkButton" id="save-layouts-button">
+                    <property name="receives-default">1</property>
+                    <property name="icon-name">media-floppy-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Save the layouts to the disk. Invalid changes will be lost!</property>
+                  </object>
+                </child>
+                <child>
+                  <object class="GtkButton" id="reload-layouts-button">
+                    <property name="receives-default">1</property>
+                    <property name="icon-name">view-refresh-symbolic</property>
+                    <property name="tooltip-text" translatable="yes">Reload the layouts from the disk - discarding all non-saved changes.</property>
+                  </object>
+                </child>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="vexpand">1</property>
+                <property name="child">
+                  <object class="GtkViewport">
+                    <property name="child">
+                      <object class="GtkListBox" id="layouts-listbox">
+                        <property name="selection-mode">none</property>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="add-layout-button">
+                <property name="receives-default">1</property>
+                <property name="margin-start">8</property>
+                <property name="margin-end">8</property>
+                <property name="margin-top">12</property>
+                <property name="icon-name">list-add-symbolic</property>
+              </object>
+            </child>
+          </object>
+        </property>
+        <property name="tab">
+          <object class="GtkLabel" id="popup-layouts-tab-label">
+            <property name="visible">0</property>
+            <property name="halign">start</property>
+            <property name="margin-start">8</property>
+            <property name="margin-end">8</property>
+            <property name="margin-top">8</property>
+            <property name="margin-bottom">8</property>
+            <property name="label" translatable="yes">Popup Layouts</property>
+          </object>
+        </property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkNotebookPage">
+        <property name="child">
           <object class="GtkBox">
             <property name="halign">center</property>
             <property name="margin-start">15</property>
@@ -1119,12 +1243,12 @@ please open an issue on Github.</property>
                 </child>
                 <child>
                   <object class="GtkLinkButton">
-                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
+                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md</property>
                     <property name="halign">center</property>
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">15</property>
                     <property name="use-underline">1</property>
-                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/GUIDE.md</property>
+                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md</property>
                   </object>
                 </child>
                 <child>
@@ -1140,12 +1264,12 @@ please open an issue on Github.</property>
                 </child>
                 <child>
                   <object class="GtkLinkButton">
-                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md</property>
                     <property name="halign">center</property>
                     <property name="margin-top">5</property>
                     <property name="margin-bottom">15</property>
                     <property name="use-underline">1</property>
-                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md</property>
                   </object>
                 </child>
               </object>
@@ -1210,6 +1334,32 @@ please open an issue on Github.</property>
                             <property name="margin-bottom">12</property>
                             <property name="label" translatable="yes">&lt;u&gt;&lt;b&gt;Hidden Settings&lt;/b&gt;&lt;/u&gt;</property>
                             <property name="use-markup">1</property>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow">
+                        <property name="child">
+                          <object class="GtkBox">
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="valign">center</property>
+                                <property name="hexpand">1</property>
+                                <property name="label" translatable="yes">Advanced / Experimental Settings</property>
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="enable-advanced-experimental-features">
+                                <property name="valign">center</property>
+                                <property name="active">1</property>
+                              </object>
+                            </child>
                           </object>
                         </property>
                       </object>

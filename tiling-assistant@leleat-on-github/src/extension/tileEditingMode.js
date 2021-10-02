@@ -4,7 +4,7 @@ const {Clutter, GObject, Meta, St} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const {Settings, Shortcuts} = Me.imports.src.common;
-const {Util} = Me.imports.src.utility;
+const {Util} = Me.imports.src.extension.utility;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -16,8 +16,8 @@ const MODES = {
 };
 
 /**
- * Classes for keyboard-driven (and only) tiling management.
- * It's entered via a keyboard shortcut.
+ * Classes for keyboard-driven (and only keyboard) tiling management.
+ * It's entered via a keyboard shortcut (in keybindingHandler.js).
  */
 
 var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget {
@@ -52,7 +52,7 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
 		const openWindows = Util.getOpenWindows();
 		if (openWindows.length === 0 || this._topTileGroup.length === 0) {
-			main.notify("Tiling Assistant", _("Can't enter 'Tile Editing Mode', if there isn't a tileGroup."));
+			main.notify("Tiling Assistant", _("Can't enter 'Tile Editing Mode', if there isn't a tileGroup visible."));
 			this.close();
 			return;
 		}
@@ -66,10 +66,10 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 		}
 
 		const gap = Settings.getInt(Settings.WINDOW_GAP);
-		const color = Settings.getString(Settings.TILE_EDITING_MODE_COLOR); // rgb(X,Y,Z)
+		const color = Settings.getString(Settings.TILE_EDITING_MODE_COLOR); // "rgb(X,Y,Z)"
 
 		// primary window is the focused window, which is operated on
-		this._primaryIndicator = new Indicator(`border: ${gap / 2 + 1}px solid ${color};`, gap);
+		this._primaryIndicator = new Indicator(`border: ${Math.max(gap / 2, 4)}px solid ${color};`, gap);
 		this._primaryIndicator.set_opacity(0);
 		this.add_child(this._primaryIndicator);
 
@@ -234,15 +234,15 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 				const openWindows = Util.getOpenWindows(Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY))
 						.filter(w => !this._topTileGroup.includes(w));
 				const rect = this._primaryIndicator.rect;
-				const TilingPopup = Me.imports.src.tilingPopup;
+				const TilingPopup = Me.imports.src.extension.tilingPopup;
 				const tilingPopup = new TilingPopup.TilingSwitcherPopup(openWindows, rect, false);
 				if (!tilingPopup.show(this._topTileGroup)) {
 					tilingPopup.destroy();
 					return;
 				}
 
-				tilingPopup.connect("tiling-finished", (popup, tilingCanceled) => {
-					if (tilingCanceled)
+				tilingPopup.connect("closed", (popup, canceled) => {
+					if (canceled)
 						return;
 
 					const {tiledWindow} = popup;
@@ -356,7 +356,7 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
 		if (this.currMode === MODES.SWAP
 				&& [Clutter.KEY_Control_L, Clutter.KEY_Control_R].includes(keyEvent.keyval)) {
-			// TODO kinda messy and difficult to use/activate since ctrl needs to be released first...
+			// TODO kinda messy code and difficult to use/activate since ctrl needs to be released first...
 			// try to [equalize] the size (width OR height) of the highlighted rectangles
 			// including the rectangles which are in the union of the 2 highlighted rects
 			if (keyEvent.modifier_state & Clutter.ModifierType.SHIFT_MASK) {

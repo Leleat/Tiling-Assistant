@@ -17,6 +17,7 @@ var Settings = class Settings {
 	static RESTORE_SIZE_ON = "restore-window-size-on";
 	static ENABLE_HOLD_INVERSE_LANDSCAPE = "enable-hold-maximize-inverse-landscape";
 	static ENABLE_HOLD_INVERSE_PORTRAIT = "enable-hold-maximize-inverse-portrait";
+	static ENABLE_ADV_EXP_SETTINGS = "enable-advanced-experimental-features";
 	static CURR_WORKSPACE_ONLY = "tiling-popup-current-workspace-only"
 	static TILE_EDITING_MODE_COLOR = "tile-editing-mode-color";
 	static SECONDARY_PREVIEW_ACTIVATOR = "secondary-tiling-preview-activator";
@@ -112,7 +113,7 @@ var Settings = class Settings {
 	};
 };
 
-// shortcut keys:
+// shortcut keys (except the ones related to the popupLayouts):
 var Shortcuts = class Shortcuts {
 
 	static TOGGLE_POPUP = "toggle-tiling-popup";
@@ -171,4 +172,98 @@ var AlternatePreviewMod = class SecondaryPreviewActivator {
 	static CTRL = "Ctrl";
 	static ALT = "Alt";
 	static RMB = "RMB";
+};
+
+// Data structures for popup layouts.
+// See src/prefs/layoutsPrefs.js for details on layouts.
+var Layout = class Layout {
+
+	// @layout is the parsed object from a json file.
+	constructor(layout = null) {
+		this._name = layout?._name ?? "";
+		this._items = layout?._items ?? [];
+	};
+
+	getName() {
+		return this._name;
+	};
+
+	setName(name) {
+		this._name = name;
+	};
+
+	getItem(index) {
+		return this._items[index];
+	};
+
+	addItem(item = null) {
+		item = item ?? new LayoutItem();
+		this._items.push(item)
+		return item;
+	};
+
+	removeItem(index) {
+		return this._items.splice(index, 1);
+	};
+
+	getItems(filterOutEmptyRects = true) {
+		return filterOutEmptyRects
+			? this._items.filter(i => Object.keys(i.rect).length === 4)
+			: this._items;
+	};
+
+	setItems(items) {
+		this._items = items;
+	};
+
+	getItemCount(filterOutEmptyRects = false) {
+		return filterOutEmptyRects
+				? this.getItems().length
+				: this._items.length;
+	};
+
+	// @returns [ok, errMsg, idx of the problematic rect]
+	// This check is for the entire layout and goes further than just
+	// the format check of an individual item (via the prefs gui). For example,
+	// we also check that the rects don't overlap each other, don't extend
+	// outside of the screen etc...
+	validate() {
+		const rects = this.getItems().map(i => i.rect);
+		if (rects.length === 0)
+			return [false, "No valid rectangles defined.", -1];
+
+		const getOverlapArea = function(r1, r2) {
+			return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
+					* Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+		};
+
+		for (let i = 0; i < rects.length; i++) {
+			const rect = rects[i];
+
+			if (rect.width <= 0 || rect.width > 1)
+				return [false, `Rectangle ${i} has an invalid width.`, i];
+
+			if (rect.height <= 0 || rect.height > 1)
+				return [false, `Rectangle ${i} has an invalid height.`, i];
+
+			if (rect.x < 0 || rect.y < 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
+				return [false, `Rectangle ${i} extends beyond the screen.`, i];
+
+			for (let j = i + 1; j < rects.length; j++) {
+				if (getOverlapArea(rect, rects[j]) !== 0)
+					return [false, `Rectangles ${i} and ${j} overlap.`, j];
+			}
+		}
+
+		return [true, "", -1];
+	};
+};
+
+var LayoutItem = class LayoutItem {
+
+	constructor() {
+		this.rect = {};
+		this.appId = null;
+		this.loopType = "";
+	};
 };

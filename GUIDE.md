@@ -16,7 +16,7 @@
 
 ### Mouse-driven Workflow
 
-Dragging a window to the screen edges or quarters will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted (for landscape or portrait displays separately).
+Dragging a window to the screen edges or corners will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted (for landscape or portrait displays separately).
 
 Holding `Ctrl` when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space. Hovering at the very edges will affect multiple windows.
 
@@ -24,7 +24,7 @@ Holding `Ctrl` when moving a window over a tiled window, will make the grabbed w
 
 ### Keyboard-driven Workflow
 
-Use the the shortcuts from the `Keybindings` settings and the [Tile Editing Mode](#Tile-Editing-Mode).
+Use the the shortcuts from the `Keybindings` settings, the [Popup Layouts](#Popup-Layouts) and the [Tile Editing Mode](#Tile-Editing-Mode).
 
 ## Terminology
 
@@ -58,13 +58,17 @@ Hitting `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free sc
 
 ### Popup Layouts
 
-A Popup Layout consists of a list of arbitrary rectangles. When activating a popup layout, the tiling popup will ask you which of the open windows you want in which rectangle of your layout. Read the tooltip in the `Popup Layouts` settings to understand how to set them up.
+A 'Popup Layout' has a name and a list of rectangles with optional apps and loopTypes attached to each rectangle. If you activate a layout, you will spawn a Tiling Popup (hence the name 'Popup Layout') at each rectangle - one after the other. If you attached an app to the rectangle, instead of calling the Tiling Popup, a new instance of the app will be opened and tiled in that spot. If you set a loopType, you will keep tiling windows to that one rectangle and make them share that space evenly. This way you can setup layouts similiar to "Master and Stack". Any rectangle can have a loopType set.
 
-The `Popup Layout Selector` enables you to search for layouts by name. That means you don't have to remember their keybindings.
-
-The settings for the `Popup Layouts` are [hidden](#Hidden-Settings) by default.
+You define rectangles by entering their `x` and `y` coordinate as well as their `width` and `height` into a text field separated by `--`. They are floating point values and can range from 0 to 1. The point (0,0) represents the top-left of your workspace and (1,1) the bottom-right. A loopType is set by appending `--h` or `--v` to the text field for a horizontal and a vertical loop respectively. You can attach an app by using the `add button` to the right of a text field. It acts like a toggle. If you already attached an app to it, clicking it again, will remove the app. Here is an example. The text field at row 0 defines a horizontal loop (`.5--0--.5--.5--h`) for the top-right quarter of my workspace and row 1 defines a non-looped rectangle (`.5--.5--.5--.5`) at the bottom-right quarter with an app (`Calender`) attached to it.
 
 ![](media/Guide_layouts.gif)
+
+The `Search Popup Layout` keybinding enables you to activate layouts by name. That means you don't have to remember or set their keyboard shortcut. Here you can see it in action.
+
+![](media/Guide_layouts2.gif)
+
+By default, the `Popup Layouts` are [hidden](#Hidden-Settings) behind the 'Advanced / Experimental Settings'.
 
 ### Hidden Settings
 

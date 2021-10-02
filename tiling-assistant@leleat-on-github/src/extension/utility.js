@@ -1,7 +1,7 @@
 "use strict";
 
 const {altTab, main} = imports.ui;
-const {Clutter, Meta, Shell, St} = imports.gi;
+const {Clutter, GLib, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -10,7 +10,8 @@ const {Settings, Shortcuts} = Me.imports.src.common;
 const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 
 /**
- * Library of commonly used functions for the extension.js' files (and not prefs)
+ * Library of commonly used functions for the extension.js' files
+ * (and *not* the prefs files)
  */
 
 var Util = class Utility {
@@ -662,10 +663,45 @@ var Util = class Utility {
 		if (!freeScreenSpace)
 			return;
 
-		const TilingPopup = Me.imports.src.tilingPopup;
+		const TilingPopup = Me.imports.src.extension.tilingPopup;
 		const popup = new TilingPopup.TilingSwitcherPopup(openWindows, freeScreenSpace);
 		if (!popup.show(topTileGroup))
 			popup.destroy();
+	};
+
+	static openAppTiled(app, rect, openTilingPopup = false) {
+		if (!app.can_open_new_window())
+			return;
+
+		let sId = global.display.connect("window-created", (display, window) => {
+			const disconnectWindowCreateSignal = () => {
+				global.display.disconnect(sId);
+				sId = 0;
+			};
+
+			const firstFrameId = window.get_compositor_private().connect("first-frame", () => {
+				window.get_compositor_private().disconnect(firstFrameId);
+				const openedWindowApp = Shell.WindowTracker.get_default().get_window_app(window);
+				// check, if the created window is from the app and if it allows to be moved and resized
+				// because (for example) Steam uses a WindowType.Normal window for their loading screen,
+				// which we don't want to trigger the tiling for
+				if (sId && openedWindowApp && openedWindowApp === app
+						&& ((window.allows_resize() && window.allows_move()) || window.get_maximized())) {
+					disconnectWindowCreateSignal();
+					this.tile(window, rect, openTilingPopup, true);
+				}
+			});
+
+			// don't immediately disconnect the signal in case the launched window doesn't match the original app
+			// since it may be a loading screen or the user started an app inbetween etc... (see above)
+			// but in case the check above fails disconnect signal after 1 min at the latest
+			GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
+				sId && disconnectWindowCreateSignal();
+				return GLib.SOURCE_REMOVE;
+			});
+		});
+
+		app.open_new_window(-1);
 	};
 
 	static updateTileGroup(tileGroup) {

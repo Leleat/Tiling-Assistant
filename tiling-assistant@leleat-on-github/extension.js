@@ -23,8 +23,9 @@ const {Gio, GLib, Meta} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const {Settings} = Me.imports.src.common;
-const {Util} = Me.imports.src.utility;
+
+let Settings;
+let Util;
 
 /**
  * 2 entry points:
@@ -36,18 +37,23 @@ const {Util} = Me.imports.src.utility;
  */
 
 function init() {
+	ExtensionUtils.initTranslations(Me.metadata.uuid);
 };
 
 function enable() {
+	Settings = Me.imports.src.common.Settings;
 	Settings.initialize();
+	Util = Me.imports.src.extension.utility.Util;
 	Util.initialize();
 
-	const MoveHandler = Me.imports.src.moveHandler;
+	const MoveHandler = Me.imports.src.extension.moveHandler;
 	this._moveHandler = new MoveHandler.Handler();
-	const ResizeHandler = Me.imports.src.resizeHandler;
+	const ResizeHandler = Me.imports.src.extension.resizeHandler;
 	this._resizeHandler = new ResizeHandler.Handler();
-	const KeybindingHandler = Me.imports.src.keybindingHandler;
+	const KeybindingHandler = Me.imports.src.extension.keybindingHandler;
 	this._keybindingHandler = new KeybindingHandler.Handler();
+	const PopupLayoutsManager = Me.imports.src.extension.popupLayoutsManager;
+	this._popupLayoutsManager = new PopupLayoutsManager.LayoutManager();
 
 	// disable native tiling
 	this._gnomeMutterSettings = ExtensionUtils.getSettings("org.gnome.mutter");
@@ -82,8 +88,13 @@ function disable() {
 	_saveBeforeSessionLock();
 
 	this._moveHandler.destroy();
+	this._moveHandler = null;
 	this._resizeHandler.destroy();
+	this._resizeHandler = null;
 	this._keybindingHandler.destroy();
+	this._keybindingHandler = null;
+	this._popupLayoutsManager.destroy();
+	this._popupLayoutsManager = null;
 
 	Util.destroy();
 	Settings.destroy();

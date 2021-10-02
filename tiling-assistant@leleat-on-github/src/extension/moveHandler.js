@@ -6,14 +6,14 @@ const {Clutter, GLib, Meta} = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 const {RestoreOn, AlternatePreviewMod, Settings, Shortcuts} = Me.imports.src.common;
-const {Util} = Me.imports.src.utility;
+const {Util} = Me.imports.src.extension.utility;
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
- * If the moved window is tiled at the start of the grab, untile it. This is done by
- * releasing the grab via code, resizing the window, and then restarting the grab via code.
- * On wayland this may not be reliable. As a workaround there is a setting to restore
- * a tiled window's size on the actual grab end.
+ * If the moved window is tiled at the start of the grab, untile it. This is
+ * done by releasing the grab via code, resizing the window, and then restarting
+ * the grab via code. On wayland this may not be reliable. As a workaround there
+ * is a setting to restore a tiled window's size on the actual grab end.
  */
 
 var Handler = class TilingMoveHandler {

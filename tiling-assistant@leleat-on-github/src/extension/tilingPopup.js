@@ -5,7 +5,7 @@ const {Clutter, GObject, Meta, Shell, St} = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const {Util} = Me.imports.src.utility;
+const {Util} = Me.imports.src.extension.utility;
 
 /**
  * Classes for the tiling popup, which opens when tiling a window
@@ -15,7 +15,7 @@ const {Util} = Me.imports.src.utility;
 
 var TilingSwitcherPopup = GObject.registerClass({
 	Signals: {
-		"tiling-finished": {param_types: [GObject.TYPE_BOOLEAN]} // tilingCanceled
+		"closed": { param_types: [GObject.TYPE_BOOLEAN] } // canceled
 	},
 }, class TilingSwitcherPopup extends switcherPopup.SwitcherPopup {
 	// @allowConsecutivePopup means wether the window that is tiled with the popup
@@ -273,7 +273,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 
 	fadeAndDestroy() {
 		const tilingCanceled = !this.tiledWindow;
-		this.emit("tiling-finished", tilingCanceled);
+		this.emit("closed", tilingCanceled);
 
 		this._shadeBG && this._shadeBG.destroy();
 		this._shadeBG = null;

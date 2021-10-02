@@ -19,6 +19,9 @@
 	</enum>
 
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
+
+		<!-- General Tab -->
+
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
 		</key>
@@ -43,6 +46,9 @@
 		<key name="enable-hold-maximize-inverse-portrait" type="b">
 			<default>false</default>
 		</key>
+
+		<!-- Keybindings Tab -->
+
 		<key name="toggle-tiling-popup" type="as">
 			<default>[]</default>
 		</key>
@@ -78,6 +84,80 @@
 		</key>
 		<key name="tile-bottomright-quarter" type="as">
 			<default><![CDATA[['<Super>KP_3']]]></default>
+		</key>
+
+		<!-- Popup Layouts Tab -->
+		<!-- Hidden by default unless the advanced / experimental settings are enabled.
+		The number of layouts / shortcuts are hardcoded / limited to 20 -->
+
+		<key name="search-popup-layout" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout0" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout1" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout2" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout3" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout4" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout5" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout6" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout7" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout8" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout9" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout10" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout11" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout12" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout13" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout14" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout15" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout16" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout17" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout18" type="as">
+			<default>[]</default>
+		</key>
+		<key name="activate-layout19" type="as">
+			<default>[]</default>
+		</key>
+
+		<!-- Hidden Settings Tab -->
+
+		<key name="enable-advanced-experimental-features" type="b">
+			<default>false</default>
 		</key>
 		<key name="tiling-popup-current-workspace-only" type="b">
 			<default>true</default>
