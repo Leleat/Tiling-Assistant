@@ -285,7 +285,7 @@
               </object>
             </child>
             <child>
-              <object class="GtkListBoxRow">
+              <object class="GtkListBoxRow" id="restore-window-size-on-row">
                 <property name="child">
                   <object class="GtkBox">
                     <property name="margin-start">12</property>
@@ -541,9 +541,7 @@ If that is the case, you can try &apos;Restore Window Size on Grab End&apos; ins
                                     </child>
                                     <child>
                                       <object class="GtkImage">
-                                        <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space as good as possible based on the tiled windows around it.
-
-If there is no space, the window will either untile or maximize depending on wether it&apos;s currently tiled.</property>
+                                        <property name="tooltip-text" translatable="yes">The focused window will try to fill the free screen space as good as possible based on the tiled windows around it.</property>
                                         <property name="margin-start">12</property>
                                         <property name="icon-name">dialog-information-symbolic</property>
                                       </object>

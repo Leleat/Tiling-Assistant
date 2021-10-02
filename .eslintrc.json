@@ -1,0 +1,81 @@
+{
+    "env": {
+        "es2021": true
+    },
+    "extends": "eslint:recommended",
+    "parserOptions": {
+        "ecmaVersion": "latest"
+    },
+    "rules": {
+        "array-bracket-spacing": [
+            "error",
+            "never"
+        ],
+        "comma-dangle": "error",
+        "comma-spacing": [
+            "error",
+            {
+                "before": false,
+                "after": true
+            }
+        ],
+        "eol-last": [
+            "error",
+            "always"
+        ],
+        "func-call-spacing": [
+            "error",
+            "never"
+        ],
+        "indent": [
+            "error",
+            4,
+            {
+                "FunctionExpression": {
+                    "parameters": 2
+                }
+            }
+        ],
+        "linebreak-style": [
+            "error",
+            "unix"
+        ],
+        "no-empty": [
+            "error",
+            { "allowEmptyCatch": true }
+        ],
+        "no-extra-boolean-cast": "off",
+        "no-implicit-coercion": [
+            "error",
+            { "allow": ["!!"] }
+        ],
+        "no-multiple-empty-lines": "error",
+        "no-multi-spaces": "error",
+        "no-trailing-spaces": "error",
+        "no-undef": "error",
+        "no-unneeded-ternary": "error",
+        "no-unused-vars": "error",
+        "object-curly-spacing": [
+            "error",
+            "always"
+        ],
+        "quotes": [
+            "error",
+            "single",
+            { "avoidEscape": true }
+        ],
+        "semi": [
+            "error",
+            "always"
+        ],
+        "space-before-blocks": [
+            "error",
+            "always"
+        ]
+    },
+    "globals": {
+        "imports": "readonly",
+        "global": "readonly",
+        "log": "readonly"
+    }
+}

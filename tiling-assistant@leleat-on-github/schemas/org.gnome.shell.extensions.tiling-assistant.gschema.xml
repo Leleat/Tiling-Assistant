@@ -90,6 +90,9 @@
 		<!-- Hidden by default unless the advanced / experimental settings are enabled.
 		The number of layouts / shortcuts are hardcoded / limited to 20 -->
 
+		<key name="import-layout-examples" type="b">
+			<default>true</default>
+		</key>
 		<key name="search-popup-layout" type="as">
 			<default>[]</default>
 		</key>

@@ -1,4 +1,17 @@
-.layout-search-highlight {
+.popup-layout-search-highlight {
     background-color: rgba(255, 255, 255, .1);
     border-radius: 16px;
+}
+
+.tile-editing-mode-active-marker {
+    border: 5px solid rgb(27, 106, 203);
+    background-color: rgba(27, 106, 203, 0.3);
+}
+
+.tile-editing-mode-inactive-marker {
+    background-color: rgba(20, 86, 167, 0.8);
+}
+
+.tile-editing-mode-anchor-marker {
+    background-color: rgba(27, 106, 203, 0.3);
 }

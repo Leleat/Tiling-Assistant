@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-04 00:47+0200\n"
+"POT-Creation-Date: 2021-10-08 01:15+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: laichiaheng\n"
 "Language-Team: None\n"
@@ -300,45 +300,49 @@ msgstr ""
 msgid "Debugging: Show Free Screen Rects"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:58
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:62
 msgid "Tiling popup enabled"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:58
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:63
 msgid "Tiling popup was disabled"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:87
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:88
 msgid "No valid popup layouts defined."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:158
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:178
 msgid "Popup Layouts: App not found."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:307
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:315
 msgid "Type to search..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:415
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:423
 msgid "Nameless layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:55
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:58
 msgid "Can't enter 'Tile Editing Mode', if there isn't a tileGroup visible."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:308
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:298
 msgid ""
 "Can't resize in that direction. Super + Directions resizes on the S and E "
 "side. Super + Shift + Directions on the N and W side."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:101
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:95
 msgid "Nameless Layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:313
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:170
+msgid "Layout"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:310
 msgid "Check out the 'Guide' in the repository (see the 'Help' Tab)."
 msgstr ""
 

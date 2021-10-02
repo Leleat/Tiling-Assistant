@@ -1,435 +1,454 @@
-"use strict";
+'use strict';
 
-const {altTab, main, switcherPopup} = imports.ui;
-const {Clutter, GObject, Meta, Shell, St} = imports.gi;
+const { Clutter, GObject, Meta, Shell, St } = imports.gi;
+const { altTab: AltTab, main: Main, switcherPopup: SwitcherPopup } = imports.ui;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const {Util} = Me.imports.src.extension.utility;
+
+const { Direction, Orientation } = Me.imports.src.common;
+const Util = Me.imports.src.extension.utility.Util;
 
 /**
- * Classes for the tiling popup, which opens when tiling a window
+ * Classes for the Tiling Popup, which opens when tiling a window
  * and there is free screen space to fill with other windows.
  * Mostly based on GNOME's altTab.js
  */
 
-var TilingSwitcherPopup = GObject.registerClass({
-	Signals: {
-		"closed": { param_types: [GObject.TYPE_BOOLEAN] } // canceled
-	},
-}, class TilingSwitcherPopup extends switcherPopup.SwitcherPopup {
-	// @allowConsecutivePopup means wether the window that is tiled with the popup
-	// may cause the popup to appear again (for ex. when holding Shift/Alt when activating an icon)
-	_init(openWindows, freeScreenRect, allowConsecutivePopup = true) {
-		this._freeScreenRect = freeScreenRect;
-		this._shadeBG = null;
+var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unused-vars
+    Signals: {
+        // Bool indicates wether the Tiling Popup was canceled
+        // (or if a window was tiled with this popup)
+        'closed': { param_types: [GObject.TYPE_BOOLEAN] }
+    }
+}, class TilingSwitcherPopup extends SwitcherPopup.SwitcherPopup {
 
-		super._init();
+    /**
+     * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
+     *      popup offers to tile.
+     * @param {Rect} freeScreenRect the Rect, which the popup will tile a window
+     *      to. The popup will be centered in this rect.
+     * @param {boolean} allowConsecutivePopup allow the popup to create another
+     *      Tiling Popup, if there is still unambiguous free screen space after
+     *      this popup tiled a window.
+     */
+    _init(openWindows, freeScreenRect, allowConsecutivePopup = true) {
+        this._freeScreenRect = freeScreenRect;
+        this._shadeBG = null;
 
-		this._thumbnails = null;
-		this._thumbnailTimeoutId = 0;
-		this._currentWindow = -1;
-		this.thumbnailsVisible = false;
-		// the window, which is going to be tiled with this popup (or null, if canceled)
-		this.tiledWindow = null;
-		this._allowConsecutivePopup = allowConsecutivePopup;
+        super._init();
 
-		const apps = Shell.AppSystem.get_default().get_running();
-		this._switcherList = new TSwitcherList(openWindows, apps, this);
-		this._items = this._switcherList.icons;
+        this._thumbnails = null;
+        this._thumbnailTimeoutId = 0;
+        this._currentWindow = -1;
+        this.thumbnailsVisible = false;
+        // The window, which was tiled with the Tiling Popup after it's closed
+        // or null, if the popup was closed with tiling a window
+        this.tiledWindow = null;
+        this._allowConsecutivePopup = allowConsecutivePopup;
 
-		// destroy popup when touching outside of popup
-		this.connect("touch-event", (actor, event) => {
-			if (Meta.is_wayland_compositor())
-				this.fadeAndDestroy();
+        const apps = Shell.AppSystem.get_default().get_running();
+        this._switcherList = new TSwitcherList(openWindows, apps, this);
+        this._items = this._switcherList.icons;
 
-			return Clutter.EVENT_PROPAGATE;
-		});
-	};
+        // Destroy popup when touching outside of popup
+        this.connect('touch-event', () => {
+            if (Meta.is_wayland_compositor())
+                this.fadeAndDestroy();
 
-	// when showing the tiling popup the background will be shaded for easier visibility.
-	// @tileGroup determines, which windows will be above the shading widget.
-	// when tiling "normally", the tileGroup is simply the same as Util.getTopTileGroup...
-	show(tileGroup) {
-		if (this._items.length === 0)
-			return false;
+            return Clutter.EVENT_PROPAGATE;
+        });
+    }
 
-		if (!main.pushModal(this)) {
-			// Probably someone else has a pointer grab, try again with keyboard only
-			if (!main.pushModal(this, {options: Meta.ModalOptions.POINTER_ALREADY_GRABBED}))
-				return false;
-		}
+    /**
+     * @param {Array} tileGroup an array of Meta.Windows. When the popup
+     *      appears it will shade the background. These windows will won't
+     *      be affected by that.
+     * @returns if the popup was successfully shown.
+     */
+    show(tileGroup) {
+        if (!this._items.length)
+            return false;
 
-		this._haveModal = true;
+        if (!Main.pushModal(this)) {
+            // Probably someone else has a pointer grab, try again with keyboard
+            const alreadyGrabbed = Meta.ModalOptions.POINTER_ALREADY_GRABBED;
+            if (!Main.pushModal(this, { options: alreadyGrabbed }))
+                return false;
+        }
 
-		this._switcherList.connect('item-activated', this._itemActivated.bind(this));
-		this._switcherList.connect('item-entered', this._itemEntered.bind(this));
-		this._switcherList.connect('item-removed', this._itemRemoved.bind(this));
-		this.add_actor(this._switcherList);
+        this._haveModal = true;
 
-		// Need to force an allocation so we can figure out
-		// whether we need to scroll when selecting
-		this.visible = true;
-		this.get_allocation_box();
+        this._switcherList.connect('item-activated', this._itemActivated.bind(this));
+        this._switcherList.connect('item-entered', this._itemEntered.bind(this));
+        this._switcherList.connect('item-removed', this._itemRemoved.bind(this));
+        this.add_actor(this._switcherList);
 
-		this._select(0);
+        // Need to force an allocation so we can figure out
+        // whether we need to scroll when selecting
+        this.visible = true;
+        this.get_allocation_box();
 
-		main.osdWindowManager.hideAll();
+        this._select(0);
 
-		this._shadeBackground(tileGroup);
-		this.opacity = 0;
-		this.ease({
-			opacity: 255,
-			duration: 200,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD
-		});
+        Main.osdWindowManager.hideAll();
 
-		return true;
-	};
+        this._shadeBackground(tileGroup);
+        this.opacity = 0;
+        this.ease({
+            opacity: 255,
+            duration: 200,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
 
-	_shadeBackground(tileGroup) {
-		const lastTiledWindow = tileGroup[0];
-		const activeWs = global.workspace_manager.get_active_workspace();
-		const workArea = lastTiledWindow?.get_work_area_for_monitor(lastTiledWindow.get_monitor())
-				?? activeWs.get_work_area_for_monitor(global.display.get_current_monitor());
+        return true;
+    }
 
-		this._shadeBG = new St.Widget({
-			style: "background-color : black",
-			x: workArea.x,
-			y: workArea.y,
-			width: workArea.width,
-			height: workArea.height,
-			opacity: 0
-		});
-		global.window_group.add_child(this._shadeBG);
-		this._shadeBG.ease({
-			opacity: 180,
-			duration: 200,
-			mode: Clutter.AnimationMode.EASE_OUT_QUAD
-		});
+    _shadeBackground(tileGroup) {
+        const tiledWindow = tileGroup[0];
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const mon = tiledWindow?.get_monitor();
+        const currMon = global.display.get_current_monitor();
+        const workArea = tiledWindow?.get_work_area_for_monitor(mon)
+                ?? activeWs.get_work_area_for_monitor(currMon);
 
-		if (!lastTiledWindow)
-			return;
+        this._shadeBG = new St.Widget({
+            style: 'background-color : black',
+            x: workArea.x,
+            y: workArea.y,
+            width: workArea.width,
+            height: workArea.height,
+            opacity: 0
+        });
+        global.window_group.add_child(this._shadeBG);
+        this._shadeBG.ease({
+            opacity: 180,
+            duration: 200,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
 
-		// clones to correctly shade the background for consecutive tiling.
-		for (let i = 1; i < tileGroup.length; i++) {
-			const wActor = tileGroup[i].get_compositor_private();
-			const clone = new Clutter.Clone({
-				source: wActor,
-				x: wActor.x,
-				y: wActor.y
-			});
-			global.window_group.add_child(clone);
-			wActor.hide();
-			this.connect("destroy", () => {
-				wActor.show();
-				clone.destroy();
-			});
-		}
+        if (!tiledWindow)
+            return;
 
-		const tiledWindowActor = lastTiledWindow.get_compositor_private();
-		global.window_group.set_child_above_sibling(tiledWindowActor, this._shadeBG);
-	};
+        // Clones to correctly shade the background for consecutive tiling.
+        for (let i = 1; i < tileGroup.length; i++) {
+            const wActor = tileGroup[i].get_compositor_private();
+            const clone = new Clutter.Clone({
+                source: wActor,
+                x: wActor.x,
+                y: wActor.y
+            });
+            global.window_group.add_child(clone);
+            wActor.hide();
+            this.connect('destroy', () => {
+                wActor.show();
+                clone.destroy();
+            });
+        }
 
-	vfunc_allocate(box) {
-		this.set_allocation(box);
+        const tActor = tiledWindow.get_compositor_private();
+        global.window_group.set_child_above_sibling(tActor, this._shadeBG);
+    }
 
-		const freeScreenRect = this._freeScreenRect;
-		const childBox = new Clutter.ActorBox();
+    vfunc_allocate(box) {
+        this.set_allocation(box);
 
-		const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
-		const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
-		const hPadding = leftPadding + rightPadding;
+        const freeScreenRect = this._freeScreenRect;
+        const childBox = new Clutter.ActorBox();
 
-		const [, childNaturalHeight] = this._switcherList.get_preferred_height(
-				freeScreenRect.width - hPadding);
-		const [, childNaturalWidth] = this._switcherList.get_preferred_width(childNaturalHeight);
+        const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
+        const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
+        const hPadding = leftPadding + rightPadding;
 
-		childBox.x1 = Math.max(freeScreenRect.x + leftPadding
-			, freeScreenRect.x + Math.floor((freeScreenRect.width - childNaturalWidth) / 2));
-		childBox.x2 = Math.min(freeScreenRect.x + freeScreenRect.width - rightPadding
-				, childBox.x1 + childNaturalWidth);
-		childBox.y1 = freeScreenRect.y + Math.floor((freeScreenRect.height - childNaturalHeight) / 2);
-		childBox.y2 = childBox.y1 + childNaturalHeight;
+        const [, childNaturalHeight] = this._switcherList.get_preferred_height(
+            freeScreenRect.width - hPadding);
+        const [, childNaturalWidth] = this._switcherList.get_preferred_width(childNaturalHeight);
 
-		this._switcherList.allocate(childBox);
+        childBox.x1 = Math.max(freeScreenRect.x + leftPadding,
+            freeScreenRect.x + Math.floor((freeScreenRect.width - childNaturalWidth) / 2));
+        childBox.x2 = Math.min(freeScreenRect.x2 - rightPadding,
+            childBox.x1 + childNaturalWidth);
+        childBox.y1 = freeScreenRect.y + Math.floor((freeScreenRect.height - childNaturalHeight) / 2);
+        childBox.y2 = childBox.y1 + childNaturalHeight;
 
-		if (this._thumbnails) {
-			const childBox = this._switcherList.get_allocation_box();
-			const focusedWindow = global.display.focus_window;
-			const monitor = global.display.get_monitor_geometry(
-				focusedWindow?.get_monitor() ?? global.display.get_current_monitor()
-			);
+        this._switcherList.allocate(childBox);
 
-			const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
-			const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
-			const bottomPadding = this.get_theme_node().get_padding(St.Side.BOTTOM);
-			const hPadding = leftPadding + rightPadding;
+        if (this._thumbnails) {
+            const childBox = this._switcherList.get_allocation_box();
+            const focusedWindow = global.display.focus_window;
+            const monitor = global.display.get_monitor_geometry(
+                focusedWindow?.get_monitor() ?? global.display.get_current_monitor()
+            );
 
-			const icon = this._items[this._selectedIndex];
-			const [posX] = icon.get_transformed_position();
-			const thumbnailCenter = posX + icon.width / 2;
-			const [, childNaturalWidth] = this._thumbnails.get_preferred_width(-1);
-			childBox.x1 = Math.max(monitor.x + leftPadding
-				, Math.floor(thumbnailCenter - childNaturalWidth / 2)
-			);
-			if (childBox.x1 + childNaturalWidth > monitor.x + monitor.width - hPadding) {
-				const offset = childBox.x1 + childNaturalWidth - monitor.width + hPadding;
-				childBox.x1 = Math.max(monitor.x + leftPadding, childBox.x1 - offset - hPadding);
-			}
+            const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
+            const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
+            const bottomPadding = this.get_theme_node().get_padding(St.Side.BOTTOM);
+            const hPadding = leftPadding + rightPadding;
 
-			const spacing = this.get_theme_node().get_length('spacing');
+            const icon = this._items[this._selectedIndex];
+            const [posX] = icon.get_transformed_position();
+            const thumbnailCenter = posX + icon.width / 2;
+            const [, childNaturalWidth] = this._thumbnails.get_preferred_width(-1);
+            childBox.x1 = Math.max(monitor.x + leftPadding,
+                Math.floor(thumbnailCenter - childNaturalWidth / 2)
+            );
+            if (childBox.x1 + childNaturalWidth > monitor.x + monitor.width - hPadding) {
+                const offset = childBox.x1 + childNaturalWidth - monitor.width + hPadding;
+                childBox.x1 = Math.max(monitor.x + leftPadding, childBox.x1 - offset - hPadding);
+            }
 
-			childBox.x2 = childBox.x1 +  childNaturalWidth;
-			if (childBox.x2 > monitor.x + monitor.width - rightPadding)
-				childBox.x2 = monitor.x + monitor.width - rightPadding;
-			childBox.y1 = this._switcherList.allocation.y2 + spacing;
-			this._thumbnails.addClones(monitor.y + monitor.height - bottomPadding - childBox.y1);
-			const [, childNaturalHeight] = this._thumbnails.get_preferred_height(-1);
-			childBox.y2 = childBox.y1 + childNaturalHeight;
+            const spacing = this.get_theme_node().get_length('spacing');
 
-			this._thumbnails.allocate(childBox);
-		}
-	};
+            childBox.x2 = childBox.x1 + childNaturalWidth;
+            if (childBox.x2 > monitor.x + monitor.width - rightPadding)
+                childBox.x2 = monitor.x + monitor.width - rightPadding;
+            childBox.y1 = this._switcherList.allocation.y2 + spacing;
+            this._thumbnails.addClones(monitor.y + monitor.height - bottomPadding - childBox.y1);
+            const [, childNaturalHeight] = this._thumbnails.get_preferred_height(-1);
+            childBox.y2 = childBox.y1 + childNaturalHeight;
 
-	vfunc_button_press_event(buttonEvent) {
-		if (buttonEvent.button === Clutter.BUTTON_MIDDLE
-				|| buttonEvent.button === Clutter.BUTTON_SECONDARY) {
-			this._finish(global.get_current_time());
-			return Clutter.EVENT_PROPAGATE;
-		}
+            this._thumbnails.allocate(childBox);
+        }
+    }
 
-		return super.vfunc_button_press_event(buttonEvent);
-	};
+    vfunc_button_press_event(buttonEvent) {
+        const btn = buttonEvent.button;
+        if ( btn === Clutter.BUTTON_MIDDLE || btn === Clutter.BUTTON_SECONDARY) {
+            this._finish(global.get_current_time());
+            return Clutter.EVENT_PROPAGATE;
+        }
 
-	_nextWindow() {
-		return altTab.AppSwitcherPopup.prototype._nextWindow.apply(this);
-	};
+        return super.vfunc_button_press_event(buttonEvent);
+    }
 
-	_previousWindow() {
-		return altTab.AppSwitcherPopup.prototype._previousWindow.apply(this);
-	};
+    _nextWindow() {
+        return AltTab.AppSwitcherPopup.prototype._nextWindow.apply(this);
+    }
 
-	_keyPressHandler(keysym, action) {
-		const moveUp = Util.isDirection(keysym, Meta.MotionDirection.UP);
-		const moveDown = Util.isDirection(keysym, Meta.MotionDirection.DOWN);
-		const moveLeft = Util.isDirection(keysym, Meta.MotionDirection.LEFT);
-		const moveRight = Util.isDirection(keysym, Meta.MotionDirection.RIGHT);
+    _previousWindow() {
+        return AltTab.AppSwitcherPopup.prototype._previousWindow.apply(this);
+    }
 
-		if (this._thumbnailsFocused) {
-			if (moveLeft)
-				this._select(this._selectedIndex, this._previousWindow());
-			else if (moveRight)
-				this._select(this._selectedIndex, this._nextWindow());
-			else if (moveUp || moveDown)
-				this._select(this._selectedIndex, null, true);
-			else
-				return Clutter.EVENT_PROPAGATE;
-		} else if (moveLeft) {
-			this._select(this._previous());
-		} else if (moveRight) {
-			this._select(this._next());
-		} else if (moveDown || moveUp) {
-			this._select(this._selectedIndex, 0);
-		} else {
-			return Clutter.EVENT_PROPAGATE;
-		}
+    _keyPressHandler(keysym) {
+        const moveUp = Util.isDirection(keysym, Direction.N);
+        const moveDown = Util.isDirection(keysym, Direction.S);
+        const moveLeft = Util.isDirection(keysym, Direction.W);
+        const moveRight = Util.isDirection(keysym, Direction.E);
 
-		return Clutter.EVENT_STOP;
-	};
+        if (this._thumbnailsFocused) {
+            if (moveLeft)
+                this._select(this._selectedIndex, this._previousWindow());
+            else if (moveRight)
+                this._select(this._selectedIndex, this._nextWindow());
+            else if (moveUp || moveDown)
+                this._select(this._selectedIndex, null, true);
+            else
+                return Clutter.EVENT_PROPAGATE;
+        } else if (moveLeft) {
+            this._select(this._previous());
+        } else if (moveRight) {
+            this._select(this._next());
+        } else if (moveDown || moveUp) {
+            this._select(this._selectedIndex, 0);
+        } else {
+            return Clutter.EVENT_PROPAGATE;
+        }
 
-	_scrollHandler(...params) {
-		return altTab.AppSwitcherPopup.prototype._scrollHandler.apply(this, params);
-	};
+        return Clutter.EVENT_STOP;
+    }
 
-	_itemActivatedHandler(...params) {
-		return altTab.AppSwitcherPopup.prototype._itemActivatedHandler.apply(this, params);
-	};
+    _scrollHandler(...params) {
+        return AltTab.AppSwitcherPopup.prototype._scrollHandler.apply(this, params);
+    }
 
-	_itemEnteredHandler(...params) {
-		return altTab.AppSwitcherPopup.prototype._itemEnteredHandler.apply(this, params);
-	};
+    _itemActivatedHandler(...params) {
+        return AltTab.AppSwitcherPopup.prototype._itemActivatedHandler.apply(this, params);
+    }
 
-	_windowActivated(thumbnailSwitcher, n) {
-		const window = this._items[this._selectedIndex].cachedWindows[n];
-		this._tileWindow(window);
-		this.fadeAndDestroy();
-	};
+    _itemEnteredHandler(...params) {
+        return AltTab.AppSwitcherPopup.prototype._itemEnteredHandler.apply(this, params);
+    }
 
-	_windowEntered(...params) {
-		return altTab.AppSwitcherPopup.prototype._windowEntered.apply(this, params);
-	};
+    _windowActivated(thumbnailSwitcher, n) {
+        const window = this._items[this._selectedIndex].cachedWindows[n];
+        this._tileWindow(window);
+        this.fadeAndDestroy();
+    }
 
-	_windowRemoved(...params) {
-		return altTab.AppSwitcherPopup.prototype._windowRemoved.apply(this, params);
-	};
+    _windowEntered(...params) {
+        return AltTab.AppSwitcherPopup.prototype._windowEntered.apply(this, params);
+    }
 
-	_finish(timestamp) {
-		const appIcon = this._items[this._selectedIndex];
-		const window = appIcon.cachedWindows[Math.max(0, this._currentWindow)];
-		this._tileWindow(window);
-		super._finish(timestamp);
-	};
+    _windowRemoved(...params) {
+        return AltTab.AppSwitcherPopup.prototype._windowRemoved.apply(this, params);
+    }
 
-	fadeAndDestroy() {
-		const tilingCanceled = !this.tiledWindow;
-		this.emit("closed", tilingCanceled);
+    _finish(timestamp) {
+        const appIcon = this._items[this._selectedIndex];
+        const window = appIcon.cachedWindows[Math.max(0, this._currentWindow)];
+        this._tileWindow(window);
+        super._finish(timestamp);
+    }
 
-		this._shadeBG && this._shadeBG.destroy();
-		this._shadeBG = null;
-		super.fadeAndDestroy();
-	};
+    fadeAndDestroy() {
+        const canceled = !this.tiledWindow;
+        this.emit('closed', canceled);
 
-	_onDestroy() {
-		return altTab.AppSwitcherPopup.prototype._onDestroy.apply(this);
-	};
+        this._shadeBG?.destroy();
+        this._shadeBG = null;
+        super.fadeAndDestroy();
+    }
 
-	_select(...params) {
-		return altTab.AppSwitcherPopup.prototype._select.apply(this, params);
-	};
+    _onDestroy() {
+        return AltTab.AppSwitcherPopup.prototype._onDestroy.apply(this);
+    }
 
-	_tileWindow(window) {
-		const isAltPressed = Util.isModPressed(Clutter.ModifierType.MOD1_MASK);
-		const isShiftPressed = Util.isModPressed(Clutter.ModifierType.SHIFT_MASK);
-		if (isAltPressed) { // halve to right or bottom
-			// prefer vertical tiling more (because of horizontal screen orientation)
-			if (this._freeScreenRect.width >= this._freeScreenRect.height * 1.25) {
-				this._freeScreenRect.x = this._freeScreenRect.x
-						+ Math.floor(this._freeScreenRect.width / 2);
-				this._freeScreenRect.width = this._freeScreenRect.width / 2;
-			} else {
-				this._freeScreenRect.y = this._freeScreenRect.y
-						+ Math.floor(this._freeScreenRect.height / 2);
-				this._freeScreenRect.height = Math.ceil(this._freeScreenRect.height / 2);
-			}
+    _select(...params) {
+        return AltTab.AppSwitcherPopup.prototype._select.apply(this, params);
+    }
 
-		} else if (isShiftPressed) { // halve to left or top
-			if (this._freeScreenRect.width >= this._freeScreenRect.height * 1.25)
-				this._freeScreenRect.width = Math.ceil(this._freeScreenRect.width / 2);
-			else
-				this._freeScreenRect.height = Math.ceil(this._freeScreenRect.height / 2);
-		}
+    _tileWindow(window) {
+        let rect = this._freeScreenRect;
 
-		this.tiledWindow = window;
+        // Halve the tile rect.
+        // If isShiftPressed, then put the window at the top / left side;
+        // if isAltPressed, then put it at the bottom / right side.
+        // The orientation depends on the available screen space.
+        const isShiftPressed = Util.isModPressed(Clutter.ModifierType.SHIFT_MASK);
+        const isAltPressed = Util.isModPressed(Clutter.ModifierType.MOD1_MASK);
+        if (isShiftPressed || isAltPressed) {
+            // Prefer vertical a bit more (because screens are usually horizontal)
+            const vertical = rect.width >= rect.height * 1.25;
+            const size = vertical ? 'width' : 'height';
+            const orientation = vertical ? Orientation.V : Orientation.H;
+            const idx = isShiftPressed ? 0 : 1;
+            rect = rect.getUnitAt(idx, rect[size] / 2, orientation);
+        }
 
-		window.change_workspace(global.workspace_manager.get_active_workspace());
-		window.move_to_monitor(global.display.get_current_monitor());
-		Util.tile(window, this._freeScreenRect, this._allowConsecutivePopup);
-		window.activate(global.get_current_time());
-	};
+        this.tiledWindow = window;
 
-	_timeoutPopupThumbnails() {
-		return altTab.AppSwitcherPopup.prototype._timeoutPopupThumbnails.apply(this);
-	};
+        window.change_workspace(global.workspace_manager.get_active_workspace());
+        window.move_to_monitor(global.display.get_current_monitor());
+        Util.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
+        window.activate(global.get_current_time());
+    }
 
-	_destroyThumbnails() {
-		return altTab.AppSwitcherPopup.prototype._destroyThumbnails.apply(this);
-	};
+    _timeoutPopupThumbnails() {
+        return AltTab.AppSwitcherPopup.prototype._timeoutPopupThumbnails.apply(this);
+    }
 
-	_createThumbnails() {
-		return altTab.AppSwitcherPopup.prototype._createThumbnails.apply(this);
-	};
+    _destroyThumbnails() {
+        return AltTab.AppSwitcherPopup.prototype._destroyThumbnails.apply(this);
+    }
 
-	// dont _finish(), if no mods are pressed
-	_resetNoModsTimeout() {
-	};
+    _createThumbnails() {
+        return AltTab.AppSwitcherPopup.prototype._createThumbnails.apply(this);
+    }
+
+    // Dont _finish(), if no mods are pressed
+    _resetNoModsTimeout() {
+    }
 });
 
-const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends switcherPopup.SwitcherList {
-	_init(openWindows, apps, altTabPopup) {
-		super._init(true);
+const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends SwitcherPopup.SwitcherList {
 
-		this.icons = [];
-		this._arrows = [];
+    _init(openWindows, apps, altTabPopup) {
+        super._init(true);
 
-		const winTracker = Shell.WindowTracker.get_default();
-		for (const app of apps) {
-			const appIcon = new altTab.AppIcon(app);
-			appIcon.cachedWindows = openWindows.filter(w => winTracker.get_window_app(w) === app);
-			if (appIcon.cachedWindows.length > 0)
-				this._addIcon(appIcon);
-		}
+        this.icons = [];
+        this._arrows = [];
 
-		this._curApp = -1;
-		this._altTabPopup = altTabPopup;
-		this._mouseTimeOutId = 0;
+        const winTracker = Shell.WindowTracker.get_default();
+        for (const app of apps) {
+            const appIcon = new AltTab.AppIcon(app);
+            appIcon.cachedWindows = openWindows.filter(w => {
+                return winTracker.get_window_app(w) === app;
+            });
 
-		this.connect('destroy', this._onDestroy.bind(this));
-	};
+            if (appIcon.cachedWindows.length)
+                this._addIcon(appIcon);
+        }
 
-	_onDestroy() {
-		return altTab.AppSwitcher.prototype._onDestroy.apply(this);
-	};
+        this._curApp = -1;
+        this._altTabPopup = altTabPopup;
+        this._mouseTimeOutId = 0;
 
-	_setIconSize() {
-		let j = 0;
-		while (this._items.length > 1 && this._items[j].style_class != 'item-box')
-			j++;
+        this.connect('destroy', this._onDestroy.bind(this));
+    }
 
-		const themeNode = this._items[j].get_theme_node();
-		this._list.ensure_style();
+    _onDestroy() {
+        return AltTab.AppSwitcher.prototype._onDestroy.apply(this);
+    }
 
-		const iconPadding = themeNode.get_horizontal_padding();
-		const iconBorder = themeNode.get_border_width(St.Side.LEFT)
-				+ themeNode.get_border_width(St.Side.RIGHT);
-		const [, labelNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
-		const iconSpacing = labelNaturalHeight + iconPadding + iconBorder;
-		const totalSpacing = this._list.spacing * (this._items.length - 1);
+    _setIconSize() {
+        let j = 0;
+        while (this._items.length > 1 && this._items[j].style_class != 'item-box')
+            j++;
 
-		const freeScreenRect = this._altTabPopup._freeScreenRect;
-		const parentPadding = this.get_parent().get_theme_node().get_horizontal_padding();
-		const availWidth = freeScreenRect.width - parentPadding
-				- this.get_theme_node().get_horizontal_padding();
+        const themeNode = this._items[j].get_theme_node();
+        this._list.ensure_style();
 
-		const scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
-		const baseIconSizes = [96, 64, 48, 32, 22];
-		const iconSizes = baseIconSizes.map(s => s * scaleFactor);
-		let iconSize = baseIconSizes[0];
+        const iconPadding = themeNode.get_horizontal_padding();
+        const iconBorder = themeNode.get_border_width(St.Side.LEFT)
+            + themeNode.get_border_width(St.Side.RIGHT);
+        const [, labelNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
+        const iconSpacing = labelNaturalHeight + iconPadding + iconBorder;
+        const totalSpacing = this._list.spacing * (this._items.length - 1);
 
-		if (this._items.length > 1) {
-			for (let i =  0; i < baseIconSizes.length; i++) {
-				iconSize = baseIconSizes[i];
-				const height = iconSizes[i] + iconSpacing;
-				const w = height * this._items.length + totalSpacing;
-				if (w <= availWidth)
-					break;
-			}
-		}
+        const freeScreenRect = this._altTabPopup._freeScreenRect;
+        const parentPadding = this.get_parent().get_theme_node().get_horizontal_padding();
+        const availWidth = freeScreenRect.width - parentPadding
+            - this.get_theme_node().get_horizontal_padding();
 
-		this._iconSize = iconSize;
+        const scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        const baseIconSizes = [96, 64, 48, 32, 22];
+        const iconSizes = baseIconSizes.map(s => s * scaleFactor);
+        let iconSize = baseIconSizes[0];
 
-		for (let i = 0; i < this.icons.length; i++) {
-			if (this.icons[i].icon != null)
-				break;
-			this.icons[i].set_size(iconSize);
-		}
-	};
+        if (this._items.length > 1) {
+            for (let i = 0; i < baseIconSizes.length; i++) {
+                iconSize = baseIconSizes[i];
+                const height = iconSizes[i] + iconSpacing;
+                const w = height * this._items.length + totalSpacing;
+                if (w <= availWidth)
+                    break;
+            }
+        }
 
-	vfunc_get_preferred_height(...params) {
-		return altTab.AppSwitcher.prototype.vfunc_get_preferred_height.apply(this, params);
-	};
+        this._iconSize = iconSize;
 
-	vfunc_allocate(...params) {
-		return altTab.AppSwitcher.prototype.vfunc_allocate.apply(this, params);
-	};
+        for (let i = 0; i < this.icons.length; i++) {
+            if (this.icons[i].icon != null)
+                break;
+            this.icons[i].set_size(iconSize);
+        }
+    }
 
-	_onItemEnter(...params) {
-		return altTab.AppSwitcher.prototype._onItemEnter.apply(this, params);
-	};
+    vfunc_get_preferred_height(...params) {
+        return AltTab.AppSwitcher.prototype.vfunc_get_preferred_height.apply(this, params);
+    }
 
-	_enterItem(...params) {
-		return altTab.AppSwitcher.prototype._enterItem.apply(this, params);
-	};
+    vfunc_allocate(...params) {
+        return AltTab.AppSwitcher.prototype.vfunc_allocate.apply(this, params);
+    }
 
-	highlight(...params) {
-		return altTab.AppSwitcher.prototype.highlight.apply(this, params);
-	};
+    _onItemEnter(...params) {
+        return AltTab.AppSwitcher.prototype._onItemEnter.apply(this, params);
+    }
 
-	_addIcon(...params) {
-		return altTab.AppSwitcher.prototype._addIcon.apply(this, params);
-	};
+    _enterItem(...params) {
+        return AltTab.AppSwitcher.prototype._enterItem.apply(this, params);
+    }
 
-	_removeIcon(...params) {
-		return altTab.AppSwitcher.prototype._removeIcon.apply(this, params);
-	};
+    highlight(...params) {
+        return AltTab.AppSwitcher.prototype.highlight.apply(this, params);
+    }
+
+    _addIcon(...params) {
+        return AltTab.AppSwitcher.prototype._addIcon.apply(this, params);
+    }
+
+    _removeIcon(...params) {
+        return AltTab.AppSwitcher.prototype._removeIcon.apply(this, params);
+    }
 });

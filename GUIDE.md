@@ -58,7 +58,7 @@ Hitting `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free sc
 
 ### Popup Layouts
 
-A 'Popup Layout' has a name and a list of rectangles with optional apps and loopTypes attached to each rectangle. If you activate a layout, you will spawn a Tiling Popup (hence the name 'Popup Layout') at each rectangle - one after the other. If you attached an app to the rectangle, instead of calling the Tiling Popup, a new instance of the app will be opened and tiled in that spot. If you set a loopType, you will keep tiling windows to that one rectangle and make them share that space evenly. This way you can setup layouts similiar to "Master and Stack". Any rectangle can have a loopType set.
+A 'Popup Layout' has a name and a list of rectangles with optional apps and loopTypes attached to each rectangle. If you activate a layout, you will spawn a Tiling Popup (hence the name 'Popup Layout') at each rectangle - one after the other. If you attached an app to the rectangle, instead of calling the Tiling Popup, a new instance of the app will be opened and tiled in that spot. If you set a loopType, you will keep tiling windows to that one rectangle and make them share that space evenly. This way you can setup layouts similiar to 'Master and Stack'. Any rectangle can have a loopType set.
 
 You define rectangles by entering their `x` and `y` coordinate as well as their `width` and `height` into a text field separated by `--`. They are floating point values and can range from 0 to 1. The point (0,0) represents the top-left of your workspace and (1,1) the bottom-right. A loopType is set by appending `--h` or `--v` to the text field for a horizontal and a vertical loop respectively. You can attach an app by using the `add button` to the right of a text field. It acts like a toggle. If you already attached an app to it, clicking it again, will remove the app. Here is an example. The text field at row 0 defines a horizontal loop (`.5--0--.5--.5--h`) for the top-right quarter of my workspace and row 1 defines a non-looped rectangle (`.5--.5--.5--.5`) at the bottom-right quarter with an app (`Calender`) attached to it.
 
@@ -72,6 +72,6 @@ By default, the `Popup Layouts` are [hidden](#Hidden-Settings) behind the 'Advan
 
 ### Hidden Settings
 
-This is a 'hidden' (more specificly: nameless) tab under `Help`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, and experimental settings.
+This is a 'hidden' (more specificly: nameless) tab under `Help`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, advanced and experimental settings.
 
 ![](media/Guide_HiddenSettings.png)
