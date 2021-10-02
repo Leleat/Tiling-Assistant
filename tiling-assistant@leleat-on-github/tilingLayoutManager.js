@@ -28,10 +28,23 @@ var LayoutManager = class TilingLayoutManager {
 		this._tiledViaLayout = [];
 		this._tiledViaLoop = [];
 		this._layoutRectPreview = null;
+
+		this._keyBindings = [];
+		[...Array(30)].forEach((undef, idx) => this._keyBindings.push(`activate-layout${idx}`));
+		this._keyBindings.forEach(key => {
+			main.wm.addKeybinding(
+				key
+				, MainExtension.settings
+				, Meta.KeyBindingFlags.IGNORE_AUTOREPEAT
+				, Shell.ActionMode.NORMAL
+				, () => this.startTilingToLayout(Number.parseInt(key.substring(15)))
+			);
+		});
 	}
 
 	destroy() {
 		this._finishTilingToLayout();
+		this._keyBindings.forEach(key => main.wm.removeKeybinding(key));
 	}
 
 	// start a layout via keybinding from extension.js.
