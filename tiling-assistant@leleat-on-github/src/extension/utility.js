@@ -65,23 +65,23 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
      */
     static isDirection(keyVal, direction) {
         switch (direction) {
-        case Direction.N:
-            return keyVal === Clutter.KEY_Up
+            case Direction.N:
+                return keyVal === Clutter.KEY_Up
                         || keyVal === Clutter.KEY_w || keyVal === Clutter.KEY_W
                         || keyVal === Clutter.KEY_k || keyVal === Clutter.KEY_K;
 
-        case Direction.S:
-            return keyVal === Clutter.KEY_Down
+            case Direction.S:
+                return keyVal === Clutter.KEY_Down
                         || keyVal === Clutter.KEY_s || keyVal === Clutter.KEY_S
                         || keyVal === Clutter.KEY_j || keyVal === Clutter.KEY_J;
 
-        case Direction.W:
-            return keyVal === Clutter.KEY_Left
+            case Direction.W:
+                return keyVal === Clutter.KEY_Left
                         || keyVal === Clutter.KEY_a || keyVal === Clutter.KEY_A
                         || keyVal === Clutter.KEY_h || keyVal === Clutter.KEY_H;
 
-        case Direction.E:
-            return keyVal === Clutter.KEY_Right
+            case Direction.E:
+                return keyVal === Clutter.KEY_Right
                         || keyVal === Clutter.KEY_d || keyVal === Clutter.KEY_D
                         || keyVal === Clutter.KEY_l || keyVal === Clutter.KEY_L;
         }
@@ -396,97 +396,97 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         const screenRects = tRects.concat(workArea.minus(tRects));
 
         switch (shortcut) {
-        case Shortcuts.MAXIMIZE: {
-            return workArea.copy();
+            case Shortcuts.MAXIMIZE: {
+                return workArea.copy();
 
-        } case Shortcuts.LEFT: {
-            const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-            const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-            return new Rect(
-                workArea.x,
-                workArea.y,
-                width,
-                workArea.height
-            );
+            } case Shortcuts.LEFT: {
+                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
+                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                return new Rect(
+                    workArea.x,
+                    workArea.y,
+                    width,
+                    workArea.height
+                );
 
-        } case Shortcuts.RIGHT: {
-            const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-            const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-            return new Rect(
-                workArea.x2 - width,
-                workArea.y,
-                width,
-                workArea.height
-            );
+            } case Shortcuts.RIGHT: {
+                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
+                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                return new Rect(
+                    workArea.x2 - width,
+                    workArea.y,
+                    width,
+                    workArea.height
+                );
 
-        } case Shortcuts.TOP: {
-            const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-            const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x,
-                workArea.y,
-                workArea.width,
-                height
-            );
+            } case Shortcuts.TOP: {
+                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
+                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x,
+                    workArea.y,
+                    workArea.width,
+                    height
+                );
 
-        } case Shortcuts.BOTTOM: {
-            const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-            const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x,
-                workArea.y2 - height,
-                workArea.width,
-                height
-            );
+            } case Shortcuts.BOTTOM: {
+                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
+                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x,
+                    workArea.y2 - height,
+                    workArea.width,
+                    height
+                );
 
-        } case Shortcuts.TOP_LEFT: {
-            const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-            const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-            const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-            const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x,
-                workArea.y,
-                width,
-                height
-            );
+            } case Shortcuts.TOP_LEFT: {
+                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
+                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
+                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x,
+                    workArea.y,
+                    width,
+                    height
+                );
 
-        } case Shortcuts.TOP_RIGHT: {
-            const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-            const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-            const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-            const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x2 - width,
-                workArea.y,
-                width,
-                height
-            );
+            } case Shortcuts.TOP_RIGHT: {
+                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
+                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
+                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x2 - width,
+                    workArea.y,
+                    width,
+                    height
+                );
 
-        } case Shortcuts.BOTTOM_LEFT: {
-            const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-            const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-            const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-            const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x,
-                workArea.y2 - height,
-                width,
-                height
-            );
+            } case Shortcuts.BOTTOM_LEFT: {
+                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
+                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
+                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x,
+                    workArea.y2 - height,
+                    width,
+                    height
+                );
 
-        } case Shortcuts.BOTTOM_RIGHT: {
-            const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-            const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-            const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-            const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-            return new Rect(
-                workArea.x2 - width,
-                workArea.y2 - height,
-                width,
-                height
-            );
-        }}
+            } case Shortcuts.BOTTOM_RIGHT: {
+                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
+                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
+                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                return new Rect(
+                    workArea.x2 - width,
+                    workArea.y2 - height,
+                    width,
+                    height
+                );
+            }}
     }
 
     /**

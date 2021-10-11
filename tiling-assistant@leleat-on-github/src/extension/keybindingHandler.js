@@ -100,15 +100,15 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
             const rect = Util.getTileFor(shortcutName, workArea);
 
             switch (dynamicSetting) {
-            case DynamicKeybindings.FOCUS:
-                this._dynamicFocus(window, shortcutName);
-                break;
-            case DynamicKeybindings.TILING_STATE:
-            case DynamicKeybindings.TILING_STATE_WINDOWS:
-                this._dynamicTilingState(window, shortcutName, isWindowsStyle);
-                break;
-            default:
-                Util.toggleTiling(window, rect);
+                case DynamicKeybindings.FOCUS:
+                    this._dynamicFocus(window, shortcutName);
+                    break;
+                case DynamicKeybindings.TILING_STATE:
+                case DynamicKeybindings.TILING_STATE_WINDOWS:
+                    this._dynamicTilingState(window, shortcutName, isWindowsStyle);
+                    break;
+                default:
+                    Util.toggleTiling(window, rect);
             }
         }
     }
@@ -134,18 +134,18 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
 
         let direction;
         switch (shortcutName) {
-        case Shortcuts.MAXIMIZE:
-        case Shortcuts.TOP:
-            direction = Direction.N;
-            break;
-        case Shortcuts.BOTTOM:
-            direction = Direction.S;
-            break;
-        case Shortcuts.LEFT:
-            direction = Direction.W;
-            break;
-        case Shortcuts.RIGHT:
-            direction = Direction.E;
+            case Shortcuts.MAXIMIZE:
+            case Shortcuts.TOP:
+                direction = Direction.N;
+                break;
+            case Shortcuts.BOTTOM:
+                direction = Direction.S;
+                break;
+            case Shortcuts.LEFT:
+                direction = Direction.W;
+                break;
+            case Shortcuts.RIGHT:
+                direction = Direction.E;
         }
 
         const nearestWindow = Util.getNearestWindow(
@@ -273,127 +273,127 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
         let rect;
         if (isLeftHalf) {
             switch (shortcutName) {
-            case Shortcuts.TOP:
-            case Shortcuts.MAXIMIZE:
-                rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.RIGHT:
-                Util.untile(window);
-                return;
+                case Shortcuts.TOP:
+                case Shortcuts.MAXIMIZE:
+                    rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.RIGHT:
+                    Util.untile(window);
+                    return;
             }
 
         } else if (isRightHalf) {
             switch (shortcutName) {
-            case Shortcuts.TOP:
-            case Shortcuts.MAXIMIZE:
-                rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.LEFT:
-                Util.untile(window);
-                return;
+                case Shortcuts.TOP:
+                case Shortcuts.MAXIMIZE:
+                    rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.LEFT:
+                    Util.untile(window);
+                    return;
             }
 
         } else if (isTopHalf) {
             switch (shortcutName) {
-            case Shortcuts.LEFT:
-                rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.RIGHT:
-                rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                Util.untile(window);
-                return;
+                case Shortcuts.LEFT:
+                    rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.RIGHT:
+                    rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    Util.untile(window);
+                    return;
             }
 
         } else if (isBottomHalf) {
             switch (shortcutName) {
-            case Shortcuts.LEFT:
-                rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.RIGHT:
-                rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.TOP:
-            case Shortcuts.MAXIMIZE:
-                Util.untile(window);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
-                return;
+                case Shortcuts.LEFT:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.RIGHT:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.TOP:
+                case Shortcuts.MAXIMIZE:
+                    Util.untile(window);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    return;
             }
 
         } else if (isTopLeftQuarter) {
             switch (shortcutName) {
-            case Shortcuts.RIGHT:
-                rect = Util.getTileFor(Shortcuts.TOP, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
+                case Shortcuts.RIGHT:
+                    rect = Util.getTileFor(Shortcuts.TOP, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
             }
 
         } else if (isTopRightQuarter) {
             switch (shortcutName) {
-            case Shortcuts.LEFT:
-                rect = Util.getTileFor(Shortcuts.TOP, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
+                case Shortcuts.LEFT:
+                    rect = Util.getTileFor(Shortcuts.TOP, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
             }
 
         } else if (isBottomLeftQuarter) {
             switch (shortcutName) {
-            case Shortcuts.TOP:
-            case Shortcuts.MAXIMIZE:
-                rect = Util.getTileFor(Shortcuts.LEFT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.RIGHT:
-                rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
-                return;
+                case Shortcuts.TOP:
+                case Shortcuts.MAXIMIZE:
+                    rect = Util.getTileFor(Shortcuts.LEFT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.RIGHT:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    return;
             }
 
         } else if (isBottomRightQuarter) {
             switch (shortcutName) {
-            case Shortcuts.TOP:
-            case Shortcuts.MAXIMIZE:
-                rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.LEFT:
-                rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                Util.toggleTiling(window, rect);
-                return;
-            case Shortcuts.BOTTOM:
-                rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
-                return;
+                case Shortcuts.TOP:
+                case Shortcuts.MAXIMIZE:
+                    rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.LEFT:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
+                case Shortcuts.BOTTOM:
+                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    return;
             }
         }
 

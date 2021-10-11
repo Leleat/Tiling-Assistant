@@ -238,22 +238,22 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         // Tile preview
         let secondaryModeActivatorPressed = false;
         switch (Settings.getString(Settings.SECONDARY_PREVIEW_ACTIVATOR)) {
-        case AlternatePreviewMod.CTRL: {
-            const ctrl = Clutter.ModifierType.CONTROL_MASK;
-            secondaryModeActivatorPressed = Util.isModPressed(ctrl);
-            break;
-        }
-        case AlternatePreviewMod.ALT: {
-            const altL = Clutter.ModifierType.MOD1_MASK;
-            const altGr = Clutter.ModifierType.MOD5_MASK;
-            secondaryModeActivatorPressed =
+            case AlternatePreviewMod.CTRL: {
+                const ctrl = Clutter.ModifierType.CONTROL_MASK;
+                secondaryModeActivatorPressed = Util.isModPressed(ctrl);
+                break;
+            }
+            case AlternatePreviewMod.ALT: {
+                const altL = Clutter.ModifierType.MOD1_MASK;
+                const altGr = Clutter.ModifierType.MOD5_MASK;
+                secondaryModeActivatorPressed =
                 Util.isModPressed(altL) || Util.isModPressed(altGr);
-            break;
-        }
-        case AlternatePreviewMod.RMB: {
-            const rmb = Clutter.ModifierType.BUTTON3_MASK;
-            secondaryModeActivatorPressed = Util.isModPressed(rmb);
-        }}
+                break;
+            }
+            case AlternatePreviewMod.RMB: {
+                const rmb = Clutter.ModifierType.BUTTON3_MASK;
+                secondaryModeActivatorPressed = Util.isModPressed(rmb);
+            }}
 
         const secondarySetting = Settings.DEFAULT_TO_SECONDARY_PREVIEW;
         const defaultToSecondaryMode = Settings.getBoolean(secondarySetting);

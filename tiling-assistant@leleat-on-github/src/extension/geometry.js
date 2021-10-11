@@ -20,25 +20,25 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
         this._rect = new Meta.Rectangle();
 
         switch(params.length) {
-        case 0:
-            break;
+            case 0:
+                break;
 
-        case 1:
-            this._rect.x = params[0].x;
-            this._rect.y = params[0].y;
-            this._rect.width = params[0].width;
-            this._rect.height = params[0].height;
-            break;
+            case 1:
+                this._rect.x = params[0].x;
+                this._rect.y = params[0].y;
+                this._rect.width = params[0].width;
+                this._rect.height = params[0].height;
+                break;
 
-        case 4:
-            this._rect.x = params[0];
-            this._rect.y = params[1];
-            this._rect.width = params[2];
-            this._rect.height = params[3];
-            break;
+            case 4:
+                this._rect.x = params[0];
+                this._rect.y = params[1];
+                this._rect.width = params[2];
+                this._rect.height = params[3];
+                break;
 
-        default:
-            log('Tiling Assistant: Invalid param count for Rect constructor!');
+            default:
+                log('Tiling Assistant: Invalid param count for Rect constructor!');
         }
     }
 
@@ -449,22 +449,22 @@ var Axis = class Axis { // eslint-disable-line no-unused-vars
         this.orientation = Orientation.H;
 
         switch(params.length) {
-        case 0:
-            break;
+            case 0:
+                break;
 
-        case 2:
-            this.start = params[0];
-            this.end = params[1];
-            break;
+            case 2:
+                this.start = params[0];
+                this.end = params[1];
+                break;
 
-        case 3:
-            this.start = params[0];
-            this.end = params[1];
-            this.orientation = params[2];
-            break;
+            case 3:
+                this.start = params[0];
+                this.end = params[1];
+                this.orientation = params[2];
+                break;
 
-        default:
-            log('Tiling Assistant: Invalid param count for Axis constructor!');
+            default:
+                log('Tiling Assistant: Invalid param count for Axis constructor!');
         }
     }
 

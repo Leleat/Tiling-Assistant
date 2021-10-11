@@ -33,9 +33,11 @@
             {
                 "FunctionExpression": {
                     "parameters": 2
-                }
+                },
+                "SwitchCase": 1
             }
         ],
+        "keyword-spacing": "error",
         "linebreak-style": [
             "error",
             "unix"
