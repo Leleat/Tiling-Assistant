@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-13 20:56+0200\n"
+"POT-Creation-Date: 2021-10-13 21:23+0200\n"
 "PO-Revision-Date: 2021-08-03 01:02+0200\n"
 "Last-Translator: Vojtěch Perník <translations@pervoj.cz>\n"
 "Language-Team: Czech <gnome-cs-list@gnome.org>\n"
@@ -135,8 +135,8 @@ msgid ""
 "The focused window will try to fill the free screen space as good as "
 "possible based on the tiled windows around it."
 msgstr ""
-"Zaměřené okno se bude snažit co nejlépe vyplnit volný prostor na "
-"obrazovce na základě okolních oken s dlaždicemi."
+"Zaměřené okno se bude snažit co nejlépe vyplnit volný prostor na obrazovce "
+"na základě okolních oken s dlaždicemi."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:587
 msgid "Toggle Maximization"
@@ -345,7 +345,7 @@ msgid "Nameless layout..."
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:78
-msgid "Can't enter 'Tile Editing Mode', if no tiled window visible."
+msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:108

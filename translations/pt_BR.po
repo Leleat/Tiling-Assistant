@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-13 20:56+0200\n"
+"POT-Creation-Date: 2021-10-13 21:23+0200\n"
 "PO-Revision-Date: 2021-10-12 17:39-0300\n"
 "Last-Translator: Fabio A. De Muzio Tobich <fabiomt@gmail.com>\n"
 "Language-Team: \n"
@@ -154,8 +154,8 @@ msgid ""
 "The focused window will try to fill the free screen space as good as "
 "possible based on the tiled windows around it."
 msgstr ""
-"A janela em foco tentará preencher o espaço livre da melhor forma "
-"possível baseando-se nas janelas ladrilhadas ao redor."
+"A janela em foco tentará preencher o espaço livre da melhor forma possível "
+"baseando-se nas janelas ladrilhadas ao redor."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:587
 msgid "Toggle Maximization"
@@ -364,7 +364,7 @@ msgid "Nameless layout..."
 msgstr "Leiaute sem nome..."
 
 #: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:78
-msgid "Can't enter 'Tile Editing Mode', if no tiled window visible."
+msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:108

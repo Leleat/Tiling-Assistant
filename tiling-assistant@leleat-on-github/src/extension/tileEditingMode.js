@@ -75,7 +75,7 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
 
         const openWindows = Util.getWindows();
         if (!openWindows.length || !this._windows.length) {
-            const msg = _("Can't enter 'Tile Editing Mode', if no tiled window visible.");
+            const msg = _("Can't enter 'Tile Editing Mode', if no tiled window is visible.");
             Main.notify('Tiling Assistant', msg);
             this.close();
             return;
