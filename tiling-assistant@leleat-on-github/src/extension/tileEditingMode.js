@@ -19,7 +19,6 @@ const Modes = {
     DEFAULT: 1,
     SWAP: 2,
     RESIZE: 4,
-    EQUALIZE: 8,
     CLOSE: 16
 };
 
@@ -132,15 +131,12 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
     vfunc_key_press_event(keyEvent) {
         const mods = keyEvent.modifier_state;
         const isCtrlPressed = mods & Clutter.ModifierType.CONTROL_MASK;
-        const isShiftPressed = mods & Clutter.ModifierType.SHIFT_MASK;
         const isSuperPressed = mods & Clutter.ModifierType.MOD4_MASK;
 
         let newMode;
 
         if (isSuperPressed)
             newMode = Modes.RESIZE;
-        else if (isCtrlPressed && isShiftPressed)
-            newMode = Modes.EQUALIZE;
         else if (isCtrlPressed)
             newMode = Modes.SWAP;
         else
@@ -196,10 +192,6 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
 
             case Modes.RESIZE:
                 this._keyHandler = new ResizeKeyHandler(this);
-                break;
-
-            case Modes.EQUALIZE:
-                this._keyHandler = new EqualizeKeyHandler(this);
                 break;
 
             case Modes.CLOSE:
@@ -738,75 +730,4 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-top');
         this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-bottom');
     }
-};
-
-const EqualizeKeyHandler = class EqualizeKeyHandler extends DefaultKeyHandler {
-    /*
-    constructor(tileEditor) {
-        super(tileEditor);
-
-        // Create an 'anchor indicator' to indicate where the equalizing starts
-        const styleClass = 'tile-editing-mode-anchor-indicator';
-        const indicator = this._makeIndicator(styleClass, this._selectIndicator.rect);
-        indicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
-    }
-
-    handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.keyval);
-
-        // [Directions] to choose a window with WASD, hjkl or arrow keys
-        if (direction)
-            this._focusInDir(direction);
-
-        // [Esc]ape Tile Editing Mode
-        else if (keyEvent.keyval === Clutter.KEY_Escape)
-            return Modes.DEFAULT;
-
-        return Modes.EQUALIZE;
-    }
-
-    handleKeyRelease(keyEvent) {
-        const keyVal = keyEvent.keyval;
-        const mods = keyEvent.modifier_state;
-        const ctrlKeys = [Clutter.KEY_Control_L, Clutter.KEY_Control_R];
-        const shiftKeys = [Clutter.KEY_Shift_L, Clutter.KEY_Shift_R];
-
-        // Don't care, if Shift or Ctrl was released first.
-        if (ctrlKeys.includes(keyVal) || shiftKeys.includes(keyVal)) {
-            const ctrlMod = Clutter.ModifierType.CONTROL_MASK;
-            const shiftMod = Clutter.ModifierType.SHIFT_MASK;
-            if (!(mods & ctrlMod) && !(mods & shiftMod))
-                return Modes.EQUALIZE;
-
-            const window = this._selectIndicator.window;
-            const anchor = this._anchorIndicator.window;
-            if (!window || !anchor)
-                return Modes.DEFAULT;
-
-            const union = window.tiledRect.union(anchor);
-            const affectedWindows = this._windows.filter(w =>
-                union.containsRect(w.tiledRect));
-            const affectedArea = affectedWindows.reduce((sum, w) => {
-                sum += w.tiledRect.area;
-                return sum;
-            }, 0);
-
-            if (union.area !== affectedArea)
-                return Modes.DEFAULT;
-
-            this._equalize(affectedWindows);
-
-            // Update the focus indicator.
-            this._selectIndicator.focus(window.tiledRect, window);
-
-            return Modes.DEFAULT;
-        }
-
-        return Modes.EQUALIZE;
-    }
-
-    _equalize(windows) {
-        // TODO not yet implemented...
-    }
-    */
 };
