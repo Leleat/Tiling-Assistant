@@ -19,7 +19,7 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
     constructor(...params) {
         this._rect = new Meta.Rectangle();
 
-        switch(params.length) {
+        switch (params.length) {
             case 0:
                 break;
 
@@ -448,7 +448,7 @@ var Axis = class Axis { // eslint-disable-line no-unused-vars
         this._end = 0;
         this.orientation = Orientation.H;
 
-        switch(params.length) {
+        switch (params.length) {
             case 0:
                 break;
 
