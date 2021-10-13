@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-08 01:15+0200\n"
+"POT-Creation-Date: 2021-10-13 20:56+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: k-fog <kiridasuku@gmail.com>\n"
 "Language-Team: Japanese <>\n"
@@ -131,108 +131,105 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:544
 msgid ""
 "The focused window will try to fill the free screen space as good as "
-"possible based on the tiled windows around it.\n"
-"\n"
-"If there is no space, the window will either untile or maximize depending on "
-"wether it's currently tiled."
+"possible based on the tiled windows around it."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:589
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:587
 msgid "Toggle Maximization"
 msgstr "最大化切り替え"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
 msgid "<b>    General    </b>"
 msgstr "<b>    一般    </b>"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:661
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:659
 msgid "Tile to top"
 msgstr "上に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:701
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:699
 msgid "Tile to bottom"
 msgstr "下に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:741
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:739
 msgid "Tile to left"
 msgstr "左に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:781
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:779
 msgid "Tile to right"
 msgstr "右に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:816
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:814
 msgid "<b>    Side Tiling    </b>"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:855
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:853
 msgid "Tile to top-left"
 msgstr "左上に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:893
 msgid "Tile to top-right"
 msgstr "右上に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:935
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:933
 msgid "Tile to bottom-left"
 msgstr "左下に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:975
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:973
 msgid "Tile to bottom-right"
 msgstr "右下に並べる"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1010
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1008
 msgid "<b>    Corner Tiling    </b>"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1031
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1029
 msgid "Keybindings"
 msgstr "キーバインド"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1056
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1054
 msgid "Search Popup Layout"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1104
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1102
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1111
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1109
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1149
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1147
 msgid "Popup Layouts"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1170
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1168
 msgid "Tiling Assistant"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1193
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1191
 msgid ""
 "If you want to report a bug or need help,\n"
 "\n"
 "please open an issue on Github."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1214
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1212
 msgid ""
 "List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1236
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1234
 msgid ""
 "The <big><b>GUIDE</b></big> offers a detailed explanation of every feature."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1257
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1255
 msgid ""
 "The <big><b>CHANGELOG</b></big> lists the differences between each extension "
 "version."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1286
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1284
 msgid ""
 "<small>This extension is licensed under the <a href='https://www.gnu.org/"
 "licenses/old-licenses/gpl-2.0.html'>GNU General Public License, version 2 or "
@@ -240,120 +237,114 @@ msgid ""
 "can be found in the Github repository.</small>"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1303
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1301
 msgid "Help"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1335
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1333
 msgid "<u><b>Hidden Settings</b></u>"
 msgstr "<u><b>隠されし設定</b></u>"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1353
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1351
 msgid "Advanced / Experimental Settings"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1379
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1377
 msgid "Tiling Popup: Current Workspace only"
 msgstr "タイリングポップアップ：現在のワークスペースのみ"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1404
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1402
 msgid "Tile Editing Mode: Focus Color"
 msgstr "タイル編集モード：フォーカス色"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1430
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1428
 msgid "Tile Preview: Secondary Mode Activator"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1441
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1439
 msgid "Ctrl"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1442
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1440
 msgid "Alt"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1443
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1441
 msgid "RMB"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1463
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1461
 msgid "Tile Preview: Default to Secondary Mode"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1488
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1486
 msgid "Tile Animations"
 msgstr "タイル化アニメーション"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1514
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1512
 msgid "Untile Animations"
 msgstr "タイル化解除アニメーション"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1540
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1538
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "画面上端での動作切り替え時間"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1568
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1566
 msgid "Vertical Tile Preview Trigger Area"
 msgstr "上下整列プレビュー反応範囲"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1597
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1595
 msgid "Horizontal Tile Preview Trigger Area"
 msgstr "左右整列プレビュー反応範囲"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1625
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1623
 msgid "Debugging: Show Tiled Rects"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1669
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1667
 msgid "Debugging: Show Free Screen Rects"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:62
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
 msgid "Tiling popup enabled"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:63
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:67
 msgid "Tiling popup was disabled"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:88
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:90
 msgid "No valid popup layouts defined."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:178
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:181
 msgid "Popup Layouts: App not found."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:315
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:321
 msgid "Type to search..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:423
+#: tiling-assistant@leleat-on-github/src/extension/popupLayoutsManager.js:431
 msgid "Nameless layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:58
-msgid "Can't enter 'Tile Editing Mode', if there isn't a tileGroup visible."
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:78
+msgid "Can't enter 'Tile Editing Mode', if no tiled window visible."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:298
-msgid ""
-"Can't resize in that direction. Super + Directions resizes on the S and E "
-"side. Super + Shift + Directions on the N and W side."
-msgstr ""
-
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:95
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:108
 msgid "Nameless Layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:170
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:183
 msgid "Layout"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:310
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:349
 msgid "Check out the 'Guide' in the repository (see the 'Help' Tab)."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:314
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:353
 msgid "This tooltip for help..."
 msgstr ""
