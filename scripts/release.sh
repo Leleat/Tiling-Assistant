@@ -40,7 +40,7 @@ bash scripts/build.sh
 
 # commit changes
 echo Committing version bump...
-git add $METADATA $PKGBUILD
+git add $METADATA $PKGBUILD scripts/aur-build/.SRCINFO translations/*.po translations/*.pot
 git commit -m "bump version to $NEW_VERSION_NR"
 echo
 
@@ -48,6 +48,9 @@ echo
 echo Creating tag \'v$NEW_VERSION_NR\'...
 git tag v$NEW_VERSION_NR
 echo Tag created.
+echo
+
+echo Release done.
 echo
 
 echo TODO:
