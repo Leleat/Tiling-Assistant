@@ -290,6 +290,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
             untiledRect = new Rect(rect);
 
         const untiledWidth = untiledRect?.width ?? 1000;
+        const postUntileRect = window.get_frame_rect();
 
         global.display.begin_grab_op(
             window,
@@ -299,9 +300,9 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
             -1, // Button
             global.get_pointer()[2], // modifier
             global.get_current_time(),
-            rect.x + untiledWidth * relativeX,
+            postUntileRect.x + untiledWidth * relativeX,
             // So the pointer isn't above the window in some cases.
-            Math.max(eventY, rect.y)
+            Math.max(eventY, postUntileRect.y)
         );
     }
 
