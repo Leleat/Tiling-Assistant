@@ -230,6 +230,9 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
             // Un / Highlight the save button, if the user made in / valid changes.
             this._applySaveButtonStyle(ok ? 'suggested-action' : 'destructive-action');
         });
+        layoutRow.connect('row-removed', (row, idx) => {
+            this._settings.set_strv(`activate-layout${idx}`, []);
+        });
         this._layoutsListBox.append(layoutRow);
 
         const treeView = layoutRow.getTreeView();

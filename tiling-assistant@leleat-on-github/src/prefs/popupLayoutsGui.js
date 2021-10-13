@@ -20,7 +20,10 @@ const _ = Domain.gettext;
  */
 
 var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
-    Signals: { 'changed': { param_types: [GObject.TYPE_BOOLEAN] } }
+    Signals: {
+        'changed': { param_types: [GObject.TYPE_BOOLEAN] },
+        'row-removed': { param_types: [GObject.TYPE_INT] }
+    }
 }, class PopupLayoutRow extends Gtk.ListBoxRow {
 
     // Use a static variable to make sure the indices are unique since just using
@@ -172,6 +175,7 @@ var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
         const deleteButton = Gtk.Button.new_from_icon_name('edit-delete-symbolic');
         deleteButton.connect('clicked', () => {
             this.emit('changed', true);
+            this.emit('row-removed', this._idx);
             this.destroy();
         });
         mainBox.append(deleteButton);
