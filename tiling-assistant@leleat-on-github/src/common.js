@@ -202,6 +202,20 @@ var Direction = class Direction { // eslint-disable-line no-unused-vars
     static E = 2;
     static S = 4;
     static W = 8;
+
+    static opposite(dir) {
+        let opposite = 0;
+        if (dir & this.N)
+            opposite |= this.S;
+        if (dir & this.S)
+            opposite |= this.N;
+        if (dir & this.W)
+            opposite |= this.E;
+        if (dir & this.E)
+            opposite |= this.W;
+
+        return opposite;
+    }
 };
 
 // Classes for popup layouts:

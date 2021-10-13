@@ -1,3 +1,5 @@
+'use strict';
+
 const { Clutter, GObject, Meta, St } = imports.gi;
 const Main = imports.ui.main;
 
@@ -12,22 +14,29 @@ const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
-const MODES = {
-    SELECT: 1,
-    SWAP: 2
+const SCALE_SIZE = 100;
+const Modes = {
+    DEFAULT: 1,
+    SWAP: 2,
+    RESIZE: 4,
+    EQUALIZE: 8,
+    CLOSE: 16
 };
 
-// TODO: Rewrite entire file. The mode and indicator system,
-// the keyboard handling and basically everything else as well are quite bad...
-// although they are working correctly.
-// Change resize mode: follow gnomes keyboard-based resizing
+/**
+ * Classes for the 'Tile Editing Mode'. A mode to manage your tiled windows
+ * with your keyboard (and only the keyboard). The Tile Editor gets instanced
+ * as soon as the keyboard shortcut is activated. The Handler classes are
+ * basically modes / states for the Tile Editor each with a 'on key press' and
+ * 'on key released' function.
+ */
 
-// eslint-disable-next-line no-unused-vars
-var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget {
+// eslint-disable-next-line
+var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
 
     _init() {
-        const currMon = global.display.get_current_monitor();
-        const display = global.display.get_monitor_geometry(currMon);
+        const monitor = global.display.get_current_monitor();
+        const display = global.display.get_monitor_geometry(monitor);
         super._init({
             x: display.x,
             y: display.y,
@@ -37,7 +46,18 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
         });
 
         this._haveModal = false;
-        this.currMode = MODES.SELECT;
+        // The windows managed by the Tile Editor, that means the tiled windows
+        // that aren't overlapped by other windows; in other words: the top tile Group
+        this._windows = [];
+        // The first indicator is used for indicating the active selection by
+        // the user. Other indicators may be added and removed depending on the
+        // current mode. For example, when swapping windows, there will be a
+        // second indicator to show which window will be swapped.
+        this._indicators = [];
+        this._mode = Modes.DEFAULT;
+        // Handler of keyboard events depending on the mode.
+        this._keyHandler = null;
+
         Main.uiGroup.add_child(this);
     }
 
@@ -56,37 +76,28 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
         const openWindows = Util.getWindows();
         if (!openWindows.length || !this._windows.length) {
-            const msg = _("Can't enter 'Tile Editing Mode', if a tile group isn't visible.");
+            const msg = _("Can't enter 'Tile Editing Mode', if no tiled window visible.");
             Main.notify('Tiling Assistant', msg);
             this.close();
             return;
         }
 
+        // The first window may not be tiled. It just wasn't overlapping a
+        // window from the top tile group. So raise the first window of the
+        // tile group to get entire tile group to the foreground.
         const window = this._windows[0];
-        for (const w of openWindows) {
-            if (w === this._windows[0])
-                break;
+        window.raise();
 
-            w.lower();
-        }
+        // Create the active selection indicator.
+        const styleClass = 'tile-editing-mode-select-indicator';
+        const selectIndicator = new Indicator(styleClass, window.tiledRect);
+        selectIndicator.focus(window.tiledRect, window);
+        this._indicators.push(selectIndicator);
+        this.add_child(selectIndicator);
 
-        const gap = Settings.getInt(Settings.WINDOW_GAP);
-        const color = Settings.getString(Settings.TILE_EDITING_MODE_COLOR); // 'rgb(X,Y,Z)'
-
-        // primary window is the focused window, which is operated on
-        const style = `border: ${Math.max(gap / 2, 4)}px solid ${color};`;
-        this._primaryIndicator = new Indicator(style, gap);
-        this.add_child(this._primaryIndicator);
-
-        // secondary indicator (for swapping with focused window).
-        // the primary and secondary indicator combined indicate the focus.
-        // the primary indicator is the thick border/outline and the seconday indicator the filling
-        const rgb = color.substring(color.indexOf('(') + 1, color.indexOf(')')).split(',');
-        const style2 = `background-color: rgba(${rgb[0]}, ${rgb[1]}, ${rgb[2]}, .3);`;
-        this._secondaryIndicator = new Indicator(style2, gap);
-        this.add_child(this._secondaryIndicator);
-
-        this.select(window.tiledRect, window);
+        // Enter initial state.
+        this._mode = Modes.DEFAULT;
+        this._keyHandler = new DefaultKeyHandler(this);
     }
 
     close() {
@@ -95,26 +106,23 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
             this._haveModal = false;
         }
 
-        const window = this._primaryIndicator?.window;
-        window?.activate(global.get_current_time());
+        this._windows = [];
+        this._indicators = [];
+        this._keyHandler = null;
 
-        this.ease({
+        // this._selectIndicator may be undefined, if Tile Editing Mode is
+        // left as soon as it's entered (e. g. when there's no tile group).
+        this._selectIndicator?.window.activate(global.get_current_time());
+        this._selectIndicator?.ease({
+            x: this._selectIndicator.x + SCALE_SIZE / 2,
+            y: this._selectIndicator.y + SCALE_SIZE / 2,
+            width: this._selectIndicator.width - SCALE_SIZE,
+            height: this._selectIndicator.height - SCALE_SIZE,
             opacity: 0,
             duration: 100,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => this.destroy()
-        });
-    }
-
-    select(rect, window) {
-        this.currMode = MODES.SELECT;
-        this._primaryIndicator.select(rect, window);
-        this._secondaryIndicator.select(rect, window);
-    }
-
-    secondarySelect(rect, window) {
-        this.currMode = MODES.SWAP;
-        this._secondaryIndicator.select(rect, window);
+        }) ?? this.destroy();
     }
 
     vfunc_button_press_event() {
@@ -122,35 +130,232 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
     }
 
     vfunc_key_press_event(keyEvent) {
-        const keySym = keyEvent.keyval;
-        const modState = keyEvent.modifier_state;
-        const isCtrlPressed = modState & Clutter.ModifierType.CONTROL_MASK;
-        const isShiftPressed = modState & Clutter.ModifierType.SHIFT_MASK;
-        const isSuperPressed = modState & Clutter.ModifierType.MOD4_MASK;
+        const mods = keyEvent.modifier_state;
+        const isCtrlPressed = mods & Clutter.ModifierType.CONTROL_MASK;
+        const isShiftPressed = mods & Clutter.ModifierType.SHIFT_MASK;
+        const isSuperPressed = mods & Clutter.ModifierType.MOD4_MASK;
 
-        // [E]xpand to fill space
-        if (keySym === Clutter.KEY_e || keySym === Clutter.KEY_E) {
-            const window = this._primaryIndicator.window;
+        let newMode;
+
+        if (isSuperPressed)
+            newMode = Modes.RESIZE;
+        else if (isCtrlPressed && isShiftPressed)
+            newMode = Modes.EQUALIZE;
+        else if (isCtrlPressed)
+            newMode = Modes.SWAP;
+        else
+            newMode = Modes.DEFAULT;
+
+        if (newMode !== this._mode)
+            this._switchMode(newMode);
+
+        newMode = this._keyHandler.handleKeyPress(keyEvent);
+
+        if (newMode !== this._mode)
+            this._switchMode(newMode);
+    }
+
+    vfunc_key_release_event(keyEvent) {
+        const newMode = this._keyHandler.handleKeyRelease(keyEvent);
+        if (newMode !== this._mode)
+            this._switchMode(newMode);
+    }
+
+    _switchMode(newMode) {
+        if (!newMode)
+            return;
+
+        this._mode = newMode;
+
+        // Remove all except the selection indicator.
+        // Animate with a scale down and fade effect.
+        const lastIdx = this._indicators.length - 1;
+        const indicators = this._indicators.splice(1, lastIdx);
+        indicators.forEach(i => {
+            i.ease({
+                x: i.x + SCALE_SIZE / 2,
+                y: i.y + SCALE_SIZE / 2,
+                width: i.width - SCALE_SIZE,
+                height: i.height - SCALE_SIZE,
+                opacity: 0,
+                duration: 100,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD
+            });
+        });
+
+        this._keyHandler.prepareLeave();
+
+        switch (newMode) {
+            case Modes.DEFAULT:
+                this._keyHandler = new DefaultKeyHandler(this);
+                break;
+
+            case Modes.SWAP:
+                this._keyHandler = new SwapKeyHandler(this);
+                break;
+
+            case Modes.RESIZE:
+                this._keyHandler = new ResizeKeyHandler(this);
+                break;
+
+            case Modes.EQUALIZE:
+                this._keyHandler = new EqualizeKeyHandler(this);
+                break;
+
+            case Modes.CLOSE:
+                this.close();
+        }
+    }
+
+    get indicators() {
+        return this._indicators;
+    }
+
+    get selectIndicator() {
+        return this._indicators[0];
+    }
+
+    get windows() {
+        return this._windows;
+    }
+});
+
+/**
+ * Indicate the user selection or other stuff.
+ */
+const Indicator = GObject.registerClass(class TileEditingModeIndicator extends St.Widget {
+
+    /**
+     * @param {string} style_class
+     * @param {Rect} pos
+     */
+    _init(style_class, pos) {
+        // Start from a scaled down position.
+        super._init({
+            style_class,
+            x: pos.x + SCALE_SIZE / 2,
+            y: pos.y + SCALE_SIZE / 2,
+            width: pos.width - SCALE_SIZE,
+            height: pos.height - SCALE_SIZE,
+            opacity: 0
+        });
+
+        this.rect = null;
+        this.window = null;
+    }
+
+    /**
+     * Animate the indicator to a specific position.
+     *
+     * @param {Rect} rect the position the indicator will animate to.
+     * @param {Meta.Window|null} window the window at `rect`'s position.
+     */
+    focus(rect, window = null) {
+        const gap = Settings.getInt('window-gap');
+        const monitor = global.display.get_current_monitor();
+        const display = global.display.get_monitor_geometry(monitor);
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+
+        // We need to adjust the indicator here because if the user uses a
+        // window `gap`, the tiled windows will shrink by gap / 2 on all sides,
+        // so that the gap between 2 windows is 1 full gap. If the tiled windows
+        // borders the workArea at the start, we shift the window by gap / 2.
+        // So that the gap between 2 windows and the workArea is uniform. Same
+        // goes for, if the window ends on the workArea. Adjust the indicator's
+        // size accordingly.
+        let xAdj = gap / 2;
+        let yAdj = gap / 2;
+        let widthAdj = -gap;
+        let heightAdj = -gap;
+
+        if (rect.x === workArea.x)
+            xAdj += gap / 2;
+        if (rect.y === workArea.y)
+            yAdj += gap / 2;
+        if (rect.x === workArea.x)
+            widthAdj -= gap / 2;
+        if (rect.x2 === workArea.x2)
+            widthAdj -= gap / 2;
+        if (rect.y === workArea.y)
+            heightAdj -= gap / 2;
+        if (rect.y2 === workArea.y2)
+            heightAdj -= gap / 2;
+
+        this.ease({
+            x: rect.x - display.x + xAdj,
+            y: rect.y - display.y + yAdj,
+            width: rect.width + widthAdj,
+            height: rect.height + heightAdj,
+            opacity: 255,
+            duration: 150,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
+
+        this.rect = rect;
+        this.window = window;
+    }
+});
+
+/**
+ * Base class for other keyboard handlers and the default handler itself.
+ *
+ * @param {TileEditingMode} tileEditor
+ */
+const DefaultKeyHandler = class DefaultKeyHandler {
+
+    constructor(tileEditor) {
+        this._tileEditor = tileEditor;
+    }
+
+    /**
+     * Automatically called when leaving a mode.
+     */
+    prepareLeave() {
+    }
+
+    /**
+     * Automatically called on a keyEvent.
+     *
+     * @param {number} keyEvent
+     * @returns {Modes} The mode to enter after the event was handled.
+     */
+    handleKeyPress(keyEvent) {
+        const keyVal = keyEvent.keyval;
+
+        // [Directions] to move focus with WASD, hjkl or arrow keys
+        const dir = Util.getDirection(keyVal);
+        if (dir) {
+            this._focusInDir(dir);
+
+        // [E]xpand to fill the available space
+        } else if (keyVal === Clutter.KEY_e || keyVal === Clutter.KEY_E) {
+            const window = this._selectIndicator.window;
             if (!window)
-                return;
+                return Modes.DEFAULT;
 
             const tiledRect = this._windows.map(w => w.tiledRect);
             const tileRect = Util.getBestFreeRect(tiledRect, window.tiledRect);
             if (window.tiledRect.equal(tileRect))
-                return;
+                return Modes.DEFAULT;
 
-            const maximize = tileRect.equal(window.get_work_area_current_monitor());
+            const workArea = window.get_work_area_current_monitor();
+            const maximize = tileRect.equal(workArea);
             if (maximize && this._windows.length > 1)
-                return;
+                return Modes.DEFAULT;
 
             Util.tile(window, tileRect, { openTilingPopup: false });
-            maximize ? this.close() : this.select(window.tiledRect, window);
 
-        // [C]ycle through halves of the available space of the window
-        } else if ((keySym === Clutter.KEY_c || keySym === Clutter.KEY_C)) {
-            const window = this._primaryIndicator.window;
+            if (maximize)
+                return Modes.CLOSE;
+
+            this._selectIndicator.focus(window.tiledRect, window);
+
+        // [C]ycle through halves of the available space around the window
+        } else if ((keyVal === Clutter.KEY_c || keyVal === Clutter.KEY_C)) {
+            const window = this._selectIndicator.window;
             if (!window)
-                return;
+                return Modes.DEFAULT;
 
             const tiledRects = this._windows.map(w => w.tiledRect);
             const fullRect = Util.getBestFreeRect(tiledRects, window.tiledRect);
@@ -163,63 +368,64 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
             const newIndex = (currIdx + 1) % 4;
 
             Util.tile(window, rects[newIndex], { openTilingPopup: false });
-            this.select(rects[newIndex], window);
+            this._selectIndicator.focus(window.tiledRect, window);
 
         // [Q]uit a window
-        } else if (keySym === Clutter.KEY_q || keySym === Clutter.KEY_Q) {
-            const window = this._primaryIndicator.window;
+        } else if (keyVal === Clutter.KEY_q || keyVal === Clutter.KEY_Q) {
+            const window = this._selectIndicator.window;
             if (!window)
-                return;
+                return Modes.DEFAULT;
 
             this._windows.splice(this._windows.indexOf(window), 1);
             window.delete(global.get_current_time());
             const newWindow = this._windows[0];
-            newWindow ? this.select(newWindow.tiledRect, newWindow) : this.close();
+            if (!newWindow)
+                return Modes.CLOSE;
 
-        // [R]estore window size
-        } else if (keySym === Clutter.KEY_r || keySym === Clutter.KEY_R) {
-            const window = this._primaryIndicator.window;
+            this._selectIndicator.focus(newWindow.tiledRect, newWindow);
+
+        // [R]estore a window's size
+        } else if (keyVal === Clutter.KEY_r || keyVal === Clutter.KEY_R) {
+            const window = this._selectIndicator.window;
             if (!window)
-                return;
+                return Modes.DEFAULT;
 
-            const ogRect = window.tiledRect.copy();
+            const selectedRect = window.tiledRect.copy();
             this._windows.splice(this._windows.indexOf(window), 1);
             Util.untile(window);
-            if (!this._windows.length) {
-                this.close();
-                return;
-            }
+            if (!this._windows.length)
+                return Modes.CLOSE;
 
-            this._windows.forEach(w => w.raise());
-            const topTiled = Util.getWindows().find(w => this._windows.includes(w));
-            topTiled.activate(global.get_current_time());
-            this.select(ogRect, null);
+            // Re-raise tile group, so it isn't below the just-untiled window
+            this._windows[0].raise();
+            this._selectIndicator.focus(selectedRect, null);
 
-        // [Esc]ape tile editing mode
-        } else if (keySym === Clutter.KEY_Escape) {
-            this.currMode === MODES.SELECT
-                ? this.close()
-                : this.select(this._primaryIndicator.rect, this._primaryIndicator.window);
+        // [Esc]ape Tile Editing Mode
+        } else if (keyVal === Clutter.KEY_Escape) {
+            return Modes.CLOSE;
 
-        // [Enter/Space]
-        } else if (keySym === Clutter.KEY_Return || keySym === Clutter.KEY_space) {
-            if (this.currMode !== MODES.SELECT)
-                return;
-
-            const window = this._primaryIndicator.window;
+        // [Enter/Space] to activate
+        } else if (keyVal === Clutter.KEY_Return || keyVal === Clutter.KEY_space) {
+            // a window: quit Tile Editing Mode
+            const window = this._selectIndicator.window;
             if (window) {
-                this.close();
+                return Modes.CLOSE;
 
-            // open Tiling Popup, when activating an empty spot
+            // an empty spot: open Tiling Popup
             } else {
-                const openWindows = Util.getWindows(Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY))
-                    .filter(w => !this._windows.includes(w));
-                const rect = this._primaryIndicator.rect;
-                const TilingPopup = Me.imports.src.extension.tilingPopup;
-                const tilingPopup = new TilingPopup.TilingSwitcherPopup(openWindows, rect, false);
+                const notEditing = w => !this._windows.includes(w);
+                const currWsOnly = Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY);
+                const openWindows = Util.getWindows(currWsOnly).filter(notEditing);
+                const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
+                const tilingPopup = new TilingSwitcherPopup(
+                    openWindows,
+                    this._selectIndicator.rect,
+                    false
+                );
+
                 if (!tilingPopup.show(this._windows)) {
                     tilingPopup.destroy();
-                    return;
+                    return Modes.DEFAULT;
                 }
 
                 tilingPopup.connect('closed', (popup, canceled) => {
@@ -228,199 +434,379 @@ var TileEditor = GObject.registerClass(class TilingEditingMode extends St.Widget
 
                     const { tiledWindow } = popup;
                     this._windows.unshift(tiledWindow);
-                    this.select(tiledWindow.tiledRect, tiledWindow);
+                    this._selectIndicator.focus(tiledWindow.tiledRect, tiledWindow);
                 });
             }
-
-        // [Direction] (WASD, hjkl or arrow keys)
-        } else if (Util.isDirection(keySym, Direction.N)) {
-            isSuperPressed
-                ? this._resize(Direction.N, isShiftPressed)
-                : this._selectTowards(Direction.N, isCtrlPressed);
-
-        } else if (Util.isDirection(keySym, Direction.S)) {
-            isSuperPressed
-                ? this._resize(Direction.S, isShiftPressed)
-                : this._selectTowards(Direction.S, isCtrlPressed);
-
-        } else if (Util.isDirection(keySym, Direction.W)) {
-            isSuperPressed
-                ? this._resize(Direction.W, isShiftPressed)
-                : this._selectTowards(Direction.W, isCtrlPressed);
-
-        } else if (Util.isDirection(keySym, Direction.E)) {
-            isSuperPressed
-                ? this._resize(Direction.E, isShiftPressed)
-                : this._selectTowards(Direction.E, isCtrlPressed);
         }
+
+        return Modes.DEFAULT;
     }
 
-    _selectTowards(direction, isCtrlPressed) {
+    /**
+     * Automatically called on a keyEvent.
+     *
+     * @param {number} keyEvent
+     * @returns {Modes} The mode to enter after the event was handled.
+     */
+    handleKeyRelease() {
+        return Modes.DEFAULT;
+    }
+
+    /**
+     * Move the the selection indicator towards direction of `dir`.
+     *
+     * @param {Direction} dir
+     */
+    _focusInDir(dir) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
-        const currRect = isCtrlPressed ? this._secondaryIndicator.rect : this._primaryIndicator.rect;
         const tiledRects = this._windows.map(w => w.tiledRect);
-        const freeScreenRects = workArea.minus(tiledRects);
-        const closestRect = currRect.getNeighbor(direction, tiledRects.concat(freeScreenRects));
-        if (!closestRect)
+        const screenRects = tiledRects.concat(workArea.minus(tiledRects));
+        const nearestRect = this._selectIndicator.rect.getNeighbor(dir, screenRects);
+        if (!nearestRect)
             return;
 
-        const newWindow = this._windows.find(w => w.tiledRect.equal(closestRect));
-        isCtrlPressed
-            ? this.secondarySelect(closestRect, newWindow)
-            : this.select(closestRect, newWindow);
+        const newWindow = this._windows.find(w => w.tiledRect.equal(nearestRect));
+        this._selectIndicator.focus(newWindow?.tiledRect ?? nearestRect, newWindow);
     }
 
-    _resize(direction, isShiftPressed) {
-        const window = this._primaryIndicator.window;
-        if (!window)
-            return;
+    /**
+     * Create a new indicator, add it to the indicators array
+     * and to the Tile Editor.
+     *
+     * @param {string} styleClass
+     * @param {Rect} rect
+     * @returns {Indicator} the newly created Indicator.
+     */
+    _makeIndicator(styleClass, rect) {
+        const indicator = new Indicator(styleClass, rect);
+        this._indicators.push(indicator);
+        this._tileEditor.add_child(indicator);
+        return indicator;
+    }
 
-        const resizedRect = window.tiledRect.copy();
-        const workArea = new Rect(window.get_work_area_current_monitor());
-        let resizeStep = 100;
-        // limit resizeStep when trying to extend outside of the current screen
-        if (direction === Direction.N && isShiftPressed)
-            resizeStep = Math.min(resizeStep, resizedRect.y - workArea.y);
-        else if (direction === Direction.S && !isShiftPressed)
-            resizeStep = Math.min(resizeStep,
-                workArea.y2 - resizedRect.y2);
-        else if (direction === Direction.W && isShiftPressed)
-            resizeStep = Math.min(resizeStep, resizedRect.x - workArea.x);
-        else if (direction === Direction.E && !isShiftPressed)
-            resizeStep = Math.min(resizeStep,
-                workArea.x2 - resizedRect.x2);
+    get _indicators() {
+        return this._tileEditor.indicators;
+    }
 
-        if (!resizeStep) {
-            Main.notify('Tiling Assistant', _("Can't resize in that direction. Super + Directions resizes on the S and E side. Super + Shift + Directions on the N and W side."));
-            return;
+    get _windows() {
+        return this._tileEditor.windows;
+    }
+
+    get _selectIndicator() {
+        return this._indicators[0];
+    }
+
+    /**
+     * @returns {Indicator} the first indicator after the user selection
+     *      indicator. This is usually the indicator the user selected before
+     *      entering a non-default mode. For example, when swapping windows.
+     */
+    get _anchorIndicator() {
+        return this._indicators[1];
+    }
+};
+
+/**
+ * Move the selected window to a different position. If there is a window at
+ * the new position, the 2 windows will swap their positions.
+ *
+ * @param {TileEditingMode} tileEditor
+ */
+const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
+
+    constructor(tileEditor) {
+        super(tileEditor);
+
+        // Create an 'anchor indicator' to indicate the window that will be swapped
+        const styleClass = 'tile-editing-mode-anchor-indicator';
+        const indicator = this._makeIndicator(styleClass, this._selectIndicator.rect);
+        indicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
+    }
+
+    handleKeyPress(keyEvent) {
+        const direction = Util.getDirection(keyEvent.keyval);
+
+        // [Directions] to choose a window to swap with WASD, hjkl or arrow keys
+        if (direction)
+            this._focusInDir(direction);
+
+        // [Esc]ape Tile Editing Mode
+        else if (keyEvent.keyval === Clutter.KEY_Escape)
+            return Modes.DEFAULT;
+
+        return Modes.SWAP;
+    }
+
+    handleKeyRelease(keyEvent) {
+        const keyVal = keyEvent.keyval;
+        const ctrlKeys = [Clutter.KEY_Control_L, Clutter.KEY_Control_R];
+
+        if (ctrlKeys.includes(keyVal)) {
+            this._swap();
+            return Modes.DEFAULT;
         }
 
-        const isVertical = direction === Direction.N || direction === Direction.S;
-        const changeDir = ((direction === Direction.S || direction === Direction.E) ? 1 : -1)
-                * (isShiftPressed ? -1 : 1);
-        const getResizedRect = function(rect, dimensionChangeOnly, dir) {
-            return new Rect(
-                rect.x + (dimensionChangeOnly || isVertical ? 0 : resizeStep * -dir),
-                rect.y + (!dimensionChangeOnly && isVertical ? resizeStep * -dir : 0),
-                rect.width + (isVertical ? 0 : resizeStep * dir),
-                rect.height + (isVertical ? resizeStep * dir : 0)
-            );
-        };
-        const resizeSide = function(rect1, rect2, opposite) {
-            const [posProp, dimensionProp] = isVertical ? ['y', 'height'] : ['x', 'width'];
-            if (isShiftPressed)
-                return opposite ? Util.equal(rect1[posProp] + rect1[dimensionProp], rect2[posProp])
-                    : Util.equal(rect1[posProp], rect2[posProp]);
-            else
-                return opposite
-                    ? Util.equal(rect1[posProp], rect2[posProp] + rect2[dimensionProp])
-                    : Util.equal(rect1[posProp] + rect1[dimensionProp],
-                        rect2[posProp] + rect2[dimensionProp]);
+        return Modes.SWAP;
+    }
+
+    _swap() {
+        if (this._anchorIndicator.window)
+            Util.tile(this._anchorIndicator.window, this._selectIndicator.rect, {
+                openTilingPopup: false
+            });
+
+        if (this._selectIndicator.window)
+            Util.tile(this._selectIndicator.window, this._anchorIndicator.rect, {
+                openTilingPopup: false
+            });
+
+        this._selectIndicator.focus(this._selectIndicator.rect,
+            this._anchorIndicator.window);
+    }
+};
+
+const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
+
+    constructor(tileEditor) {
+        super(tileEditor);
+
+        // The edge that is currently being resized.
+        this._currEdge = null;
+    }
+
+    prepareLeave() {
+        // Delete the resize styles.
+        this._removeResizeStyle();
+    }
+
+    handleKeyPress(keyEvent) {
+        // [Directions] to resize with WASD, hjkl or arrow keys
+        const direction = Util.getDirection(keyEvent.keyval);
+        if (direction) {
+            const window = this._selectIndicator.window;
+            if (!window)
+                return Modes.DEFAULT;
+
+            // First call: Go to an edge.
+            if (!this._currEdge) {
+                this._currEdge = direction;
+                this._applyResizeStyle(direction);
+                return Modes.RESIZE;
+
+            // Change resize orientation from H to V
+            } else if ([Direction.N, Direction.S].includes(this._currEdge)) {
+                if ([Direction.W, Direction.E].includes(direction)) {
+                    this._currEdge = direction;
+                    this._applyResizeStyle(direction);
+                    return Modes.RESIZE;
+                }
+
+            // Change resize orientation from V to H
+            } else if ([Direction.W, Direction.E].includes(this._currEdge)) {
+                if ([Direction.N, Direction.S].includes(direction)) {
+                    this._currEdge = direction;
+                    this._applyResizeStyle(direction);
+                    return Modes.RESIZE;
+                }
+            }
+
+            this._resize(window, direction);
+
+            // Update the selection indicator.
+            this._selectIndicator.focus(window.tiledRect, window);
+
+        // [Esc]ape Tile Editing Mode
+        } else if (keyEvent.keyval === Clutter.KEY_Escape) {
+            return Modes.CLOSE;
+        }
+
+        return Modes.RESIZE;
+    }
+
+    handleKeyRelease(keyEvent) {
+        const keyVal = keyEvent.keyval;
+        const superKeys = [Clutter.KEY_Super_L, Clutter.KEY_Super_R];
+        return superKeys.includes(keyVal) ? Modes.DEFAULT : Modes.RESIZE;
+    }
+
+    _resize(window, keyDir) {
+        // Rect, which is being resized by the user. But it still has
+        // its original / pre-resize dimensions
+        const resizedRect = window.tiledRect;
+        const workArea = new Rect(window.get_work_area_current_monitor());
+        let resizeAmount = 50;
+
+        // Limit resizeAmount to the workArea
+        if (this._currEdge === Direction.N && keyDir === Direction.N)
+            resizeAmount = Math.min(resizeAmount, resizedRect.y - workArea.y);
+        else if (this._currEdge === Direction.S && keyDir === Direction.S)
+            resizeAmount = Math.min(resizeAmount, workArea.y2 - resizedRect.y2);
+        else if (this._currEdge === Direction.W && keyDir === Direction.W)
+            resizeAmount = Math.min(resizeAmount, resizedRect.x - workArea.x);
+        else if (this._currEdge === Direction.E && keyDir === Direction.E)
+            resizeAmount = Math.min(resizeAmount, workArea.x2 - resizedRect.x2);
+
+        if (resizeAmount <= 0)
+            return;
+
+        // Function to update the passed rect by the resizeAmount depending on
+        // the edge that is resized. Some windows will resize on the same edge
+        // as the one the user is resizing. Other windows will resize on the
+        // opposite edge.
+        const updateRectSize = function(rect, resizeOnEdge) {
+            const growDir = keyDir === resizeOnEdge ? 1 : -1;
+            switch (resizeOnEdge) {
+                case Direction.N:
+                    rect.y -= resizeAmount * growDir;
+                    // falls through
+                case Direction.S:
+                    rect.height += resizeAmount * growDir;
+                    break;
+
+                case Direction.W:
+                    rect.x -= resizeAmount * growDir;
+                    // falls through
+                case Direction.E:
+                    rect.width += resizeAmount * growDir;
+            }
         };
 
+        // Actually resize the windows here.
         this._windows.forEach(w => {
-            if (resizeSide.call(this, w.tiledRect, resizedRect, false)) {
-                const tileRect = getResizedRect(w.tiledRect, !isShiftPressed, changeDir);
-                if (tileRect.equal(w.get_work_area_current_monitor()))
-                    return;
+            // The window, which is resized by the user, is included in this.
+            if (this._isSameSide(resizedRect, w.tiledRect)) {
+                const newRect = w.tiledRect.copy();
+                updateRectSize(newRect, this._currEdge);
+                Util.tile(w, newRect, { openTilingPopup: false });
 
-                Util.tile(w, tileRect, { openTilingPopup: false });
-            } else if (resizeSide.call(this, w.tiledRect, resizedRect, true)) {
-                const tileRect = getResizedRect(w.tiledRect, isShiftPressed, -changeDir);
-                if (tileRect.equal(w.get_work_area_current_monitor()))
-                    return;
-
-                Util.tile(w, tileRect, { openTilingPopup: false });
+            } else if (this._isOppositeSide(resizedRect, w.tiledRect)) {
+                const newRect = w.tiledRect.copy();
+                updateRectSize(newRect, Direction.opposite(this._currEdge));
+                Util.tile(w, newRect, { openTilingPopup: false });
             }
         });
-        this.select(window.tiledRect, window);
     }
 
-    vfunc_key_release_event(keyEvent) {
-        const primWindow = this._primaryIndicator.window;
-        const secWindow = this._secondaryIndicator.window;
-
-        if (this.currMode === MODES.SWAP
-                && [Clutter.KEY_Control_L, Clutter.KEY_Control_R].includes(keyEvent.keyval)) {
-            // TODO messy code and difficult to use/activate since ctrl needs to be released first...
-            // try to [equalize] the size (width OR height) of the highlighted rectangles
-            // including the rectangles which are in the union of the 2 highlighted rects
-            if (keyEvent.modifier_state & Clutter.ModifierType.SHIFT_MASK) {
-                const equalize = function(pos, dimension) {
-                    const unifiedRect = primWindow.tiledRect.union(secWindow.tiledRect);
-                    const windowsToResize = Util.getTopTileGroup(false).filter(w => unifiedRect.containsRect(w.tiledRect));
-                    if (unifiedRect.area !== windowsToResize.reduce((areaSum, w) => areaSum + w.tiledRect.area, 0))
-                        return;
-
-                    const [beginnings, endings] = windowsToResize.reduce((array, w) => {
-                        array[0].push(w.tiledRect[pos]);
-                        array[1].push(w.tiledRect[pos] + w.tiledRect[dimension]);
-                        return array;
-                    }, [[], []]);
-                    const uniqueBeginnings = [...new Set(beginnings)].sort((a, b) => a - b);
-                    const uniqueEndings = [...new Set(endings)].sort((a, b) => a - b);
-                    const newDimension = Math.ceil(unifiedRect[dimension] / uniqueEndings.length); // per row/column
-                    windowsToResize.forEach(w => {
-                        const rect = w.tiledRect.copy();
-                        const begIdx = uniqueBeginnings.indexOf(w.tiledRect[pos]);
-                        const endIdx = uniqueEndings.indexOf(w.tiledRect[pos] + w.tiledRect[dimension]);
-                        rect[pos] = unifiedRect[pos] + begIdx * newDimension;
-                        rect[dimension] = w.tiledRect[pos] + w.tiledRect[dimension] === unifiedRect[pos] + unifiedRect[dimension]
-                            ? unifiedRect[pos] + unifiedRect[dimension] - rect[pos]
-                            : (endIdx - begIdx + 1) * newDimension;
-                        Util.tile(w, rect, { openTilingPopup: false });
-                    });
-                };
-
-                if (primWindow.tiledRect.x === secWindow.tiledRect.x
-                        || primWindow.tiledRect.x2 === secWindow.tiledRect.x2)
-                    equalize('y', 'height');
-                else if (primWindow.tiledRect.y === secWindow.tiledRect.y
-                        || primWindow.tiledRect.y2 === secWindow.tiledRect.y2)
-                    equalize('x', 'width');
-
-                this.select(secWindow.tiledRect, secWindow);
-
-            // [swap] focused and secondary window(s)/rect
-            } else {
-                primWindow && Util.tile(primWindow, this._secondaryIndicator.rect, { openTilingPopup: false });
-                secWindow && Util.tile(secWindow, this._primaryIndicator.rect, { openTilingPopup: false });
-                this.select(this._secondaryIndicator.rect, primWindow);
-            }
+    _isOppositeSide(rect1, rect2) {
+        switch (this._currEdge) {
+            case Direction.N:
+                return rect1.y === rect2.y2;
+            case Direction.S:
+                return rect1.y2 === rect2.y;
+            case Direction.W:
+                return rect1.x === rect2.x2;
+            case Direction.E:
+                return rect1.x2 === rect2.x;
         }
+
+        return false;
     }
-});
 
-const Indicator = GObject.registerClass(
-    class TilingEditingModeIndicator extends St.Widget {
-
-        _init(style, gap) {
-            super._init({
-                style,
-                opacity: 0
-            });
-
-            this.rect = null;
-            this.window = null;
-            this._gap = gap;
+    _isSameSide(rect1, rect2) {
+        switch (this._currEdge) {
+            case Direction.N:
+                return rect1.y === rect2.y;
+            case Direction.S:
+                return rect1.y2 === rect2.y2;
+            case Direction.W:
+                return rect1.x === rect2.x;
+            case Direction.E:
+                return rect1.x2 === rect2.x2;
         }
 
-        select(rect, window) {
-            const monitor = global.display.get_current_monitor();
-            const display = global.display.get_monitor_geometry(monitor);
-            this.ease({
-                x: rect.x + (this._gap - 2) / 2 - display.x,
-                y: rect.y + (this._gap - 2) / 2 - display.y,
-                width: rect.width - this._gap + 2,
-                height: rect.height - this._gap + 2,
-                opacity: 255,
-                duration: 150,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD
-            });
+        return false;
+    }
 
-            this.rect = rect;
-            this.window = window;
+    _applyResizeStyle(dir) {
+        this._removeResizeStyle();
+
+        if (dir === Direction.N)
+            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-top');
+        if (dir === Direction.S)
+            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-bottom');
+        if (dir === Direction.E)
+            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-right');
+        if (dir === Direction.W)
+            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-left');
+    }
+
+    _removeResizeStyle() {
+        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-left');
+        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-right');
+        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-top');
+        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-bottom');
+    }
+};
+
+const EqualizeKeyHandler = class EqualizeKeyHandler extends DefaultKeyHandler {
+    /*
+    constructor(tileEditor) {
+        super(tileEditor);
+
+        // Create an 'anchor indicator' to indicate where the equalizing starts
+        const styleClass = 'tile-editing-mode-anchor-indicator';
+        const indicator = this._makeIndicator(styleClass, this._selectIndicator.rect);
+        indicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
+    }
+
+    handleKeyPress(keyEvent) {
+        const direction = Util.getDirection(keyEvent.keyval);
+
+        // [Directions] to choose a window with WASD, hjkl or arrow keys
+        if (direction)
+            this._focusInDir(direction);
+
+        // [Esc]ape Tile Editing Mode
+        else if (keyEvent.keyval === Clutter.KEY_Escape)
+            return Modes.DEFAULT;
+
+        return Modes.EQUALIZE;
+    }
+
+    handleKeyRelease(keyEvent) {
+        const keyVal = keyEvent.keyval;
+        const mods = keyEvent.modifier_state;
+        const ctrlKeys = [Clutter.KEY_Control_L, Clutter.KEY_Control_R];
+        const shiftKeys = [Clutter.KEY_Shift_L, Clutter.KEY_Shift_R];
+
+        // Don't care, if Shift or Ctrl was released first.
+        if (ctrlKeys.includes(keyVal) || shiftKeys.includes(keyVal)) {
+            const ctrlMod = Clutter.ModifierType.CONTROL_MASK;
+            const shiftMod = Clutter.ModifierType.SHIFT_MASK;
+            if (!(mods & ctrlMod) && !(mods & shiftMod))
+                return Modes.EQUALIZE;
+
+            const window = this._selectIndicator.window;
+            const anchor = this._anchorIndicator.window;
+            if (!window || !anchor)
+                return Modes.DEFAULT;
+
+            const union = window.tiledRect.union(anchor);
+            const affectedWindows = this._windows.filter(w =>
+                union.containsRect(w.tiledRect));
+            const affectedArea = affectedWindows.reduce((sum, w) => {
+                sum += w.tiledRect.area;
+                return sum;
+            }, 0);
+
+            if (union.area !== affectedArea)
+                return Modes.DEFAULT;
+
+            this._equalize(affectedWindows);
+
+            // Update the focus indicator.
+            this._selectIndicator.focus(window.tiledRect, window);
+
+            return Modes.DEFAULT;
         }
-    });
+
+        return Modes.EQUALIZE;
+    }
+
+    _equalize(windows) {
+        // TODO not yet implemented...
+    }
+    */
+};

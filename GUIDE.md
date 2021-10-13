@@ -48,7 +48,7 @@ This is a special mode to manage your tiled windows with your keyboard.
 
 You can navigate focus with the direction keys (`WASD`, `hjkl` or the `arrows`). Holding `Ctrl` while moving the focus and then releasing `Ctrl` will swap the highlighted windows. If you hold `Shift` as well instead of swapping the 2 highlighted windows, the sizes of the 2 windows and the windows between them will be equalized (*either* the width *or* the height based on the position of the 2 highlighted windows).
 
-`Super` + `Directions` will resize the selected window on the E or S side. Additionally, holding `Shift` will resize the window on the W or N side.
+`Super` + `Directions` resizes the selected window. This follows GNOME's native resizing behaviour. That means, if you resize on one side and then want to resize on the opposite side, you first need to go to a neighbouring side of your current side before you can go to the opposite side. For intance, if you are currently increasing / decreasing the window size on the North side using the `up` and `down` arrows (or `w` / `s` / `j` / `k`) and then want to resize on the South, you first need to go the West or East side with the `left` or `right` arrows before you can use `down` to reach the South side.
 
 When a window is highlighted, press `Q` to [q]uit it, `R` to [r]estore its size, and `E` to [e]xpand it to fill the available space. Press `C` to [c]ycle through 'half' states of a window.
 

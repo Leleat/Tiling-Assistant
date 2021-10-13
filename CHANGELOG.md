@@ -7,6 +7,7 @@
 **Changed**
 - hid the `Layouts` behind the 'Advanced / Experimental Settings' switch (in `Hidden Settings`)
 - renamed `Layout` to `Popup Layout` since just `Layout` may be misleading
+- Tile Editing Mode's resizing now follows GNOME native keyboard resizing style (see `Alt` + `F8`)
 - removed the PieMenu
 - removed support for GNOME < 40
 - refactored code & created scripts to automate stuff like building, updating translations...

@@ -90,6 +90,23 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
     }
 
     /**
+     * @param {number} keyVal
+     * @returns {Direction}
+     */
+    static getDirection(keyVal) {
+        if (this.isDirection(keyVal, Direction.N))
+            return Direction.N;
+        else if (this.isDirection(keyVal, Direction.S))
+            return Direction.S;
+        else if (this.isDirection(keyVal, Direction.W))
+            return Direction.W;
+        else if (this.isDirection(keyVal, Direction.E))
+            return Direction.E;
+        else
+            return null;
+    }
+
+    /**
      * @param {number} modMask a Clutter.ModifierType.
      * @returns wether the current event the modifier at `modMask`.
      */
