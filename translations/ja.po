@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2021-10-13 21:23+0200\n"
+"POT-Creation-Date: 2021-10-14 21:04+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: k-fog <kiridasuku@gmail.com>\n"
 "Language-Team: Japanese <>\n"
@@ -333,18 +333,18 @@ msgstr ""
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:108
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:111
 msgid "Nameless Layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:183
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:187
 msgid "Layout"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:349
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:353
 msgid "Check out the 'Guide' in the repository (see the 'Help' Tab)."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:353
+#: tiling-assistant@leleat-on-github/src/prefs/popupLayoutsGui.js:357
 msgid "This tooltip for help..."
 msgstr ""
