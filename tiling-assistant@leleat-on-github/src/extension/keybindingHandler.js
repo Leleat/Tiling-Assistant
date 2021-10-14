@@ -230,45 +230,45 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
 
         const wRect = window.tiledRect;
         const isLeftHalf =
-                wRect.x === workArea.x
-                && wRect.y === workArea.y
-                && wRect.width !== workArea.width
-                && wRect.height === workArea.height;
+            wRect.x === workArea.x
+            && wRect.y === workArea.y
+            && wRect.width !== workArea.width
+            && wRect.height === workArea.height;
         const isRightHalf =
-                wRect.x !== workArea.x
-                && wRect.y === workArea.y
-                && wRect.x2 === workArea.x2
-                && wRect.height === workArea.height;
+            wRect.x !== workArea.x
+            && wRect.y === workArea.y
+            && wRect.x2 === workArea.x2
+            && wRect.height === workArea.height;
         const isTopHalf =
-                wRect.x === workArea.x
-                && wRect.y === workArea.y
-                && wRect.width === workArea.width
-                && wRect.height !== workArea.height;
+            wRect.x === workArea.x
+            && wRect.y === workArea.y
+            && wRect.width === workArea.width
+            && wRect.height !== workArea.height;
         const isBottomHalf =
-                wRect.x === workArea.x
-                && wRect.y !== workArea.y
-                && wRect.width === workArea.width
-                && wRect.y2 === workArea.y2;
+            wRect.x === workArea.x
+            && wRect.y !== workArea.y
+            && wRect.width === workArea.width
+            && wRect.y2 === workArea.y2;
         const isTopLeftQuarter =
-                wRect.x === workArea.x
-                && wRect.y === workArea.y
-                && wRect.width !== workArea.width
-                && wRect.height !== workArea.height;
+            wRect.x === workArea.x
+            && wRect.y === workArea.y
+            && wRect.width !== workArea.width
+            && wRect.height !== workArea.height;
         const isTopRightQuarter =
-                wRect.x !== workArea.x
-                && wRect.y === workArea.y
-                && wRect.x2 === workArea.x2
-                && wRect.height !== workArea.height;
+            wRect.x !== workArea.x
+            && wRect.y === workArea.y
+            && wRect.x2 === workArea.x2
+            && wRect.height !== workArea.height;
         const isBottomLeftQuarter =
-                wRect.x === workArea.x
-                && wRect.y !== workArea.y
-                && wRect.width !== workArea.width
-                && wRect.y2 === workArea.y2;
+            wRect.x === workArea.x
+            && wRect.y !== workArea.y
+            && wRect.width !== workArea.width
+            && wRect.y2 === workArea.y2;
         const isBottomRightQuarter =
-                wRect.x !== workArea.x
-                && wRect.y !== workArea.y
-                && wRect.x2 === workArea.x2
-                && wRect.y2 === workArea.y2;
+            wRect.x !== workArea.x
+            && wRect.y !== workArea.y
+            && wRect.x2 === workArea.x2
+            && wRect.y2 === workArea.y2;
 
         let rect;
         if (isLeftHalf) {
