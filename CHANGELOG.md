@@ -2,7 +2,7 @@
 
 ## v26
 **Added**
-- AUR package (#85)
+- ~~AUR package~~ (not by me, see #85)
 
 **Changed**
 - hid the `Layouts` behind the 'Advanced / Experimental Settings' switch (in `Hidden Settings`)
