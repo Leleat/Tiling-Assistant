@@ -33,7 +33,7 @@ Please see the ![Guide](GUIDE.md) for an explanation of every feature.
 
 ## Installation
 
-You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download / clone the repository and run the `scripts/build.sh` script with the `-i` flag. There is also the `gnome-shell-extension-tiling-assistant` package from the AUR (Arch User Repository).
+You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download / clone the repository and run the `scripts/build.sh` script with the `-i` flag. It's also on the AUR (but that one isn't maintained me).
 
 ## Translations
 
