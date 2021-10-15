@@ -30,7 +30,6 @@ const _ = Domain.gettext;
  */
 
 var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused-vars
-
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios
@@ -242,7 +241,6 @@ var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused
             } else {
                 this._finish();
             }
-
         } else {
             const tiledWindow = tilingPopup.tiledWindow;
             this._tiledWithLayout.push(tiledWindow);
@@ -259,8 +257,8 @@ var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused
                     const [pos, dimension] = this._currItem.loopType === 'h'
                         ? ['y', 'height']
                         : ['x', 'width'];
-                    rect[dimension] = rect[dimension] / this._tiledWithLoop.length;
-                    rect[pos] = rect[pos] + idx * rect[dimension];
+                    rect[dimension] /= this._tiledWithLoop.length;
+                    rect[pos] += idx * rect[dimension];
                     Util.tile(w, rect, { openTilingPopup: false, skipAnim: true });
                 });
             }
@@ -291,7 +289,6 @@ var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused
 const LayoutSearch = GObject.registerClass({
     Signals: { 'item-activated': { param_types: [GObject.TYPE_INT] } }
 }, class PopupLayoutsSearch extends St.BoxLayout {
-
     _init(layouts) {
         super._init({
             width: 500,
@@ -318,7 +315,7 @@ const LayoutSearch = GObject.registerClass({
             style: `font-size: ${fontSize}px;\
                     border-radius: 16px;`,
             // The cursor overlaps the text, so add some spaces at the beginning
-            hint_text: ' ' + _('Type to search...')
+            hint_text: ` ${_('Type to search...')}`
         });
         const entryClutterText = entry.get_clutter_text();
         entryClutterText.connect('key-press-event', this._onKeyPressed.bind(this));
@@ -361,17 +358,14 @@ const LayoutSearch = GObject.registerClass({
         if (keySym === Clutter.KEY_Escape) {
             this.destroy();
             return Clutter.EVENT_STOP;
-
-        } else if (keySym === Clutter.KEY_Return
-                || keySym === Clutter.KEY_KP_Enter
-                || keySym === Clutter.KEY_ISO_Enter) {
+        } else if (keySym === Clutter.KEY_Return ||
+                keySym === Clutter.KEY_KP_Enter ||
+                keySym === Clutter.KEY_ISO_Enter) {
             this._activate();
             return Clutter.EVENT_STOP;
-
-        } else if (keySym == Clutter.KEY_Down) {
+        } else if (keySym === Clutter.KEY_Down) {
             this._focusNext();
             return Clutter.EVENT_STOP;
-
         } else if (keySym === Clutter.KEY_Up) {
             this._focusPrev();
             return Clutter.EVENT_STOP;
@@ -423,12 +417,11 @@ const LayoutSearch = GObject.registerClass({
  * An Item representing a Layout within the Popup Layout search.
  */
 const SearchItem = GObject.registerClass(class PopupLayoutsSearchItem extends St.Label {
-
     _init(text, fontSize) {
         super._init({
             // Add some spaces to the beginning to align it better
             // with the rounded corners
-            text: '   ' + (text || _('Nameless layout...')),
+            text: `   ${text || _('Nameless layout...')}`,
             style: `font-size: ${fontSize}px;\
                 text-align: left;\
                 padding: 8px\

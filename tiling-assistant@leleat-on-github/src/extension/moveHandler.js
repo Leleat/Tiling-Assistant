@@ -19,7 +19,6 @@ const Util = Me.imports.src.extension.utility.Util;
  */
 
 var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
-
     constructor() {
         const moveOps = [Meta.GrabOp.MOVING, Meta.GrabOp.KEYBOARD_MOVING];
 
@@ -120,9 +119,8 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
 
         // Try to restore the window size
         const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
-        if ((window.tiledRect || this._wasMaximizedOnStart)
-                && restoreSetting === RestoreOn.ON_GRAB_START) {
-
+        if ((window.tiledRect || this._wasMaximizedOnStart) &&
+                restoreSetting === RestoreOn.ON_GRAB_START) {
             // HACK:
             // The grab begin signal (and thus this function call) gets fired
             // at the moment of the first click. However I don't want to restore
@@ -253,20 +251,20 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
             case AlternatePreviewMod.RMB: {
                 const rmb = Clutter.ModifierType.BUTTON3_MASK;
                 secondaryModeActivatorPressed = Util.isModPressed(rmb);
-            }}
+            } }
 
         const secondarySetting = Settings.DEFAULT_TO_SECONDARY_PREVIEW;
         const defaultToSecondaryMode = Settings.getBoolean(secondarySetting);
-        if (!defaultToSecondaryMode && !secondaryModeActivatorPressed
-                || defaultToSecondaryMode && secondaryModeActivatorPressed)
-            this._primaryPreviewTile(window, grabOp);
+        if (!defaultToSecondaryMode && !secondaryModeActivatorPressed ||
+                defaultToSecondaryMode && secondaryModeActivatorPressed)
+        { this._primaryPreviewTile(window, grabOp); }
         else
-            this._secondaryPreviewTile(
-                window,
-                grabOp,
-                topTileGroup,
-                freeScreenRects
-            );
+        { this._secondaryPreviewTile(
+            window,
+            grabOp,
+            topTileGroup,
+            freeScreenRects
+        ); }
     }
 
     _restoreSizeAndRestartGrab(window, eventX, eventY, grabOp) {
@@ -359,26 +357,22 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         if (tileTopLeftQuarter) {
             this._tileRect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (tileTopRightQuarter) {
             this._tileRect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (tileBottomLeftQuarter) {
             this._tileRect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (tileBottomRightQuarter) {
             this._tileRect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (pointerAtTopEdge) {
             // Switch between maximize & top tiling when keeping the mouse at the top edge.
             const monitorRect = global.display.get_monitor_geometry(this._monitorNr);
             const isLandscape = monitorRect.width >= monitorRect.height;
             const shouldMaximize =
-                    isLandscape && !Settings.getBoolean(Settings.ENABLE_HOLD_INVERSE_LANDSCAPE)
-                    || !isLandscape && !Settings.getBoolean(Settings.ENABLE_HOLD_INVERSE_PORTRAIT);
+                    isLandscape && !Settings.getBoolean(Settings.ENABLE_HOLD_INVERSE_LANDSCAPE) ||
+                    !isLandscape && !Settings.getBoolean(Settings.ENABLE_HOLD_INVERSE_PORTRAIT);
             const tileRect = shouldMaximize
                 ? workArea
                 : Util.getTileFor(Shortcuts.TOP, workArea, this._monitorNr);
@@ -386,9 +380,9 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                 ? Util.getTileFor(Shortcuts.TOP, workArea, this._monitorNr)
                 : workArea;
             // Dont open preview / start new timer if preview was already one for the top
-            if (this._tilePreview._rect
-                        && (holdTileRect.equal(this._tilePreview._rect)
-                                || this._tilePreview._rect.equal(tileRect.meta)))
+            if (this._tilePreview._rect &&
+                        (holdTileRect.equal(this._tilePreview._rect) ||
+                                this._tilePreview._rect.equal(tileRect.meta)))
                 return;
 
             this._tileRect = tileRect;
@@ -399,9 +393,9 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                 Settings.getInt(Settings.INVERSE_TOP_MAXIMIZE_TIMER), () => {
                 // Only open the alternative preview, if the timeout-ed timer
                 // is the same as the one which started last
-                    if (timerId === this._latestPreviewTimerId
-                        && this._tilePreview._showing
-                        && this._tilePreview._rect.equal(tileRect.meta)) {
+                    if (timerId === this._latestPreviewTimerId &&
+                        this._tilePreview._showing &&
+                        this._tilePreview._rect.equal(tileRect.meta)) {
                         this._tileRect = holdTileRect;
                         this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
                     }
@@ -409,19 +403,15 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                     return GLib.SOURCE_REMOVE;
                 });
             timerId = this._latestPreviewTimerId;
-
         } else if (pointerAtBottomEdge) {
             this._tileRect = Util.getTileFor(Shortcuts.BOTTOM, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (pointerAtLeftEdge) {
             this._tileRect = Util.getTileFor(Shortcuts.LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else if (pointerAtRightEdge) {
             this._tileRect = Util.getTileFor(Shortcuts.RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
-
         } else {
             this._tileRect = null;
             this._tilePreview.close();
@@ -539,15 +529,12 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
             if (hovered.atTopEdge) {
                 if (w.tiledRect.y === hoveredRect.y || w.tiledRect.y2 === hoveredRect.y)
                     return w.tiledRect.height < smallest.tiledRect.height ? w : smallest;
-
             } else if (hovered.atBottomEdge) {
                 if (w.tiledRect.y === hoveredRect.y2 || w.tiledRect.y2 === hoveredRect.y2)
                     return w.tiledRect.height < smallest.tiledRect.height ? w : smallest;
-
             } else if (hovered.atLeftEdge) {
                 if (w.tiledRect.x === hoveredRect.x || w.tiledRect.x2 === hoveredRect.x)
                     return w.tiledRect.width < smallest.tiledRect.width ? w : smallest;
-
             } else if (hovered.atRightEdge) {
                 if (w.tiledRect.x === hoveredRect.x2 || w.tiledRect.x2 === hoveredRect.x2)
                     return w.tiledRect.width < smallest.tiledRect.width ? w : smallest;
@@ -562,8 +549,8 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         // determine the final size of the grabbed window. Use half of the size
         // factor, if we are at the screen edges. The cases for the bottom and
         // right screen edges are covered further down.
-        const factor = hovered.atLeftEdge && hoveredRect.x === workArea.x
-                || hovered.atTopEdge && hoveredRect.y === workArea.y
+        const factor = hovered.atLeftEdge && hoveredRect.x === workArea.x ||
+                hovered.atTopEdge && hoveredRect.y === workArea.y
             ? 1 / 3
             : 2 / 3;
 
@@ -572,7 +559,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         // align with the hovered rect. The vertical size (height) is a fraction
         // of the smallestWindow.
         if (hovered.atTopEdge || hovered.atBottomEdge) {
-            const getX1X2 = function(alignsAt) {
+            const getX1X2 = alignsAt => {
                 return topTileGroup.reduce((x1x2, w) => {
                     const currX = x1x2[0];
                     const currX2 = x1x2[1];
@@ -581,13 +568,13 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                         : x1x2;
                 }, [hoveredRect.x, hoveredRect.x2]);
             };
-            const alignTopEdge = function(w) {
-                return hoveredRect.y === w.tiledRect.y
-                        || hoveredRect.y === w.tiledRect.y2;
+            const alignTopEdge = w => {
+                return hoveredRect.y === w.tiledRect.y ||
+                        hoveredRect.y === w.tiledRect.y2;
             };
-            const alignBottomEdge = function(w) {
-                return hoveredRect.y2 === w.tiledRect.y2
-                        || hoveredRect.y2 === w.tiledRect.y;
+            const alignBottomEdge = w => {
+                return hoveredRect.y2 === w.tiledRect.y2 ||
+                        hoveredRect.y2 === w.tiledRect.y;
             };
 
             const [x1, x2] = getX1X2(hovered.atTopEdge ? alignTopEdge : alignBottomEdge);
@@ -606,7 +593,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         // with the hovered rect. The horizontal size (width) is a fraction of
         // the smallestWindow.
         } else {
-            const getY1Y2 = function(alignsAt) {
+            const getY1Y2 = alignsAt => {
                 return topTileGroup.reduce((y1y2, w) => {
                     const currY = y1y2[0];
                     const currY2 = y1y2[1];
@@ -615,13 +602,13 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                         : y1y2;
                 }, [hoveredRect.y, hoveredRect.y2]);
             };
-            const alignLeftEdge = function(w) {
-                return hoveredRect.x === w.tiledRect.x
-                        || hoveredRect.x === w.tiledRect.x2;
+            const alignLeftEdge = w => {
+                return hoveredRect.x === w.tiledRect.x ||
+                        hoveredRect.x === w.tiledRect.x2;
             };
-            const alignRightEdge = function(w) {
-                return hoveredRect.x2 === w.tiledRect.x2
-                        || hoveredRect.x2 === w.tiledRect.x;
+            const alignRightEdge = w => {
+                return hoveredRect.x2 === w.tiledRect.x2 ||
+                        hoveredRect.x2 === w.tiledRect.x;
             };
 
             const [y1, y2] = getY1Y2(hovered.atLeftEdge ? alignLeftEdge : alignRightEdge);

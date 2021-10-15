@@ -22,7 +22,6 @@ var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unus
         'closed': { param_types: [GObject.TYPE_BOOLEAN] }
     }
 }, class TilingSwitcherPopup extends SwitcherPopup.SwitcherPopup {
-
     /**
      * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
@@ -109,8 +108,8 @@ var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unus
         const activeWs = global.workspace_manager.get_active_workspace();
         const mon = tiledWindow?.get_monitor();
         const currMon = global.display.get_current_monitor();
-        const workArea = tiledWindow?.get_work_area_for_monitor(mon)
-                ?? activeWs.get_work_area_for_monitor(currMon);
+        const workArea = tiledWindow?.get_work_area_for_monitor(mon) ??
+                activeWs.get_work_area_for_monitor(currMon);
 
         this._shadeBG = new St.Widget({
             style: 'background-color : black',
@@ -174,46 +173,46 @@ var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unus
         this._switcherList.allocate(childBox);
 
         if (this._thumbnails) {
-            const childBox = this._switcherList.get_allocation_box();
+            const cbox = this._switcherList.get_allocation_box();
             const focusedWindow = global.display.focus_window;
             const monitor = global.display.get_monitor_geometry(
                 focusedWindow?.get_monitor() ?? global.display.get_current_monitor()
             );
 
-            const leftPadding = this.get_theme_node().get_padding(St.Side.LEFT);
-            const rightPadding = this.get_theme_node().get_padding(St.Side.RIGHT);
+            const leftPadd = this.get_theme_node().get_padding(St.Side.LEFT);
+            const rightPadd = this.get_theme_node().get_padding(St.Side.RIGHT);
             const bottomPadding = this.get_theme_node().get_padding(St.Side.BOTTOM);
-            const hPadding = leftPadding + rightPadding;
+            const hPadd = leftPadd + rightPadd;
 
             const icon = this._items[this._selectedIndex];
             const [posX] = icon.get_transformed_position();
             const thumbnailCenter = posX + icon.width / 2;
-            const [, childNaturalWidth] = this._thumbnails.get_preferred_width(-1);
-            childBox.x1 = Math.max(monitor.x + leftPadding,
-                Math.floor(thumbnailCenter - childNaturalWidth / 2)
+            const [, cNatWidth] = this._thumbnails.get_preferred_width(-1);
+            cbox.x1 = Math.max(monitor.x + leftPadd,
+                Math.floor(thumbnailCenter - cNatWidth / 2)
             );
-            if (childBox.x1 + childNaturalWidth > monitor.x + monitor.width - hPadding) {
-                const offset = childBox.x1 + childNaturalWidth - monitor.width + hPadding;
-                childBox.x1 = Math.max(monitor.x + leftPadding, childBox.x1 - offset - hPadding);
+            if (cbox.x1 + cNatWidth > monitor.x + monitor.width - hPadd) {
+                const offset = cbox.x1 + cNatWidth - monitor.width + hPadd;
+                cbox.x1 = Math.max(monitor.x + leftPadd, cbox.x1 - offset - hPadd);
             }
 
             const spacing = this.get_theme_node().get_length('spacing');
 
-            childBox.x2 = childBox.x1 + childNaturalWidth;
-            if (childBox.x2 > monitor.x + monitor.width - rightPadding)
-                childBox.x2 = monitor.x + monitor.width - rightPadding;
-            childBox.y1 = this._switcherList.allocation.y2 + spacing;
-            this._thumbnails.addClones(monitor.y + monitor.height - bottomPadding - childBox.y1);
-            const [, childNaturalHeight] = this._thumbnails.get_preferred_height(-1);
-            childBox.y2 = childBox.y1 + childNaturalHeight;
+            cbox.x2 = cbox.x1 + cNatWidth;
+            if (cbox.x2 > monitor.x + monitor.width - rightPadd)
+                cbox.x2 = monitor.x + monitor.width - rightPadd;
+            cbox.y1 = this._switcherList.allocation.y2 + spacing;
+            this._thumbnails.addClones(monitor.y + monitor.height - bottomPadding - cbox.y1);
+            const [, cNatHeight] = this._thumbnails.get_preferred_height(-1);
+            cbox.y2 = cbox.y1 + cNatHeight;
 
-            this._thumbnails.allocate(childBox);
+            this._thumbnails.allocate(cbox);
         }
     }
 
     vfunc_button_press_event(buttonEvent) {
         const btn = buttonEvent.button;
-        if ( btn === Clutter.BUTTON_MIDDLE || btn === Clutter.BUTTON_SECONDARY) {
+        if (btn === Clutter.BUTTON_MIDDLE || btn === Clutter.BUTTON_SECONDARY) {
             this._finish(global.get_current_time());
             return Clutter.EVENT_PROPAGATE;
         }
@@ -351,7 +350,6 @@ var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unus
 });
 
 const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends SwitcherPopup.SwitcherList {
-
     _init(openWindows, apps, altTabPopup) {
         super._init(true);
 
@@ -382,23 +380,23 @@ const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends Swi
 
     _setIconSize() {
         let j = 0;
-        while (this._items.length > 1 && this._items[j].style_class != 'item-box')
+        while (this._items.length > 1 && this._items[j].style_class !== 'item-box')
             j++;
 
         const themeNode = this._items[j].get_theme_node();
         this._list.ensure_style();
 
         const iconPadding = themeNode.get_horizontal_padding();
-        const iconBorder = themeNode.get_border_width(St.Side.LEFT)
-            + themeNode.get_border_width(St.Side.RIGHT);
+        const iconBorder = themeNode.get_border_width(St.Side.LEFT) +
+            themeNode.get_border_width(St.Side.RIGHT);
         const [, labelNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
         const iconSpacing = labelNaturalHeight + iconPadding + iconBorder;
         const totalSpacing = this._list.spacing * (this._items.length - 1);
 
         const freeScreenRect = this._altTabPopup._freeScreenRect;
         const parentPadding = this.get_parent().get_theme_node().get_horizontal_padding();
-        const availWidth = freeScreenRect.width - parentPadding
-            - this.get_theme_node().get_horizontal_padding();
+        const availWidth = freeScreenRect.width - parentPadding -
+            this.get_theme_node().get_horizontal_padding();
 
         const scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
         const baseIconSizes = [96, 64, 48, 32, 22];
@@ -418,7 +416,7 @@ const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends Swi
         this._iconSize = iconSize;
 
         for (let i = 0; i < this.icons.length; i++) {
-            if (this.icons[i].icon != null)
+            if (this.icons[i].icon !== null)
                 break;
             this.icons[i].set_size(iconSize);
         }

@@ -8,7 +8,6 @@ const Gtk = imports.gi.Gtk;
  */
 
 var Util = class Utility { // eslint-disable-line no-unused-vars
-
     /**
      * Binds the settings to the GUI.
      * Taken from Overview-Improved by human.experience \
@@ -36,7 +35,7 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
             gtkListStore.set(iter, [COLUMN_KEY, COLUMN_MODS], [key, mods]);
         };
 
-        renderer.connect('accel-edited', (renderer, path, key, mods) => {
+        renderer.connect('accel-edited', (ren, path, key, mods) => {
             const accel = Gtk.accelerator_name(key, mods);
             updateShortcutRow(accel);
             settings.set_strv(settingsKey, [accel]);
@@ -47,7 +46,7 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
             settings.set_strv(settingsKey, []);
         });
 
-        settings.connect('changed::' + settingsKey, () => {
+        settings.connect(`changed::${settingsKey}`, () => {
             updateShortcutRow(settings.get_strv(settingsKey)[0]);
         });
 

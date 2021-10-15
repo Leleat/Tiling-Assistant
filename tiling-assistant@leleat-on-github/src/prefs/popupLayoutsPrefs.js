@@ -40,7 +40,6 @@ const Util = Me.imports.src.prefs.utility.Util;
  */
 
 var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
-
     /**
      * @param {Gtk.Builder} builder the Gtk.Builder from the main prefs file.
      * @param {Gio.Settings} settings the Gio.Settings object from the main prefs file.
@@ -80,8 +79,8 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
         // The shortcuts for the layouts are bound when the layoutRows are created.
         ['search-popup-layout'].forEach((key, idx) => {
             // bind gui and gsettings
-            const treeView = this._builder.get_object(key + '-treeview');
-            const listStore = this._builder.get_object(key + '-liststore');
+            const treeView = this._builder.get_object(`${key}-treeview`);
+            const listStore = this._builder.get_object(`${key}-liststore`);
             Util.bindShortcut(this._settings, key, treeView, listStore);
 
             // bind clear-shortcut-buttons
@@ -125,7 +124,7 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
                 return;
 
             this._settings.set_boolean(importExamples, false);
-            const exampleFile = this._makeFile(Me.Path + '/src/layouts_example.json');
+            const exampleFile = this._makeFile(`${Me.Path}/src/layouts_example.json`);
             const [succ, c] = exampleFile.load_contents(null);
             if (!succ)
                 return;
@@ -159,7 +158,6 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
                 const keys = this._settings.get_strv(`activate-layout${layoutRow.getIdx()}`);
                 this._settings.set_strv(`activate-layout${layouts.length - 1}`, keys);
                 this._settings.set_strv(`activate-layout${layoutRow.getIdx()}`, []);
-
             } else {
                 // Remove keyboard shortcuts, if they aren't assigned to a
                 // valid layout, because they won't be visible to the user
@@ -186,8 +184,8 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
     _makeFile(parentPath = '', fileName = '') {
         // Create directory structure, if it doesn't exist.
         const userConfigDir = GLib.get_user_config_dir();
-        const dirLocation = parentPath
-                || GLib.build_filenamev([userConfigDir, '/tiling-assistant']);
+        const dirLocation = parentPath ||
+                GLib.build_filenamev([userConfigDir, '/tiling-assistant']);
         const parentDir = Gio.File.new_for_path(dirLocation);
         try { parentDir.make_directory_with_parents(null); } catch (e) {}
 

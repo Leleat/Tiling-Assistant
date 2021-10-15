@@ -216,7 +216,6 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
  * Indicate the user selection or other stuff.
  */
 const Indicator = GObject.registerClass(class TileEditingModeIndicator extends St.Widget {
-
     /**
      * @param {string} style_class
      * @param {Rect} pos
@@ -295,7 +294,6 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
  * @param {TileEditingMode} tileEditor
  */
 const DefaultKeyHandler = class DefaultKeyHandler {
-
     constructor(tileEditor) {
         this._tileEditor = tileEditor;
     }
@@ -344,7 +342,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             this._selectIndicator.focus(window.tiledRect, window);
 
         // [C]ycle through halves of the available space around the window
-        } else if ((keyVal === Clutter.KEY_c || keyVal === Clutter.KEY_C)) {
+        } else if (keyVal === Clutter.KEY_c || keyVal === Clutter.KEY_C) {
             const window = this._selectIndicator.window;
             if (!window)
                 return Modes.DEFAULT;
@@ -507,7 +505,6 @@ const DefaultKeyHandler = class DefaultKeyHandler {
  * @param {TileEditingMode} tileEditor
  */
 const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
-
     constructor(tileEditor) {
         super(tileEditor);
 
@@ -545,14 +542,14 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
 
     _swap() {
         if (this._anchorIndicator.window)
-            Util.tile(this._anchorIndicator.window, this._selectIndicator.rect, {
-                openTilingPopup: false
-            });
+        { Util.tile(this._anchorIndicator.window, this._selectIndicator.rect, {
+            openTilingPopup: false
+        }); }
 
         if (this._selectIndicator.window)
-            Util.tile(this._selectIndicator.window, this._anchorIndicator.rect, {
-                openTilingPopup: false
-            });
+        { Util.tile(this._selectIndicator.window, this._anchorIndicator.rect, {
+            openTilingPopup: false
+        }); }
 
         this._selectIndicator.focus(this._selectIndicator.rect,
             this._anchorIndicator.window);
@@ -560,7 +557,6 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
 };
 
 const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
-
     constructor(tileEditor) {
         super(tileEditor);
 
@@ -647,7 +643,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         // the edge that is resized. Some windows will resize on the same edge
         // as the one the user is resizing. Other windows will resize on the
         // opposite edge.
-        const updateRectSize = function(rect, resizeOnEdge) {
+        const updateRectSize = (rect, resizeOnEdge) => {
             const growDir = keyDir === resizeOnEdge ? 1 : -1;
             switch (resizeOnEdge) {
                 case Direction.N:
@@ -672,7 +668,6 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
                 const newRect = w.tiledRect.copy();
                 updateRectSize(newRect, this._currEdge);
                 Util.tile(w, newRect, { openTilingPopup: false });
-
             } else if (this._isOppositeSide(resizedRect, w.tiledRect)) {
                 const newRect = w.tiledRect.copy();
                 updateRectSize(newRect, Direction.opposite(this._currEdge));

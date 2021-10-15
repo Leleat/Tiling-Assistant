@@ -18,7 +18,6 @@ const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
  */
 
 var Util = class Utility { // eslint-disable-line no-unused-vars
-
     static initialize() {
         this._tileGroupManager = new TileGroupManager();
     }
@@ -66,24 +65,24 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
     static isDirection(keyVal, direction) {
         switch (direction) {
             case Direction.N:
-                return keyVal === Clutter.KEY_Up
-                        || keyVal === Clutter.KEY_w || keyVal === Clutter.KEY_W
-                        || keyVal === Clutter.KEY_k || keyVal === Clutter.KEY_K;
+                return keyVal === Clutter.KEY_Up ||
+                        keyVal === Clutter.KEY_w || keyVal === Clutter.KEY_W ||
+                        keyVal === Clutter.KEY_k || keyVal === Clutter.KEY_K;
 
             case Direction.S:
-                return keyVal === Clutter.KEY_Down
-                        || keyVal === Clutter.KEY_s || keyVal === Clutter.KEY_S
-                        || keyVal === Clutter.KEY_j || keyVal === Clutter.KEY_J;
+                return keyVal === Clutter.KEY_Down ||
+                        keyVal === Clutter.KEY_s || keyVal === Clutter.KEY_S ||
+                        keyVal === Clutter.KEY_j || keyVal === Clutter.KEY_J;
 
             case Direction.W:
-                return keyVal === Clutter.KEY_Left
-                        || keyVal === Clutter.KEY_a || keyVal === Clutter.KEY_A
-                        || keyVal === Clutter.KEY_h || keyVal === Clutter.KEY_H;
+                return keyVal === Clutter.KEY_Left ||
+                        keyVal === Clutter.KEY_a || keyVal === Clutter.KEY_A ||
+                        keyVal === Clutter.KEY_h || keyVal === Clutter.KEY_H;
 
             case Direction.E:
-                return keyVal === Clutter.KEY_Right
-                        || keyVal === Clutter.KEY_d || keyVal === Clutter.KEY_D
-                        || keyVal === Clutter.KEY_l || keyVal === Clutter.KEY_L;
+                return keyVal === Clutter.KEY_Right ||
+                        keyVal === Clutter.KEY_d || keyVal === Clutter.KEY_D ||
+                        keyVal === Clutter.KEY_l || keyVal === Clutter.KEY_L;
         }
 
         return false;
@@ -123,8 +122,8 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
      */
     static isMaximized(window) {
         const workArea = window.get_work_area_current_monitor();
-        return window.get_maximized() === Meta.MaximizeFlags.BOTH
-                || (window.tiledRect?.equal(workArea));
+        return window.get_maximized() === Meta.MaximizeFlags.BOTH ||
+                window.tiledRect?.equal(workArea);
     }
 
     /**
@@ -180,14 +179,13 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                 });
                 // Same applies for already grouped windows; but only check if,
                 // it doesn't already overlap non-grouped windows.
-                const overlapsGroupedWindows = !overlapsNonGroupedWindows
-                        && groupedWindows.some(w => w.tiledRect.overlap(wRect));
+                const overlapsGroupedWindows = !overlapsNonGroupedWindows &&
+                        groupedWindows.some(w => w.tiledRect.overlap(wRect));
 
                 if (overlapsNonGroupedWindows || overlapsGroupedWindows)
                     notGroupedWindows.push(window);
                 else
                     groupedWindows.push(window);
-
             } else {
                 // The window is maximized, so all windows below it can't belong
                 // to this group anymore.
@@ -257,12 +255,8 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeRects = workArea.minus(rectList);
-        if (!freeRects.length) {
-            const activeWs = global.workspace_manager.get_active_workspace();
-            const monitor = global.display.get_current_monitor();
-            const workArea = activeWs.get_work_area_for_monitor(monitor);
+        if (!freeRects.length)
             return currRect ?? new Rect(workArea);
-        }
 
         // Try to expand the currRect to fill the rest of the space
         // that is available around it.
@@ -303,10 +297,10 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
             // make sure they overlap. After the linking, we just check, if the
             // combinded link fully contains the current rects unexpanded axis.
             const currAxis = new Axis(currRect[unxpndPos1], currRect[unxpndPos2]);
-            const freeRectsEncompassCurrRectAxis = function(freeRects) {
-                const linkedAxes = freeRects.reduce((linked, r) => {
+            const freeRectsEncompassCurrRectAxis = freeR => {
+                const linkedAxes = freeR.reduce((linked, r) => {
                     return linked.link(new Axis(r[unxpndPos1], r[unxpndPos2]));
-                }, new Axis(freeRects[0][unxpndPos1], freeRects[0][unxpndPos2]));
+                }, new Axis(freeR[0][unxpndPos1], freeR[0][unxpndPos2]));
 
                 return linkedAxes.contains(currAxis);
             };
@@ -345,7 +339,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                 rectList.push(newRect);
                 return newRect.union(
                     this.getBestFreeRect(rectList, newRect, Orientation.H));
-
             } else {
                 return newRect;
             }
@@ -356,7 +349,7 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         // it should be good enough.
         } else {
             const biggestSingle = freeRects.reduce((currBiggest, rect) => {
-                return currBiggest.area >= rect.area ? currBiggest: rect;
+                return currBiggest.area >= rect.area ? currBiggest : rect;
             });
             rectList.push(biggestSingle);
 
@@ -415,7 +408,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         switch (shortcut) {
             case Shortcuts.MAXIMIZE: {
                 return workArea.copy();
-
             } case Shortcuts.LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
@@ -425,7 +417,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     workArea.height
                 );
-
             } case Shortcuts.RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
@@ -435,7 +426,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     workArea.height
                 );
-
             } case Shortcuts.TOP: {
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
@@ -445,7 +435,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     workArea.width,
                     height
                 );
-
             } case Shortcuts.BOTTOM: {
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
@@ -455,7 +444,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     workArea.width,
                     height
                 );
-
             } case Shortcuts.TOP_LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
@@ -467,7 +455,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     height
                 );
-
             } case Shortcuts.TOP_RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
@@ -479,7 +466,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     height
                 );
-
             } case Shortcuts.BOTTOM_LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
@@ -491,7 +477,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     height
                 );
-
             } case Shortcuts.BOTTOM_RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
@@ -503,7 +488,7 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     width,
                     height
                 );
-            }}
+            } }
     }
 
     /**
@@ -578,12 +563,12 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         const y = newRect.y + (gap - (workArea.y === newRect.y ? 0 : gap / 2));
         // Lessen gap by half when the window isn't on the
         // left or the right edge of the screen
-        const width = newRect.width
-                - (2 * gap - (workArea.x === newRect.x ? 0 : gap / 2)
-                - (workArea.x2 === newRect.x2 ? 0 : gap / 2));
-        const height = newRect.height
-                - (2 * gap - (workArea.y === newRect.y ? 0 : gap / 2)
-                - (workArea.y2 === newRect.y2 ? 0 : gap / 2));
+        const width = newRect.width -
+                (2 * gap - (workArea.x === newRect.x ? 0 : gap / 2) -
+                (workArea.x2 === newRect.x2 ? 0 : gap / 2));
+        const height = newRect.height -
+                (2 * gap - (workArea.y === newRect.y ? 0 : gap / 2) -
+                (workArea.y2 === newRect.y2 ? 0 : gap / 2));
 
         // Animations
         const wActor = window.get_compositor_private();
@@ -611,7 +596,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                         clone.destroy();
                     }
                 });
-
             } else if (wasMaximized) {
                 //
             } else {
@@ -672,17 +656,16 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
 
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
         if (!wasMaximized && !skipAnim && untileAnim)
-            Main.wm._prepareAnimationInfo(
-                global.window_manager,
-                window.get_compositor_private(),
-                window.get_frame_rect(),
-                Meta.SizeChange.UNMAXIMIZE
-            );
+        { Main.wm._prepareAnimationInfo(
+            global.window_manager,
+            window.get_compositor_private(),
+            window.get_frame_rect(),
+            Meta.SizeChange.UNMAXIMIZE
+        ); }
 
         const oldRect = window.untiledRect;
         if (restoreFullPos) {
             window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
-
         } else {
             // Resize the window while keeping the relative x pos (of the pointer)
             const currWindowFrame = new Rect(window.get_frame_rect());
@@ -747,7 +730,6 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
 
             const firstFrameId = window.get_compositor_private()
                 .connect('first-frame', () => {
-
                     window.get_compositor_private().disconnect(firstFrameId);
                     const winTracker = Shell.WindowTracker.get_default();
                     const openedWindowApp = winTracker.get_window_app(window);
@@ -755,10 +737,9 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
                     // to be moved and resized because, for example, Steam uses a
                     // WindowType.Normal window for their loading screen, which we
                     // don't want to trigger the tiling for.
-                    if (sId && openedWindowApp && openedWindowApp === app
-                        && (window.allows_resize() && window.allows_move()
-                                || window.get_maximized())) {
-
+                    if (sId && openedWindowApp && openedWindowApp === app &&
+                        (window.allows_resize() && window.allows_move() ||
+                                window.get_maximized())) {
                         disconnectWindowCreateSignal();
                         this.tile(window, rect, { openTilingPopup, skipAnim: true });
                     }
@@ -894,7 +875,7 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
             if (!w.isTiled)
                 return;
 
-            log('Tile group for: ' + w.get_wm_class());
+            log(`Tile group for: ${w.get_wm_class()}`);
             const tileGroup = this.getTileGroupFor(w);
             tileGroup.forEach(tw => log(tw.get_wm_class()));
             log('---');

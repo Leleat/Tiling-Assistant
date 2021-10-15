@@ -17,8 +17,8 @@ function buildPrefsWidget() { // eslint-disable-line no-unused-vars
     return new PrefsWidget();
 }
 
-const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk.ScrolledWindow {
-
+const PrefsWidget = GObject.registerClass(
+class TilingAssistantPrefs extends Gtk.ScrolledWindow {
     _init(params) {
         super._init(params);
 
@@ -29,7 +29,7 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
         this.connect('destroy', () => this._settings.run_dispose());
 
         this._builder = new Gtk.Builder();
-        this._builder.add_from_file(Me.path + '/src/ui/prefs.ui');
+        this._builder.add_from_file(`${Me.path}/src/ui/prefs.ui`);
 
         const mainPrefs = this._builder.get_object('main-prefs');
         this.set_child(mainPrefs);
@@ -133,7 +133,8 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
             Settings.TILE_EDITING_MODE_COLOR
         ];
 
-        const getBindProperty = function(key) {
+
+        const getBindProperty = key => {
             if (spinButtons.includes(key))
                 return 'value';
             else if (switches.includes(key))
@@ -178,8 +179,8 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
     _bindKeybindings(shortcuts) {
         shortcuts.forEach((key, idx) => {
             // Bind gui and gsettings
-            const treeView = this._builder.get_object(key + '-treeview');
-            const listStore = this._builder.get_object(key + '-liststore');
+            const treeView = this._builder.get_object(`${key}-treeview`);
+            const listStore = this._builder.get_object(`${key}-liststore`);
             Util.bindShortcut(this._settings, key, treeView, listStore);
 
             // Bind clear-shortcut-buttons
@@ -191,6 +192,7 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
                 clearButton.set_sensitive(this._settings.get_strv(key)[0]));
         });
     }
+
 
     /**
      * Connects the 'Advanced / Experimental Settings' switch with the

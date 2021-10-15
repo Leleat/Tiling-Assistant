@@ -9,9 +9,7 @@
  * A Singleton providing access to the settings.
  */
 var Settings = class Settings { // eslint-disable-line no-unused-vars
-
     static _settings;
-
     static ENABLE_TILING_POPUP = 'enable-tiling-popup';
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
     static DYNAMIC_KEYBINDINGS_BEHAVIOUR = 'dynamic-keybinding-behaviour';
@@ -128,7 +126,6 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
  * ones related to Popup Layouts.
  */
 var Shortcuts = class Shortcuts { // eslint-disable-line no-unused-vars
-
     static TOGGLE_POPUP = 'toggle-tiling-popup';
     static EDIT_MODE = 'tile-edit-mode';
     static AUTO_FILL = 'auto-tile';
@@ -170,13 +167,11 @@ var Shortcuts = class Shortcuts { // eslint-disable-line no-unused-vars
 
 // Enums:
 var RestoreOn = class RestoreWindowSizeBehaviour { // eslint-disable-line no-unused-vars
-
     static ON_GRAB_START = 'Grab Start';
     static ON_GRAB_END = 'Grab End';
 };
 
 var DynamicKeybindings = class DynamicKeybindingBehaviour { // eslint-disable-line no-unused-vars
-
     static DISABLED = 'Disabled';
     static FOCUS = 'Focus';
     static TILING_STATE = 'Tiling State';
@@ -184,20 +179,17 @@ var DynamicKeybindings = class DynamicKeybindingBehaviour { // eslint-disable-li
 };
 
 var AlternatePreviewMod = class SecondaryPreviewActivator { // eslint-disable-line no-unused-vars
-
     static CTRL = 'Ctrl';
     static ALT = 'Alt';
     static RMB = 'RMB';
 };
 
 var Orientation = class Orientation { // eslint-disable-line no-unused-vars
-
     static H = 1;
     static V = 2;
 };
 
 var Direction = class Direction { // eslint-disable-line no-unused-vars
-
     static N = 1;
     static E = 2;
     static S = 4;
@@ -221,7 +213,6 @@ var Direction = class Direction { // eslint-disable-line no-unused-vars
 // Classes for popup layouts:
 // See src/prefs/layoutsPrefs.js for details on layouts.
 var Layout = class Layout { // eslint-disable-line no-unused-vars
-
     /**
      * @param {object} layout is the parsed object from the layouts file.
      */
@@ -306,9 +297,9 @@ var Layout = class Layout { // eslint-disable-line no-unused-vars
         if (!rects.length)
             return [false, 'No valid rectangles defined.', -1];
 
-        const getOverlapArea = function(r1, r2) {
-            return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x))
-                    * Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+        const getOverlapArea = (r1, r2) => {
+            return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) *
+                    Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
         };
 
         for (let i = 0; i < rects.length; i++) {
@@ -334,7 +325,6 @@ var Layout = class Layout { // eslint-disable-line no-unused-vars
 };
 
 var LayoutItem = class LayoutItem {
-
     constructor() {
         this.rect = {};
         this.appId = null;

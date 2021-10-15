@@ -15,7 +15,6 @@ const Settings = Me.imports.src.common.Settings;
  */
 
 var Manager = class TileGroupManager { // eslint-disable-line no-unused-vars
-
     constructor() {
         // { windowId1: int, windowId2: int, ... }
         this._groupRaiseIds = new Map();

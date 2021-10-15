@@ -25,7 +25,6 @@ var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
         'row-removed': { param_types: [GObject.TYPE_INT] }
     }
 }, class PopupLayoutRow extends Gtk.ListBoxRow {
-
     // Use a static variable to make sure the indices are unique since just using
     // something like the child index isn't enough because the user may add *and*
     // delete rows at random... so 1 child index may appear multiple times
@@ -184,6 +183,7 @@ var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
          * Initialize *
          **************/
 
+        // eslint-disable-next-line prefer-template, no-useless-concat
         mainFrame.set_label('    ' + _('Layout') + ` ${this._idx}` + '    ');
         this._nameEntry.get_buffer().set_text(this._layout.getName(), -1);
 
@@ -261,7 +261,6 @@ var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
             // Print error in the preview area
             this._errorLabel.set_label(errMsg);
             this._drawingArea.set_draw_func(() => {});
-
         } else {
             // Draw the acual preview for the rects
             this._errorLabel.set_label('');
@@ -327,7 +326,6 @@ var GuiRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
 const GuiEntry = GObject.registerClass({
     Signals: { 'changed': { param_types: [GObject.TYPE_BOOLEAN] } }
 }, class PopupLayoutGuiEntry extends Gtk.Box {
-
     /**
      * @param {number} idx the index of this entry within the layout.
      * @param {{rect: object, appId: number|null, loopType: string|null}} item
@@ -343,7 +341,7 @@ const GuiEntry = GObject.registerClass({
         this._item = item;
 
         const label = new Gtk.Label({ label: `${idx}:` });
-        const loop = item.loopType ? `${'--' + item.loopType}` : '';
+        const loop = item.loopType ? `--${item.loopType}` : '';
         const rect = item.rect;
         const text = Object.keys(rect).length !== 0
             ? `${rect.x}--${rect.y}--${rect.width}--${rect.height}${loop}`
@@ -413,7 +411,6 @@ const GuiEntry = GObject.registerClass({
                 height: parseFloat(values[3].trim())
             };
             this._item.loopType = values[4] || null;
-
         } else {
             this._item.rect = {};
             this._item.loopType = null;

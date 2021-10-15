@@ -25,7 +25,6 @@ const Side = {
  */
 
 var Handler = class TilingResizeHandler { // eslint-disable-line no-unused-vars
-
     constructor() {
         const isResizing = grabOp => {
             switch (grabOp) {
@@ -243,14 +242,14 @@ var Handler = class TilingResizeHandler { // eslint-disable-line no-unused-vars
         const grabbedsOldRect = this._preGrabRects.get(window);
 
         const isResizingW = (grabOp & Meta.GrabOp.RESIZING_W) > 1;
-        const newGrabbedTiledRectX = window.tiledRect.x
-                + (grabbedsNewRect.x - grabbedsOldRect.x)
-                + (isResizingW && window.tiledRect.x === workArea.x ? gap / 2 : 0);
+        const newGrabbedTiledRectX = window.tiledRect.x +
+                (grabbedsNewRect.x - grabbedsOldRect.x) +
+                (isResizingW && window.tiledRect.x === workArea.x ? gap / 2 : 0);
 
         const isResizingN = (grabOp & Meta.GrabOp.RESIZING_N) > 1;
-        const newGrabbedTiledRectY = window.tiledRect.y
-                + (grabbedsNewRect.y - grabbedsOldRect.y)
-                + (isResizingN && window.tiledRect.y === workArea.y ? gap / 2 : 0);
+        const newGrabbedTiledRectY = window.tiledRect.y +
+                (grabbedsNewRect.y - grabbedsOldRect.y) +
+                (isResizingN && window.tiledRect.y === workArea.y ? gap / 2 : 0);
 
         // If resizing on the E side, you can simply rely on get_frame_rect's
         // new width else x2 should stick to where it was (manual calc due
@@ -329,7 +328,6 @@ var Handler = class TilingResizeHandler { // eslint-disable-line no-unused-vars
     // or horizontally) at a time based on grabOp
     _getPassiveResizedRect(grabOp, resizedWindow, window,
             resizeOnSameSide, resizeOnOpposingSide) {
-
         if (!grabOp)
             return null;
 
@@ -375,7 +373,6 @@ var Handler = class TilingResizeHandler { // eslint-disable-line no-unused-vars
  * workArea.width, then it wouldn't resize at all.
  */
 const ResizeOp = class ResizeOp {
-
     /**
      * @param {number} side
      */
@@ -392,7 +389,6 @@ const ResizeOp = class ResizeOp {
      */
     static createResizeOp(resizeOnSameSideV, resizeOnOpposingSideV,
             resizeOnSameSideH, resizeOnOpposingSideH) {
-
         let verticalResizeSide = Side.NONE;
         let horizontalResizeSide = Side.NONE;
 

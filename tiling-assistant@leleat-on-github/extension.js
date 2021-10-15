@@ -34,8 +34,8 @@ let Util;
  * 1. keyboard shortcuts:
  *  => keybindingHandler.js
  * 2. Grabbing a window:
- * 	=> moveHandler.js (when moving a window)
- * 	=> resizeHandler.js (when resizing a window)
+ *  => moveHandler.js (when moving a window)
+ *  => resizeHandler.js (when resizing a window)
  */
 
 function init() { // eslint-disable-line no-unused-vars
@@ -74,11 +74,11 @@ function enable() { // eslint-disable-line no-unused-vars
         return allWindowsByStacking.find(w => {
             const rect = w.get_frame_rect();
             const workArea = w.get_work_area_current_monitor();
-            return w.is_on_primary_monitor()
-                    && w.showing_on_its_workspace()
-                    && w.get_window_type() !== Meta.WindowType.DESKTOP
-                    && (w.maximized_vertically || w.tiledRect?.y === workArea.y)
-                    && stageX > rect.x && stageX < rect.x + rect.width;
+            return w.is_on_primary_monitor() &&
+                    w.showing_on_its_workspace() &&
+                    w.get_window_type() !== Meta.WindowType.DESKTOP &&
+                    (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
+                    stageX > rect.x && stageX < rect.x + rect.width;
         });
     };
 
@@ -186,7 +186,7 @@ function _loadAfterSessionLock() {
     if (!file.query_exists(null))
         return;
 
-    try {file.create(Gio.FileCreateFlags.NONE, null);} catch (e) {}
+    try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
     const [success, contents] = file.load_contents(null);
     if (!success || !contents.length)
         return;

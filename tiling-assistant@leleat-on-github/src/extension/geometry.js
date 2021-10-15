@@ -11,7 +11,6 @@ const { Direction, Orientation } = Me.imports.src.common;
  * Wrapper for Meta.Rectangle to add some more functions.
  */
 var Rect = class Rect { // eslint-disable-line no-unused-vars
-
     /**
      * @param  {...any} params No parameters, 1 Meta.Rectangle or the x, y,
      * width and height values should be passed to the constructor.
@@ -47,8 +46,8 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
      * @returns {boolean}
      */
     containsPoint(point) {
-        return point.x >= this.x && point.x <= this.x2
-                && point.y >= this.y && point.y <= this.y2;
+        return point.x >= this.x && point.x <= this.x2 &&
+                point.y >= this.y && point.y <= this.y2;
     }
 
     /**
@@ -121,16 +120,16 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
 
         // Put rects into a Map with their relevenat pos'es as the keys and
         // filter out `this`.
-        const posMap = rects.reduce((posMap, rect) => {
+        const posMap = rects.reduce((map, rect) => {
             if (rect.equal(this))
-                return posMap;
+                return map;
 
             const pos = rect[cmprProp];
-            if (!posMap.has(pos))
-                posMap.set(pos, []);
+            if (!map.has(pos))
+                map.set(pos, []);
 
-            posMap.get(pos).push(rect);
-            return posMap;
+            map.get(pos).push(rect);
+            return map;
         }, new Map());
 
         // Sort the pos'es in an ascending / descending order.
@@ -150,8 +149,8 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
         // is no actual neighbor.
         const neighbors = posMap.get(neighborPos ?? sortedPoses[0]);
         return neighbors.reduce((currNearest, rect) => {
-            return Math.abs(currNearest[nonCmprProp] - this[nonCmprProp])
-                    <= Math.abs(rect[nonCmprProp] - this[nonCmprProp])
+            return Math.abs(currNearest[nonCmprProp] - this[nonCmprProp]) <=
+                    Math.abs(rect[nonCmprProp] - this[nonCmprProp])
                 ? currNearest
                 : rect;
         });
@@ -184,7 +183,6 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
 
         if (index <= 0) {
             return firstUnitRect;
-
         } else {
             const remaining = this.minus(firstUnitRect)[0];
             return remaining.getUnitAt(index - 1, unitSize, orientation);
@@ -438,7 +436,6 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
  * Axis with the same orientation as valid input. Default Orienation is H.
  */
 var Axis = class Axis { // eslint-disable-line no-unused-vars
-
     /**
      * @param {...any} params takes either 0, 2 (start and end) or
      * 3 (start, end, orientation) parameters.
@@ -491,8 +488,8 @@ var Axis = class Axis { // eslint-disable-line no-unused-vars
      * @returns {boolean}
      */
     equal(axis) {
-        return this.start === axis.start && this.end === axis.end
-                && this.orientation === axis.orientation;
+        return this.start === axis.start && this.end === axis.end &&
+               this.orientation === axis.orientation;
     }
 
     /**

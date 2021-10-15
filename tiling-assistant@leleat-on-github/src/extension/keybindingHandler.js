@@ -20,7 +20,6 @@ const _ = Domain.gettext;
  */
 
 var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-vars
-
     constructor() {
         const allowInOverview = [Shortcuts.TOGGLE_POPUP];
         this._keyBindings = Shortcuts.getAllKeys();
@@ -206,9 +205,9 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
      *      activated.
      */
     _dynamicTilingState(window, shortcutName, isWindowsStyle) {
-        const untileFromMax = shortcutName === Shortcuts.TOP
-            || shortcutName === Shortcuts.MAXIMIZE
-            || shortcutName === Shortcuts.BOTTOM;
+        const untileFromMax = shortcutName === Shortcuts.TOP ||
+            shortcutName === Shortcuts.MAXIMIZE ||
+            shortcutName === Shortcuts.BOTTOM;
 
         if (Util.isMaximized(window) && untileFromMax) {
             Util.untile(window);
@@ -230,45 +229,45 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
 
         const wRect = window.tiledRect;
         const isLeftHalf =
-            wRect.x === workArea.x
-            && wRect.y === workArea.y
-            && wRect.width !== workArea.width
-            && wRect.height === workArea.height;
+            wRect.x === workArea.x &&
+            wRect.y === workArea.y &&
+            wRect.width !== workArea.width &&
+            wRect.height === workArea.height;
         const isRightHalf =
-            wRect.x !== workArea.x
-            && wRect.y === workArea.y
-            && wRect.x2 === workArea.x2
-            && wRect.height === workArea.height;
+            wRect.x !== workArea.x &&
+            wRect.y === workArea.y &&
+            wRect.x2 === workArea.x2 &&
+            wRect.height === workArea.height;
         const isTopHalf =
-            wRect.x === workArea.x
-            && wRect.y === workArea.y
-            && wRect.width === workArea.width
-            && wRect.height !== workArea.height;
+            wRect.x === workArea.x &&
+            wRect.y === workArea.y &&
+            wRect.width === workArea.width &&
+            wRect.height !== workArea.height;
         const isBottomHalf =
-            wRect.x === workArea.x
-            && wRect.y !== workArea.y
-            && wRect.width === workArea.width
-            && wRect.y2 === workArea.y2;
+            wRect.x === workArea.x &&
+            wRect.y !== workArea.y &&
+            wRect.width === workArea.width &&
+            wRect.y2 === workArea.y2;
         const isTopLeftQuarter =
-            wRect.x === workArea.x
-            && wRect.y === workArea.y
-            && wRect.width !== workArea.width
-            && wRect.height !== workArea.height;
+            wRect.x === workArea.x &&
+            wRect.y === workArea.y &&
+            wRect.width !== workArea.width &&
+            wRect.height !== workArea.height;
         const isTopRightQuarter =
-            wRect.x !== workArea.x
-            && wRect.y === workArea.y
-            && wRect.x2 === workArea.x2
-            && wRect.height !== workArea.height;
+            wRect.x !== workArea.x &&
+            wRect.y === workArea.y &&
+            wRect.x2 === workArea.x2 &&
+            wRect.height !== workArea.height;
         const isBottomLeftQuarter =
-            wRect.x === workArea.x
-            && wRect.y !== workArea.y
-            && wRect.width !== workArea.width
-            && wRect.y2 === workArea.y2;
+            wRect.x === workArea.x &&
+            wRect.y !== workArea.y &&
+            wRect.width !== workArea.width &&
+            wRect.y2 === workArea.y2;
         const isBottomRightQuarter =
-            wRect.x !== workArea.x
-            && wRect.y !== workArea.y
-            && wRect.x2 === workArea.x2
-            && wRect.y2 === workArea.y2;
+            wRect.x !== workArea.x &&
+            wRect.y !== workArea.y &&
+            wRect.x2 === workArea.x2 &&
+            wRect.y2 === workArea.y2;
 
         let rect;
         if (isLeftHalf) {
@@ -286,7 +285,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     Util.untile(window);
                     return;
             }
-
         } else if (isRightHalf) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
@@ -302,7 +300,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     Util.untile(window);
                     return;
             }
-
         } else if (isTopHalf) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
@@ -317,7 +314,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     Util.untile(window);
                     return;
             }
-
         } else if (isBottomHalf) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
@@ -337,7 +333,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
                     return;
             }
-
         } else if (isTopLeftQuarter) {
             switch (shortcutName) {
                 case Shortcuts.RIGHT:
@@ -349,7 +344,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     Util.toggleTiling(window, rect);
                     return;
             }
-
         } else if (isTopRightQuarter) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
@@ -361,7 +355,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     Util.toggleTiling(window, rect);
                     return;
             }
-
         } else if (isBottomLeftQuarter) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
@@ -378,7 +371,6 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
                     isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
                     return;
             }
-
         } else if (isBottomRightQuarter) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
