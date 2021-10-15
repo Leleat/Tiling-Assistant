@@ -30,10 +30,36 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
 
         this._builder = new Gtk.Builder();
         this._builder.add_from_file(Me.path + '/src/ui/prefs.ui');
-        this.set_child(this._builder.get_object('main-prefs'));
 
-        this.set_min_content_width(550);
-        this.set_min_content_height(575);
+        const mainPrefs = this._builder.get_object('main-prefs');
+        this.set_child(mainPrefs);
+
+        // Setup Header bar with info-menu
+        mainPrefs.connect('realize', () => {
+            const headerBar = this._builder.get_object('header-bar');
+            const extPrefsDialog = mainPrefs.get_root();
+            extPrefsDialog.set_titlebar(headerBar);
+            extPrefsDialog.set_default_size(525, 625);
+
+            const actionGroup = new Gio.SimpleActionGroup();
+            extPrefsDialog.insert_action_group('prefs', actionGroup);
+
+            const bugReportAction = new Gio.SimpleAction({ name: 'open-bug-report' });
+            bugReportAction.connect('activate', this._openBugReport.bind(this, extPrefsDialog));
+            actionGroup.add_action(bugReportAction);
+
+            const userGuideAction = new Gio.SimpleAction({ name: 'open-user-guide' });
+            userGuideAction.connect('activate', this._openUserGuide.bind(this, extPrefsDialog));
+            actionGroup.add_action(userGuideAction);
+
+            const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
+            changelogAction.connect('activate', this._openChangelog.bind(this, extPrefsDialog));
+            actionGroup.add_action(changelogAction);
+
+            const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
+            licenseAction.connect('activate', this._openLicense.bind(this, extPrefsDialog));
+            actionGroup.add_action(licenseAction);
+        });
 
         this._bindWidgets(Settings.getAllKeys());
         this._bindKeybindings(Shortcuts.getAllKeys());
@@ -43,6 +69,34 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
         // LayoutPrefs manages everything related to popupLayouts on the
         // prefs side (including the keyboard shortcuts)
         this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
+    }
+
+    _openBugReport(extPrefsDialog) {
+        Gio.AppInfo.launch_default_for_uri(
+            'https://github.com/Leleat/Tiling-Assistant/issues/new?assignees=&labels=bug&template=bug_report.md&title=',
+            extPrefsDialog.get_display().get_app_launch_context()
+        );
+    }
+
+    _openUserGuide(extPrefsDialog) {
+        Gio.AppInfo.launch_default_for_uri(
+            'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md',
+            extPrefsDialog.get_display().get_app_launch_context()
+        );
+    }
+
+    _openChangelog(extPrefsDialog) {
+        Gio.AppInfo.launch_default_for_uri(
+            'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md',
+            extPrefsDialog.get_display().get_app_launch_context()
+        );
+    }
+
+    _openLicense(extPrefsDialog) {
+        Gio.AppInfo.launch_default_for_uri(
+            'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE',
+            extPrefsDialog.get_display().get_app_launch_context()
+        );
     }
 
     /**

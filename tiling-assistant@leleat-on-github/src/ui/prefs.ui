@@ -1,6 +1,50 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="tiling-assistant@leleat-on-github">
   <requires lib="gtk+" version="3.24"/>
+
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- = Header Bar =========================================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+
+  <menu id="info-menu">
+    <section>
+      <item>
+        <attribute name="label" translatable="yes">Report a Bug</attribute>
+        <attribute name="action">prefs.open-bug-report</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">User Guide</attribute>
+        <attribute name="action">prefs.open-user-guide</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Changelog</attribute>
+        <attribute name="action">prefs.open-changelog</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">License</attribute>
+        <attribute name="action">prefs.open-license</attribute>
+      </item>
+    </section>
+  </menu>
+
+  <object class="GtkHeaderBar" id="header-bar">
+    <child>
+      <object class="GtkMenuButton" id="menuButton">
+        <property name="receives-default">True</property>
+        <property name="menu-model">info-menu</property>
+        <property name="icon-name">dialog-information-symbolic</property>
+      </object>
+    </child>
+  </object>
+
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- = Adjustments and ListStores =========================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+
   <object class="GtkListStore" id="auto-tile-liststore">
     <columns>
       <column type="gint"/>
@@ -116,6 +160,13 @@
     <property name="step-increment">2</property>
     <property name="page-increment">8</property>
   </object>
+
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- = Preference Window ==================================================================== -->
+  <!-- ======================================================================================== -->
+  <!-- ======================================================================================== -->
+
   <object class="GtkNotebook" id="main-prefs">
     <property name="vexpand">1</property>
     <property name="tab-pos">top</property>
@@ -449,7 +500,7 @@
                                     <child>
                                       <object class="GtkLabel">
                                         <property name="valign">center</property>
-                                        <property name="label" translatable="yes">Auto-Tile</property>
+                                        <property name="label" translatable="yes">Fill Untiled Space</property>
                                         <property name="xalign">0</property>
                                       </object>
                                     </child>
