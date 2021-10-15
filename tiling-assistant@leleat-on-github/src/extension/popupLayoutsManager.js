@@ -105,8 +105,8 @@ var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused
         if (!layout)
             return;
 
-        const currWsOnly = Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY);
-        this._remainingWindows = Util.getWindows(currWsOnly);
+        const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+        this._remainingWindows = Util.getWindows(allWs);
         this._items = new Layout(layout).getItems();
         this._currItem = null;
 

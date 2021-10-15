@@ -133,9 +133,9 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
      * @returns {Meta.Windows[]} an array of of the open Meta.Windows in
      *      stacking order.
      */
-    static getWindows(currentWorkspace = true) {
+    static getWindows(allWorkspaces = false) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const openWindows = AltTab.getWindows(currentWorkspace ? activeWs : null);
+        const openWindows = AltTab.getWindows(allWorkspaces ? null : activeWs);
         const orderedOpenWindows = global.display.sort_windows_by_stacking(openWindows);
         return orderedOpenWindows.reverse().filter(w => {
             return w.allows_move() && w.allows_resize() || this.isMaximized(w);
@@ -709,8 +709,8 @@ var Util = class Utility { // eslint-disable-line no-unused-vars
         if (!Settings.getBoolean(Settings.ENABLE_TILING_POPUP))
             return;
 
-        const currWorkspace = Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY);
-        const openWindows = this.getWindows(currWorkspace);
+        const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+        const openWindows = this.getWindows(allWs);
         const topTileGroup = this.getTopTileGroup(false);
         topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));
         if (!openWindows.length)

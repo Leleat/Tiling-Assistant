@@ -406,8 +406,8 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             // an empty spot: open Tiling Popup
             } else {
                 const notEditing = w => !this._windows.includes(w);
-                const currWsOnly = Settings.getBoolean(Settings.CURR_WORKSPACE_ONLY);
-                const openWindows = Util.getWindows(currWsOnly).filter(notEditing);
+                const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+                const openWindows = Util.getWindows(allWs).filter(notEditing);
                 const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
                 const tilingPopup = new TilingSwitcherPopup(
                     openWindows,

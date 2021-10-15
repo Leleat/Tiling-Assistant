@@ -25,6 +25,9 @@
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
 		</key>
+		<key name="tiling-popup-all-workspace" type="b">
+			<default>false</default>
+		</key>
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>
@@ -35,15 +38,6 @@
 			<default>0</default>
 		</key>
 		<key name="maximize-with-gap" type="b">
-			<default>false</default>
-		</key>
-		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
-			<default>"Grab Start"</default>
-		</key>
-		<key name="enable-hold-maximize-inverse-landscape" type="b">
-			<default>false</default>
-		</key>
-		<key name="enable-hold-maximize-inverse-portrait" type="b">
 			<default>false</default>
 		</key>
 
@@ -162,9 +156,6 @@
 		<key name="enable-advanced-experimental-features" type="b">
 			<default>false</default>
 		</key>
-		<key name="tiling-popup-current-workspace-only" type="b">
-			<default>true</default>
-		</key>
 		<key name="tile-editing-mode-color" type="s">
 	  		<default>"rgb(27, 106, 203)"</default>
 		</key>
@@ -174,6 +165,9 @@
 		<key name="default-to-secondary-tiling-preview" type="b">
 			<default>false</default>
 		</key>
+		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
+			<default>"Grab Start"</default>
+		</key>
 		<key name="enable-tile-animations" type="b">
 			<default>true</default>
 		</key>
@@ -182,6 +176,12 @@
 		</key>
 		<key name="toggle-maximize-tophalf-timer" type="i">
 			<default>600</default>
+		</key>
+		<key name="enable-hold-maximize-inverse-landscape" type="b">
+			<default>false</default>
+		</key>
+		<key name="enable-hold-maximize-inverse-portrait" type="b">
+			<default>false</default>
 		</key>
 		<key name="vertical-preview-area" type="i">
 			<default>15</default>

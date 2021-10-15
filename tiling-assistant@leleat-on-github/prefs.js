@@ -32,8 +32,8 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
         this._builder.add_from_file(Me.path + '/src/ui/prefs.ui');
         this.set_child(this._builder.get_object('main-prefs'));
 
-        this.set_min_content_width(650);
-        this.set_min_content_height(600);
+        this.set_min_content_width(550);
+        this.set_min_content_height(575);
 
         this._bindWidgets(Settings.getAllKeys());
         this._bindKeybindings(Shortcuts.getAllKeys());
@@ -67,7 +67,7 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
             Settings.ENABLE_HOLD_INVERSE_LANDSCAPE,
             Settings.ENABLE_HOLD_INVERSE_PORTRAIT,
             Settings.MAXIMIZE_WITH_GAPS,
-            Settings.CURR_WORKSPACE_ONLY,
+            Settings.POPUP_ALL_WORKSPACES,
             Settings.DEFAULT_TO_SECONDARY_PREVIEW
         ];
         const comboBoxes = [
@@ -144,7 +144,7 @@ const PrefsWidget = GObject.registerClass(class TilingAssistantPrefs extends Gtk
      */
     _updateAdvancedSettingsVisibility() {
         const advancedWidgetIds = [
-            'popup-layouts', 'popup-layouts-tab-label', 'restore-window-size-on-row'
+            'popup-layouts', 'popup-layouts-tab-label'
         ];
         const advancedKey = Settings.ENABLE_ADV_EXP_SETTINGS;
 

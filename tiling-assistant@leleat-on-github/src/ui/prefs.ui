@@ -118,8 +118,9 @@
   </object>
   <object class="GtkNotebook" id="main-prefs">
     <property name="vexpand">1</property>
-    <property name="tab-pos">left</property>
+    <property name="tab-pos">top</property>
     <property name="scrollable">1</property>
+    <property name="show-border">0</property>
     <child>
       <object class="GtkNotebookPage">
         <property name="child">
@@ -149,6 +150,32 @@
                     </child>
                     <child>
                       <object class="GtkSwitch" id="enable-tiling-popup">
+                        <property name="valign">center</property>
+                        <property name="active">1</property>
+                      </object>
+                    </child>
+                  </object>
+                </property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkListBoxRow">
+                <property name="child">
+                  <object class="GtkBox">
+                    <property name="margin-start">12</property>
+                    <property name="margin-end">12</property>
+                    <property name="margin-top">12</property>
+                    <property name="margin-bottom">12</property>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="valign">center</property>
+                        <property name="hexpand">1</property>
+                        <property name="label" translatable="yes">Include apps from all workspaces</property>
+                        <property name="xalign">0</property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkSwitch" id="tiling-popup-all-workspace">
                         <property name="valign">center</property>
                         <property name="active">1</property>
                       </object>
@@ -284,124 +311,11 @@
                 </property>
               </object>
             </child>
-            <child>
-              <object class="GtkListBoxRow" id="restore-window-size-on-row">
-                <property name="child">
-                  <object class="GtkBox">
-                    <property name="margin-start">12</property>
-                    <property name="margin-end">12</property>
-                    <property name="margin-top">12</property>
-                    <property name="margin-bottom">12</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="valign">center</property>
-                        <property name="label" translatable="yes">Restore Window Size on</property>
-                        <property name="xalign">0</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkImage">
-                        <property name="tooltip-text" translatable="yes">This setting is intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
-
-If that is the case, you can try &apos;Restore Window Size on Grab End&apos; instead.</property>
-                        <property name="margin-start">12</property>
-                        <property name="icon-name">dialog-information-symbolic</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkComboBoxText" id="restore-window-size-on">
-                        <property name="halign">end</property>
-                        <property name="hexpand">1</property>
-                        <property name="active-id">0</property>
-                        <items>
-                          <item id="0" translatable="yes">Grab Start</item>
-                          <item id="1" translatable="yes">Grab End</item>
-                        </items>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkListBoxRow">
-                <property name="activatable">0</property>
-                <property name="selectable">0</property>
-                <property name="child">
-                  <object class="GtkBox">
-                    <property name="margin-start">12</property>
-                    <property name="margin-end">12</property>
-                    <property name="margin-top">12</property>
-                    <property name="margin-bottom">12</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="valign">center</property>
-                        <property name="label" translatable="yes">&lt;u&gt;Inverse Top Screen Edge Action:&lt;/u&gt;</property>
-                        <property name="use-markup">1</property>
-                        <property name="xalign">0</property>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkListBoxRow">
-                <property name="margin-start">24</property>
-                <property name="child">
-                  <object class="GtkBox">
-                    <property name="margin-start">12</property>
-                    <property name="margin-end">12</property>
-                    <property name="margin-top">12</property>
-                    <property name="margin-bottom">12</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="valign">center</property>
-                        <property name="label" translatable="yes">Landscape Displays</property>
-                        <property name="xalign">0</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSwitch" id="enable-hold-maximize-inverse-landscape">
-                        <property name="halign">end</property>
-                        <property name="hexpand">1</property>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkListBoxRow">
-                <property name="margin-start">24</property>
-                <property name="child">
-                  <object class="GtkBox">
-                    <property name="margin-start">12</property>
-                    <property name="margin-end">12</property>
-                    <property name="margin-top">12</property>
-                    <property name="margin-bottom">12</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="valign">center</property>
-                        <property name="label" translatable="yes">Portrait Displays</property>
-                        <property name="xalign">0</property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkSwitch" id="enable-hold-maximize-inverse-portrait">
-                        <property name="halign">end</property>
-                        <property name="hexpand">1</property>
-                      </object>
-                    </child>
-                  </object>
-                </property>
-              </object>
-            </child>
           </object>
         </property>
         <property name="tab">
           <object class="GtkLabel">
-            <property name="halign">start</property>
+            <property name="hexpand">1</property>
             <property name="margin-start">8</property>
             <property name="margin-end">8</property>
             <property name="margin-top">8</property>
@@ -811,7 +725,7 @@ If that is the case, you can try &apos;Restore Window Size on Grab End&apos; ins
                             </property>
                             <child type="label">
                               <object class="GtkLabel">
-                                <property name="label" translatable="yes">&lt;b&gt;    Side Tiling    &lt;/b&gt;</property>
+                                <property name="label" translatable="yes">&lt;b&gt;    Edge Tiling    &lt;/b&gt;</property>
                                 <property name="use-markup">1</property>
                               </object>
                             </child>
@@ -1021,7 +935,7 @@ If that is the case, you can try &apos;Restore Window Size on Grab End&apos; ins
         </property>
         <property name="tab">
           <object class="GtkLabel">
-            <property name="halign">start</property>
+            <property name="hexpand">1</property>
             <property name="margin-start">8</property>
             <property name="margin-end">8</property>
             <property name="margin-top">8</property>
@@ -1139,166 +1053,12 @@ If that is the case, you can try &apos;Restore Window Size on Grab End&apos; ins
         <property name="tab">
           <object class="GtkLabel" id="popup-layouts-tab-label">
             <property name="visible">0</property>
-            <property name="halign">start</property>
+            <property name="hexpand">1</property>
             <property name="margin-start">8</property>
             <property name="margin-end">8</property>
             <property name="margin-top">8</property>
             <property name="margin-bottom">8</property>
             <property name="label" translatable="yes">Popup Layouts</property>
-          </object>
-        </property>
-      </object>
-    </child>
-    <child>
-      <object class="GtkNotebookPage">
-        <property name="child">
-          <object class="GtkBox">
-            <property name="halign">center</property>
-            <property name="margin-start">15</property>
-            <property name="margin-end">15</property>
-            <property name="margin-top">15</property>
-            <property name="margin-bottom">15</property>
-            <property name="hexpand">1</property>
-            <property name="vexpand">1</property>
-            <property name="orientation">vertical</property>
-            <child>
-              <object class="GtkLabel">
-                <property name="halign">center</property>
-                <property name="margin-top">5</property>
-                <property name="label" translatable="yes">Tiling Assistant</property>
-                <property name="justify">center</property>
-                <attributes>
-                  <attribute name="weight" value="ultrabold"></attribute>
-                  <attribute name="size" value="15360"></attribute>
-                </attributes>
-              </object>
-            </child>
-            <child>
-              <object class="GtkLinkButton">
-                <property name="label">https://github.com/Leleat/Tiling-Assistant</property>
-                <property name="halign">center</property>
-                <property name="margin-top">5</property>
-                <property name="margin-bottom">15</property>
-                <property name="use-underline">1</property>
-                <property name="uri">https://github.com/Leleat/Tiling-Assistant</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="halign">center</property>
-                <property name="valign">start</property>
-                <property name="vexpand">1</property>
-                <property name="label" translatable="yes">If you want to report a bug or need help,
-
-please open an issue on Github.</property>
-                <property name="use-markup">1</property>
-                <property name="justify">center</property>
-                <property name="wrap">1</property>
-                <property name="width-chars">27</property>
-                <property name="max-width-chars">47</property>
-              </object>
-            </child>
-            <child>
-              <object class="GtkSeparator"/>
-            </child>
-            <child>
-              <object class="GtkBox">
-                <property name="valign">center</property>
-                <property name="vexpand">1</property>
-                <property name="orientation">vertical</property>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="halign">center</property>
-                    <property name="label" translatable="yes">List of known &lt;big&gt;&lt;b&gt;INCOMPATIBLE&lt;/b&gt;&lt;/big&gt; apps/extensions/limitations.</property>
-                    <property name="use-markup">1</property>
-                    <property name="justify">center</property>
-                    <property name="wrap">1</property>
-                    <property name="width-chars">27</property>
-                    <property name="max-width-chars">47</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLinkButton">
-                    <property name="label">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
-                    <property name="halign">center</property>
-                    <property name="margin-top">5</property>
-                    <property name="margin-bottom">15</property>
-                    <property name="use-underline">1</property>
-                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/issues/61</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="halign">center</property>
-                    <property name="margin-top">20</property>
-                    <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;GUIDE&lt;/b&gt;&lt;/big&gt; offers a detailed explanation of every feature.</property>
-                    <property name="use-markup">1</property>
-                    <property name="justify">center</property>
-                    <property name="wrap">1</property>
-                    <property name="width-chars">27</property>
-                    <property name="max-width-chars">47</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLinkButton">
-                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md</property>
-                    <property name="halign">center</property>
-                    <property name="margin-top">5</property>
-                    <property name="margin-bottom">15</property>
-                    <property name="use-underline">1</property>
-                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="margin-top">20</property>
-                    <property name="label" translatable="yes">The &lt;big&gt;&lt;b&gt;CHANGELOG&lt;/b&gt;&lt;/big&gt; lists the differences between each extension version.</property>
-                    <property name="use-markup">1</property>
-                    <property name="justify">center</property>
-                    <property name="wrap">1</property>
-                    <property name="width-chars">27</property>
-                    <property name="max-width-chars">47</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLinkButton">
-                    <property name="label">https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md</property>
-                    <property name="halign">center</property>
-                    <property name="margin-top">5</property>
-                    <property name="margin-bottom">15</property>
-                    <property name="use-underline">1</property>
-                    <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md</property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <child>
-              <object class="GtkSeparator"/>
-            </child>
-            <child>
-              <object class="GtkLabel">
-                <property name="halign">center</property>
-                <property name="valign">end</property>
-                <property name="margin-bottom">20</property>
-                <property name="vexpand">1</property>
-                <property name="label" translatable="yes">&lt;small&gt;This extension is licensed under the &lt;a href=&apos;https://www.gnu.org/licenses/old-licenses/gpl-2.0.html&apos;&gt;GNU General Public License, version 2 or later&lt;/a&gt; and comes with &lt;u&gt;&lt;b&gt;NO WARRANTY&lt;/b&gt;&lt;/u&gt;.  A copy of this license can be found in the Github repository.&lt;/small&gt;</property>
-                <property name="use-markup">1</property>
-                <property name="justify">center</property>
-                <property name="wrap">1</property>
-                <property name="width-chars">40</property>
-                <property name="max-width-chars">0</property>
-              </object>
-            </child>
-          </object>
-        </property>
-        <property name="tab">
-          <object class="GtkLabel">
-            <property name="halign">start</property>
-            <property name="margin-start">8</property>
-            <property name="margin-end">8</property>
-            <property name="margin-top">8</property>
-            <property name="margin-bottom">8</property>
-            <property name="label" translatable="yes">Help</property>
           </object>
         </property>
       </object>
@@ -1354,32 +1114,6 @@ please open an issue on Github.</property>
                             </child>
                             <child>
                               <object class="GtkSwitch" id="enable-advanced-experimental-features">
-                                <property name="valign">center</property>
-                                <property name="active">1</property>
-                              </object>
-                            </child>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkListBoxRow">
-                        <property name="child">
-                          <object class="GtkBox">
-                            <property name="margin-start">12</property>
-                            <property name="margin-end">12</property>
-                            <property name="margin-top">12</property>
-                            <property name="margin-bottom">12</property>
-                            <child>
-                              <object class="GtkLabel">
-                                <property name="valign">center</property>
-                                <property name="hexpand">1</property>
-                                <property name="label" translatable="yes">Tiling Popup: Current Workspace only</property>
-                                <property name="xalign">0</property>
-                              </object>
-                            </child>
-                            <child>
-                              <object class="GtkSwitch" id="tiling-popup-current-workspace-only">
                                 <property name="valign">center</property>
                                 <property name="active">1</property>
                               </object>
@@ -1472,6 +1206,45 @@ please open an issue on Github.</property>
                       </object>
                     </child>
                     <child>
+                      <object class="GtkListBoxRow" id="restore-window-size-on-row">
+                        <property name="child">
+                          <object class="GtkBox">
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Restore Window Size on</property>
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkImage">
+                                <property name="tooltip-text" translatable="yes">This setting is intended for Wayland users. Tiled windows may not properly restore their size when they are being grabbed on Wayland.
+
+        If that is the case, you can try &apos;Restore Window Size on Grab End&apos; instead.</property>
+                                <property name="margin-start">12</property>
+                                <property name="icon-name">dialog-information-symbolic</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkComboBoxText" id="restore-window-size-on">
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
+                                <property name="active-id">0</property>
+                                <items>
+                                  <item id="0" translatable="yes">Grab Start</item>
+                                  <item id="1" translatable="yes">Grab End</item>
+                                </items>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkListBoxRow">
                         <property name="child">
                           <object class="GtkBox">
@@ -1545,6 +1318,56 @@ please open an issue on Github.</property>
                                 <property name="snap-to-ticks">1</property>
                                 <property name="update-policy">if-valid</property>
                                 <property name="value">750</property>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow">
+                        <property name="child">
+                          <object class="GtkBox">
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Inverse Top Screen Edge Action: Landscape Displays</property>
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="enable-hold-maximize-inverse-landscape">
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
+                              </object>
+                            </child>
+                          </object>
+                        </property>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBoxRow">
+                        <property name="child">
+                          <object class="GtkBox">
+                            <property name="margin-start">12</property>
+                            <property name="margin-end">12</property>
+                            <property name="margin-top">12</property>
+                            <property name="margin-bottom">12</property>
+                            <child>
+                              <object class="GtkLabel">
+                                <property name="valign">center</property>
+                                <property name="label" translatable="yes">Inverse Top Screen Edge Action: Portrait Displays</property>
+                                <property name="xalign">0</property>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkSwitch" id="enable-hold-maximize-inverse-portrait">
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
                               </object>
                             </child>
                           </object>

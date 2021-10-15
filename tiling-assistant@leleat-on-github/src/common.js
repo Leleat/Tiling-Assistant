@@ -21,7 +21,7 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
     static ENABLE_HOLD_INVERSE_LANDSCAPE = 'enable-hold-maximize-inverse-landscape';
     static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
-    static CURR_WORKSPACE_ONLY = 'tiling-popup-current-workspace-only';
+    static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
     static TILE_EDITING_MODE_COLOR = 'tile-editing-mode-color';
     static SECONDARY_PREVIEW_ACTIVATOR = 'secondary-tiling-preview-activator';
     static DEFAULT_TO_SECONDARY_PREVIEW = 'default-to-secondary-tiling-preview';
@@ -62,7 +62,7 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
             this.RESTORE_SIZE_ON,
             this.ENABLE_HOLD_INVERSE_LANDSCAPE,
             this.ENABLE_HOLD_INVERSE_PORTRAIT,
-            this.CURR_WORKSPACE_ONLY,
+            this.POPUP_ALL_WORKSPACES,
             this.TILE_EDITING_MODE_COLOR,
             this.SECONDARY_PREVIEW_ACTIVATOR,
             this.DEFAULT_TO_SECONDARY_PREVIEW,
