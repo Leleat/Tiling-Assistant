@@ -7,6 +7,8 @@ assignees: ''
 
 ---
 
+<!-- If you just want to ask a question, please open a discussion instead. -->
+
 **Describe the bug**
 
 **Steps To Reproduce**
@@ -14,14 +16,14 @@ assignees: ''
 **System Info:**
  - Distro (incl. version):
  - GNOME (Shell) version:
- - Extensions version: 
+ - Extension version: 
  - XOrg/Wayland:
 
 **Journalctl logs**
-<!-- Run `journalctl -fo cat /usr/bin/gnome-shell` in a Terminal. Then reproduce the bug. Ideally, disable all other extensions and restart GNOME shell so that the logs don't get spammed with unrelated stuff.-->
+<!-- Run `journalctl -fo cat /usr/bin/gnome-shell` in a Terminal. Then reproduce the bug. Ideally, disable all other extensions before that and restart GNOME shell, so you can be sure that this extension isn't conflicting with others. -->
 
 **List of other extensions**
 <!-- It's possible Tiling Assistant is conflicting with other extensions. So please provide a list of your installed extensions. Run `gnome-extensions list --enabled` and post the output here. -->
 
 **Screenshots/-captures**
-<!-- If you can, please provide a screenshot/-capture of the issue. This will help explain your problem.-->
+<!-- If you can, please provide a screenshot/-capture of the issue. -->
