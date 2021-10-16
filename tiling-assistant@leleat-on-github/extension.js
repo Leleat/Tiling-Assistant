@@ -55,8 +55,8 @@ function enable() { // eslint-disable-line no-unused-vars
     this._resizeHandler = new ResizeHandler.Handler();
     const KeybindingHandler = Me.imports.src.extension.keybindingHandler;
     this._keybindingHandler = new KeybindingHandler.Handler();
-    const PopupLayoutsManager = Me.imports.src.extension.popupLayoutsManager;
-    this._popupLayoutsManager = new PopupLayoutsManager.LayoutManager();
+    const LayoutsManager = Me.imports.src.extension.layoutsManager;
+    this._layoutsManager = new LayoutsManager.LayoutManager();
 
     // Disable native tiling.
     this._gnomeMutterSettings = ExtensionUtils.getSettings('org.gnome.mutter');
@@ -84,9 +84,6 @@ function enable() { // eslint-disable-line no-unused-vars
 
     // Restore tiled window properties after session was unlocked.
     _loadAfterSessionLock();
-
-    // TODO remove
-    _convertLayouts();
 }
 
 function disable() { // eslint-disable-line no-unused-vars
@@ -100,8 +97,8 @@ function disable() { // eslint-disable-line no-unused-vars
     this._resizeHandler = null;
     this._keybindingHandler.destroy();
     this._keybindingHandler = null;
-    this._popupLayoutsManager.destroy();
-    this._popupLayoutsManager = null;
+    this._layoutsManager.destroy();
+    this._layoutsManager = null;
 
     Util.destroy();
     Util = null;
@@ -218,60 +215,4 @@ function _loadAfterSessionLock() {
             Util.updateTileGroup(group);
         }
     });
-}
-
-// v26 changes the way layouts are saved / read from the disk.
-// Previously, the layouts file was parsed from an array of individual layouts.
-// An individual layout had a name and an array for the rects, the apps and the
-// loopType each. Accessing the properties was done by using the same index on
-// the 3 different arrays... Now a layout has a name and 1 array of items.
-// 1 layout item has a rect, an app and a loopType property. This makes the json
-// file much more readable (and hopefully the code as well).
-function _convertLayouts() {
-    // Check, if the layouts file exists
-    const pathArr = [GLib.get_user_config_dir(), '/tiling-assistant/layouts.json'];
-    const path = GLib.build_filenamev(pathArr);
-    const oldFile = Gio.File.new_for_path(path);
-    if (!oldFile.query_exists(null))
-        return;
-
-    // Load the content and check, if there were layouts even defined
-    const [success, contents] = oldFile.load_contents(null);
-    if (!success || !contents.length)
-        return;
-
-    const layouts = JSON.parse(ByteArray.toString(contents));
-    // Check, if the oldFile no longer follows the old format i. e.
-    // it has already been converted or the layouts array is empty
-    if (!layouts[0]?.rects)
-        return;
-
-    // Make a backup of the old layouts in a new file, just in case
-    const backupPath = GLib.build_filenamev([GLib.get_user_config_dir(), '/tiling-assistant/layouts_backup_v25.json']);
-    const backup = Gio.File.new_for_path(backupPath);
-    try { backup.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
-    backup.replace_contents(JSON.stringify(layouts), null,
-        false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-
-    // Convert to new format
-    const convertedLayouts = layouts.map(l => {
-        const layout = {
-            _name: l.name,
-            _items: []
-        };
-
-        l.rects.forEach((rect, idx) => {
-            layout._items.push({
-                rect,
-                appId: l.apps[idx] || null,
-                loopType: l.loopModes[idx] || null
-            });
-        });
-
-        return layout;
-    });
-
-    // Save and replace oldFile
-    oldFile.replace_contents(JSON.stringify(convertedLayouts), null,
-        false, Gio.FileCreateFlags.REPLACE_DESTINATION, null);
 }

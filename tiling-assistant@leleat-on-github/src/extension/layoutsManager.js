@@ -16,20 +16,20 @@ const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
 /**
- * Here are the classes to handle popup layouts on the shell / extension side.
- * See src/prefs/popupLayoutsPrefs.js for more details and general info about
- * popupLayouts. In summary, a Layout is an array of LayoutItems. A LayoutItem
- * is a JS Object and has a rect, an appId and a loopType. Only the rect is
- * mandatory. AppId may be null or a String. Same for the LoopType. If a layout
- * is activated, we will loop / step through each LayoutItem and spawn a Tiling
- * Popup one after the other for the rects and offer to tile a window to that rect.
- * If an appId is defined, instead of calling the Tiling Popup, we tile (a new
- * Instance of) the app to the rect. If a LoopType is defined, instead of going
- * to the next item / rect, we spawn a Tiling Popup on the same item / rect and
- * all the tiled windows will share that spot evenly (a la 'Master and Stack').
+ * Here are the classes to handle layouts on the shell / extension side.
+ * See src/prefs/layoutsPrefs.js for more details and general info about layouts.
+ * In summary, a Layout is an array of LayoutItems. A LayoutItem is a JS Object
+ * and has a rect, an appId and a loopType. Only the rect is mandatory. AppId may
+ * be null or a String. Same for the LoopType. If a layout is activated, we will
+ * loop / step through each LayoutItem and spawn a Tiling Popup one after the
+ * other for the rects and offer to tile a window to that rect. If an appId is
+ * defined, instead of calling the Tiling Popup, we tile (a new Instance of)
+ * the app to the rect. If a LoopType is defined, instead of going to the next
+ * item / rect, we spawn a Tiling Popup on the same item / rect and all the
+ * tiled windows will share that spot evenly (a la 'Master and Stack').
  */
 
-var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused-vars
+var LayoutManager = class TilingLayoutsManager { // eslint-disable-line no-unused-vars
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios
@@ -284,11 +284,11 @@ var LayoutManager = class PopupLayoutsManager { // eslint-disable-line no-unused
 };
 
 /**
- * The GUI class for the Popup Layout search.
+ * The GUI class for the Layout search.
  */
 const LayoutSearch = GObject.registerClass({
     Signals: { 'item-activated': { param_types: [GObject.TYPE_INT] } }
-}, class PopupLayoutsSearch extends St.BoxLayout {
+}, class TilingLayoutsSearch extends St.BoxLayout {
     _init(layouts) {
         super._init({
             width: 500,
@@ -403,8 +403,8 @@ const LayoutSearch = GObject.registerClass({
         const newItem = this._items[newIdx];
         this._focused = newIdx;
 
-        prevItem?.remove_style_class_name('popup-layout-search-highlight');
-        newItem?.add_style_class_name('popup-layout-search-highlight');
+        prevItem?.remove_style_class_name('tiling-layout-search-highlight');
+        newItem?.add_style_class_name('tiling-layout-search-highlight');
     }
 
     _activate() {
@@ -416,7 +416,7 @@ const LayoutSearch = GObject.registerClass({
 /**
  * An Item representing a Layout within the Popup Layout search.
  */
-const SearchItem = GObject.registerClass(class PopupLayoutsSearchItem extends St.Label {
+const SearchItem = GObject.registerClass(class TilingLayoutsSearchItem extends St.Label {
     _init(text, fontSize) {
         super._init({
             // Add some spaces to the beginning to align it better

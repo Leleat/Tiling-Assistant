@@ -1,13 +1,13 @@
 'use strict';
 
-const { Gdk, Gio, Gtk, GObject } = imports.gi;
+const { Gio, Gtk, GObject } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const LayoutPrefs = Me.imports.src.prefs.popupLayoutsPrefs.Prefs;
+const LayoutPrefs = Me.imports.src.prefs.layoutsPrefs.Prefs;
+const { ShortcutWidget } = Me.imports.src.prefs.shortcutWidget;
 const { Settings, Shortcuts } = Me.imports.src.common;
-const Util = Me.imports.src.prefs.utility.Util;
 
 function init() { // eslint-disable-line no-unused-vars
     ExtensionUtils.initTranslations(Me.metadata.uuid);
@@ -18,7 +18,7 @@ function buildPrefsWidget() { // eslint-disable-line no-unused-vars
 }
 
 const PrefsWidget = GObject.registerClass(
-class TilingAssistantPrefs extends Gtk.ScrolledWindow {
+class TilingAssistantPrefs extends Gtk.Box {
     _init(params) {
         super._init(params);
 
@@ -32,14 +32,33 @@ class TilingAssistantPrefs extends Gtk.ScrolledWindow {
         this._builder.add_from_file(`${Me.path}/src/ui/prefs.ui`);
 
         const mainPrefs = this._builder.get_object('main-prefs');
-        this.set_child(mainPrefs);
+        this.append(mainPrefs);
 
-        // Setup Header bar with info-menu
+        this._bindSwitches();
+        this._bindSpinbuttons();
+        this._bindComboBoxes();
+        this._bindRadioButtons();
+        this._bindKeybindings();
+
+        // LayoutPrefs manages everything related to layouts on the
+        // prefs side (including the keyboard shortcuts)
+        this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
+
+        // Setup titlebar and final size
         mainPrefs.connect('realize', () => {
-            const headerBar = this._builder.get_object('header-bar');
+            // Replace the title (widget)
             const extPrefsDialog = mainPrefs.get_root();
-            extPrefsDialog.set_titlebar(headerBar);
-            extPrefsDialog.set_default_size(525, 625);
+            const titleBar = extPrefsDialog.get_titlebar();
+            titleBar.set_title_widget(this._builder.get_object('main-stack-switcher'));
+            titleBar.pack_start(this._builder.get_object('info-menu-button'));
+            const hiddenSettingsButton = this._builder.get_object('hidden-settings-button');
+            titleBar.pack_end(hiddenSettingsButton);
+            hiddenSettingsButton.connect('clicked', () => {
+                const hiddenSettings = this._builder.get_object('hidden-settings-page');
+                hiddenSettings.set_visible(!hiddenSettings.get_visible());
+            });
+
+            extPrefsDialog.set_default_size(600, 750);
 
             const actionGroup = new Gio.SimpleActionGroup();
             extPrefsDialog.insert_action_group('prefs', actionGroup);
@@ -61,19 +80,47 @@ class TilingAssistantPrefs extends Gtk.ScrolledWindow {
             actionGroup.add_action(licenseAction);
         });
 
-        this._bindWidgets(Settings.getAllKeys());
-        this._bindKeybindings(Shortcuts.getAllKeys());
+        // Allow the activation of the 'main widget' by clicking a ListBoxRow
+        for (let i = 0; i < 20; i++) {
+            this._builder.get_object(`listBox${i}`)?.connect('row-activated',
+                this._onListBoxRowActivated.bind(this));
+        }
+    }
 
-        this._updateAdvancedSettingsVisibility();
+    /**
+     * Activate the 'main widget' of the row. The row should always have a
+     * Gtk.Box as a child. The Gtk.Box should contain the 'main widget'.
+     *
+     * @param {Gtk.ListBox} listBox
+     * @param {Gtk.ListBoxRow} row
+     */
+    _onListBoxRowActivated(listBox, row) {
+        const gtkBox = row.get_first_child();
 
-        // LayoutPrefs manages everything related to popupLayouts on the
-        // prefs side (including the keyboard shortcuts)
-        this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
+        for (let child = gtkBox.get_first_child(); !!child; child = child.get_next_sibling()) {
+            if (child instanceof Gtk.Switch) {
+                child.activate();
+                break;
+            } else if (child instanceof Gtk.CheckButton) {
+                child.activate();
+                break;
+            } else if (child instanceof Gtk.SpinButton) {
+                // Just grab focus since the action to take is ambiguous.
+                child.grab_focus();
+                break;
+            } else if (child instanceof ShortcutWidget) {
+                child.activate();
+                break;
+            } else if (child instanceof Gtk.ComboBox) {
+                child.popup_shown ? child.popdown() : child.popup();
+                break;
+            }
+        }
     }
 
     _openBugReport(extPrefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
-            'https://github.com/Leleat/Tiling-Assistant/issues/new?assignees=&labels=bug&template=bug_report.md&title=',
+            'https://github.com/Leleat/Tiling-Assistant/issues',
             extPrefsDialog.get_display().get_app_launch_context()
         );
     }
@@ -99,129 +146,101 @@ class TilingAssistantPrefs extends Gtk.ScrolledWindow {
         );
     }
 
-    /**
-     * Binds the widgets from the prefs.ui file with the settings from the
-     * gschema.xml file. The settings keys need to have the same name as
-     * as the object ids in the .ui file.
-     *
-     * @param {string[]} keys - list of the settings keys.
-     */
-    _bindWidgets(keys) {
+    _bindSwitches() {
+        const switches = [
+            Settings.ENABLE_TILING_POPUP,
+            Settings.POPUP_ALL_WORKSPACES,
+            Settings.RAISE_TILE_GROUPS,
+            Settings.MAXIMIZE_WITH_GAPS,
+            Settings.ENABLE_ADV_EXP_SETTINGS,
+            Settings.ENABLE_TILE_ANIMATIONS,
+            Settings.ENABLE_UNTILE_ANIMATIONS,
+            Settings.ENABLE_HOLD_INVERSE_LANDSCAPE,
+            Settings.ENABLE_HOLD_INVERSE_PORTRAIT
+        ];
+
+        switches.forEach(key => {
+            const widget = this._builder.get_object(key);
+            this._settings.bind(key, widget, 'active', Gio.SettingsBindFlags.DEFAULT);
+        });
+    }
+
+    _bindSpinbuttons() {
         const spinButtons = [
             Settings.WINDOW_GAP,
             Settings.INVERSE_TOP_MAXIMIZE_TIMER,
             Settings.VERTICAL_PREVIEW_AREA,
             Settings.HORIZONTAL_PREVIEW_AREA
         ];
-        const switches = [
-            Settings.ENABLE_TILING_POPUP,
-            Settings.ENABLE_TILE_ANIMATIONS,
-            Settings.ENABLE_UNTILE_ANIMATIONS,
-            Settings.RAISE_TILE_GROUPS,
-            Settings.ENABLE_HOLD_INVERSE_LANDSCAPE,
-            Settings.ENABLE_HOLD_INVERSE_PORTRAIT,
-            Settings.MAXIMIZE_WITH_GAPS,
-            Settings.POPUP_ALL_WORKSPACES,
-            Settings.DEFAULT_TO_SECONDARY_PREVIEW
-        ];
-        const comboBoxes = [
-            Settings.RESTORE_SIZE_ON,
-            Settings.DYNAMIC_KEYBINDINGS_BEHAVIOUR,
-            Settings.SECONDARY_PREVIEW_ACTIVATOR
-        ];
-        const colorButtons = [
-            Settings.TILE_EDITING_MODE_COLOR
-        ];
 
-
-        const getBindProperty = key => {
-            if (spinButtons.includes(key))
-                return 'value';
-            else if (switches.includes(key))
-                return 'active';
-            else
-                return null;
-        };
-
-        // int & bool settings
-        keys.forEach(key => {
+        spinButtons.forEach(key => {
             const widget = this._builder.get_object(key);
-            const bindProperty = getBindProperty(key);
-            if (widget && bindProperty)
-                this._settings.bind(key, widget, bindProperty, Gio.SettingsBindFlags.DEFAULT);
+            this._settings.bind(key, widget, 'value', Gio.SettingsBindFlags.DEFAULT);
         });
+    }
 
-        // enum settings
+    _bindComboBoxes() {
+        const comboBoxes = [
+            Settings.SPLIT_TILE_MOD,
+            Settings.FIXED_LAYOUT_MOD,
+            Settings.RESTORE_SIZE_ON
+        ];
+
         comboBoxes.forEach(key => {
             const widget = this._builder.get_object(key);
-            widget.set_active(this._settings.get_enum(key));
             widget.connect('changed', () =>
                 this._settings.set_enum(key, widget.get_active()));
-        });
 
-        // color settings
-        colorButtons.forEach(key => {
-            const widget = this._builder.get_object(key);
-            const color = new Gdk.RGBA();
-            color.parse(this._settings.get_string(key));
-            widget.set_rgba(color);
-            widget.connect('color-set', () =>
-                this._settings.set_string(key, widget.get_rgba().to_string()));
+            widget.set_active(this._settings.get_enum(key));
         });
     }
 
-    /**
-     * Binds the keyboard shortcuts settings to the GUI and connect to their
-     * clear-shortcut-buttons.
-     *
-     * @param {string[]} shortcuts - the settings keys for the shortcuts.
-     */
-    _bindKeybindings(shortcuts) {
-        shortcuts.forEach((key, idx) => {
-            // Bind gui and gsettings
-            const treeView = this._builder.get_object(`${key}-treeview`);
-            const listStore = this._builder.get_object(`${key}-liststore`);
-            Util.bindShortcut(this._settings, key, treeView, listStore);
-
-            // Bind clear-shortcut-buttons
-            const clearButton = this._builder.get_object(`clear-button${idx + 1}`);
-            clearButton.set_sensitive(this._settings.get_strv(key)[0]);
-
-            clearButton.connect('clicked', () => this._settings.set_strv(key, []));
-            this._settings.connect(`changed::${key}`, () =>
-                clearButton.set_sensitive(this._settings.get_strv(key)[0]));
-        });
-    }
-
-
-    /**
-     * Connects the 'Advanced / Experimental Settings' switch with the
-     * other widgets to update their visibility when it's toggled.
-     */
-    _updateAdvancedSettingsVisibility() {
-        const advancedWidgetIds = [
-            'popup-layouts', 'popup-layouts-tab-label'
+    _bindRadioButtons() {
+        // These 'radioButtons' are basically just used as a ComboBox with more
+        // text. The key is a gsetting (a string) saving the current 'selection',
+        // the buttons are the ids of the Gtk.CheckButtons. The button's labels
+        // will be used as the options.
+        const radioButtons = [
+            {
+                key: Settings.DYNAMIC_KEYBINDINGS,
+                buttonNames: [
+                    'dynamic-keybinding-button-disabled',
+                    'dynamic-keybinding-button-focus',
+                    'dynamic-keybinding-button-tiling-state',
+                    'dynamic-keybinding-button-tiling-state-windows'
+                ]
+            },
+            {
+                key: Settings.DEFAULT_MOVE_MODE,
+                buttonNames: [
+                    'edge-tiling-checkbutton',
+                    'split-tiles-checkbutton',
+                    'fixed-layout-checkbutton'
+                ]
+            }
         ];
-        const advancedKey = Settings.ENABLE_ADV_EXP_SETTINGS;
 
-        const updateVisibility = () => {
-            const show = this._settings.get_boolean(advancedKey);
-            advancedWidgetIds.forEach(id => {
-                // TODO: for some reason, if the adv/exp setting is disabled and
-                // the prefs window is opened, changing the setting doesn't immediately
-                // update the visibilities. Only when changing the tab or toggling
-                // the adv/exp setting again, does the visbility update...
-                this._builder.get_object(id).set_visible(show);
+        radioButtons.forEach(({ key, buttonNames }) => {
+            const currActive = this._settings.get_string(key);
+
+            buttonNames.forEach(buttonName => {
+                const button = this._builder.get_object(buttonName);
+                const label = button.get_label();
+                button.connect('toggled', () => {
+                    this._settings.set_string(key, label);
+                });
+
+                if (label === currActive)
+                    button.activate();
             });
-        };
+        });
+    }
 
-        // Bind gui switch to gsetting
-        const advExpSwitch = this._builder.get_object(advancedKey);
-        this._settings.bind(advancedKey, advExpSwitch, 'active', Gio.SettingsBindFlags.DEFAULT);
-
-        // Update widget visibilities
-        this._settings.connect(`changed::${advancedKey}`, updateVisibility.bind(this));
-
-        updateVisibility();
+    _bindKeybindings() {
+        const shortcuts = Shortcuts.getAllKeys();
+        shortcuts.forEach(key => {
+            const shortcutWidget = this._builder.get_object(key);
+            shortcutWidget.initialize(key, this._settings);
+        });
     }
 });

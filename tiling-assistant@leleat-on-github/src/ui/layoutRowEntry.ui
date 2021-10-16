@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="tiling-assistant@leleat-on-github">
+  <requires lib="gtk" version="4.0"/>
+  <template class="TilingLayoutRowEntry" parent="GtkBox">
+    <property name="spacing">8</property>
+    <child>
+      <object class="GtkLabel" id="rectLabel">
+      </object>
+    </child>
+    <child>
+      <object class="GtkEntry" id="rectEntry">
+        <property name="hexpand">1</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton" id="rectAppButton">
+        <property name="receives-default">1</property>
+      </object>
+    </child>
+  </template>
+</interface>

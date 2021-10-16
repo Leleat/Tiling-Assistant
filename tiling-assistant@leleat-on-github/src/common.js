@@ -11,23 +11,23 @@
 var Settings = class Settings { // eslint-disable-line no-unused-vars
     static _settings;
     static ENABLE_TILING_POPUP = 'enable-tiling-popup';
+    static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
-    static DYNAMIC_KEYBINDINGS_BEHAVIOUR = 'dynamic-keybinding-behaviour';
     static WINDOW_GAP = 'window-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
-    static RESTORE_SIZE_ON = 'restore-window-size-on';
-    static ENABLE_HOLD_INVERSE_LANDSCAPE = 'enable-hold-maximize-inverse-landscape';
-    static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
+    static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
-    static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
-    static TILE_EDITING_MODE_COLOR = 'tile-editing-mode-color';
-    static SECONDARY_PREVIEW_ACTIVATOR = 'secondary-tiling-preview-activator';
-    static DEFAULT_TO_SECONDARY_PREVIEW = 'default-to-secondary-tiling-preview';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
-    static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
+    static DEFAULT_MOVE_MODE = 'default-move-mode';
+    static SPLIT_TILE_MOD = 'move-split-tiles-mod';
+    static FIXED_LAYOUT_MOD = 'move-fixed-layout-mod';
     static VERTICAL_PREVIEW_AREA = 'vertical-preview-area';
     static HORIZONTAL_PREVIEW_AREA = 'horizontal-preview-area';
+    static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
+    static ENABLE_HOLD_INVERSE_LANDSCAPE = 'enable-hold-maximize-inverse-landscape';
+    static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
+    static RESTORE_SIZE_ON = 'restore-window-size-on';
 
     static initialize() {
         const ExtensionUtils = imports.misc.extensionUtils;
@@ -47,28 +47,29 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
     }
 
     /**
-     * @returns {string[]} the settings keys except the ones for shortcuts and
-     *      Popup Layouts.
+     * @returns {string[]} the settings keys except the ones for
+     *      shortcuts and Layouts.
      */
     static getAllKeys() {
         return [
             this.ENABLE_TILING_POPUP,
+            this.POPUP_ALL_WORKSPACES,
             this.RAISE_TILE_GROUPS,
-            this.DYNAMIC_KEYBINDINGS_BEHAVIOUR,
             this.WINDOW_GAP,
             this.MAXIMIZE_WITH_GAPS,
-            this.RESTORE_SIZE_ON,
-            this.ENABLE_HOLD_INVERSE_LANDSCAPE,
-            this.ENABLE_HOLD_INVERSE_PORTRAIT,
-            this.POPUP_ALL_WORKSPACES,
-            this.TILE_EDITING_MODE_COLOR,
-            this.SECONDARY_PREVIEW_ACTIVATOR,
-            this.DEFAULT_TO_SECONDARY_PREVIEW,
+            this.DYNAMIC_KEYBINDINGS,
+            this.ENABLE_ADV_EXP_SETTINGS,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
-            this.INVERSE_TOP_MAXIMIZE_TIMER,
+            this.DEFAULT_MOVE_MODE,
+            this.SPLIT_TILE_MOD,
+            this.FIXED_LAYOUT_MOD,
             this.VERTICAL_PREVIEW_AREA,
-            this.HORIZONTAL_PREVIEW_AREA
+            this.HORIZONTAL_PREVIEW_AREA,
+            this.INVERSE_TOP_MAXIMIZE_TIMER,
+            this.ENABLE_HOLD_INVERSE_LANDSCAPE,
+            this.ENABLE_HOLD_INVERSE_PORTRAIT,
+            this.RESTORE_SIZE_ON
         ];
     }
 
@@ -123,7 +124,7 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
 
 /**
  * A Singleton providing access to the shortcut keys except the
- * ones related to Popup Layouts.
+ * ones related to the Layouts.
  */
 var Shortcuts = class Shortcuts { // eslint-disable-line no-unused-vars
     static TOGGLE_POPUP = 'toggle-tiling-popup';
@@ -178,10 +179,16 @@ var DynamicKeybindings = class DynamicKeybindingBehaviour { // eslint-disable-li
     static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
 };
 
-var AlternatePreviewMod = class SecondaryPreviewActivator { // eslint-disable-line no-unused-vars
+var MoveModeMods = class MovePreviewActivator { // eslint-disable-line no-unused-vars
     static CTRL = 'Ctrl';
     static ALT = 'Alt';
     static RMB = 'RMB';
+};
+
+var MoveModes = class MovePreviewActivator { // eslint-disable-line no-unused-vars
+    static EDGE_TILING = 'Edge Tiling';
+    static SPLIT_TILES = 'Split Tiles';
+    static FIXED_LAYOUT = 'Fixed Layout';
 };
 
 var Orientation = class Orientation { // eslint-disable-line no-unused-vars
@@ -210,7 +217,7 @@ var Direction = class Direction { // eslint-disable-line no-unused-vars
     }
 };
 
-// Classes for popup layouts:
+// Classes for the layouts:
 // See src/prefs/layoutsPrefs.js for details on layouts.
 var Layout = class Layout { // eslint-disable-line no-unused-vars
     /**

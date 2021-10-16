@@ -1,4 +1,4 @@
-.popup-layout-search-highlight {
+.tiling-layout-search-highlight {
     background-color: rgba(255, 255, 255, .1);
     border-radius: 20px;
 }
@@ -13,10 +13,6 @@
 
 .tile-editing-mode-anchor-hightlighter {
     background-color: rgba(27, 106, 203, 0.4);
-}
-
-.tile-editing-mode-other-hightlighter {
-    background-color: rgba(20, 86, 167, 0.2);
 }
 
 .tile-editing-mode-resize-left {

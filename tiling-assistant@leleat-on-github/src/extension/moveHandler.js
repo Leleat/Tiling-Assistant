@@ -6,7 +6,7 @@ const WindowManager = imports.ui.windowManager;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const { Orientation, RestoreOn, AlternatePreviewMod, Settings, Shortcuts } = Me.imports.src.common;
+const { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } = Me.imports.src.common;
 const Rect = Me.imports.src.extension.geometry.Rect;
 const Util = Me.imports.src.extension.utility.Util;
 
@@ -233,38 +233,35 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
             : event.get_coords();
         this._lastPointerPos = { x: eventX, y: eventY };
 
-        // Tile preview
-        let secondaryModeActivatorPressed = false;
-        switch (Settings.getString(Settings.SECONDARY_PREVIEW_ACTIVATOR)) {
-            case AlternatePreviewMod.CTRL: {
-                const ctrl = Clutter.ModifierType.CONTROL_MASK;
-                secondaryModeActivatorPressed = Util.isModPressed(ctrl);
-                break;
-            }
-            case AlternatePreviewMod.ALT: {
-                const altL = Clutter.ModifierType.MOD1_MASK;
-                const altGr = Clutter.ModifierType.MOD5_MASK;
-                secondaryModeActivatorPressed =
-                Util.isModPressed(altL) || Util.isModPressed(altGr);
-                break;
-            }
-            case AlternatePreviewMod.RMB: {
-                const rmb = Clutter.ModifierType.BUTTON3_MASK;
-                secondaryModeActivatorPressed = Util.isModPressed(rmb);
-            } }
+        const ctrl = Clutter.ModifierType.CONTROL_MASK;
+        const altL = Clutter.ModifierType.MOD1_MASK;
+        const altGr = Clutter.ModifierType.MOD5_MASK;
+        const rmb = Clutter.ModifierType.BUTTON3_MASK;
+        const pressed = {
+            Ctrl: Util.isModPressed(ctrl),
+            Alt: Util.isModPressed(altL) || Util.isModPressed(altGr),
+            RMB: Util.isModPressed(rmb)
+        };
 
-        const secondarySetting = Settings.DEFAULT_TO_SECONDARY_PREVIEW;
-        const defaultToSecondaryMode = Settings.getBoolean(secondarySetting);
-        if (!defaultToSecondaryMode && !secondaryModeActivatorPressed ||
-                defaultToSecondaryMode && secondaryModeActivatorPressed)
-        { this._primaryPreviewTile(window, grabOp); }
-        else
-        { this._secondaryPreviewTile(
-            window,
-            grabOp,
-            topTileGroup,
-            freeScreenRects
-        ); }
+        const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
+        const splitActivator = Settings.getString(Settings.SPLIT_TILE_MOD);
+        const fixedActivator = Settings.getString(Settings.FIXED_LAYOUT_MOD);
+
+        if (pressed[splitActivator]) {
+            defaultMode === MoveModes.SPLIT_TILES
+                ? this._edgeTilingPreview(window, grabOp)
+                : this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+        } else if (pressed[fixedActivator]) {
+            defaultMode === MoveModes.FIXED_LAYOUT
+                ? this._edgeTilingPreview(window, grabOp)
+                : this._fixedLayoutTilingPreview();
+        } else if (defaultMode === MoveModes.SPLIT_TILES) {
+            this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+        } else if (defaultMode === MoveModes.FIXED_LAYOUT) {
+            this._fixedLayoutTilingPreview();
+        } else {
+            this._edgeTilingPreview(window, grabOp);
+        }
     }
 
     _restoreSizeAndRestartGrab(window, eventX, eventY, grabOp) {
@@ -311,7 +308,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
      * @param {Meta.Window} window the grabbed Meta.Window.
      * @param {Meta.GrabOp} grabOp the current Meta.GrabOp.
      */
-    _primaryPreviewTile(window, grabOp) {
+    _edgeTilingPreview(window, grabOp) {
         // When switching monitors, provide a short grace period
         // in which the tile preview will stick to the old monitor so that
         // the user doesn't have to slowly inch the mouse to the monitor edge
@@ -325,7 +322,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
                 if (timerId === this._latestMonitorLockTimerId) {
                     this._monitorNr = global.display.get_current_monitor();
                     if (global.display.get_grab_op() === grabOp) // !
-                        this._primaryPreviewTile(window, grabOp);
+                        this._edgeTilingPreview(window, grabOp);
                 }
                 return GLib.SOURCE_REMOVE;
             });
@@ -422,17 +419,17 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
      * Activates the secondary preview mode. By default, it's activated with
      * `Ctrl`. When tiling using this mode, it will not only affect the grabbed
      * window but possibly others as well. It's split into a 'single' and a
-     * 'group' mode. Take a look at _secondaryPreviewSingle() and
-     * _secondaryPreviewGroup() for details.
+     * 'group' mode. Take a look at _splitTilingPreviewSingle() and
+     * _splitTilingPreviewGroup() for details.
      *
      * @param {Meta.Window} window
      * @param {Meta.GrabOp} grabOp
      * @param {Meta.Window[]} topTileGroup
      * @param {Rect[]} freeScreenRects
      */
-    _secondaryPreviewTile(window, grabOp, topTileGroup, freeScreenRects) {
+    _splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects) {
         if (!topTileGroup.length) {
-            this._primaryPreviewTile(window, grabOp);
+            this._edgeTilingPreview(window, grabOp);
             return;
         }
 
@@ -450,9 +447,9 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
         const atRightEdge = this._lastPointerPos.x > hoveredRect.x2 - edgeRadius;
 
         atTopEdge || atBottomEdge || atLeftEdge || atRightEdge
-            ? this._secondaryPreviewGroup(window, hoveredRect, topTileGroup,
+            ? this._splitTilingPreviewGroup(window, hoveredRect, topTileGroup,
                 { atTopEdge, atBottomEdge, atLeftEdge, atRightEdge })
-            : this._secondaryPreviewSingle(window, hoveredRect, topTileGroup);
+            : this._splitTilingPreviewSingle(window, hoveredRect, topTileGroup);
     }
 
     /**
@@ -468,7 +465,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
      * @param {Rect} hoveredRect
      * @param {Meta.Window[]} topTileGroup
      */
-    _secondaryPreviewSingle(window, hoveredRect, topTileGroup) {
+    _splitTilingPreviewSingle(window, hoveredRect, topTileGroup) {
         const atTop = this._lastPointerPos.y < hoveredRect.y + hoveredRect.height * .25;
         const atBottom = this._lastPointerPos.y > hoveredRect.y + hoveredRect.height * .75;
         const atRight = this._lastPointerPos.x > hoveredRect.x + hoveredRect.width * .75;
@@ -509,7 +506,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
     }
 
     /**
-     * Similiar to _secondaryPreviewSingle(). But it's activated by hovering
+     * Similiar to _splitTilingPreviewSingle(). But it's activated by hovering
      * the very edges of a tiled window. And instead of affecting just 1 window
      * it can possibly re-tile multiple windows. A tiled window will be affected,
      * if it aligns with the edge that is being hovered. It's probably easier
@@ -521,7 +518,7 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
      * @param {object} hovered contains booleans at which position the
      *      `hoveredRect` is hovered.
      */
-    _secondaryPreviewGroup(window, hoveredRect, topTileGroup, hovered) {
+    _splitTilingPreviewGroup(window, hoveredRect, topTileGroup, hovered) {
         // Find the smallest window that will be affected and use it to calcuate
         // the sizes of the preview. Determine the new tileRects for the rest
         // of the tileGroup via Rect.minus().
@@ -640,5 +637,9 @@ var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
 
             this._splitRects.set(w, splitRect);
         });
+    }
+
+    _fixedLayoutTilingPreview() {
+        log('--fixed layout--');
     }
 };

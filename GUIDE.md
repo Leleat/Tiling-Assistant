@@ -72,6 +72,6 @@ By default, the `Popup Layouts` are [hidden](#Hidden-Settings) behind the 'Advan
 
 ### Hidden Settings
 
-This is a 'hidden' (more specificly: nameless) tab under `Help`. It contains minor (i. e. things I don't expect the general user to ever need), debugging, advanced and experimental settings.
+This is a 'hidden settings' page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking an invisible (icon-less) button in the titlebar.
 
 ![](media/Guide_HiddenSettings.png)

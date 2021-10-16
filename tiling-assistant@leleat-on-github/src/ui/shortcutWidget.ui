@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface domain="tiling-assistant@leleat-on-github">
+  <requires lib="gtk" version="4.0"/>
+  <object class="GtkEventControllerKey" id="eventKeyController">
+    <signal name="key-pressed" handler="_onKeyPressed" swapped="no"/>
+  </object>
+  <template class="ShortcutWidget" parent="GtkBox">
+    <property name="hexpand">1</property>
+    <property name="spacing">6</property>
+    <signal name="notify::keybinding" handler="_onKeybindingChanged" swapped="no"/>
+    <child>
+      <object class="GtkButton" id="button">
+        <property name="halign">end</property>
+        <property name="hexpand">1</property>
+        <property name="valign">center</property>
+        <property name="label">Disabled</property>
+        <property name="has-frame">0</property>
+        <signal name="clicked" handler="_onButtonClicked" swapped="no"/>
+      </object>
+    </child>
+    <child>
+      <object class="GtkButton" id="clearButton">
+        <property name="has-frame">0</property>
+        <property name="sensitive">0</property>
+        <property name="focus-on-click">0</property>
+        <property name="receives-default">1</property>
+        <property name="valign">center</property>
+        <property name="icon-name">edit-undo-symbolic</property>
+        <signal name="clicked" handler="_onClearButtonClicked" swapped="no"/>
+      </object>
+    </child>
+  </template>
+</interface>

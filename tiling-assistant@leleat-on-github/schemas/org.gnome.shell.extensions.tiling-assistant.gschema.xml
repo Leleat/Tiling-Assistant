@@ -5,14 +5,7 @@
 		<value value="1" nick="Grab End"/>
 	</enum>
 
-	<enum id="org.gnome.shell.extensions.tiling-assistant.dynamic-keybindings">
-		<value value="0" nick="Disabled"/>
-		<value value="1" nick="Focus"/>
-		<value value="2" nick="Tiling State"/>
-		<value value="3" nick="Tiling State (Windows)"/>
-	</enum>
-
-	<enum id="org.gnome.shell.extensions.tiling-assistant.secondary-tiling-preview-activators">
+	<enum id="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
 		<value value="0" nick="Ctrl"/>
 		<value value="1" nick="Alt"/>
 		<value value="2" nick="RMB"/>
@@ -20,7 +13,7 @@
 
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 
-		<!-- General Tab -->
+		<!-- General Page -->
 
 		<key name="enable-tiling-popup" type="b">
 			<default>true</default>
@@ -31,7 +24,7 @@
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>
-		<key name="dynamic-keybinding-behaviour" enum="org.gnome.shell.extensions.tiling-assistant.dynamic-keybindings">
+		<key name="dynamic-keybinding-behaviour" type="s">
 			<default>"Disabled"</default>
 		</key>
 		<key name="window-gap" type="i">
@@ -41,7 +34,7 @@
 			<default>false</default>
 		</key>
 
-		<!-- Keybindings Tab -->
+		<!-- Keybindings Page -->
 
 		<key name="toggle-tiling-popup" type="as">
 			<default>[]</default>
@@ -80,7 +73,7 @@
 			<default><![CDATA[['<Super>KP_3']]]></default>
 		</key>
 
-		<!-- Popup Layouts Tab -->
+		<!-- Layouts Page -->
 		<!-- Hidden by default unless the advanced / experimental settings are enabled.
 		The number of layouts / shortcuts are hardcoded / limited to 20 -->
 
@@ -88,6 +81,9 @@
 			<default>true</default>
 		</key>
 		<key name="search-popup-layout" type="as">
+			<default>[]</default>
+		</key>
+		<key name="change-favorite-layout" type="as">
 			<default>[]</default>
 		</key>
 		<key name="activate-layout0" type="as">
@@ -151,28 +147,31 @@
 			<default>[]</default>
 		</key>
 
-		<!-- Hidden Settings Tab -->
+		<!-- Hidden Settings Page -->
 
 		<key name="enable-advanced-experimental-features" type="b">
 			<default>false</default>
-		</key>
-		<key name="tile-editing-mode-color" type="s">
-	  		<default>"rgb(27, 106, 203)"</default>
-		</key>
-		<key name="secondary-tiling-preview-activator" enum="org.gnome.shell.extensions.tiling-assistant.secondary-tiling-preview-activators">
-			<default>"Ctrl"</default>
-		</key>
-		<key name="default-to-secondary-tiling-preview" type="b">
-			<default>false</default>
-		</key>
-		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
-			<default>"Grab Start"</default>
 		</key>
 		<key name="enable-tile-animations" type="b">
 			<default>true</default>
 		</key>
 		<key name="enable-untile-animations" type="b">
 			<default>true</default>
+		</key>
+		<key name="default-move-mode" type="s">
+			<default>"Edge Tiling"</default>
+		</key>
+		<key name="move-split-tiles-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
+			<default>"Ctrl"</default>
+		</key>
+		<key name="move-fixed-layout-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
+			<default>"Alt"</default>
+		</key>
+		<key name="vertical-preview-area" type="i">
+			<default>15</default>
+		</key>
+		<key name="horizontal-preview-area" type="i">
+			<default>15</default>
 		</key>
 		<key name="toggle-maximize-tophalf-timer" type="i">
 			<default>600</default>
@@ -183,11 +182,8 @@
 		<key name="enable-hold-maximize-inverse-portrait" type="b">
 			<default>false</default>
 		</key>
-		<key name="vertical-preview-area" type="i">
-			<default>15</default>
-		</key>
-		<key name="horizontal-preview-area" type="i">
-			<default>15</default>
+		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
+			<default>"Grab Start"</default>
 		</key>
 		<key name="debugging-show-tiled-rects" type="as">
 			<default>[]</default>

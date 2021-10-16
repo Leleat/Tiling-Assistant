@@ -16,7 +16,7 @@ const _ = Domain.gettext;
 
 /**
  * Class to handle the keyboard shortcuts (on the extension side) except the
- * ones related to the popupLayouts. For those, see popupLayoutsManager.js.
+ * ones related to the Layouts. For those, see layoutsManager.js.
  */
 
 var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-vars
@@ -91,7 +91,7 @@ var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-v
 
         // Tile a window
         } else {
-            const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS_BEHAVIOUR;
+            const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
             const dynamicSetting = Settings.getString(dynamicBehaviour);
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;

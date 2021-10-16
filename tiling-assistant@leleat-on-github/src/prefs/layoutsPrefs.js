@@ -6,17 +6,16 @@ const ByteArray = imports.byteArray;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
-const LayoutRow = Me.imports.src.prefs.popupLayoutsGui.GuiRow;
-const Shortcuts = Me.imports.src.common.Shortcuts;
+const LayoutRow = Me.imports.src.prefs.layoutRow.LayoutRow;
 const Util = Me.imports.src.prefs.utility.Util;
 
 /**
- * This class takes care of everything related to popup layouts (at
- * least on the preference side). It's only being instanced by prefs.js.
- * After that, it loads / saves layouts from / to the disk and loads the
- * gui for managing layouts. The gui is created by instancing a bunch of
- * Gtk.ListBoxRows from layoutGui.js for each layout and putting them into
- * a Gtk.ListBox from the prefs.ui file.
+ * This class takes care of everything related to layouts (at least on the
+ * preference side). It's only being instanced by prefs.js. After that, it
+ * loads / saves layouts from / to the disk and loads the gui for managing
+ * layouts. The gui is created by instancing a bunch of Gtk.ListBoxRows from
+ * layoutGui.js for each layout and putting them into a Gtk.ListBox from the
+ * prefs.ui file.
  *
  * A popup layout has a name (String) and an array of LayoutItems (JS Objects).
  * A LayoutItem has a rect (JS Objects), an optional (String) appId and optional
@@ -33,13 +32,13 @@ const Util = Me.imports.src.prefs.utility.Util;
  * instead of the Tiling Popup appearing, a new instance of the app will be
  * opened and tiled to that rect (or at least I tried to do that).
  *
- * By default, the settings for popup layouts are hidden behind the 'Advanced
- * / Experimental' switch because I used a lot of hacks / assumptions... and
+ * By default, the settings for layouts are hidden behind the 'Advanced /
+ * Experimental' switch because I used a lot of hacks / assumptions... and
  * I am not even using the layouts myself. However, I don't want to remove
  * an existing feature... thus it's hidden
  */
 
-var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
+var Prefs = class TilingLayoutsPrefs { // eslint-disable-line no-unused-vars
     /**
      * @param {Gtk.Builder} builder the Gtk.Builder from the main prefs file.
      * @param {Gio.Settings} settings the Gio.Settings object from the main prefs file.
@@ -52,6 +51,7 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
 
         // The Gtk.ListBox, which LayoutRows are added to
         this._layoutsListBox = this._builder.get_object('layouts-listbox');
+        this._layoutsListBox.connect('row-activated', (listBox, row) => row.toggleReveal());
 
         // Unique button to save changes made to all layouts to the disk. For
         // simplicity, reload from file after saving to get rid of invalid input.
@@ -68,29 +68,16 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
             this._loadLayouts();
         });
 
-        // Unique button to add a new *tmp* layoutRow
         this._addLayoutButton = this._builder.get_object('add-layout-button');
         this._addLayoutButton.connect('clicked', () => {
-            this._createLayoutRow(LayoutRow.getInstanceCount());
+            const row = this._createLayoutRow(LayoutRow.getInstanceCount());
+            row.toggleReveal();
         });
 
-        // Bind keyboard shortcut(s).
-        // Account for the existing 'normal' keyboard shortcuts for the clear-button(s).
-        // The shortcuts for the layouts are bound when the layoutRows are created.
-        ['search-popup-layout'].forEach((key, idx) => {
-            // bind gui and gsettings
-            const treeView = this._builder.get_object(`${key}-treeview`);
-            const listStore = this._builder.get_object(`${key}-liststore`);
-            Util.bindShortcut(this._settings, key, treeView, listStore);
-
-            // bind clear-shortcut-buttons
-            const existingIdx = Shortcuts.getAllKeys().length;
-            const clearButton = this._builder.get_object(`clear-button${existingIdx + idx + 1}`);
-            clearButton.set_sensitive(this._settings.get_strv(key)[0]);
-
-            clearButton.connect('clicked', () => this._settings.set_strv(key, []));
-            this._settings.connect(`changed::${key}`, () =>
-                clearButton.set_sensitive(this._settings.get_strv(key)[0]));
+        // Bind the general keyboard shortcuts.
+        ['search-popup-layout', 'change-favorite-layout'].forEach(key => {
+            const shortcutWidget = this._builder.get_object(key);
+            shortcutWidget.initialize(key, this._settings);
         });
 
         // Finally, load the existing settings.
@@ -124,7 +111,7 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
                 return;
 
             this._settings.set_boolean(importExamples, false);
-            const exampleFile = this._makeFile(`${Me.Path}/src/layouts_example.json`);
+            const exampleFile = this._makeFile(`${Me.path}/src`, 'layouts_example.json');
             const [succ, c] = exampleFile.load_contents(null);
             if (!succ)
                 return;
@@ -223,18 +210,12 @@ var Prefs = class PopupLayoutsPrefs { // eslint-disable-line no-unused-vars
         if (index >= 20)
             return;
 
-        const layoutRow = new LayoutRow(layout);
+        const layoutRow = new LayoutRow(layout, this._settings);
         layoutRow.connect('changed', (row, ok) => {
             // Un / Highlight the save button, if the user made in / valid changes.
             this._applySaveButtonStyle(ok ? 'suggested-action' : 'destructive-action');
         });
-        layoutRow.connect('row-removed', (row, idx) => {
-            this._settings.set_strv(`activate-layout${idx}`, []);
-        });
         this._layoutsListBox.append(layoutRow);
-
-        const treeView = layoutRow.getTreeView();
-        const listStore = layoutRow.getListStore();
-        Util.bindShortcut(this._settings, `activate-layout${index}`, treeView, listStore);
+        return layoutRow;
     }
 };
