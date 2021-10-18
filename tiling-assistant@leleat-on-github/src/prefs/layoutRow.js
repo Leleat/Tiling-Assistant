@@ -35,10 +35,7 @@ var LayoutRow = GObject.registerClass({
         'shortcut',
         'revealer'
     ],
-    Signals: {
-        'changed': { param_types: [GObject.TYPE_BOOLEAN] },
-        'favoritized': { param_types: [GObject.TYPE_INT] }
-    }
+    Signals: { 'changed': { param_types: [GObject.TYPE_BOOLEAN] } }
 }, class TilingLayoutRow extends Gtk.ListBoxRow {
     // Use a static variable to make sure the indices are unique since just using
     // something like the child index isn't enough because the user may add *and*
@@ -70,16 +67,16 @@ var LayoutRow = GObject.registerClass({
         this._idx = TilingLayoutRow.instanceCount++;
         this._shortcutKey = `activate-layout${this._idx}`;
 
-        // Bind shortcut and its clear-button
+        // Initialize shortcut and its clear-button
         this._shortcut.initialize(this._shortcutKey, this._settings);
 
-        // Set name. Don't use a placeholder, if there is one casue of a bug
-        // when reloading the layouts...
+        // Set name. Don't use a placeholder, if there is one because of a bug
+        // when reloading the layouts
         const name = this._layout.getName();
         this._nameEntry.get_buffer().set_text(name, -1);
         this._nameEntry.set_placeholder_text(name ? '' : 'Nameless Layout...');
 
-        // Load entries with values from the layout
+        // Load the entries with values from the layout
         const items = this._layout.getItems();
         items.forEach((item, idx) => {
             const rowEntry = new LayoutRowEntry(idx, item);
@@ -93,6 +90,11 @@ var LayoutRow = GObject.registerClass({
         // Add one empty entry row
         this._onAddRowEntryButtonClicked();
 
+        // Set the favorite icon
+        if (this._settings.get_int('favorite-layout') === this._idx)
+            this.setFavoriteIcon(true);
+
+        // Update the preview / show the errorLabel
         this._updatePreview();
     }
 
@@ -101,6 +103,9 @@ var LayoutRow = GObject.registerClass({
         this.get_parent().remove(this);
     }
 
+    /**
+     * toggles wether the layout's rects are visible.
+     */
     toggleReveal() {
         this._revealer.reveal_child = !this._revealer.reveal_child;
     }
@@ -132,6 +137,16 @@ var LayoutRow = GObject.registerClass({
         }
 
         return this._layout.getItemCount() ? this._layout : null;
+    }
+
+    /**
+     * Un/Sets the favorite's icon.
+     *
+     * @param {boolean} favorite wether this is the new favorite.
+     */
+    setFavoriteIcon(favorite) {
+        const iconName = favorite ? 'starred-symbolic' : 'non-starred-symbolic';
+        this._favoriteButton.set_icon_name(iconName);
     }
 
     /**
@@ -204,19 +219,12 @@ var LayoutRow = GObject.registerClass({
     }
 
     _onfavoriteButtonClicked() {
-        const iconName = this._favoriteButton.get_icon_name();
-        if (iconName === 'starred-symbolic') {
-            this._favoriteButton.set_icon_name('non-starred-symbolic');
-        } else {
-            this._favoriteButton.set_icon_name('starred-symbolic');
-            this.emit('favoritized', this._idx);
-        }
+        const currIcon = this._favoriteButton.get_icon_name();
+        const willFavorite = currIcon !== 'starred-symbolic';
+        // The actual update of the icon happens in layoutsPrefs with a settings signal
+        this._settings.set_int('favorite-layout', willFavorite ? this._idx : -1);
     }
 
-    /**
-     * @param {GuiEntry} entry src of the event.
-     * @param {boolean} ok wether the change follows the proper format.
-     */
     _onRowEntryChanged(entry, ok) {
         // ok only is about the change being ok for the *individual* entry
         // i. e. wether their format is correct

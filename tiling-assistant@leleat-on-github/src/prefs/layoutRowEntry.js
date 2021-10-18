@@ -5,6 +5,10 @@ const { Gio, Gtk, GObject } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
+const Gettext = imports.gettext;
+const Domain = Gettext.domain(Me.metadata.uuid);
+const _ = Domain.gettext;
+
 /**
  * Multiple LayoutRowEntries make up a LayoutRow.js. See that file for more info.
  */
@@ -35,6 +39,12 @@ var LayoutRowEntry = GObject.registerClass({
             : '';
         this._rectEntry.get_buffer().set_text(text, -1);
         this._rectEntry.connect('changed', this._onRectEntryChanged.bind(this));
+
+        // Show a placeholder on the first entry, if it's empty
+        if (idx === 0 && Object.keys(rect).length === 0) {
+            const placeholder = _("Read the 'User Guide'...");
+            this._rectEntry.set_placeholder_text(placeholder);
+        }
 
         const appInfo = item.appId && Gio.DesktopAppInfo.new(item.appId);
         const iconName = appInfo?.get_icon().to_string() ?? 'list-add-symbolic';

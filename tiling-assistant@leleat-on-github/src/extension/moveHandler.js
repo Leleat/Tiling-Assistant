@@ -80,6 +80,12 @@ var Handler = class TilingMoveHandler {
         // Don't bother with rounded corners since we have more than 2 previews
         this._tilePreview.style_class = 'tile-preview';
         this._tilePreview._updateStyle = () => {};
+
+        // Prepare the 'Fixed (favorite) Layout' rects as an alternative mode
+        // to 'Edge Tiling' and 'Split Tiles'.
+        this._fixedLayout = [];
+        Settings.changed(Settings.FAVORITE_LAYOUT, this._updateFixedLayout.bind(this));
+        this._updateFixedLayout();
     }
 
     destroy() {
@@ -254,11 +260,11 @@ var Handler = class TilingMoveHandler {
         } else if (pressed[fixedActivator]) {
             defaultMode === MoveModes.FIXED_LAYOUT
                 ? this._edgeTilingPreview(window, grabOp)
-                : this._fixedLayoutTilingPreview();
+                : this._fixedLayoutTilingPreview(window);
         } else if (defaultMode === MoveModes.SPLIT_TILES) {
             this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
         } else if (defaultMode === MoveModes.FIXED_LAYOUT) {
-            this._fixedLayoutTilingPreview();
+            this._fixedLayoutTilingPreview(window);
         } else {
             this._edgeTilingPreview(window, grabOp);
         }
@@ -639,7 +645,47 @@ var Handler = class TilingMoveHandler {
         });
     }
 
-    _fixedLayoutTilingPreview() {
-        log('--fixed layout--');
+    _fixedLayoutTilingPreview(window) {
+        for (const rect of this._fixedLayout) {
+            if (rect.containsPoint(this._lastPointerPos)) {
+                this._tileRect = rect.copy();
+                this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+                return;
+            }
+        }
+
+        this._tileRect = null;
+        this._tilePreview.close();
+    }
+
+    _updateFixedLayout() {
+        this._fixedLayout = [];
+        const layouts = Util.getLayouts();
+        const layout = layouts?.[Settings.getInt(Settings.FAVORITE_LAYOUT)];
+
+        if (!layout)
+            return;
+
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const monitor = global.display.get_current_monitor();
+        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+
+        // Scale the rect's ratios to the workArea. Try to align the rects to
+        // each other and the workArea to workaround possible rounding errors
+        // due to the scaling.
+        layout._items.forEach(({ rect: rectRatios }, idx) => {
+            const rect = new Rect(
+                workArea.x + Math.floor(rectRatios.x * workArea.width),
+                workArea.y + Math.floor(rectRatios.y * workArea.height),
+                Math.ceil(rectRatios.width * workArea.width),
+                Math.ceil(rectRatios.height * workArea.height)
+            );
+            this._fixedLayout.push(rect);
+
+            for (let i = 0; i < idx; i++)
+                rect.tryAlignWith(this._fixedLayout[i]);
+        });
+
+        this._fixedLayout.forEach(rect => rect.tryAlignWith(workArea));
     }
 };

@@ -23,4 +23,21 @@ var Util = class Utility {
             child = nxtSibling;
         }
     }
+
+    /**
+     * @param {Gtk.Widget} container the parent container.
+     * @param {number} idx the index of the child to get.
+     * @returns {Gtk.Widget|null} the child at the index, if it exists.
+     */
+    static getChild(container, idx) {
+        let child = container.get_first_child();
+        for (let i = 0; !!child; i++) {
+            if (i === idx)
+                return child;
+
+            child = child.get_next_sibling();
+        }
+
+        return null;
+    }
 };

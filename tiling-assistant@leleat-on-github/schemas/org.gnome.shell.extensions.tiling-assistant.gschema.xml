@@ -86,6 +86,9 @@
 		<key name="change-favorite-layout" type="as">
 			<default>[]</default>
 		</key>
+		<key name="favorite-layout" type="i">
+			<default>-1</default>
+		</key>
 		<key name="activate-layout0" type="as">
 			<default>[]</default>
 		</key>

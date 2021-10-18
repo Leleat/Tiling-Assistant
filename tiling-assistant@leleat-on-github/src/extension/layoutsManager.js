@@ -1,7 +1,6 @@
 'use strict';
 
 const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
-const ByteArray = imports.byteArray;
 const Main = imports.ui.main;
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -16,7 +15,7 @@ const Domain = Gettext.domain(Me.metadata.uuid);
 const _ = Domain.gettext;
 
 /**
- * Here are the classes to handle layouts on the shell / extension side.
+ * Here are the classes to handle PopupLayouts on the shell / extension side.
  * See src/prefs/layoutsPrefs.js for more details and general info about layouts.
  * In summary, a Layout is an array of LayoutItems. A LayoutItem is a JS Object
  * and has a rect, an appId and a loopType. Only the rect is mandatory. AppId may
@@ -27,6 +26,12 @@ const _ = Domain.gettext;
  * the app to the rect. If a LoopType is defined, instead of going to the next
  * item / rect, we spawn a Tiling Popup on the same item / rect and all the
  * tiled windows will share that spot evenly (a la 'Master and Stack').
+ *
+ * Additionally, there the user can select a 'favorite' layout among the
+ * PopupLayouts. That layout will then be used as an fixed alternative mode to
+ * the Edge Tiling. This class only handles setting the favorite layout with a
+ * keyboard shortcut. The main code for the favorite / fixed layout is in
+ * moveHandler.js.
  */
 
 var LayoutManager = class TilingLayoutsManager {
@@ -51,27 +56,9 @@ var LayoutManager = class TilingLayoutsManager {
         this._tiledWithLoop = [];
         this._remainingWindows = [];
 
-        // Bind the keyboard shortcuts for each layout and the layout searcher
+        // Bind the keyboard shortcuts for each layout and the layout searchers
         this._keyBindings = [];
-        [...Array(20)].forEach((undef, idx) => {
-            Main.wm.addKeybinding(
-                `activate-layout${idx}`,
-                Settings.getGioObject(),
-                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                Shell.ActionMode.NORMAL,
-                this.startLayouting.bind(this, idx)
-            );
-            this._keyBindings.push(`activate-layout${idx}`);
-        });
-
-        this._keyBindings.push('search-popup-layout');
-        Main.wm.addKeybinding(
-            'search-popup-layout',
-            Settings.getGioObject(),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL,
-            this.openSearch.bind(this)
-        );
+        this._bindKeybindings();
     }
 
     destroy() {
@@ -83,8 +70,8 @@ var LayoutManager = class TilingLayoutsManager {
      * Opens a popup window so the user can activate a layout by name
      * instead of the keyboard shortcut.
      */
-    openSearch() {
-        const layouts = this._getLayouts();
+    openPopupSearch() {
+        const layouts = Util.getLayouts();
         if (!layouts.length) {
             Main.notify('Tiling Assistant', _('No valid popup layouts defined.'));
             return;
@@ -95,12 +82,29 @@ var LayoutManager = class TilingLayoutsManager {
     }
 
     /**
+     * Opens a popup so the user can choose a new favorite layout to use for
+     * the 'Fixed Layout'.
+     */
+    openFavoriteSearch() {
+        const layouts = Util.getLayouts();
+        if (!layouts.length) {
+            Main.notify('Tiling Assistant', _('No valid popup layouts defined.'));
+            return;
+        }
+
+        const search = new LayoutSearch(layouts);
+        search.connect('item-activated', (s, index) => {
+            Settings.setInt(Settings.FAVORITE_LAYOUT, index);
+        });
+    }
+
+    /**
      * Starts tiling to a Popup Layout.
      *
      * @param {number} index the index of the layout we start tiling to.
      */
     startLayouting(index) {
-        const layout = this._getLayouts()?.[index];
+        const layout = Util.getLayouts()?.[index];
         if (!layout)
             return;
 
@@ -267,19 +271,35 @@ var LayoutManager = class TilingLayoutsManager {
         }
     }
 
-    _getLayouts() {
-        const userDir = GLib.get_user_config_dir();
-        const pathArr = [userDir, '/tiling-assistant/layouts.json'];
-        const path = GLib.build_filenamev(pathArr);
-        const file = Gio.File.new_for_path(path);
-        if (!file.query_exists(null))
-            return [];
+    _bindKeybindings() {
+        for (let i = 0; i < 20; i++) {
+            this._keyBindings.push(`activate-layout${i}`);
+            Main.wm.addKeybinding(
+                `activate-layout${i}`,
+                Settings.getGioObject(),
+                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+                Shell.ActionMode.NORMAL,
+                this.startLayouting.bind(this, i)
+            );
+        }
 
-        const [success, contents] = file.load_contents(null);
-        if (!success || !contents.length)
-            return [];
+        this._keyBindings.push('search-popup-layout');
+        Main.wm.addKeybinding(
+            'search-popup-layout',
+            Settings.getGioObject(),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            this.openPopupSearch.bind(this)
+        );
 
-        return JSON.parse(ByteArray.toString(contents));
+        this._keyBindings.push('change-favorite-layout');
+        Main.wm.addKeybinding(
+            'change-favorite-layout',
+            Settings.getGioObject(),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            this.openFavoriteSearch.bind(this)
+        );
     }
 };
 

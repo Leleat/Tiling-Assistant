@@ -160,7 +160,9 @@ var Handler = class TilingKeybindingHandler {
             return;
         }
 
-        nearestWindow.activate(global.get_current_time());
+        // Activate() caused problems with an extensions' prefs window, if the
+        // extensions-app wasn't open.
+        nearestWindow.focus(global.get_current_time());
 
         // Animation for visibilty with a tmp 'tile preview'
         const fromRect = window.get_frame_rect();

@@ -9,18 +9,24 @@
     - [Tiling Popup](#Tiling-Popup)
     - [Tile Groups](#Tile-Groups)
     - [Tile Editing Mode](#Tile-Editing-Mode)
-    - [Popup Layouts](#Popup-Layouts)
+    - [Layouts](#Layouts)
+        - [Popup Layouts](#Popup-Layouts)
+        - [Fixed Layout](#Fixed-Layout)
     - [Hidden Settings](#Hidden-Settings)
 
 ## Usage
 
 ### Mouse-driven Workflow
 
-Dragging a window to the screen edges or corners will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview. Optionally, this behaviour can be inverted (for landscape or portrait displays separately).
+There are three ways ('modes') to tile windows. The default `Edge Tiling`, the `Split Tiles` mode and the `Fixed Layout`. The later two are activated when moving a window while holding `Ctrl` and `Alt` respectively.
 
-Holding `Ctrl` when moving a window over a tiled window, will make the grabbed window and the tiled window beneath it share the same space. A similiar principle applies to hovering free screen space. Hovering at the very edges will affect multiple windows.
+With `Edge Tiling`, dragging a window to the screen edges or corners will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview.
+
+In the `Split Tiles` modes you split tiled windows or free screen space based on tiled windows, if you hover over them. If you hover at the very edges, you will affect multiple windows. Here is a gif showing an example.
 
 ![](media/Guide_dnd.gif)
+
+See [Fixed Layout](#Fixed-Layout) for information regarding the last mode.
 
 ### Keyboard-driven Workflow
 
@@ -56,7 +62,11 @@ Hitting `Esc`, `Space` or `Enter` will leave the Tile Editing Mode. If a free sc
 
 ![](media/Guide_tileEditingMode.gif)
 
-### Popup Layouts
+### Layouts
+
+By default, the `Layouts` are [hidden](#Hidden-Settings) behind the 'Advanced / Experimental Settings'. There are two types of layouts.
+
+#### Popup Layouts
 
 A 'Popup Layout' has a name and a list of rectangles with optional apps and loopTypes attached to each rectangle. If you activate a layout, you will spawn a Tiling Popup (hence the name 'Popup Layout') at each rectangle - one after the other. If you attached an app to the rectangle, instead of calling the Tiling Popup, a new instance of the app will be opened and tiled in that spot. If you set a loopType, you will keep tiling windows to that one rectangle and make them share that space evenly. This way you can setup layouts similiar to 'Master and Stack'. Any rectangle can have a loopType set.
 
@@ -64,11 +74,15 @@ You define rectangles by entering their `x` and `y` coordinate as well as their 
 
 ![](media/Guide_layouts.gif)
 
-The `Search Popup Layout` keybinding enables you to activate layouts by name. That means you don't have to remember or set their keyboard shortcut. Here you can see it in action.
+The `Search for a Layout` keybinding enables you to activate layouts by name. That means you don't have to remember or set their keyboard shortcut. Here you can see it in action (Note: the settings page is outdated).
 
 ![](media/Guide_layouts2.gif)
 
-By default, the `Popup Layouts` are [hidden](#Hidden-Settings) behind the 'Advanced / Experimental Settings'.
+#### Fixed Layout
+
+The `Fixed Layout` is one single layout marked by the 'favorite button' from the list of (popup) layouts. It can be used to have a fixed layout when you move a window around. The default `Fixed Layout Activator` is `Alt`. An example illustrates this feature clearly.
+
+![](media/Guide_layouts3.gif)
 
 ### Hidden Settings
 

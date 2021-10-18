@@ -68,16 +68,28 @@ var Prefs = class TilingLayoutsPrefs {
             this._loadLayouts();
         });
 
+        // Unique button to add a new *tmp* LayoutRow
         this._addLayoutButton = this._builder.get_object('add-layout-button');
         this._addLayoutButton.connect('clicked', () => {
             const row = this._createLayoutRow(LayoutRow.getInstanceCount());
             row.toggleReveal();
         });
 
-        // Bind the general keyboard shortcuts.
+        // Bind the general layouts keyboard shortcuts.
         ['search-popup-layout', 'change-favorite-layout'].forEach(key => {
             const shortcutWidget = this._builder.get_object(key);
             shortcutWidget.initialize(key, this._settings);
+        });
+
+        // Update the 'favorite' icons, if the setting changes.
+        this._settings.connect('changed::favorite-layout', () => {
+            Util.forEachChild(this, this._layoutsListBox, r => {
+                r.setFavoriteIcon(false);
+            });
+
+            const newFav = this._settings.get_int('favorite-layout');
+            if (newFav !== -1)
+                Util.getChild(this._layoutsListBox, newFav).setFavoriteIcon(true);
         });
 
         // Finally, load the existing settings.
@@ -145,6 +157,8 @@ var Prefs = class TilingLayoutsPrefs {
                 const keys = this._settings.get_strv(`activate-layout${layoutRow.getIdx()}`);
                 this._settings.set_strv(`activate-layout${layouts.length - 1}`, keys);
                 this._settings.set_strv(`activate-layout${layoutRow.getIdx()}`, []);
+                const currFav = this._settings.get_int('favorite-layout');
+                this._settings.set_int('favorite-layout', currFav - 1);
             } else {
                 // Remove keyboard shortcuts, if they aren't assigned to a
                 // valid layout, because they won't be visible to the user

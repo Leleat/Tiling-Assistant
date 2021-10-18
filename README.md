@@ -23,7 +23,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 - **Tile Groups**: Tiled windows are considered in a group, if they don't overlap each other and aren't interrupted by non-tiled windows. If one of the windows is focused, the rest of the group will be raised to the foreground as well. A Tile Group also resizes together.
 
-- ...
+- **Layouts**:...
 
 Please see the ![Guide](GUIDE.md) for an explanation of every feature.
 

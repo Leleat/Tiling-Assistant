@@ -19,6 +19,7 @@ var Settings = class Settings {
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
+    static FAVORITE_LAYOUT = 'favorite-layout';
     static DEFAULT_MOVE_MODE = 'default-move-mode';
     static SPLIT_TILE_MOD = 'move-split-tiles-mod';
     static FIXED_LAYOUT_MOD = 'move-fixed-layout-mod';
@@ -47,8 +48,17 @@ var Settings = class Settings {
     }
 
     /**
-     * @returns {string[]} the settings keys except the ones for
-     *      shortcuts and Layouts.
+     * Listens for the change of a setting.
+     *
+     * @param {string} key a settings key.
+     * @param {*} func function to call when the setting changed.
+     */
+    static changed(key, func) {
+        this._settings.connect(`changed::${key}`, func);
+    }
+
+    /**
+     * @returns {string[]} the settings keys except the ones for shortcuts.
      */
     static getAllKeys() {
         return [
@@ -61,6 +71,7 @@ var Settings = class Settings {
             this.ENABLE_ADV_EXP_SETTINGS,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
+            this.FAVORITE_LAYOUT,
             this.DEFAULT_MOVE_MODE,
             this.SPLIT_TILE_MOD,
             this.FIXED_LAYOUT_MOD,
@@ -174,7 +185,7 @@ var RestoreOn = class RestoreWindowSizeBehaviour {
 
 var DynamicKeybindings = class DynamicKeybindingBehaviour {
     static DISABLED = 'Disabled';
-    static FOCUS = 'Focus';
+    static FOCUS = 'Window Focus';
     static TILING_STATE = 'Tiling State';
     static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
 };

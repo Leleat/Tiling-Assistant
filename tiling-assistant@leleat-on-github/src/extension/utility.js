@@ -1,7 +1,8 @@
 'use strict';
 
-const { Clutter, GLib, Meta, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, Meta, Shell, St } = imports.gi;
 const { altTab: AltTab, main: Main } = imports.ui;
+const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -756,6 +757,21 @@ var Util = class Utility {
         });
 
         app.open_new_window(-1);
+    }
+
+    static getLayouts() {
+        const userDir = GLib.get_user_config_dir();
+        const pathArr = [userDir, '/tiling-assistant/layouts.json'];
+        const path = GLib.build_filenamev(pathArr);
+        const file = Gio.File.new_for_path(path);
+        if (!file.query_exists(null))
+            return [];
+
+        const [success, contents] = file.load_contents(null);
+        if (!success || !contents.length)
+            return [];
+
+        return JSON.parse(ByteArray.toString(contents));
     }
 
     /**

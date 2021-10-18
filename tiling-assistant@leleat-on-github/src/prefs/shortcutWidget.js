@@ -43,6 +43,9 @@ var ShortcutWidget = GObject.registerClass({
         this.keybinding = this._setting.get_strv(key)[0] ?? '';
     }
 
+    /**
+     * Toggles the listening.
+     */
     activate() {
         if (this.isListening())
             this.stopListening();
@@ -50,16 +53,26 @@ var ShortcutWidget = GObject.registerClass({
             this.listen();
     }
 
+    /**
+     * Starts listening for a keyboard shortcut.
+     */
     listen() {
         this._button.set_label('Press a shortcut...');
         this._isListening = true;
     }
 
+    /**
+     * Stops listening for a keyboard shortcut.
+     */
     stopListening() {
         this._button.set_label(this._getKeybindingLabel() || 'Disabled');
         this._isListening = false;
     }
 
+    /**
+     * @returns {boolean} wether this widget is currently listening for
+     *      a shortcut.
+     */
     isListening() {
         return this._isListening;
     }
