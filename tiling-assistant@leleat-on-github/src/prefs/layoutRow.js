@@ -198,7 +198,9 @@ var LayoutRow = GObject.registerClass({
     }
 
     _onNameEntryChanged() {
-        this._layout.setName(this._nameEntry.get_buffer().get_text());
+        const name = this._nameEntry.get_buffer().get_text();
+        this._nameEntry.set_tooltip_text(name);
+        this._layout.setName(name);
         const [ok] = this._layout.validate();
         this.emit('changed', ok);
     }
