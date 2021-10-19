@@ -4,7 +4,7 @@
 
   <!-- ======================================================================================== -->
   <!-- ======================================================================================== -->
-  <!-- = Titlebar Widgets ===================================================================== -->
+  <!-- = Titlebar Widget ====================================================================== -->
   <!-- ======================================================================================== -->
   <!-- ======================================================================================== -->
 
@@ -28,18 +28,25 @@
       </item>
     </section>
   </menu>
-  <object class="GtkMenuButton" id="info-menu-button">
-    <property name="receives-default">True</property>
-    <property name="menu-model">info-menu</property>
-    <property name="icon-name">dialog-information-symbolic</property>
-  </object>
-  <object class="GtkButton" id="hidden-settings-button">
-    <property name="has-frame">0</property>
-  </object>
-  <object class="GtkStackSwitcher" id="main-stack-switcher">
-    <property name="halign">center</property>
-    <property name="hexpand">True</property>
-    <property name="stack">main-prefs</property>
+
+  <object class="GtkHeaderBar" id="titlebar">
+    <property name="title-widget">
+      <object class="GtkStackSwitcher">
+        <property name="stack">main-prefs</property>
+      </object>
+    </property>
+    <child type="start">
+      <object class="GtkMenuButton">
+        <property name="receives-default">True</property>
+        <property name="menu-model">info-menu</property>
+        <property name="icon-name">dialog-information-symbolic</property>
+      </object>
+    </child>
+    <child type="end">
+      <object class="GtkButton" id="hidden-settings-button">
+        <property name="has-frame">0</property>
+      </object>
+    </child>
   </object>
 
   <!-- ======================================================================================== -->

@@ -44,44 +44,45 @@ class TilingAssistantPrefs extends Gtk.Box {
         // prefs side (including the keyboard shortcuts)
         this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
 
-        // Setup titlebar and final size
+        // Setup titlebar and size
         mainPrefs.connect('realize', () => {
-            // Replace the title (widget)
-            const extPrefsDialog = mainPrefs.get_root();
-            const titleBar = extPrefsDialog.get_titlebar();
-            titleBar.set_title_widget(this._builder.get_object('main-stack-switcher'));
-            titleBar.pack_start(this._builder.get_object('info-menu-button'));
+            // Titlebar
+            const prefsDialog = mainPrefs.get_root();
+            prefsDialog.set_titlebar(this._builder.get_object('titlebar'));
+
+            // Window size
+            prefsDialog.set_default_size(600, 750);
+
+            // Info-popup-menu actions
+            const actionGroup = new Gio.SimpleActionGroup();
+            prefsDialog.insert_action_group('prefs', actionGroup);
+
+            const bugReportAction = new Gio.SimpleAction({ name: 'open-bug-report' });
+            bugReportAction.connect('activate', this._openBugReport.bind(this, prefsDialog));
+            actionGroup.add_action(bugReportAction);
+
+            const userGuideAction = new Gio.SimpleAction({ name: 'open-user-guide' });
+            userGuideAction.connect('activate', this._openUserGuide.bind(this, prefsDialog));
+            actionGroup.add_action(userGuideAction);
+
+            const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
+            changelogAction.connect('activate', this._openChangelog.bind(this, prefsDialog));
+            actionGroup.add_action(changelogAction);
+
+            const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
+            licenseAction.connect('activate', this._openLicense.bind(this, prefsDialog));
+            actionGroup.add_action(licenseAction);
+
+            // Hidden settings
             const hiddenSettingsButton = this._builder.get_object('hidden-settings-button');
-            titleBar.pack_end(hiddenSettingsButton);
             hiddenSettingsButton.connect('clicked', () => {
                 const hiddenSettings = this._builder.get_object('hidden-settings-page');
                 hiddenSettings.set_visible(!hiddenSettings.get_visible());
             });
-
-            extPrefsDialog.set_default_size(600, 750);
-
-            const actionGroup = new Gio.SimpleActionGroup();
-            extPrefsDialog.insert_action_group('prefs', actionGroup);
-
-            const bugReportAction = new Gio.SimpleAction({ name: 'open-bug-report' });
-            bugReportAction.connect('activate', this._openBugReport.bind(this, extPrefsDialog));
-            actionGroup.add_action(bugReportAction);
-
-            const userGuideAction = new Gio.SimpleAction({ name: 'open-user-guide' });
-            userGuideAction.connect('activate', this._openUserGuide.bind(this, extPrefsDialog));
-            actionGroup.add_action(userGuideAction);
-
-            const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
-            changelogAction.connect('activate', this._openChangelog.bind(this, extPrefsDialog));
-            actionGroup.add_action(changelogAction);
-
-            const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
-            licenseAction.connect('activate', this._openLicense.bind(this, extPrefsDialog));
-            actionGroup.add_action(licenseAction);
         });
 
         // Allow the activation of the 'main widget' by clicking a ListBoxRow
-        // TODO: port prefs to Template class as well and get rid of this
+        // TODO: port prefs to a Template class as well and get rid of this
         for (let i = 0; i < 20; i++) {
             this._builder.get_object(`listBox${i}`)?.connect('row-activated',
                 this._onListBoxRowActivated.bind(this));
@@ -119,31 +120,31 @@ class TilingAssistantPrefs extends Gtk.Box {
         }
     }
 
-    _openBugReport(extPrefsDialog) {
+    _openBugReport(prefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
             'https://github.com/Leleat/Tiling-Assistant/issues',
-            extPrefsDialog.get_display().get_app_launch_context()
+            prefsDialog.get_display().get_app_launch_context()
         );
     }
 
-    _openUserGuide(extPrefsDialog) {
+    _openUserGuide(prefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
             'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md',
-            extPrefsDialog.get_display().get_app_launch_context()
+            prefsDialog.get_display().get_app_launch_context()
         );
     }
 
-    _openChangelog(extPrefsDialog) {
+    _openChangelog(prefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
             'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md',
-            extPrefsDialog.get_display().get_app_launch_context()
+            prefsDialog.get_display().get_app_launch_context()
         );
     }
 
-    _openLicense(extPrefsDialog) {
+    _openLicense(prefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
             'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE',
-            extPrefsDialog.get_display().get_app_launch_context()
+            prefsDialog.get_display().get_app_launch_context()
         );
     }
 
