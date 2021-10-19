@@ -99,7 +99,6 @@ var LayoutRow = GObject.registerClass({
     }
 
     destroy() {
-        this._settings.set_strv(this._shortcutKey, []);
         this.get_parent().remove(this);
     }
 
@@ -206,6 +205,7 @@ var LayoutRow = GObject.registerClass({
     }
 
     _onDeleteButtonClicked() {
+        this._settings.set_strv(this._shortcutKey, []);
         this.emit('changed', true);
         this.destroy();
     }
