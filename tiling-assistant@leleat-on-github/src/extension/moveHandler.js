@@ -18,7 +18,7 @@ const Util = Me.imports.src.extension.utility.Util;
  * is a setting to restore a tiled window's size on the actual grab end.
  */
 
-var Handler = class TilingMoveHandler { // eslint-disable-line no-unused-vars
+var Handler = class TilingMoveHandler {
     constructor() {
         const moveOps = [Meta.GrabOp.MOVING, Meta.GrabOp.KEYBOARD_MOVING];
 

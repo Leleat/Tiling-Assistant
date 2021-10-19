@@ -19,7 +19,7 @@ const _ = Domain.gettext;
  * ones related to the Layouts. For those, see layoutsManager.js.
  */
 
-var Handler = class TilingKeybindingHandler { // eslint-disable-line no-unused-vars
+var Handler = class TilingKeybindingHandler {
     constructor() {
         const allowInOverview = [Shortcuts.TOGGLE_POPUP];
         this._keyBindings = Shortcuts.getAllKeys();

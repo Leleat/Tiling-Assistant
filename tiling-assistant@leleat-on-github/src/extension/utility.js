@@ -17,7 +17,7 @@ const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
  * (and *not* the prefs files)
  */
 
-var Util = class Utility { // eslint-disable-line no-unused-vars
+var Util = class Utility {
     static initialize() {
         this._tileGroupManager = new TileGroupManager();
     }

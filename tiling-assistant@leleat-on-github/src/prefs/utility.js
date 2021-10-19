@@ -5,7 +5,7 @@
  * (and *not* the extension files)
  */
 
-var Util = class Utility { // eslint-disable-line no-unused-vars
+var Util = class Utility {
     /**
      * Loops through the children of a Gtk.Widget.
      *

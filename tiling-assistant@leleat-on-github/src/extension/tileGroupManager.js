@@ -14,7 +14,7 @@ const Settings = Me.imports.src.common.Settings;
  * is raised (and if the setting isn't disabled).
  */
 
-var Manager = class TileGroupManager { // eslint-disable-line no-unused-vars
+var Manager = class TileGroupManager {
     constructor() {
         // { windowId1: int, windowId2: int, ... }
         this._groupRaiseIds = new Map();

@@ -8,7 +8,7 @@
 /**
  * A Singleton providing access to the settings.
  */
-var Settings = class Settings { // eslint-disable-line no-unused-vars
+var Settings = class Settings {
     static _settings;
     static ENABLE_TILING_POPUP = 'enable-tiling-popup';
     static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
@@ -126,7 +126,7 @@ var Settings = class Settings { // eslint-disable-line no-unused-vars
  * A Singleton providing access to the shortcut keys except the
  * ones related to the Layouts.
  */
-var Shortcuts = class Shortcuts { // eslint-disable-line no-unused-vars
+var Shortcuts = class Shortcuts {
     static TOGGLE_POPUP = 'toggle-tiling-popup';
     static EDIT_MODE = 'tile-edit-mode';
     static AUTO_FILL = 'auto-tile';
@@ -167,36 +167,36 @@ var Shortcuts = class Shortcuts { // eslint-disable-line no-unused-vars
 };
 
 // Enums:
-var RestoreOn = class RestoreWindowSizeBehaviour { // eslint-disable-line no-unused-vars
+var RestoreOn = class RestoreWindowSizeBehaviour {
     static ON_GRAB_START = 'Grab Start';
     static ON_GRAB_END = 'Grab End';
 };
 
-var DynamicKeybindings = class DynamicKeybindingBehaviour { // eslint-disable-line no-unused-vars
+var DynamicKeybindings = class DynamicKeybindingBehaviour {
     static DISABLED = 'Disabled';
     static FOCUS = 'Focus';
     static TILING_STATE = 'Tiling State';
     static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
 };
 
-var MoveModeMods = class MovePreviewActivator { // eslint-disable-line no-unused-vars
+var MoveModeMods = class MovePreviewActivator {
     static CTRL = 'Ctrl';
     static ALT = 'Alt';
     static RMB = 'RMB';
 };
 
-var MoveModes = class MovePreviewActivator { // eslint-disable-line no-unused-vars
+var MoveModes = class MovePreviewActivator {
     static EDGE_TILING = 'Edge Tiling';
     static SPLIT_TILES = 'Split Tiles';
     static FIXED_LAYOUT = 'Fixed Layout';
 };
 
-var Orientation = class Orientation { // eslint-disable-line no-unused-vars
+var Orientation = class Orientation {
     static H = 1;
     static V = 2;
 };
 
-var Direction = class Direction { // eslint-disable-line no-unused-vars
+var Direction = class Direction {
     static N = 1;
     static E = 2;
     static S = 4;
@@ -219,7 +219,7 @@ var Direction = class Direction { // eslint-disable-line no-unused-vars
 
 // Classes for the layouts:
 // See src/prefs/layoutsPrefs.js for details on layouts.
-var Layout = class Layout { // eslint-disable-line no-unused-vars
+var Layout = class Layout {
     /**
      * @param {object} layout is the parsed object from the layouts file.
      */

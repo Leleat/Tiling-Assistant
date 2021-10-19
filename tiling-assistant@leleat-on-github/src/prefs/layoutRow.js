@@ -20,7 +20,7 @@ const _ = Domain.gettext;
  * { rect, appId, loopType }. The rect is mandatory, the rest not.
  */
 
-var LayoutRow = GObject.registerClass({ // eslint-disable-line no-unused-vars
+var LayoutRow = GObject.registerClass({
     GTypeName: 'TilingLayoutRow',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/layoutRow.ui`).get_uri(),
     InternalChildren: [

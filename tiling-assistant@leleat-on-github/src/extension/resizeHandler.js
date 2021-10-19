@@ -24,7 +24,7 @@ const Side = {
  * resizing is split into its [H]orizontal and [V]ertical components.
  */
 
-var Handler = class TilingResizeHandler { // eslint-disable-line no-unused-vars
+var Handler = class TilingResizeHandler {
     constructor() {
         const isResizing = grabOp => {
             switch (grabOp) {

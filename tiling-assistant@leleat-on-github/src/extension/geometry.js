@@ -10,7 +10,7 @@ const { Direction, Orientation } = Me.imports.src.common;
 /**
  * Wrapper for Meta.Rectangle to add some more functions.
  */
-var Rect = class Rect { // eslint-disable-line no-unused-vars
+var Rect = class Rect {
     /**
      * @param  {...any} params No parameters, 1 Meta.Rectangle or the x, y,
      * width and height values should be passed to the constructor.
@@ -435,7 +435,7 @@ var Rect = class Rect { // eslint-disable-line no-unused-vars
  * Axis is just an axis-aligned line. All functions with params only take an
  * Axis with the same orientation as valid input. Default Orienation is H.
  */
-var Axis = class Axis { // eslint-disable-line no-unused-vars
+var Axis = class Axis {
     /**
      * @param {...any} params takes either 0, 2 (start and end) or
      * 3 (start, end, orientation) parameters.

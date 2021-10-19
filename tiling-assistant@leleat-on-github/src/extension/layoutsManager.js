@@ -29,7 +29,7 @@ const _ = Domain.gettext;
  * tiled windows will share that spot evenly (a la 'Master and Stack').
  */
 
-var LayoutManager = class TilingLayoutsManager { // eslint-disable-line no-unused-vars
+var LayoutManager = class TilingLayoutsManager {
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios

@@ -19,7 +19,7 @@ const Me = ExtensionUtils.getCurrentExtension();
  * https://gitlab.com/rmnvgr/nightthemeswitcher-gnome-shell-extension/-/blob/main/src/utils.js
  */
 
-var ShortcutWidget = GObject.registerClass({ // eslint-disable-line no-unused-vars
+var ShortcutWidget = GObject.registerClass({
     GTypeName: 'ShortcutWidget',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/shortcutWidget.ui`).get_uri(),
     InternalChildren: ['button', 'clearButton', 'eventKeyController'],

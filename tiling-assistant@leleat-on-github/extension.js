@@ -38,11 +38,11 @@ let Util;
  *  => resizeHandler.js (when resizing a window)
  */
 
-function init() { // eslint-disable-line no-unused-vars
+function init() {
     ExtensionUtils.initTranslations(Me.metadata.uuid);
 }
 
-function enable() { // eslint-disable-line no-unused-vars
+function enable() {
     Settings = Me.imports.src.common.Settings;
     Settings.initialize();
 
@@ -86,7 +86,7 @@ function enable() { // eslint-disable-line no-unused-vars
     _loadAfterSessionLock();
 }
 
-function disable() { // eslint-disable-line no-unused-vars
+function disable() {
     // Save tiled window properties, if the session was locked to restore
     // them after the session is unlocked again.
     _saveBeforeSessionLock();

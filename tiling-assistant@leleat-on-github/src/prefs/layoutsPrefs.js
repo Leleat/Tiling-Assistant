@@ -38,7 +38,7 @@ const Util = Me.imports.src.prefs.utility.Util;
  * an existing feature... thus it's hidden
  */
 
-var Prefs = class TilingLayoutsPrefs { // eslint-disable-line no-unused-vars
+var Prefs = class TilingLayoutsPrefs {
     /**
      * @param {Gtk.Builder} builder the Gtk.Builder from the main prefs file.
      * @param {Gio.Settings} settings the Gio.Settings object from the main prefs file.

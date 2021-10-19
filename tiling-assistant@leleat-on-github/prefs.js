@@ -9,11 +9,11 @@ const LayoutPrefs = Me.imports.src.prefs.layoutsPrefs.Prefs;
 const { ShortcutWidget } = Me.imports.src.prefs.shortcutWidget;
 const { Settings, Shortcuts } = Me.imports.src.common;
 
-function init() { // eslint-disable-line no-unused-vars
+function init() {
     ExtensionUtils.initTranslations(Me.metadata.uuid);
 }
 
-function buildPrefsWidget() { // eslint-disable-line no-unused-vars
+function buildPrefsWidget() {
     return new PrefsWidget();
 }
 

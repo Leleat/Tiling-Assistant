@@ -15,7 +15,7 @@ const Util = Me.imports.src.extension.utility.Util;
  * Mostly based on GNOME's altTab.js
  */
 
-var TilingSwitcherPopup = GObject.registerClass({ // eslint-disable-line no-unused-vars
+var TilingSwitcherPopup = GObject.registerClass({
     Signals: {
         // Bool indicates wether the Tiling Popup was canceled
         // (or if a window was tiled with this popup)

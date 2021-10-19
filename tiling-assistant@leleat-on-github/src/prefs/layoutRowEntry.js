@@ -9,7 +9,7 @@ const Me = ExtensionUtils.getCurrentExtension();
  * Multiple LayoutRowEntries make up a LayoutRow.js. See that file for more info.
  */
 
-var LayoutRowEntry = GObject.registerClass({ // eslint-disable-line no-unused-vars
+var LayoutRowEntry = GObject.registerClass({
     GTypeName: 'TilingLayoutRowEntry',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/layoutRowEntry.ui`).get_uri(),
     InternalChildren: [
