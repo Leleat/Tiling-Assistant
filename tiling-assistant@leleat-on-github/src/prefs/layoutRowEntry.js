@@ -38,7 +38,6 @@ var LayoutRowEntry = GObject.registerClass({
             ? `${rect.x}--${rect.y}--${rect.width}--${rect.height}${loop}`
             : '';
         this._rectEntry.get_buffer().set_text(text, -1);
-        this._rectEntry.connect('changed', this._onRectEntryChanged.bind(this));
 
         // Show a placeholder on the first entry, if it's empty
         if (idx === 0 && Object.keys(rect).length === 0) {
@@ -49,7 +48,6 @@ var LayoutRowEntry = GObject.registerClass({
         const appInfo = item.appId && Gio.DesktopAppInfo.new(item.appId);
         const iconName = appInfo?.get_icon().to_string() ?? 'list-add-symbolic';
         this._rectAppButton.set_icon_name(iconName);
-        this._rectAppButton.connect('clicked', this._onAppButtonClicked.bind(this));
     }
 
     /**
