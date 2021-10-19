@@ -351,12 +351,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -393,12 +394,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -435,12 +437,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled, it adapts to the pressed shortcut. For example, a window tiled to the right half will tile to the bottom-right quarter, if the 'tile to bottom' shortcut is pressed.&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -477,12 +480,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -589,12 +593,13 @@
                                       <object class="GtkLabel">
                                         <property name="margin-end">36</property>
                                         <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">&lt;small&gt;A keyboard-driven mode to manage your tiled windows&lt;/small&gt;</property>
                                         <property name="use-markup">True</property>
                                         <property name="wrap">True</property>
-                                        <property name="wrap-mode">word</property>
+                                        <property name="wrap-mode">word-char</property>
                                         <style>
                                           <class name="dim-label"/>
                                         </style>
@@ -636,12 +641,13 @@
                                       <object class="GtkLabel">
                                         <property name="margin-end">36</property>
                                         <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">&lt;small&gt;The focused window will try to fill the free screen space as good as possible based on the tiled windows around it&lt;/small&gt;</property>
                                         <property name="use-markup">True</property>
                                         <property name="wrap">True</property>
-                                        <property name="wrap-mode">word</property>
+                                        <property name="wrap-mode">word-char</property>
                                         <style>
                                           <class name="dim-label"/>
                                         </style>
@@ -1252,12 +1258,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;Moving the window to the screen edges or corners will tile the window to the tile preview&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -1294,12 +1301,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -1336,12 +1344,13 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
+                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
                                     <property name="label" translatable="yes">&lt;small&gt;The tile preview will stick to your 'favorite' layout from the 'Layouts' page&lt;/small&gt;</property>
                                     <property name="use-markup">True</property>
                                     <property name="wrap">True</property>
-                                    <property name="wrap-mode">word</property>
+                                    <property name="wrap-mode">word-char</property>
                                     <style>
                                       <class name="dim-label"/>
                                     </style>
@@ -1363,7 +1372,7 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Split Tiles Activator</property>
+                                    <property name="label" translatable="yes">'Split Tiles' Activator</property>
                                   </object>
                                 </child>
                                 <child>
@@ -1395,7 +1404,7 @@
                                 <child>
                                   <object class="GtkLabel">
                                     <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Fixed Layout Activator</property>
+                                    <property name="label" translatable="yes">'Fixed Layout' Activator</property>
                                   </object>
                                 </child>
                                 <child>
@@ -1580,12 +1589,13 @@
                                       <object class="GtkLabel">
                                         <property name="margin-end">36</property>
                                         <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
                                         <property name="halign">start</property>
                                         <property name="hexpand">True</property>
                                         <property name="label" translatable="yes">&lt;small&gt;Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;.&lt;/small&gt;</property>
                                         <property name="use-markup">True</property>
                                         <property name="wrap">True</property>
-                                        <property name="wrap-mode">word</property>
+                                        <property name="wrap-mode">word-char</property>
                                         <style>
                                           <class name="dim-label"/>
                                         </style>

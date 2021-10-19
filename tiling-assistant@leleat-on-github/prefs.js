@@ -81,6 +81,7 @@ class TilingAssistantPrefs extends Gtk.Box {
         });
 
         // Allow the activation of the 'main widget' by clicking a ListBoxRow
+        // TODO: port prefs to Template class as well and get rid of this
         for (let i = 0; i < 20; i++) {
             this._builder.get_object(`listBox${i}`)?.connect('row-activated',
                 this._onListBoxRowActivated.bind(this));
