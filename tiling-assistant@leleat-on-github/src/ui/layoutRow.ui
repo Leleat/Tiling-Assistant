@@ -24,12 +24,13 @@
             </child>
             <child>
               <object class="GtkEntry" id="nameEntry">
-                <property name="margin-end">12</property>
                 <signal name="changed" handler="_onNameEntryChanged" swapped="no"/>
               </object>
             </child>
             <child>
               <object class="GtkLabel" id="rectCountLabel">
+                <property name="margin-start">12</property>
+                <property name="margin-end">18</property>
                 <style>
                   <class name="dim-label"/>
                 </style>
@@ -40,7 +41,7 @@
             </child>
             <child>
               <object class="GtkButton" id="favoriteButton">
-                <property name="margin-start">8</property>
+                <property name="margin-start">6</property>
                 <property name="has-frame">0</property>
                 <property name="icon-name">non-starred-symbolic</property>
                 <property name="tooltip-text" translatable="yes">Your favorite layout will be used as the &apos;Fixed Layout&apos; when moving a window.</property>
@@ -74,11 +75,11 @@
                           <object class="GtkBox">
                             <property name="margin-end">6</property>
                             <property name="orientation">vertical</property>
-                            <property name="spacing">8</property>
+                            <property name="spacing">6</property>
                             <child>
                               <object class="GtkBox" id="entryBox">
                                 <property name="orientation">vertical</property>
-                                <property name="spacing">8</property>
+                                <property name="spacing">6</property>
                                 <child>
                                   <placeholder/>
                                 </child>
