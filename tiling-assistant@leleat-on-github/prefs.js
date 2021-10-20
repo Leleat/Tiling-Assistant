@@ -227,7 +227,7 @@ class TilingAssistantPrefs extends Gtk.Box {
 
             buttonNames.forEach(buttonName => {
                 const button = this._builder.get_object(buttonName);
-                const label = button.get_label();
+                const label = this._builder.get_object(`${buttonName}-label`).get_label();
                 button.connect('toggled', () => {
                     this._settings.set_string(key, label);
                 });

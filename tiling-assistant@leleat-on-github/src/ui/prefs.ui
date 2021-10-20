@@ -340,15 +340,12 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="dynamic-keybinding-button-disabled">
-                                    <property name="label" translatable="yes">Disabled</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">True</property>
                                     <style>
                                       <class name="linked"/>
@@ -356,18 +353,35 @@
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="dynamic-keybinding-button-disabled-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Disabled</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -382,35 +396,52 @@
                                 <property name="margin-start">12</property>
                                 <property name="margin-end">12</property>
                                 <property name="margin-top">12</property>
+                                <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="margin-bottom">12</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="dynamic-keybinding-button-focus">
-                                    <property name="label" translatable="yes">Window Focus</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
                                     <property name="group">dynamic-keybinding-button-disabled</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="dynamic-keybinding-button-focus-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Window Focus</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -428,32 +459,49 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="dynamic-keybinding-button-tiling-state">
-                                    <property name="label" translatable="yes">Tiling State</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
                                     <property name="group">dynamic-keybinding-button-disabled</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled, it adapts to the pressed shortcut. For example, a window tiled to the right half will tile to the bottom-right quarter, if the 'tile to bottom' shortcut is pressed.&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="dynamic-keybinding-button-tiling-state-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Tiling State</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled, it adapts to the pressed shortcut. For example, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated.&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -471,32 +519,49 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="dynamic-keybinding-button-tiling-state-windows">
-                                    <property name="label" translatable="yes">Tiling State (Windows)</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
                                     <property name="group">dynamic-keybinding-button-disabled</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="dynamic-keybinding-button-tiling-state-windows-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Tiling State (Windows)</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -1250,31 +1315,48 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="edge-tiling-checkbutton">
-                                    <property name="label" translatable="yes">Edge Tiling</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;Moving the window to the screen edges or corners will tile the window to the tile preview&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="edge-tiling-checkbutton-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Edge Tiling</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;Moving the window to the screen edges or corners will tile the window to the tile preview&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -1292,32 +1374,49 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="split-tiles-checkbutton">
-                                    <property name="label" translatable="yes">Split Tiles</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
                                     <property name="group">edge-tiling-checkbutton</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="split-tiles-checkbutton-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Split Tiles</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
@@ -1335,32 +1434,49 @@
                                 <property name="margin-bottom">12</property>
                                 <property name="halign">start</property>
                                 <property name="hexpand">True</property>
-                                <property name="orientation">vertical</property>
-                                <property name="spacing">6</property>
+                                <property name="spacing">12</property>
                                 <child>
                                   <object class="GtkCheckButton" id="fixed-layout-checkbutton">
-                                    <property name="label" translatable="yes">Fixed Layout</property>
                                     <property name="can-focus">True</property>
                                     <property name="receives-default">False</property>
                                     <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
                                     <property name="active">false</property>
                                     <property name="group">edge-tiling-checkbutton</property>
+                                    <style>
+                                      <class name="linked"/>
+                                    </style>
                                   </object>
                                 </child>
                                 <child>
-                                  <object class="GtkLabel">
+                                  <object class="GtkBox">
                                     <property name="can-focus">True</property>
-                                    <property name="xalign">0</property>
                                     <property name="halign">start</property>
                                     <property name="hexpand">True</property>
-                                    <property name="label" translatable="yes">&lt;small&gt;The tile preview will stick to your 'favorite' layout from the 'Layouts' page&lt;/small&gt;</property>
-                                    <property name="use-markup">True</property>
-                                    <property name="wrap">True</property>
-                                    <property name="wrap-mode">word-char</property>
-                                    <style>
-                                      <class name="dim-label"/>
-                                    </style>
+                                    <property name="orientation">vertical</property>
+                                    <child>
+                                      <object class="GtkLabel" id="fixed-layout-checkbutton-label">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">Fixed Layout</property>
+                                      </object>
+                                    </child>
+                                    <child>
+                                      <object class="GtkLabel">
+                                        <property name="can-focus">True</property>
+                                        <property name="xalign">0</property>
+                                        <property name="halign">start</property>
+                                        <property name="hexpand">True</property>
+                                        <property name="label" translatable="yes">&lt;small&gt;The tile preview will stick to your 'favorite' layout from the 'Layouts' page&lt;/small&gt;</property>
+                                        <property name="use-markup">True</property>
+                                        <property name="wrap">True</property>
+                                        <property name="wrap-mode">word-char</property>
+                                        <style>
+                                          <class name="dim-label"/>
+                                        </style>
+                                      </object>
+                                    </child>
                                   </object>
                                 </child>
                               </object>
