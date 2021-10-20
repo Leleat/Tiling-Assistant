@@ -394,6 +394,13 @@ var Rect = class Rect {
         return this._rect.y + this._rect.height;
     }
 
+    get center() {
+        return {
+            x: this.x + this.width / 2,
+            y: this.y + this.height / 2
+        };
+    }
+
     get width() {
         return this._rect.width;
     }
