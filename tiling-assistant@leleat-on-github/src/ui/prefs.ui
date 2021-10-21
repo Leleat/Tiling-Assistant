@@ -33,10 +33,10 @@
     </section>
   </menu>
 
-  <object class="GtkHeaderBar" id="titlebar">
+  <object class="GtkHeaderBar" id="title_bar">
     <property name="title-widget">
       <object class="GtkStackSwitcher">
-        <property name="stack">main-prefs</property>
+        <property name="stack">TilingAssistantPrefs</property>
       </object>
     </property>
     <child type="start">
@@ -86,7 +86,7 @@
   <!-- ======================================================================================== -->
   <!-- ======================================================================================== -->
 
-  <object class="GtkStack" id="main-prefs">
+  <template class="TilingAssistantPrefs" parent="GtkStack">
     <property name="transition_type">slide-left-right</property>
     <child>
       <object class="GtkStackPage">
@@ -118,7 +118,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox0">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -127,60 +128,32 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Open after tiling a window</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_tiling_popup">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Open after tiling a window</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-tiling-popup">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="active">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="active">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Include apps from all workspaces</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="tiling_popup_all_workspace">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                              </object>
+                            </property>
                             <property name="sensitive"
-                                      bind-source="enable-tiling-popup"
+                                      bind-source="enable_tiling_popup"
                                       bind-property="active"
                                       bind-flags="sync-create"/>
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Include apps from all workspaces</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="tiling-popup-all-workspace">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
                           </object>
                         </child>
                       </object>
@@ -197,7 +170,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox1">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -206,30 +180,16 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Raise together</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_raise_tile_group">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Raise together</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-raise-tile-group">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="active">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="active">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -246,7 +206,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox2">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -255,56 +216,28 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Size</property>
+                            <property name="suffix">
+                              <object class="GtkSpinButton" id="window_gap">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Size</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="window-gap">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="adjustment">window-gaps-adjustment</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="adjustment">window-gaps-adjustment</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Maximized Windows</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="maximize_with_gap">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Maximized Windows</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="maximize-with-gap">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -321,7 +254,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox3">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="selection-mode">none</property>
@@ -329,242 +263,74 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="dynamic_keybinding_disabled_row">
+                            <property name="title" translatable="yes">Disabled</property>
+                            <property name="subtitle" translatable="yes">The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton" id="dynamic_keybinding_button_disabled">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="dynamic-keybinding-button-disabled">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">True</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="dynamic-keybinding-button-disabled-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Disabled</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">True</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="dynamic_keybinding_window_focus_row">
+                            <property name="title" translatable="yes">Window Focus</property>
+                            <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut, if there is one.</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="dynamic-keybinding-button-focus">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <property name="group">dynamic-keybinding-button-disabled</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="dynamic-keybinding-button-focus-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Window Focus</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled and there is a tiled window in the direction of the shortcut, switch focus to that tiled window instead of tiling the current window&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">false</property>
+                                <property name="group">dynamic_keybinding_button_disabled</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="dynamic_keybinding_tiling_state_row">
+                            <property name="title" translatable="yes">Tiling State</property>
+                            <property name="subtitle" translatable="yes">Adapt the current window's tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated.</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="dynamic-keybinding-button-tiling-state">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <property name="group">dynamic-keybinding-button-disabled</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="dynamic-keybinding-button-tiling-state-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Tiling State</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;If the current window is tiled, it adapts to the pressed shortcut. For example, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated.&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">false</property>
+                                <property name="group">dynamic_keybinding_button_disabled</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="dynamic_keybinding_tiling_state_windows_row">
+                            <property name="title" translatable="yes">Tiling State (Windows)</property>
+                            <property name="subtitle" translatable="yes">Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="dynamic-keybinding-button-tiling-state-windows">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <property name="group">dynamic-keybinding-button-disabled</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="dynamic-keybinding-button-tiling-state-windows-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Tiling State (Windows)</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">false</property>
+                                <property name="group">dynamic_keybinding_button_disabled</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -607,7 +373,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox4">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -616,143 +383,37 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Toggle 'Tiling Popup'</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="toggle-tiling-popup"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Toggle 'Tiling Popup'</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="toggle_tiling_popup"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="spacing">6</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="halign">start</property>
-                                        <property name="label" translatable="yes">Tile Editing Mode</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="margin-end">36</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;A keyboard-driven mode to manage your tiled windows&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-edit-mode"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile Editing Mode</property>
+                            <property name="subtitle" translatable="yes">A keyboard-driven mode to manage your tiled windows</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_edit_mode"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="spacing">6</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="halign">start</property>
-                                        <property name="label" translatable="yes">Fill untiled Space</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="margin-end">36</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;The focused window will try to fill the free screen space as good as possible based on the tiled windows around it&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="auto-tile"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Fill untiled Space</property>
+                            <property name="subtitle" translatable="yes">Try to fill the free screen space based on the visible tiled windows</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="auto_tile"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Toggle Maximization</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-maximize"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Toggle Maximization</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_maximize"/>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -769,7 +430,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox5">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -778,91 +440,35 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to top</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-top-half"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to top</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_top_half"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to bottom</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-bottom-half"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to bottom</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_bottom_half"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to left</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-left-half"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to left</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_left_half"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to right</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-right-half"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to right</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_right_half"/>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -879,7 +485,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox6">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="selection-mode">none</property>
@@ -887,91 +494,35 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to top-left</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-topleft-quarter"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to top-left</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_topleft_quarter"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to top-right</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-topright-quarter"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to top-right</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_topright_quarter"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to bottom-left</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-bottomleft-quarter"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to bottom-left</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_bottomleft_quarter"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tile to bottom-right</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="tile-bottomright-quarter"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tile to bottom-right</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="tile_bottomright_quarter"/>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -989,7 +540,7 @@
         <property name="visible">0</property>
         <property name="title" translatable="yes">Layouts</property>
         <property name="visible"
-                  bind-source="enable-advanced-experimental-features"
+                  bind-source="enable_advanced_experimental_features"
                   bind-property="active"
                   bind-flags="sync-create"/>
         <property name="child">
@@ -1017,7 +568,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox12">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="margin-bottom">24</property>
                         <property name="selection-mode">none</property>
@@ -1025,42 +577,18 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <property name="child">
-                              <object class="GtkBox">
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Search for a Layout</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="search-popup-layout"/>
-                                </child>
-                              </object>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Search for a Layout</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="search_popup_layout"/>
                             </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <property name="child">
-                              <object class="GtkBox">
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="label" translatable="yes">Change favorite Layout</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="change-favorite-layout"/>
-                                </child>
-                              </object>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Change favorite Layout</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="change_favorite_layout"/>
                             </property>
                           </object>
                         </child>
@@ -1080,20 +608,20 @@
                       <object class="GtkScrolledWindow">
                         <property name="hexpand">1</property>
                         <property name="vexpand">1</property>
-                        <property name="child">
+                        <child>
                           <object class="GtkViewport">
                             <property name="scroll-to-focus">True</property>
-                            <property name="child">
-                              <object class="GtkListBox" id="layouts-listbox">
+                            <child>
+                              <object class="GtkListBox" id="layouts_listbox">
                                 <property name="show-separators">True</property>
                                 <property name="selection-mode">none</property>
                                 <style>
                                   <class name="frame"/>
                                 </style>
                               </object>
-                            </property>
+                            </child>
                           </object>
-                        </property>
+                        </child>
                       </object>
                     </child>
                     <child>
@@ -1104,7 +632,7 @@
                           <class name="linked"/>
                         </style>
                         <child>
-                          <object class="GtkButton" id="add-layout-button">
+                          <object class="GtkButton" id="add_layout_button">
                             <property name="width-request">100</property>
                             <property name="receives-default">1</property>
                             <property name="icon-name">list-add-symbolic</property>
@@ -1112,7 +640,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkButton" id="save-layouts-button">
+                          <object class="GtkButton" id="save_layouts_button">
                             <property name="width-request">100</property>
                             <property name="receives-default">1</property>
                             <property name="icon-name">media-floppy-symbolic</property>
@@ -1120,7 +648,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="GtkButton" id="reload-layouts-button">
+                          <object class="GtkButton" id="reload_layouts_button">
                             <property name="width-request">100</property>
                             <property name="icon-name">edit-undo-symbolic</property>
                             <property name="receives-default">1</property>
@@ -1138,7 +666,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkStackPage" id="hidden-settings-page">
+      <object class="GtkStackPage" id="hidden_settings_page">
         <property name="visible">0</property>
         <property name="title" translatable="yes">Hidden Settings</property>
         <property name="child">
@@ -1157,7 +685,8 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
-                      <object class="GtkListBox" id="listBox7">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -1166,29 +695,15 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Advanced / Experimental Settings</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_advanced_experimental_features">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Advanced / Experimental Settings</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-advanced-experimental-features">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -1205,7 +720,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox8">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -1214,55 +730,27 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Tiling</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_tile_animations">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Tiling</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-tile-animations">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Untiling</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_untile_animations">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Untiling</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-untile-animations">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -1279,7 +767,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox10">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="margin-bottom">24</property>
@@ -1288,442 +777,179 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="edge_tiling_row">
+                            <property name="title" translatable="yes">Edge Tiling</property>
+                            <property name="subtitle" translatable="yes">Moving the window to the screen edges or corners will tile the window to the tile preview</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton" id="edge_tiling_checkbutton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="edge-tiling-checkbutton">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="edge-tiling-checkbutton-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Edge Tiling</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;Moving the window to the screen edges or corners will tile the window to the tile preview&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">false</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="splite_tiles_row">
+                            <property name="title" translatable="yes">Split Tiles</property>
+                            <property name="subtitle" translatable="yes">Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
-                                <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="split-tiles-checkbutton">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <property name="group">edge-tiling-checkbutton</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="split-tiles-checkbutton-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Split Tiles</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
+                                <property name="active">false</property>
+                                <property name="group">edge_tiling_checkbutton</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow" id="fixed_layout_row">
+                            <property name="title" translatable="yes">Fixed Layout</property>
+                            <property name="subtitle" translatable="yes">The tile preview will stick to your 'favorite' layout from the 'Layouts' page</property>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
+                                <property name="receives-default">False</property>
                                 <property name="halign">start</property>
+                                <property name="active">false</property>
+                                <property name="group">edge_tiling_checkbutton</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">'Split Tiles' Activator</property>
+                            <property name="suffix">
+                              <object class="GtkComboBoxText" id="move_split_tiles_mod">
+                                <property name="has-frame">0</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
+                                <property name="active-id">0</property>
+                                <items>
+                                  <item id="0" translatable="yes">Ctrl</item>
+                                  <item id="1" translatable="yes">Alt</item>
+                                  <item id="2" translatable="yes">RMB</item>
+                                </items>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">'Fixed Layout' Activator</property>
+                            <property name="suffix">
+                              <object class="GtkComboBoxText" id="move_fixed_layout_mod">
+                                <property name="has-frame">0</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
+                                <property name="active-id">0</property>
+                                <items>
+                                  <item id="0" translatable="yes">Ctrl</item>
+                                  <item id="1" translatable="yes">Alt</item>
+                                  <item id="2" translatable="yes">RMB</item>
+                                </items>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Vertical Edge Preview Trigger Area</property>
+                            <property name="suffix">
+                              <object class="GtkSpinButton" id="vertical_preview_area">
+                                <property name="text">750</property>
+                                <property name="adjustment">vertical-preview-area-adjustment</property>
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
                                 <property name="hexpand">True</property>
-                                <property name="spacing">12</property>
-                                <child>
-                                  <object class="GtkCheckButton" id="fixed-layout-checkbutton">
-                                    <property name="can-focus">True</property>
-                                    <property name="receives-default">False</property>
-                                    <property name="halign">start</property>
-                                    <property name="active">false</property>
-                                    <property name="group">edge-tiling-checkbutton</property>
-                                    <style>
-                                      <class name="linked"/>
-                                    </style>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <child>
-                                      <object class="GtkLabel" id="fixed-layout-checkbutton-label">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">Fixed Layout</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;The tile preview will stick to your 'favorite' layout from the 'Layouts' page&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Horizontal Edge Preview Trigger Area</property>
+                            <property name="suffix">
+                              <object class="GtkSpinButton" id="horizontal_preview_area">
+                                <property name="text">750</property>
+                                <property name="adjustment">horizontal-preview-area-adjustment</property>
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">'Split Tiles' Activator</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkComboBoxText" id="move-split-tiles-mod">
-                                    <property name="has-frame">0</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">1</property>
-                                    <property name="active-id">0</property>
-                                    <items>
-                                      <item id="0" translatable="yes">Ctrl</item>
-                                      <item id="1" translatable="yes">Alt</item>
-                                      <item id="2" translatable="yes">RMB</item>
-                                    </items>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Inverse Top Screen Edge Action Timer</property>
+                            <property name="suffix">
+                              <object class="GtkSpinButton" id="toggle_maximize_tophalf_timer">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">'Fixed Layout' Activator</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkComboBoxText" id="move-fixed-layout-mod">
-                                    <property name="has-frame">0</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">1</property>
-                                    <property name="active-id">0</property>
-                                    <items>
-                                      <item id="0" translatable="yes">Ctrl</item>
-                                      <item id="1" translatable="yes">Alt</item>
-                                      <item id="2" translatable="yes">RMB</item>
-                                    </items>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="adjustment">toggle-maximize-tophalf-timer-adjustment</property>
+                                <property name="snap-to-ticks">1</property>
+                                <property name="update-policy">if-valid</property>
+                                <property name="value">750</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_hold_maximize_inverse_landscape">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Vertical Edge Preview Trigger Area</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="vertical-preview-area">
-                                    <property name="text">750</property>
-                                    <property name="adjustment">vertical-preview-area-adjustment</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="enable_hold_maximize_inverse_portrait">
                                 <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Horizontal Edge Preview Trigger Area</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="horizontal-preview-area">
-                                    <property name="text">750</property>
-                                    <property name="adjustment">horizontal-preview-area-adjustment</property>
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Inverse Top Screen Edge Action Timer</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSpinButton" id="toggle-maximize-tophalf-timer">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="adjustment">toggle-maximize-tophalf-timer-adjustment</property>
-                                    <property name="snap-to-ticks">1</property>
-                                    <property name="update-policy">if-valid</property>
-                                    <property name="value">750</property>
-                                  </object>
-                                </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Restore Window Size on</property>
+                            <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;.</property>
+                            <property name="suffix">
+                              <object class="GtkComboBoxText" id="restore_window_size_on">
+                                <property name="has-frame">0</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">1</property>
+                                <property name="valign">center</property>
+                                <property name="active-id">0</property>
+                                <items>
+                                  <item id="0" translatable="yes">Grab Start</item>
+                                  <item id="1" translatable="yes">Grab End</item>
+                                </items>
                               </object>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-hold-maximize-inverse-landscape">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkSwitch" id="enable-hold-maximize-inverse-portrait">
-                                    <property name="can-focus">True</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">True</property>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkBox">
-                                    <property name="can-focus">True</property>
-                                    <property name="orientation">vertical</property>
-                                    <property name="halign">start</property>
-                                    <property name="hexpand">True</property>
-                                    <property name="spacing">6</property>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="can-focus">True</property>
-                                        <property name="halign">start</property>
-                                        <property name="label" translatable="yes">Restore Window Size on</property>
-                                      </object>
-                                    </child>
-                                    <child>
-                                      <object class="GtkLabel">
-                                        <property name="margin-end">36</property>
-                                        <property name="can-focus">True</property>
-                                        <property name="xalign">0</property>
-                                        <property name="halign">start</property>
-                                        <property name="hexpand">True</property>
-                                        <property name="label" translatable="yes">&lt;small&gt;Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;.&lt;/small&gt;</property>
-                                        <property name="use-markup">True</property>
-                                        <property name="wrap">True</property>
-                                        <property name="wrap-mode">word-char</property>
-                                        <style>
-                                          <class name="dim-label"/>
-                                        </style>
-                                      </object>
-                                    </child>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkComboBoxText" id="restore-window-size-on">
-                                    <property name="has-frame">0</property>
-                                    <property name="halign">end</property>
-                                    <property name="hexpand">1</property>
-                                    <property name="valign">center</property>
-                                    <property name="active-id">0</property>
-                                    <items>
-                                      <item id="0" translatable="yes">Grab Start</item>
-                                      <item id="1" translatable="yes">Grab End</item>
-                                    </items>
-                                  </object>
-                                </child>
-                              </object>
-                            </child>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -1740,7 +966,8 @@
                       </object>
                     </child>
                     <child>
-                      <object class="GtkListBox" id="listBox11">
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
                         <property name="can-focus">True</property>
                         <property name="selection-mode">none</property>
@@ -1748,47 +975,19 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Show Tiled Rects</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="debugging-show-tiled-rects"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Show Tiled Rects</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="debugging_show_tiled_rects"/>
+                            </property>
                           </object>
                         </child>
                         <child>
-                          <object class="GtkListBoxRow">
-                            <child>
-                              <object class="GtkBox">
-                                <property name="can-focus">True</property>
-                                <property name="margin-start">12</property>
-                                <property name="margin-end">12</property>
-                                <property name="margin-top">12</property>
-                                <property name="margin-bottom">12</property>
-                                <child>
-                                  <object class="GtkLabel">
-                                    <property name="can-focus">True</property>
-                                    <property name="label" translatable="yes">Show Free Screen Rects</property>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="ShortcutWidget" id="debugging-free-rects"/>
-                                </child>
-                              </object>
-                            </child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Show Free Screen Rects</property>
+                            <property name="suffix">
+                              <object class="TilingShortcutListener" id="debugging_free_rects"/>
+                            </property>
                           </object>
                         </child>
                       </object>
@@ -1801,5 +1000,5 @@
         </property>
       </object>
     </child>
-  </object>
+  </template>
 </interface>

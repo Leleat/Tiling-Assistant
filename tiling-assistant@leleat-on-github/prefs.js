@@ -6,7 +6,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const LayoutPrefs = Me.imports.src.prefs.layoutsPrefs.Prefs;
-const { ShortcutWidget } = Me.imports.src.prefs.shortcutWidget;
+const { ListRow } = Me.imports.src.prefs.listRow;
+const { ShortcutListener } = Me.imports.src.prefs.shortcutListener;
 const { Settings, Shortcuts } = Me.imports.src.common;
 
 function init() {
@@ -27,8 +28,57 @@ function buildPrefsWidget() {
     return new PrefsWidget();
 }
 
-const PrefsWidget = GObject.registerClass(
-class TilingAssistantPrefs extends Gtk.Box {
+const PrefsWidget = GObject.registerClass({
+    GTypeName: 'TilingAssistantPrefs',
+    Template: Gio.File.new_for_path(`${Me.path}/src/ui/prefs.ui`).get_uri(),
+    InternalChildren: [
+        'title_bar',
+        'enable_tiling_popup',
+        'tiling_popup_all_workspace',
+        'enable_raise_tile_group',
+        'window_gap',
+        'maximize_with_gap',
+        'dynamic_keybinding_disabled_row',
+        'dynamic_keybinding_window_focus_row',
+        'dynamic_keybinding_tiling_state_row',
+        'dynamic_keybinding_tiling_state_windows_row',
+        'toggle_tiling_popup',
+        'tile_edit_mode',
+        'auto_tile',
+        'tile_maximize',
+        'tile_top_half',
+        'tile_bottom_half',
+        'tile_left_half',
+        'tile_right_half',
+        'tile_topleft_quarter',
+        'tile_topright_quarter',
+        'tile_bottomleft_quarter',
+        'tile_bottomright_quarter',
+        'search_popup_layout',
+        'change_favorite_layout',
+        'layouts_listbox',
+        'add_layout_button',
+        'save_layouts_button',
+        'reload_layouts_button',
+        'hidden_settings_page',
+        'enable_advanced_experimental_features',
+        'enable_tile_animations',
+        'enable_untile_animations',
+        'edge_tiling_row',
+        'splite_tiles_row',
+        'fixed_layout_row',
+        'move_split_tiles_mod',
+        'move_fixed_layout_mod',
+        'vertical_preview_area',
+        'horizontal_preview_area',
+        'toggle_maximize_tophalf_timer',
+        'enable_hold_maximize_inverse_landscape',
+        'enable_hold_maximize_inverse_portrait',
+        'restore_window_size_on',
+        'debugging_show_tiled_rects',
+        'debugging_free_rects'
+    ]
+}, class TilingAssistantPrefs extends Gtk.Stack {
     _init(params) {
         super._init(params);
 
@@ -38,13 +88,7 @@ class TilingAssistantPrefs extends Gtk.Box {
         this._settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
         this.connect('destroy', () => this._settings.run_dispose());
 
-        this._builder = new Gtk.Builder();
-        const filePath = GLib.build_filenamev([Me.path, 'src/ui/prefs.ui']);
-        this._builder.add_from_file(filePath);
-
-        const mainPrefs = this._builder.get_object('main-prefs');
-        this.append(mainPrefs);
-
+        // Bind settings to GUI
         this._bindSwitches();
         this._bindSpinbuttons();
         this._bindComboBoxes();
@@ -53,12 +97,12 @@ class TilingAssistantPrefs extends Gtk.Box {
 
         // LayoutPrefs manages everything related to layouts on the
         // prefs side (including the keyboard shortcuts)
-        this._layoutsPrefs = new LayoutPrefs(this._builder, this._settings);
+        this._layoutsPrefs = new LayoutPrefs(this);
 
         // Setup titlebar and size
-        mainPrefs.connect('realize', () => {
-            const prefsDialog = mainPrefs.get_root();
-            prefsDialog.set_titlebar(this._builder.get_object('titlebar'));
+        this.connect('realize', () => {
+            const prefsDialog = this.get_root();
+            prefsDialog.set_titlebar(this._title_bar);
             prefsDialog.add_css_class('tiling-assistant');
             prefsDialog.set_default_size(600, 750);
 
@@ -86,44 +130,14 @@ class TilingAssistantPrefs extends Gtk.Box {
             hiddenSettingsAction.connect('activate', this._openHiddenSettings.bind(this));
             actionGroup.add_action(hiddenSettingsAction);
         });
-
-        // Allow the activation of the 'main widget' by clicking a ListBoxRow
-        // TODO: port prefs to a Template class as well and get rid of this
-        for (let i = 0; i < 20; i++) {
-            this._builder.get_object(`listBox${i}`)?.connect('row-activated',
-                this._onListBoxRowActivated.bind(this));
-        }
     }
 
     /**
-     * Activate the 'main widget' of the row. The row should always have a
-     * Gtk.Box as a child. The Gtk.Box should contain the 'main widget'.
-     *
      * @param {Gtk.ListBox} listBox
-     * @param {Gtk.ListBoxRow} row
+     * @param {TilingListRow} row
      */
-    _onListBoxRowActivated(listBox, row) {
-        const gtkBox = row.get_first_child();
-
-        for (let child = gtkBox.get_first_child(); !!child; child = child.get_next_sibling()) {
-            if (child instanceof Gtk.Switch) {
-                child.activate();
-                break;
-            } else if (child instanceof Gtk.CheckButton) {
-                child.activate();
-                break;
-            } else if (child instanceof Gtk.SpinButton) {
-                // Just grab focus since the action to take is ambiguous.
-                child.grab_focus();
-                break;
-            } else if (child instanceof ShortcutWidget) {
-                child.activate();
-                break;
-            } else if (child instanceof Gtk.ComboBox) {
-                child.popup_shown ? child.popdown() : child.popup();
-                break;
-            }
-        }
+    _onListRowActivated(listBox, row) {
+        row.activate();
     }
 
     _openBugReport(prefsDialog) {
@@ -155,7 +169,7 @@ class TilingAssistantPrefs extends Gtk.Box {
     }
 
     _openHiddenSettings() {
-        const hiddenSettings = this._builder.get_object('hidden-settings-page');
+        const hiddenSettings = this._hidden_settings_page;
         hiddenSettings.set_visible(!hiddenSettings.get_visible());
     }
 
@@ -173,7 +187,7 @@ class TilingAssistantPrefs extends Gtk.Box {
         ];
 
         switches.forEach(key => {
-            const widget = this._builder.get_object(key);
+            const widget = this[`_${key.replaceAll('-', '_')}`];
             this._settings.bind(key, widget, 'active', Gio.SettingsBindFlags.DEFAULT);
         });
     }
@@ -187,7 +201,7 @@ class TilingAssistantPrefs extends Gtk.Box {
         ];
 
         spinButtons.forEach(key => {
-            const widget = this._builder.get_object(key);
+            const widget = this[`_${key.replaceAll('-', '_')}`];
             this._settings.bind(key, widget, 'value', Gio.SettingsBindFlags.DEFAULT);
         });
     }
@@ -200,7 +214,7 @@ class TilingAssistantPrefs extends Gtk.Box {
         ];
 
         comboBoxes.forEach(key => {
-            const widget = this._builder.get_object(key);
+            const widget = this[`_${key.replaceAll('-', '_')}`];
             widget.connect('changed', () =>
                 this._settings.set_enum(key, widget.get_active()));
 
@@ -209,42 +223,43 @@ class TilingAssistantPrefs extends Gtk.Box {
     }
 
     _bindRadioButtons() {
-        // These 'radioButtons' are basically just used as a ComboBox with more
-        // text. The key is a gsetting (a string) saving the current 'selection',
-        // the buttons are the ids of the Gtk.CheckButtons. The button's labels
-        // will be used as the options.
+        // These 'radioButtons' are basically just used as a ComboBox with info
+        // text. The key is a gsetting (a string) saving the current 'selection'.
+        // The listRows' titles will be used for the options.
         const radioButtons = [
             {
                 key: Settings.DYNAMIC_KEYBINDINGS,
-                buttonNames: [
-                    'dynamic-keybinding-button-disabled',
-                    'dynamic-keybinding-button-focus',
-                    'dynamic-keybinding-button-tiling-state',
-                    'dynamic-keybinding-button-tiling-state-windows'
+                rowNames: [
+                    'dynamic_keybinding_disabled_row',
+                    'dynamic_keybinding_window_focus_row',
+                    'dynamic_keybinding_tiling_state_row',
+                    'dynamic_keybinding_tiling_state_windows_row'
                 ]
             },
             {
                 key: Settings.DEFAULT_MOVE_MODE,
-                buttonNames: [
-                    'edge-tiling-checkbutton',
-                    'split-tiles-checkbutton',
-                    'fixed-layout-checkbutton'
+                rowNames: [
+                    'edge_tiling_row',
+                    'splite_tiles_row',
+                    'fixed_layout_row'
                 ]
             }
         ];
 
-        radioButtons.forEach(({ key, buttonNames }) => {
+        radioButtons.forEach(({ key, rowNames }) => {
             const currActive = this._settings.get_string(key);
 
-            buttonNames.forEach(buttonName => {
-                const button = this._builder.get_object(buttonName);
-                const label = this._builder.get_object(`${buttonName}-label`).get_label();
-                button.connect('toggled', () => {
-                    this._settings.set_string(key, label);
+            rowNames.forEach(name => {
+                const row = this[`_${name}`];
+                const checkButton = row.prefix;
+                const title = row.title;
+                checkButton.connect('toggled', () => {
+                    this._settings.set_string(key, title);
                 });
 
-                if (label === currActive)
-                    button.activate();
+                // Set initial state
+                if (title === currActive)
+                    checkButton.activate();
             });
         });
     }
@@ -252,8 +267,8 @@ class TilingAssistantPrefs extends Gtk.Box {
     _bindKeybindings() {
         const shortcuts = Shortcuts.getAllKeys();
         shortcuts.forEach(key => {
-            const shortcutWidget = this._builder.get_object(key);
-            shortcutWidget.initialize(key, this._settings);
+            const shortcut = this[`_${key.replaceAll('-', '_')}`];
+            shortcut.initialize(key, this._settings);
         });
     }
 });

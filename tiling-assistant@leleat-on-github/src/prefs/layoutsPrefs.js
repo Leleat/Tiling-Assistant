@@ -40,22 +40,19 @@ const Util = Me.imports.src.prefs.utility.Util;
 
 var Prefs = class TilingLayoutsPrefs {
     /**
-     * @param {Gtk.Builder} builder the Gtk.Builder from the main prefs file.
-     * @param {Gio.Settings} settings the Gio.Settings object from the main prefs file.
+     * @param {TilingAssistantPrefs} mainPrefs
      */
-    constructor(builder, settings) {
+    constructor(mainPrefs) {
         // Keep a reference to the settings for the shortcuts
-        // and the builder to get the objects from the ui file
-        this._builder = builder;
-        this._settings = settings;
+        this._settings = mainPrefs._settings;
 
         // The Gtk.ListBox, which LayoutRows are added to
-        this._layoutsListBox = this._builder.get_object('layouts-listbox');
+        this._layoutsListBox = mainPrefs._layouts_listbox;
         this._layoutsListBox.connect('row-activated', (listBox, row) => row.toggleReveal());
 
         // Unique button to save changes made to all layouts to the disk. For
         // simplicity, reload from file after saving to get rid of invalid input.
-        this._saveLayoutsButton = this._builder.get_object('save-layouts-button');
+        this._saveLayoutsButton = mainPrefs._save_layouts_button;
         this._saveLayoutsButton.connect('clicked', () => {
             this._saveLayouts();
             this._loadLayouts();
@@ -63,13 +60,13 @@ var Prefs = class TilingLayoutsPrefs {
 
         // Unique button to load layouts from the disk
         // (discarding all tmp changes) without any user prompt
-        this._reloadLayoutsButton = this._builder.get_object('reload-layouts-button');
+        this._reloadLayoutsButton = mainPrefs._reload_layouts_button;
         this._reloadLayoutsButton.connect('clicked', () => {
             this._loadLayouts();
         });
 
         // Unique button to add a new *tmp* LayoutRow
-        this._addLayoutButton = this._builder.get_object('add-layout-button');
+        this._addLayoutButton = mainPrefs._add_layout_button;
         this._addLayoutButton.connect('clicked', () => {
             const row = this._createLayoutRow(LayoutRow.getInstanceCount());
             row.toggleReveal();
@@ -77,8 +74,8 @@ var Prefs = class TilingLayoutsPrefs {
 
         // Bind the general layouts keyboard shortcuts.
         ['search-popup-layout', 'change-favorite-layout'].forEach(key => {
-            const shortcutWidget = this._builder.get_object(key);
-            shortcutWidget.initialize(key, this._settings);
+            const shortcut = mainPrefs[`_${key.replaceAll('-', '_')}`];
+            shortcut.initialize(key, this._settings);
         });
 
         // Update the 'favorite' icons, if the setting changes.

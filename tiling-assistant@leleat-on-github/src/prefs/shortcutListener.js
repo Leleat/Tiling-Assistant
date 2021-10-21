@@ -19,9 +19,9 @@ const Me = ExtensionUtils.getCurrentExtension();
  * https://gitlab.com/rmnvgr/nightthemeswitcher-gnome-shell-extension/-/blob/main/src/utils.js
  */
 
-var ShortcutWidget = GObject.registerClass({
-    GTypeName: 'ShortcutWidget',
-    Template: Gio.File.new_for_path(`${Me.path}/src/ui/shortcutWidget.ui`).get_uri(),
+var ShortcutListener = GObject.registerClass({
+    GTypeName: 'TilingShortcutListener',
+    Template: Gio.File.new_for_path(`${Me.path}/src/ui/shortcutListener.ui`).get_uri(),
     InternalChildren: ['button', 'clearButton', 'eventKeyController'],
     Properties: {
         keybinding: GObject.ParamSpec.string(
@@ -32,7 +32,7 @@ var ShortcutWidget = GObject.registerClass({
             null
         )
     }
-}, class ShortcutWidget extends Gtk.Box {
+}, class TilingShortcutListener extends Gtk.Box {
     initialize(key, setting) {
         this._key = key;
         this._setting = setting;
