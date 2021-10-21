@@ -1,6 +1,6 @@
 'use strict';
 
-const { Gio, Gtk, GObject } = imports.gi;
+const { Gdk, Gio, GLib, Gtk, GObject } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -14,6 +14,16 @@ function init() {
 }
 
 function buildPrefsWidget() {
+    // Load css file
+    const provider = new Gtk.CssProvider();
+    const path = GLib.build_filenamev([Me.path, 'src/stylesheet/prefs.css']);
+    provider.load_from_path(path);
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(),
+        provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+
     return new PrefsWidget();
 }
 
@@ -29,7 +39,8 @@ class TilingAssistantPrefs extends Gtk.Box {
         this.connect('destroy', () => this._settings.run_dispose());
 
         this._builder = new Gtk.Builder();
-        this._builder.add_from_file(`${Me.path}/src/ui/prefs.ui`);
+        const filePath = GLib.build_filenamev([Me.path, 'src/ui/prefs.ui']);
+        this._builder.add_from_file(filePath);
 
         const mainPrefs = this._builder.get_object('main-prefs');
         this.append(mainPrefs);
@@ -46,11 +57,9 @@ class TilingAssistantPrefs extends Gtk.Box {
 
         // Setup titlebar and size
         mainPrefs.connect('realize', () => {
-            // Titlebar
             const prefsDialog = mainPrefs.get_root();
             prefsDialog.set_titlebar(this._builder.get_object('titlebar'));
-
-            // Window size
+            prefsDialog.add_css_class('tiling-assistant');
             prefsDialog.set_default_size(600, 750);
 
             // Info-popup-menu actions

@@ -1,0 +1,17 @@
+window.tiling-assistant list.frame {
+	border-radius: 12px;
+}
+
+window.tiling-assistant list.frame row:last-child {
+	border-bottom: none;
+}
+
+window.tiling-assistant combobox button.combo {
+	background: none;
+	border: none;
+	box-shadow: none;
+}
+
+window.tiling-assistant combobox button.combo arrow {
+	padding-left: 6px;
+}
