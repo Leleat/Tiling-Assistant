@@ -26,6 +26,10 @@
         <attribute name="label" translatable="yes">License</attribute>
         <attribute name="action">prefs.open-license</attribute>
       </item>
+      <item>
+        <attribute name="label" translatable="yes">Advanced...</attribute>
+        <attribute name="action">prefs.open-hidden-settings</attribute>
+      </item>
     </section>
   </menu>
 
@@ -40,11 +44,6 @@
         <property name="receives-default">True</property>
         <property name="menu-model">info-menu</property>
         <property name="icon-name">dialog-information-symbolic</property>
-      </object>
-    </child>
-    <child type="end">
-      <object class="GtkButton" id="hidden-settings-button">
-        <property name="has-frame">0</property>
       </object>
     </child>
   </object>
@@ -1157,22 +1156,6 @@
                     <property name="margin-bottom">36</property>
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="can-focus">True</property>
-                        <property name="halign">start</property>
-                        <property name="margin-bottom">24</property>
-                        <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">Hidden Settings</property>
-                        <attributes>
-                          <attribute name="weight" value="bold"/>
-                          <attribute name="underline" value="True"/>
-                        </attributes>
-                        <style>
-                          <class name="dim-label"/>
-                        </style>
-                      </object>
-                    </child>
                     <child>
                       <object class="GtkListBox" id="listBox7">
                         <property name="show-separators">True</property>

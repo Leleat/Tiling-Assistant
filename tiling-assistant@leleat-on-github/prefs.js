@@ -73,12 +73,9 @@ class TilingAssistantPrefs extends Gtk.Box {
             licenseAction.connect('activate', this._openLicense.bind(this, prefsDialog));
             actionGroup.add_action(licenseAction);
 
-            // Hidden settings
-            const hiddenSettingsButton = this._builder.get_object('hidden-settings-button');
-            hiddenSettingsButton.connect('clicked', () => {
-                const hiddenSettings = this._builder.get_object('hidden-settings-page');
-                hiddenSettings.set_visible(!hiddenSettings.get_visible());
-            });
+            const hiddenSettingsAction = new Gio.SimpleAction({ name: 'open-hidden-settings' });
+            hiddenSettingsAction.connect('activate', this._openHiddenSettings.bind(this));
+            actionGroup.add_action(hiddenSettingsAction);
         });
 
         // Allow the activation of the 'main widget' by clicking a ListBoxRow
@@ -146,6 +143,11 @@ class TilingAssistantPrefs extends Gtk.Box {
             'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE',
             prefsDialog.get_display().get_app_launch_context()
         );
+    }
+
+    _openHiddenSettings() {
+        const hiddenSettings = this._builder.get_object('hidden-settings-page');
+        hiddenSettings.set_visible(!hiddenSettings.get_visible());
     }
 
     _bindSwitches() {

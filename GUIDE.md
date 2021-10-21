@@ -86,6 +86,4 @@ The `Fixed Layout` is one single layout marked by the 'favorite button' from the
 
 ### Hidden Settings
 
-This is a 'hidden settings' page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking an invisible (icon-less) button in the titlebar.
-
-![](media/Guide_HiddenSettings.png)
+This is a 'hidden settings' page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking the 'Advanced...' menu item, which appears when clicking the titlebar button.
