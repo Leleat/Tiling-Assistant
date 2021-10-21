@@ -63,32 +63,25 @@ var Manager = class TileGroupManager {
                         // automatically call dissolveTileGroup() with the signal
                         // but in case I missed / don't know about other cases where
                         // w may be nullish, dissolve the tileGroups anyway.
-                        if (!w) {
+                        if (!w || !this._groupRaiseIds.has(wId)) {
                             this.dissolveTileGroup(wId);
                             return;
                         }
 
-                        // Disconnect the raise signal, so we don't end up
-                        // in an infinite loop of windows raising each other.
-                        if (this._groupRaiseIds.has(wId)) {
-                            w.disconnect(this._groupRaiseIds.get(wId));
-                            this._groupRaiseIds.delete(wId);
-                        }
-
+                        // Prevent an infinite loop of windows raising each other
+                        w.block_signal_handler(this._groupRaiseIds.get(wId));
                         w.raise();
+                        w.unblock_signal_handler(this._groupRaiseIds.get(wId));
                     });
 
                     // Re-raise the just raised window so it may not be below
                     // other tiled window otherwise when untiling via keyboard
                     // it may be below other tiled windows.
+                    const signalId = this._groupRaiseIds.get(raisedWindowId);
+                    raisedWindow.block_signal_handler(signalId);
                     raisedWindow.raise();
+                    raisedWindow.unblock_signal_handler(signalId);
                 }
-
-                // Re-establish the tileGroups after having disconnected
-                // the raise signals before.
-                const raisedTileGroup = this._tileGroups.get(raisedWindowId);
-                this.updateTileGroup(this._getAllWindows()
-                    .filter(w => raisedTileGroup.includes(w.get_id())));
             }));
 
             if (this._unmanagedIds.has(windowId))
