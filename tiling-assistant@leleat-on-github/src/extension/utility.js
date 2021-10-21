@@ -128,7 +128,7 @@ var Util = class Utility {
     }
 
     /**
-     * @param {boolean} [currentWorkspace=true] determines wether we only want
+     * @param {boolean} [allWorkspaces=false] determines wether we only want
      *      the windows from the current workspace.
      * @returns {Meta.Windows[]} an array of of the open Meta.Windows in
      *      stacking order.
@@ -136,9 +136,20 @@ var Util = class Utility {
     static getWindows(allWorkspaces = false) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const openWindows = AltTab.getWindows(allWorkspaces ? null : activeWs);
-        const orderedOpenWindows = global.display.sort_windows_by_stacking(openWindows);
-        return orderedOpenWindows.reverse().filter(w => {
-            return w.allows_move() && w.allows_resize() || this.isMaximized(w);
+        // The open windows are not sorted properly when tiling with the Tiling
+        // Popup because altTab sorts by focus.
+        const sorted = global.display.sort_windows_by_stacking(openWindows);
+        return sorted.reverse().filter(w => {
+            // I don't think this should normally happen but if it does, this
+            // extension can crash GNOME Shell.. so guard against it. A way to
+            // have a window's monitor be -1, for example, is explained here:
+            // https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/4713
+            if (w.get_monitor() === -1)
+                return false;
+
+            // Assumption: a maximized window can also resize (once unmaximized)
+            const canResize = w.allows_move() && w.allows_resize() || this.isMaximized(w);
+            return canResize;
         });
     }
 
