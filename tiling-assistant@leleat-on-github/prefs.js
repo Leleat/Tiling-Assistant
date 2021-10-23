@@ -42,6 +42,7 @@ const PrefsWidget = GObject.registerClass({
         'dynamic_keybinding_window_focus_row',
         'dynamic_keybinding_tiling_state_row',
         'dynamic_keybinding_tiling_state_windows_row',
+        'dynamic_keybinding_fixed_layout_row',
         'toggle_tiling_popup',
         'tile_edit_mode',
         'auto_tile',
@@ -233,7 +234,8 @@ const PrefsWidget = GObject.registerClass({
                     'dynamic_keybinding_disabled_row',
                     'dynamic_keybinding_window_focus_row',
                     'dynamic_keybinding_tiling_state_row',
-                    'dynamic_keybinding_tiling_state_windows_row'
+                    'dynamic_keybinding_tiling_state_windows_row',
+                    'dynamic_keybinding_fixed_layout_row'
                 ]
             },
             {

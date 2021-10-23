@@ -80,12 +80,6 @@ var Handler = class TilingMoveHandler {
         // Don't bother with rounded corners since we have more than 2 previews
         this._tilePreview.style_class = 'tile-preview';
         this._tilePreview._updateStyle = () => {};
-
-        // Prepare the 'Fixed (favorite) Layout' rects as an alternative mode
-        // to 'Edge Tiling' and 'Split Tiles'.
-        this._fixedLayout = [];
-        Settings.changed(Settings.FAVORITE_LAYOUT, this._updateFixedLayout.bind(this));
-        this._updateFixedLayout();
     }
 
     destroy() {
@@ -176,6 +170,7 @@ var Handler = class TilingMoveHandler {
             this._isGrabOp = true;
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
+            this._fixedLayout = Util.getFixedLayout();
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -221,6 +216,7 @@ var Handler = class TilingMoveHandler {
         }));
         Util.tile(window, this._tileRect);
 
+        this._fixedLayout = [];
         this._splitRects.clear();
         this._tilePreview.close();
         this._tileRect = null;
@@ -656,36 +652,5 @@ var Handler = class TilingMoveHandler {
 
         this._tileRect = null;
         this._tilePreview.close();
-    }
-
-    _updateFixedLayout() {
-        this._fixedLayout = [];
-        const layouts = Util.getLayouts();
-        const layout = layouts?.[Settings.getInt(Settings.FAVORITE_LAYOUT)];
-
-        if (!layout)
-            return;
-
-        const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
-
-        // Scale the rect's ratios to the workArea. Try to align the rects to
-        // each other and the workArea to workaround possible rounding errors
-        // due to the scaling.
-        layout._items.forEach(({ rect: rectRatios }, idx) => {
-            const rect = new Rect(
-                workArea.x + Math.floor(rectRatios.x * workArea.width),
-                workArea.y + Math.floor(rectRatios.y * workArea.height),
-                Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
-            );
-            this._fixedLayout.push(rect);
-
-            for (let i = 0; i < idx; i++)
-                rect.tryAlignWith(this._fixedLayout[i]);
-        });
-
-        this._fixedLayout.forEach(rect => rect.tryAlignWith(workArea));
     }
 };

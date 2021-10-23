@@ -3,7 +3,7 @@
 ## v27
 **Added**
 - 'Fixed Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)
-    - It allows people to dnd a window to a predefined layout (Check out the GUIDE.md for details)
+    - It allows people to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
 
 **Changed**
 - reworked the preference window to follow GNOME's HIG a bit more closely
@@ -11,6 +11,9 @@
 - moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Setting`
 - moved the 'Include apps from all workspaces' for the Tiling Popup to the general settings
 - and some other minor settings tweaks
+
+**Removed**
+- the color selection for the Tile Editing Mode because now we can always follow the system's native Tile-Preview style
 
 
 ## v26

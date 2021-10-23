@@ -188,6 +188,7 @@ var DynamicKeybindings = class DynamicKeybindingBehaviour {
     static FOCUS = 'Window Focus';
     static TILING_STATE = 'Tiling State';
     static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
+    static FIXED_LAYOUT = 'Fixed Layout';
 };
 
 var MoveModeMods = class MovePreviewActivator {

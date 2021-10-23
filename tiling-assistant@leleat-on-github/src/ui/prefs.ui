@@ -333,6 +333,28 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingListRow" id="dynamic_keybinding_fixed_layout_row">
+                            <property name="title" translatable="yes">Fixed Layout</property>
+                            <property name="subtitle" translatable="yes">Move the window across the 'Fixed Layout'</property>
+                            <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
+                            <property name="prefix">
+                              <object class="GtkCheckButton">
+                                <property name="can-focus">True</property>
+                                <property name="receives-default">False</property>
+                                <property name="halign">start</property>
+                                <property name="active">false</property>
+                                <property name="group">dynamic_keybinding_button_disabled</property>
+                                <style>
+                                  <class name="linked"/>
+                                </style>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                   </object>

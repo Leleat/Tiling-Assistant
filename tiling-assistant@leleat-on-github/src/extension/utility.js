@@ -770,6 +770,9 @@ var Util = class Utility {
         app.open_new_window(-1);
     }
 
+    /**
+     * @returns {Layout[]} the layouts
+     */
     static getLayouts() {
         const userDir = GLib.get_user_config_dir();
         const pathArr = [userDir, '/tiling-assistant/layouts.json'];
@@ -783,6 +786,41 @@ var Util = class Utility {
             return [];
 
         return JSON.parse(ByteArray.toString(contents));
+    }
+
+    /**
+     * @returns {Rect[]} the rects of the 'Fixed layout'
+     */
+    static getFixedLayout() {
+        const fixedLayout = [];
+        const layouts = this.getLayouts();
+        const layout = layouts?.[Settings.getInt(Settings.FAVORITE_LAYOUT)];
+
+        if (!layout)
+            return [];
+
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const monitor = global.display.get_current_monitor();
+        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+
+        // Scale the rect's ratios to the workArea. Try to align the rects to
+        // each other and the workArea to workaround possible rounding errors
+        // due to the scaling.
+        layout._items.forEach(({ rect: rectRatios }, idx) => {
+            const rect = new Rect(
+                workArea.x + Math.floor(rectRatios.x * workArea.width),
+                workArea.y + Math.floor(rectRatios.y * workArea.height),
+                Math.ceil(rectRatios.width * workArea.width),
+                Math.ceil(rectRatios.height * workArea.height)
+            );
+            fixedLayout.push(rect);
+
+            for (let i = 0; i < idx; i++)
+                rect.tryAlignWith(fixedLayout[i]);
+        });
+
+        fixedLayout.forEach(rect => rect.tryAlignWith(workArea));
+        return fixedLayout;
     }
 
     /**

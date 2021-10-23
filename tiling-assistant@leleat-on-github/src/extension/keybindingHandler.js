@@ -106,6 +106,9 @@ var Handler = class TilingKeybindingHandler {
                 case DynamicKeybindings.TILING_STATE_WINDOWS:
                     this._dynamicTilingState(window, shortcutName, isWindowsStyle);
                     break;
+                case DynamicKeybindings.FIXED_LAYOUT:
+                    this._dynamicFixedLayout(window, shortcutName);
+                    break;
                 default:
                     Util.toggleTiling(window, rect);
             }
@@ -392,5 +395,55 @@ var Handler = class TilingKeybindingHandler {
         }
 
         Util.toggleTiling(window, Util.getTileFor(shortcutName, workArea));
+    }
+
+    _dynamicFixedLayout(window, shortcutName) {
+        const workArea = new Rect(window.get_work_area_current_monitor());
+        const toggleTiling = () => {
+            const rect = Util.getTileFor(shortcutName, workArea);
+            Util.toggleTiling(window, rect);
+        };
+
+        if (!window.isTiled) {
+            toggleTiling();
+            return;
+        }
+
+        const fixedLayout = Util.getFixedLayout();
+        if (!fixedLayout.length) {
+            toggleTiling();
+            return;
+        }
+
+        const currRect = fixedLayout.find(r => r.equal(window.tiledRect));
+        if (!currRect) {
+            toggleTiling();
+            return;
+        }
+
+        let direction;
+        switch (shortcutName) {
+            case Shortcuts.TOP:
+            case Shortcuts.MAXIMIZE:
+                direction = Direction.N;
+                break;
+            case Shortcuts.BOTTOM:
+                direction = Direction.S;
+                break;
+            case Shortcuts.LEFT:
+                direction = Direction.W;
+                break;
+            case Shortcuts.RIGHT:
+                direction = Direction.E;
+        }
+
+        if (direction) {
+            const neighbor = currRect.getNeighbor(direction, fixedLayout, false);
+            neighbor
+                ? Util.tile(window, neighbor, { openTilingPopup: false })
+                : Util.untile(window);
+        } else {
+            toggleTiling();
+        }
     }
 };
