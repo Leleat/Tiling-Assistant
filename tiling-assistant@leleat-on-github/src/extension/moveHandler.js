@@ -170,7 +170,7 @@ var Handler = class TilingMoveHandler {
             this._isGrabOp = true;
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
-            this._fixedLayout = Util.getFixedLayout();
+            this._favoriteLayout = Util.getFavoriteLayout();
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -216,7 +216,7 @@ var Handler = class TilingMoveHandler {
         }));
         Util.tile(window, this._tileRect);
 
-        this._fixedLayout = [];
+        this._favoriteLayout = [];
         this._splitRects.clear();
         this._tilePreview.close();
         this._tileRect = null;
@@ -247,20 +247,20 @@ var Handler = class TilingMoveHandler {
 
         const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
         const splitActivator = Settings.getString(Settings.SPLIT_TILE_MOD);
-        const fixedActivator = Settings.getString(Settings.FIXED_LAYOUT_MOD);
+        const favActivator = Settings.getString(Settings.FAVORITE_LAYOUT_MOD);
 
         if (pressed[splitActivator]) {
             defaultMode === MoveModes.SPLIT_TILES
                 ? this._edgeTilingPreview(window, grabOp)
                 : this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
-        } else if (pressed[fixedActivator]) {
-            defaultMode === MoveModes.FIXED_LAYOUT
+        } else if (pressed[favActivator]) {
+            defaultMode === MoveModes.FAVORITE_LAYOUT
                 ? this._edgeTilingPreview(window, grabOp)
-                : this._fixedLayoutTilingPreview(window);
+                : this._favoriteLayoutTilingPreview(window);
         } else if (defaultMode === MoveModes.SPLIT_TILES) {
             this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
-        } else if (defaultMode === MoveModes.FIXED_LAYOUT) {
-            this._fixedLayoutTilingPreview(window);
+        } else if (defaultMode === MoveModes.FAVORITE_LAYOUT) {
+            this._favoriteLayoutTilingPreview(window);
         } else {
             this._edgeTilingPreview(window, grabOp);
         }
@@ -641,8 +641,8 @@ var Handler = class TilingMoveHandler {
         });
     }
 
-    _fixedLayoutTilingPreview(window) {
-        for (const rect of this._fixedLayout) {
+    _favoriteLayoutTilingPreview(window) {
+        for (const rect of this._favoriteLayout) {
             if (rect.containsPoint(this._lastPointerPos)) {
                 this._tileRect = rect.copy();
                 this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);

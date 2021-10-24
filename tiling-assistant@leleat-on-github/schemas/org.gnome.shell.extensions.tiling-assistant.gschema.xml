@@ -167,7 +167,7 @@
 		<key name="move-split-tiles-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
 			<default>"Ctrl"</default>
 		</key>
-		<key name="move-fixed-layout-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
+		<key name="move-favorite-layout-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
 			<default>"Alt"</default>
 		</key>
 		<key name="vertical-preview-area" type="i">

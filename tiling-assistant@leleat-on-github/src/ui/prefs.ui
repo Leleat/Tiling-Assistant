@@ -334,9 +334,9 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingListRow" id="dynamic_keybinding_fixed_layout_row">
-                            <property name="title" translatable="yes">Fixed Layout</property>
-                            <property name="subtitle" translatable="yes">Move the window across the 'Fixed Layout'</property>
+                          <object class="TilingListRow" id="dynamic_keybinding_favorite_layout_row">
+                            <property name="title" translatable="yes">Favorite Layout</property>
+                            <property name="subtitle" translatable="yes">Move the window across the predefined rectangles of your favorite Layout</property>
                             <property name="visible"
                                       bind-source="enable_advanced_experimental_features"
                                       bind-property="active"
@@ -834,8 +834,8 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingListRow" id="fixed_layout_row">
-                            <property name="title" translatable="yes">Fixed Layout</property>
+                          <object class="TilingListRow" id="favorite_layout_row">
+                            <property name="title" translatable="yes">Favorite Layout</property>
                             <property name="subtitle" translatable="yes">The tile preview will stick to your 'favorite' layout from the 'Layouts' page</property>
                             <property name="prefix">
                               <object class="GtkCheckButton">
@@ -871,9 +871,9 @@
                         </child>
                         <child>
                           <object class="TilingListRow">
-                            <property name="title" translatable="yes">'Fixed Layout' Activator</property>
+                            <property name="title" translatable="yes">'Favorite Layout' Activator</property>
                             <property name="suffix">
-                              <object class="GtkComboBoxText" id="move_fixed_layout_mod">
+                              <object class="GtkComboBoxText" id="move_favorite_layout_mod">
                                 <property name="has-frame">0</property>
                                 <property name="halign">end</property>
                                 <property name="hexpand">1</property>

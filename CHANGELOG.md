@@ -2,8 +2,9 @@
 
 ## v27
 **Added**
-- 'Fixed Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)
+- 'Favorite Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)
     - It allows people to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
+    - It also adapts the keyboard shortcuts to the layout
 
 **Changed**
 - reworked the preference window to follow GNOME's HIG a bit more closely

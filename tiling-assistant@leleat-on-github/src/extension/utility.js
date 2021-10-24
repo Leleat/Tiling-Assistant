@@ -393,10 +393,10 @@ var Util = class Utility {
     }
 
     /**
-     * Gets the rectangle for special positions (the screen halves and
-     * quarters) adapted to the surrounding rectangles. The position is
-     * determined by `shortcut` but this function isn't limited to just
-     * keyboard shortcuts. This is also used when dnd-ing a window.
+     * Gets the rectangle for special positions adapted to the surrounding
+     * rectangles. The position is determined by `shortcut` but this function
+     * isn't limited to just keyboard shortcuts. This is also used when
+     * dnd-ing a window.
      *
      * Examples: Shortcuts.LEFT gets the left-most rectangle with the height
      * of the workArea. Shortcuts.BOTTOM_LEFT gets the rectangle touching the
@@ -414,8 +414,10 @@ var Util = class Utility {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         const topTileGroup = this.getTopTileGroup(true, monitor);
-        const tRects = topTileGroup.map(w => w.tiledRect);
-        const screenRects = tRects.concat(workArea.minus(tRects));
+        const existingRects = topTileGroup.length > 1
+            ? topTileGroup.map(w => w.tiledRect)
+            : this.getFavoriteLayout();
+        const screenRects = existingRects.concat(workArea.minus(existingRects));
 
         switch (shortcut) {
             case Shortcuts.MAXIMIZE: {
@@ -789,10 +791,12 @@ var Util = class Utility {
     }
 
     /**
-     * @returns {Rect[]} the rects of the 'Fixed layout'
+     * @returns {Rect[]} the rects of the 'Favorite layout'
      */
-    static getFixedLayout() {
-        const fixedLayout = [];
+    static getFavoriteLayout() {
+        // I don't know when the layout may have changed on the disk(?),
+        // so always get it anew.
+        const favoriteLayout = [];
         const layouts = this.getLayouts();
         const layout = layouts?.[Settings.getInt(Settings.FAVORITE_LAYOUT)];
 
@@ -813,15 +817,16 @@ var Util = class Utility {
                 Math.ceil(rectRatios.width * workArea.width),
                 Math.ceil(rectRatios.height * workArea.height)
             );
-            fixedLayout.push(rect);
+            favoriteLayout.push(rect);
 
             for (let i = 0; i < idx; i++)
-                rect.tryAlignWith(fixedLayout[i]);
+                rect.tryAlignWith(favoriteLayout[i]);
         });
 
-        fixedLayout.forEach(rect => rect.tryAlignWith(workArea));
-        return fixedLayout;
+        favoriteLayout.forEach(rect => rect.tryAlignWith(workArea));
+        return favoriteLayout;
     }
+
 
     /**
      * Delegates to the TileGroupmanager. See tileGroupManager.js' function.

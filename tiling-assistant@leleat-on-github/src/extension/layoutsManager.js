@@ -30,8 +30,7 @@ const _ = Domain.gettext;
  * Additionally, there the user can select a 'favorite' layout among the
  * PopupLayouts. That layout will then be used as an fixed alternative mode to
  * the Edge Tiling. This class only handles setting the favorite layout with a
- * keyboard shortcut. The main code for the favorite / fixed layout is in
- * moveHandler.js.
+ * keyboard shortcut.
  */
 
 var LayoutManager = class TilingLayoutsManager {
@@ -83,7 +82,7 @@ var LayoutManager = class TilingLayoutsManager {
 
     /**
      * Opens a popup so the user can choose a new favorite layout to use for
-     * the 'Fixed Layout'.
+     * the 'Favorite Layout'.
      */
     openFavoriteSearch() {
         const layouts = Util.getLayouts();

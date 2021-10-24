@@ -11,14 +11,14 @@
     - [Tile Editing Mode](#Tile-Editing-Mode)
     - [Layouts](#Layouts)
         - [Popup Layouts](#Popup-Layouts)
-        - [Fixed Layout](#Fixed-Layout)
+        - [Favorite Layout](#Favorite-Layout)
     - [Hidden Settings](#Hidden-Settings)
 
 ## Usage
 
 ### Mouse-driven Workflow
 
-There are three ways ('modes') to tile windows. The default `Edge Tiling`, the `Split Tiles` mode and the `Fixed Layout`. The later two are activated when moving a window while holding `Ctrl` and `Alt` respectively.
+There are three ways ('modes') to tile windows. The default `Edge Tiling`, the `Split Tiles` mode and the `Favorite Layout`. The later two are activated when moving a window while holding `Ctrl` and `Alt` respectively.
 
 With `Edge Tiling`, dragging a window to the screen edges or corners will open a tile preview. By default, the top edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half tiling preview.
 
@@ -26,7 +26,7 @@ In the `Split Tiles` modes you split tiled windows or free screen space based on
 
 ![](media/Guide_dnd.gif)
 
-See [Fixed Layout](#Fixed-Layout) for information regarding the last mode.
+See [Favorite Layout](#Favorite-Layout) for information regarding the last mode.
 
 ### Keyboard-driven Workflow
 
@@ -78,9 +78,9 @@ The `Search for a Layout` keybinding enables you to activate layouts by name. Th
 
 ![](media/Guide_layouts2.gif)
 
-#### Fixed Layout
+#### Favorite Layout
 
-The `Fixed Layout` is one single layout marked by the 'favorite button' from the list of (popup) layouts. It can be used to have a fixed layout when you move a window around. The default `Fixed Layout Activator` is `Alt`. An example illustrates this feature clearly.
+The `Favorite Layout` is one single layout marked by the 'favorite button' from the list of (popup) layouts. It can be used to have a fixed layout when you move a window around. The default `Favorite Layout Activator` is `Alt`. An example illustrates this feature clearly.
 
 ![](media/Guide_layouts3.gif)
 

@@ -22,7 +22,7 @@ var Settings = class Settings {
     static FAVORITE_LAYOUT = 'favorite-layout';
     static DEFAULT_MOVE_MODE = 'default-move-mode';
     static SPLIT_TILE_MOD = 'move-split-tiles-mod';
-    static FIXED_LAYOUT_MOD = 'move-fixed-layout-mod';
+    static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
     static VERTICAL_PREVIEW_AREA = 'vertical-preview-area';
     static HORIZONTAL_PREVIEW_AREA = 'horizontal-preview-area';
     static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
@@ -74,7 +74,7 @@ var Settings = class Settings {
             this.FAVORITE_LAYOUT,
             this.DEFAULT_MOVE_MODE,
             this.SPLIT_TILE_MOD,
-            this.FIXED_LAYOUT_MOD,
+            this.FAVORITE_LAYOUT_MOD,
             this.VERTICAL_PREVIEW_AREA,
             this.HORIZONTAL_PREVIEW_AREA,
             this.INVERSE_TOP_MAXIMIZE_TIMER,
@@ -188,7 +188,7 @@ var DynamicKeybindings = class DynamicKeybindingBehaviour {
     static FOCUS = 'Window Focus';
     static TILING_STATE = 'Tiling State';
     static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
-    static FIXED_LAYOUT = 'Fixed Layout';
+    static FAVORITE_LAYOUT = 'Favorite Layout';
 };
 
 var MoveModeMods = class MovePreviewActivator {
@@ -200,7 +200,7 @@ var MoveModeMods = class MovePreviewActivator {
 var MoveModes = class MovePreviewActivator {
     static EDGE_TILING = 'Edge Tiling';
     static SPLIT_TILES = 'Split Tiles';
-    static FIXED_LAYOUT = 'Fixed Layout';
+    static FAVORITE_LAYOUT = 'Favorite Layout';
 };
 
 var Orientation = class Orientation {

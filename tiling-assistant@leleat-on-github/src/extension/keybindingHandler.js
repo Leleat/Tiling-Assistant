@@ -106,8 +106,8 @@ var Handler = class TilingKeybindingHandler {
                 case DynamicKeybindings.TILING_STATE_WINDOWS:
                     this._dynamicTilingState(window, shortcutName, isWindowsStyle);
                     break;
-                case DynamicKeybindings.FIXED_LAYOUT:
-                    this._dynamicFixedLayout(window, shortcutName);
+                case DynamicKeybindings.FAVORITE_LAYOUT:
+                    this._dynamicFavoriteLayout(window, shortcutName);
                     break;
                 default:
                     Util.toggleTiling(window, rect);
@@ -397,7 +397,7 @@ var Handler = class TilingKeybindingHandler {
         Util.toggleTiling(window, Util.getTileFor(shortcutName, workArea));
     }
 
-    _dynamicFixedLayout(window, shortcutName) {
+    _dynamicFavoriteLayout(window, shortcutName) {
         const workArea = new Rect(window.get_work_area_current_monitor());
         const toggleTiling = () => {
             const rect = Util.getTileFor(shortcutName, workArea);
@@ -409,14 +409,8 @@ var Handler = class TilingKeybindingHandler {
             return;
         }
 
-        const fixedLayout = Util.getFixedLayout();
-        if (!fixedLayout.length) {
-            toggleTiling();
-            return;
-        }
-
-        const currRect = fixedLayout.find(r => r.equal(window.tiledRect));
-        if (!currRect) {
+        const favoriteLayout = Util.getFavoriteLayout();
+        if (favoriteLayout.length <= 1) {
             toggleTiling();
             return;
         }
@@ -438,10 +432,8 @@ var Handler = class TilingKeybindingHandler {
         }
 
         if (direction) {
-            const neighbor = currRect.getNeighbor(direction, fixedLayout, false);
-            neighbor
-                ? Util.tile(window, neighbor, { openTilingPopup: false })
-                : Util.untile(window);
+            const neighbor = window.tiledRect.getNeighbor(direction, favoriteLayout);
+            Util.tile(window, neighbor, { openTilingPopup: false });
         } else {
             toggleTiling();
         }

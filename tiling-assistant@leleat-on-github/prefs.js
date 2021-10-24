@@ -42,7 +42,7 @@ const PrefsWidget = GObject.registerClass({
         'dynamic_keybinding_window_focus_row',
         'dynamic_keybinding_tiling_state_row',
         'dynamic_keybinding_tiling_state_windows_row',
-        'dynamic_keybinding_fixed_layout_row',
+        'dynamic_keybinding_favorite_layout_row',
         'toggle_tiling_popup',
         'tile_edit_mode',
         'auto_tile',
@@ -67,9 +67,9 @@ const PrefsWidget = GObject.registerClass({
         'enable_untile_animations',
         'edge_tiling_row',
         'split_tiles_row',
-        'fixed_layout_row',
+        'favorite_layout_row',
         'move_split_tiles_mod',
-        'move_fixed_layout_mod',
+        'move_favorite_layout_mod',
         'vertical_preview_area',
         'horizontal_preview_area',
         'toggle_maximize_tophalf_timer',
@@ -210,7 +210,7 @@ const PrefsWidget = GObject.registerClass({
     _bindComboBoxes() {
         const comboBoxes = [
             Settings.SPLIT_TILE_MOD,
-            Settings.FIXED_LAYOUT_MOD,
+            Settings.FAVORITE_LAYOUT_MOD,
             Settings.RESTORE_SIZE_ON
         ];
 
@@ -235,7 +235,7 @@ const PrefsWidget = GObject.registerClass({
                     'dynamic_keybinding_window_focus_row',
                     'dynamic_keybinding_tiling_state_row',
                     'dynamic_keybinding_tiling_state_windows_row',
-                    'dynamic_keybinding_fixed_layout_row'
+                    'dynamic_keybinding_favorite_layout_row'
                 ]
             },
             {
@@ -243,7 +243,7 @@ const PrefsWidget = GObject.registerClass({
                 rowNames: [
                     'edge_tiling_row',
                     'split_tiles_row',
-                    'fixed_layout_row'
+                    'favorite_layout_row'
                 ]
             }
         ];
