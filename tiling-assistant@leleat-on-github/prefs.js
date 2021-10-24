@@ -66,7 +66,7 @@ const PrefsWidget = GObject.registerClass({
         'enable_tile_animations',
         'enable_untile_animations',
         'edge_tiling_row',
-        'splite_tiles_row',
+        'split_tiles_row',
         'fixed_layout_row',
         'move_split_tiles_mod',
         'move_fixed_layout_mod',
@@ -105,7 +105,7 @@ const PrefsWidget = GObject.registerClass({
             const prefsDialog = this.get_root();
             prefsDialog.set_titlebar(this._title_bar);
             prefsDialog.add_css_class('tiling-assistant');
-            prefsDialog.set_default_size(600, 750);
+            prefsDialog.set_default_size(575, 750);
 
             // Info-popup-menu actions
             const actionGroup = new Gio.SimpleActionGroup();
@@ -242,7 +242,7 @@ const PrefsWidget = GObject.registerClass({
                 key: Settings.DEFAULT_MOVE_MODE,
                 rowNames: [
                     'edge_tiling_row',
-                    'splite_tiles_row',
+                    'split_tiles_row',
                     'fixed_layout_row'
                 ]
             }

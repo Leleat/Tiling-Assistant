@@ -816,7 +816,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingListRow" id="splite_tiles_row">
+                          <object class="TilingListRow" id="split_tiles_row">
                             <property name="title" translatable="yes">Split Tiles</property>
                             <property name="subtitle" translatable="yes">Releasing the grab on the moving window while hovering over a tiled window (or free screen space based on tiled windows) pushes the hovered window(s) aside</property>
                             <property name="prefix">
