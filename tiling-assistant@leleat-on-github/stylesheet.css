@@ -2,35 +2,3 @@
     background-color: rgba(255, 255, 255, .1);
     border-radius: 20px;
 }
-
-.tile-editing-mode-select-indicator {
-    border: 4px solid rgb(27, 106, 203);
-    /* Add an outline because Terminal for some reason has 1 or 2px more
-    than its get_frame_rect()...? */
-    outline: 2px solid rgb(27, 106, 203);
-    background-color: rgba(27, 106, 203, 0.2);
-}
-
-.tile-editing-mode-anchor-indicator {
-    background-color: rgba(27, 106, 203, 0.4);
-}
-
-.tile-editing-mode-resize-left {
-    border: 2px solid rgb(27, 106, 203);
-    border-left: 15px solid rgb(27, 106, 203);
-}
-
-.tile-editing-mode-resize-right {
-    border: 2px solid rgb(27, 106, 203);
-    border-right: 15px solid rgb(27, 106, 203);
-}
-
-.tile-editing-mode-resize-top {
-    border: 2px solid rgb(27, 106, 203);
-    border-top: 15px solid rgb(27, 106, 203);
-}
-
-.tile-editing-mode-resize-bottom {
-    border: 2px solid rgb(27, 106, 203);
-    border-bottom: 15px solid rgb(27, 106, 203);
-}

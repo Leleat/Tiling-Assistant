@@ -30,8 +30,8 @@ const Modes = {
  * 'on key released' function.
  */
 
-// eslint-disable-next-line
-var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
+var TileEditor = GObject.registerClass(
+class TileEditingMode extends St.Widget { // eslint-disable-line
 
     _init() {
         const monitor = global.display.get_current_monitor();
@@ -48,11 +48,8 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
         // The windows managed by the Tile Editor, that means the tiled windows
         // that aren't overlapped by other windows; in other words: the top tile Group
         this._windows = [];
-        // The first indicator is used for indicating the active selection by
-        // the user. Other indicators may be added and removed depending on the
-        // current mode. For example, when swapping windows, there will be a
-        // second indicator to show which window will be swapped.
-        this._indicators = [];
+        // Indicate the active selection by the user. Added to `this`.
+        this._selectIndicator = null;
         this._mode = Modes.DEFAULT;
         // Handler of keyboard events depending on the mode.
         this._keyHandler = null;
@@ -88,11 +85,10 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
         window.raise();
 
         // Create the active selection indicator.
-        const styleClass = 'tile-editing-mode-select-indicator';
-        const selectIndicator = new Indicator(styleClass, window.tiledRect);
-        selectIndicator.focus(window.tiledRect, window);
-        this._indicators.push(selectIndicator);
-        this.add_child(selectIndicator);
+        const params = { style_class: 'tile-preview' };
+        this._selectIndicator = new Indicator(params, window.tiledRect);
+        this._selectIndicator.focus(window.tiledRect, window);
+        this.add_child(this._selectIndicator);
 
         // Enter initial state.
         this._mode = Modes.DEFAULT;
@@ -106,19 +102,18 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
         }
 
         this._windows = [];
-        this._indicators = [];
         this._keyHandler = null;
 
         // this._selectIndicator may be undefined, if Tile Editing Mode is
         // left as soon as it's entered (e. g. when there's no tile group).
-        this._selectIndicator?.window.activate(global.get_current_time());
+        this._selectIndicator?.window?.activate(global.get_current_time());
         this._selectIndicator?.ease({
             x: this._selectIndicator.x + SCALE_SIZE / 2,
             y: this._selectIndicator.y + SCALE_SIZE / 2,
             width: this._selectIndicator.width - SCALE_SIZE,
             height: this._selectIndicator.height - SCALE_SIZE,
             opacity: 0,
-            duration: 100,
+            duration: 150,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => this.destroy()
         }) ?? this.destroy();
@@ -142,9 +137,11 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
         else
             newMode = Modes.DEFAULT;
 
+        // First switch mode, if a new mod is pressed.
         if (newMode !== this._mode)
             this._switchMode(newMode);
 
+        // Handle the key press and get mode depending on that.
         newMode = this._keyHandler.handleKeyPress(keyEvent);
 
         if (newMode !== this._mode)
@@ -162,53 +159,21 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
             return;
 
         this._mode = newMode;
-
-        // Remove all except the selection indicator.
-        // Animate with a scale down and fade effect.
-        const lastIdx = this._indicators.length - 1;
-        const indicators = this._indicators.splice(1, lastIdx);
-        indicators.forEach(i => {
-            i.ease({
-                x: i.x + SCALE_SIZE / 2,
-                y: i.y + SCALE_SIZE / 2,
-                width: i.width - SCALE_SIZE,
-                height: i.height - SCALE_SIZE,
-                opacity: 0,
-                duration: 100,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD
-            });
-        });
-
         this._keyHandler.prepareLeave();
 
         switch (newMode) {
             case Modes.DEFAULT:
                 this._keyHandler = new DefaultKeyHandler(this);
                 break;
-
             case Modes.SWAP:
                 this._keyHandler = new SwapKeyHandler(this);
                 break;
-
             case Modes.RESIZE:
                 this._keyHandler = new ResizeKeyHandler(this);
                 break;
-
             case Modes.CLOSE:
                 this.close();
         }
-    }
-
-    get indicators() {
-        return this._indicators;
-    }
-
-    get selectIndicator() {
-        return this._indicators[0];
-    }
-
-    get windows() {
-        return this._windows;
     }
 });
 
@@ -217,17 +182,17 @@ var TileEditor = GObject.registerClass(class TileEditingMode extends St.Widget {
  */
 const Indicator = GObject.registerClass(class TileEditingModeIndicator extends St.Widget {
     /**
-     * @param {string} style_class
-     * @param {Rect} pos
+     * @param {string} widgetParams
+     * @param {Rect} rect the final rect / pos of the indicator
      */
-    _init(style_class, pos) {
+    _init(widgetParams = {}, rect) {
         // Start from a scaled down position.
         super._init({
-            style_class,
-            x: pos.x + SCALE_SIZE / 2,
-            y: pos.y + SCALE_SIZE / 2,
-            width: pos.width - SCALE_SIZE,
-            height: pos.height - SCALE_SIZE,
+            ...widgetParams,
+            x: rect.x + SCALE_SIZE / 2,
+            y: rect.y + SCALE_SIZE / 2,
+            width: rect.width - SCALE_SIZE,
+            height: rect.height - SCALE_SIZE,
             opacity: 0
         });
 
@@ -394,7 +359,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
         } else if (keyVal === Clutter.KEY_Escape) {
             return Modes.CLOSE;
 
-        // [Enter/Space] to activate
+        // [Enter / Space] to activate
         } else if (keyVal === Clutter.KEY_Return || keyVal === Clutter.KEY_space) {
             // a window: quit Tile Editing Mode
             const window = this._selectIndicator.window;
@@ -461,40 +426,12 @@ const DefaultKeyHandler = class DefaultKeyHandler {
         this._selectIndicator.focus(newWindow?.tiledRect ?? nearestRect, newWindow);
     }
 
-    /**
-     * Create a new indicator, add it to the indicators array
-     * and to the Tile Editor.
-     *
-     * @param {string} styleClass
-     * @param {Rect} rect
-     * @returns {Indicator} the newly created Indicator.
-     */
-    _makeIndicator(styleClass, rect) {
-        const indicator = new Indicator(styleClass, rect);
-        this._indicators.push(indicator);
-        this._tileEditor.add_child(indicator);
-        return indicator;
-    }
-
-    get _indicators() {
-        return this._tileEditor.indicators;
-    }
-
     get _windows() {
-        return this._tileEditor.windows;
+        return this._tileEditor._windows;
     }
 
     get _selectIndicator() {
-        return this._indicators[0];
-    }
-
-    /**
-     * @returns {Indicator} the first indicator after the user selection
-     *      indicator. This is usually the indicator the user selected before
-     *      entering a non-default mode. For example, when swapping windows.
-     */
-    get _anchorIndicator() {
-        return this._indicators[1];
+        return this._tileEditor._selectIndicator;
     }
 };
 
@@ -509,9 +446,17 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
         super(tileEditor);
 
         // Create an 'anchor indicator' to indicate the window that will be swapped
-        const styleClass = 'tile-editing-mode-anchor-indicator';
-        const indicator = this._makeIndicator(styleClass, this._selectIndicator.rect);
-        indicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
+        const color = this._selectIndicator.get_theme_node().get_background_color();
+        const { red, green, blue, alpha } = color;
+        this._anchorIndicator = new Indicator({
+            style: `background-color: rgba(${red}, ${green}, ${blue}, ${alpha / 255})`
+        }, this._selectIndicator.rect);
+        this._anchorIndicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
+        this._tileEditor.add_child(this._anchorIndicator);
+    }
+
+    prepareLeave() {
+        this._anchorIndicator.destroy();
     }
 
     handleKeyPress(keyEvent) {
@@ -562,11 +507,11 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
 
         // The edge that is currently being resized.
         this._currEdge = null;
+        this._resizeSideIndicator = null;
     }
 
     prepareLeave() {
-        // Delete the resize styles.
-        this._removeResizeStyle();
+        this._resizeSideIndicator?.destroy();
     }
 
     handleKeyPress(keyEvent) {
@@ -580,14 +525,14 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
             // First call: Go to an edge.
             if (!this._currEdge) {
                 this._currEdge = direction;
-                this._applyResizeStyle(direction);
+                this._createResizeIndicator();
                 return Modes.RESIZE;
 
             // Change resize orientation from H to V
             } else if ([Direction.N, Direction.S].includes(this._currEdge)) {
                 if ([Direction.W, Direction.E].includes(direction)) {
                     this._currEdge = direction;
-                    this._applyResizeStyle(direction);
+                    this._createResizeIndicator();
                     return Modes.RESIZE;
                 }
 
@@ -595,7 +540,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
             } else if ([Direction.W, Direction.E].includes(this._currEdge)) {
                 if ([Direction.N, Direction.S].includes(direction)) {
                     this._currEdge = direction;
-                    this._applyResizeStyle(direction);
+                    this._createResizeIndicator();
                     return Modes.RESIZE;
                 }
             }
@@ -604,6 +549,9 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
 
             // Update the selection indicator.
             this._selectIndicator.focus(window.tiledRect, window);
+
+            // Update resize side indicator
+            this._resizeSideIndicator.updatePos(window.tiledRect);
 
         // [Esc]ape Tile Editing Mode
         } else if (keyEvent.keyval === Clutter.KEY_Escape) {
@@ -706,23 +654,82 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         return false;
     }
 
-    _applyResizeStyle(dir) {
-        this._removeResizeStyle();
-
-        if (dir === Direction.N)
-            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-top');
-        if (dir === Direction.S)
-            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-bottom');
-        if (dir === Direction.E)
-            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-right');
-        if (dir === Direction.W)
-            this._selectIndicator.add_style_class_name('tile-editing-mode-resize-left');
-    }
-
-    _removeResizeStyle() {
-        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-left');
-        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-right');
-        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-top');
-        this._selectIndicator.remove_style_class_name('tile-editing-mode-resize-bottom');
+    _createResizeIndicator() {
+        this._resizeSideIndicator?.destroy();
+        this._resizeSideIndicator = new ResizeSideIndicator(
+            this._currEdge, this._selectIndicator.rect);
+        Main.uiGroup.add_child(this._resizeSideIndicator);
     }
 };
+
+const ResizeSideIndicator = GObject.registerClass(
+class ResizeSideIndicator extends St.Widget {
+    _init(edge, activeRect) {
+        const [width, height] = [Direction.N, Direction.S].includes(edge)
+            ? [200, 20]
+            : [20, 200];
+
+        super._init({
+            width,
+            height,
+            opacity: 0,
+            style: 'background-color: black;\
+                    border-radius: 999px;'
+        });
+
+        this._edge = edge;
+        this._moveDist = 100;
+
+        this.updatePos(activeRect);
+
+        // Inner pill
+        const innerWidth = this.width < this.height ? 4 : 75;
+        const innerHeight = this.width < this.height ? 75 : 4;
+        this.add_child(new St.Widget({
+            x: this.width / 2 - innerWidth / 2,
+            y: this.height / 2 - innerHeight / 2,
+            width: innerWidth,
+            height: innerHeight,
+            style: 'background-color: #ebebeb;\
+                    border-radius: 999px;'
+        }));
+    }
+
+    destroy() {
+        this.ease({
+            opacity: 0,
+            duration: 100,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+            onComplete: () => super.destroy()
+        });
+    }
+
+    updatePos(rect) {
+        let x, y;
+        switch (this._edge) {
+            case Direction.N:
+                x = rect.center.x - this.width / 2;
+                y = rect.y - this.height / 2;
+                break;
+            case Direction.S:
+                x = rect.center.x - this.width / 2;
+                y = rect.y2 - this.height / 2;
+                break;
+            case Direction.W:
+                x = rect.x - this.width / 2;
+                y = rect.center.y - this.height / 2;
+                break;
+            case Direction.E:
+                x = rect.x2 - this.width / 2;
+                y = rect.center.y - this.height / 2;
+        }
+
+        this.ease({
+            x,
+            y,
+            opacity: 255,
+            duration: 150,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+        });
+    }
+});
