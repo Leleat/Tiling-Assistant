@@ -414,7 +414,7 @@ var Util = class Utility {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         const topTileGroup = this.getTopTileGroup(true, monitor);
-        const existingRects = topTileGroup.length > 1
+        const existingRects = topTileGroup.length >= 1
             ? topTileGroup.map(w => w.tiledRect)
             : this.getFavoriteLayout();
         const screenRects = existingRects.concat(workArea.minus(existingRects));
@@ -502,7 +502,8 @@ var Util = class Utility {
                     width,
                     height
                 );
-            } }
+            }
+        }
     }
 
     /**
