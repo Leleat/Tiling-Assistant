@@ -1,15 +1,16 @@
 {
     "added": [
-        "- 'Favorite Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)"
+        "- Added a 'Favorite Layout' feature. It's a new window movement mode as an alternative to the default Edge Tiling (#94). It allows you to define an arbritrary layout to drag windows to. Checkout the 'User Guide' for details",
+        "- Added a Changelog dialog in the prefs window on release of a new extension version (deactivatable in the 'Hidden Settings')"
     ],
     "removed": [
-        "- the color selection for the Tile Editing Mode because now we can always follow the system's native Tile-Preview style"
+        "- Removed the color selection for the Tile Editing Mode. Always follow the system's native Tile-Preview style"
     ],
     "changed": [
-        "- reworked the preference window to follow GNOME's HIG a bit more closely",
-        "- moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Setting`",
-        "- moved the 'Include apps from all workspaces' for the Tiling Popup to the general settings",
-        "- and some other minor settings tweaks"
+        "- 'Tile to top' & 'Toggle Maximization' cycle between top tiling and maximization in 'Tiling State' and 'Tiling State (Windows)' mode",
+        "- Reworked the preference window to follow GNOME's HIG a bit more closely",
+        "- Moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Settings`",
+        "- Moved the 'Include apps from all workspaces' for the Tiling Popup to the general settings"
     ],
     "fixed": []
 }

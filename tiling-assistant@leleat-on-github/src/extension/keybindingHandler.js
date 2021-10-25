@@ -210,23 +210,37 @@ var Handler = class TilingKeybindingHandler {
      *      activated.
      */
     _dynamicTilingState(window, shortcutName, isWindowsStyle) {
-        const untileFromMax = shortcutName === Shortcuts.TOP ||
-            shortcutName === Shortcuts.MAXIMIZE ||
-            shortcutName === Shortcuts.BOTTOM;
-
-        if (Util.isMaximized(window) && untileFromMax) {
-            Util.untile(window);
-            return;
-        }
-
         const workArea = new Rect(window.get_work_area_current_monitor());
 
-        if (!window.isTiled) {
-            if (isWindowsStyle && shortcutName === Shortcuts.BOTTOM) {
-                window.minimize();
-            } else {
-                const rect = Util.getTileFor(shortcutName, workArea);
-                Util.toggleTiling(window, rect);
+        if (Util.isMaximized(window)) {
+            switch (shortcutName) {
+                case Shortcuts.MAXIMIZE:
+                case Shortcuts.TOP: {
+                    const rect = Util.getTileFor(Shortcuts.TOP, workArea);
+                    Util.tile(window, rect, { skipAnim: true });
+                    break;
+                } case Shortcuts.BOTTOM: {
+                    Util.untile(window);
+                    break;
+                } default: {
+                    const rect = Util.getTileFor(shortcutName, workArea);
+                    Util.toggleTiling(window, rect);
+                }
+            }
+
+            return;
+        } else if (!window.isTiled) {
+            switch (shortcutName) {
+                case Shortcuts.BOTTOM: {
+                    if (isWindowsStyle) {
+                        window.minimize();
+                        break;
+                    }
+                // falls through
+                } default: {
+                    const rect = Util.getTileFor(shortcutName, workArea);
+                    Util.toggleTiling(window, rect);
+                }
             }
 
             return;
@@ -307,6 +321,10 @@ var Handler = class TilingKeybindingHandler {
             }
         } else if (isTopHalf) {
             switch (shortcutName) {
+                case Shortcuts.TOP:
+                    rect = Util.getTileFor(Shortcuts.MAXIMIZE, workArea);
+                    Util.toggleTiling(window, rect);
+                    return;
                 case Shortcuts.LEFT:
                     rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
                     Util.toggleTiling(window, rect);

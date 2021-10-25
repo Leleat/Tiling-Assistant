@@ -4,10 +4,11 @@
 **Added**
 - 'Favorite Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)
     - It allows people to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
-    - It also adapts the keyboard shortcuts and edge previews to the layout
-- Changelog dialog to prefs window on new extension version (disable in `Hidden Settings`)
+    - It also adapts the keyboard shortcuts and edge previews to the favorite layout
+- Changelog dialog to prefs window on new extension version (deactivatable in `Hidden Settings`)
 
 **Changed**
+- `Tile to top` & `Toggle Maximization` cycle between top tiling and maximization in `Tiling State` and `Tiling State (Windows)`
 - reworked the preference window to follow GNOME's HIG a bit more closely
     - use titlebar, listBoxes, etc...
 - moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Setting`
