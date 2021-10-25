@@ -161,6 +161,12 @@
 		<key name="enable-untile-animations" type="b">
 			<default>true</default>
 		</key>
+		<key name="changelog-version" type="i">
+			<default>-1</default>
+		</key>
+		<key name="show-changelog-on-update" type="b">
+			<default>true</default>
+		</key>
 		<key name="default-move-mode" type="s">
 			<default>"Edge Tiling"</default>
 		</key>

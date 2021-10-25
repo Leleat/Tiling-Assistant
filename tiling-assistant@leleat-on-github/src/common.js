@@ -17,6 +17,8 @@ var Settings = class Settings {
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
+    static SHOW_CHANGE_ON_UPDATE = 'show-changelog-on-update';
+    static CHANGELOG_VERSION = 'changelog-version';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
     static FAVORITE_LAYOUT = 'favorite-layout';
@@ -69,6 +71,8 @@ var Settings = class Settings {
             this.MAXIMIZE_WITH_GAPS,
             this.DYNAMIC_KEYBINDINGS,
             this.ENABLE_ADV_EXP_SETTINGS,
+            this.SHOW_CHANGE_ON_UPDATE,
+            this.CHANGELOG_VERSION,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
             this.FAVORITE_LAYOUT,

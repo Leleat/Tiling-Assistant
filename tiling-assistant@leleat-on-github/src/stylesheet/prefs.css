@@ -1,3 +1,8 @@
+window.tiling-changelog {
+	border-radius: 12px;
+	border: 1px solid #8d8d8d;
+}
+
 window.tiling-assistant list.frame {
 	border-radius: 12px;
 }

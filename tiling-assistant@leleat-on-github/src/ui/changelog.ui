@@ -1,0 +1,213 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk" version="4.0"/>
+  <template class="TilingChangelog" parent="GtkDialog">
+    <property name="visible">1</property>
+    <property name="decorated">False</property>
+    <property name="modal">True</property>
+    <property name="default_width">500</property>
+    <property name="default_height">500</property>
+    <property name="destroy-with-parent">True</property>
+    <property name="child">
+      <object class="GtkWindowHandle">
+        <property name="vexpand">True</property>
+        <property name="hexpand">True</property>
+        <child>
+          <object class="GtkOverlay">
+            <child type="overlay">
+              <object class="GtkWindowControls">
+                <property name="valign">start</property>
+                <property name="halign">end</property>
+                <property name="margin-end">6</property>
+                <property name="margin-top">6</property>
+                <property name="side">end</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow">
+                <property name="vexpand">1</property>
+                <property name="vscrollbar-policy">3</property>
+                <property name="child">
+                  <object class="GtkViewport">
+                    <property name="vexpand">1</property>
+                    <property name="child">
+                      <object class="GtkBox">
+                        <property name="margin-start">48</property>
+                        <property name="margin-end">48</property>
+                        <property name="margin-top">48</property>
+                        <property name="margin-bottom">48</property>
+                        <property name="orientation">vertical</property>
+                        <child>
+                          <object class="GtkImage">
+                            <property name="margin-bottom">6</property>
+                            <property name="icon-name">org.gnome.Logs</property>
+                            <property name="pixel-size">48</property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLabel">
+                            <property name="label">Changelog</property>
+                            <style>
+                              <class name="large-title"/>
+                            </style>
+                            <attributes>
+                              <attribute name="weight" value="bold"></attribute>
+                            </attributes>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="addedBox">
+                            <property name="visible">0</property>
+                            <property name="margin-top">36</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="spacing">12</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="halign">start</property>
+                                    <property name="label">Added</property>
+                                    <attributes>
+                                      <attribute name="weight" value="bold"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">document-new-symbolic</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBox" id="addedListBox">
+                                <property name="selection-mode">none</property>
+                                <property name="show-separators">True</property>
+                                <style>
+                                  <class name="frame"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="removedBox">
+                            <property name="visible">0</property>
+                            <property name="margin-top">36</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="spacing">12</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="halign">start</property>
+                                    <property name="label">Removed</property>
+                                    <attributes>
+                                      <attribute name="weight" value="bold"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">edit-delete-symbolic</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBox" id="removedListBox">
+                                <property name="selection-mode">none</property>
+                                <property name="show-separators">True</property>
+                                <style>
+                                  <class name="frame"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="changedBox">
+                            <property name="visible">0</property>
+                            <property name="margin-top">36</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="spacing">12</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="halign">start</property>
+                                    <property name="label">Changed</property>
+                                    <attributes>
+                                      <attribute name="weight" value="bold"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">document-edit-symbolic</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBox" id="changedListBox">
+                                <property name="selection-mode">none</property>
+                                <property name="show-separators">True</property>
+                                <style>
+                                  <class name="frame"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkBox" id="fixedBox">
+                            <property name="visible">0</property>
+                            <property name="margin-top">36</property>
+                            <property name="orientation">vertical</property>
+                            <property name="spacing">12</property>
+                            <child>
+                              <object class="GtkBox">
+                                <property name="spacing">12</property>
+                                <child>
+                                  <object class="GtkLabel">
+                                    <property name="halign">start</property>
+                                    <property name="label">Fixed</property>
+                                    <attributes>
+                                      <attribute name="weight" value="bold"></attribute>
+                                    </attributes>
+                                  </object>
+                                </child>
+                                <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">emblem-default-symbolic</property>
+                                  </object>
+                                </child>
+                              </object>
+                            </child>
+                            <child>
+                              <object class="GtkListBox" id="fixedListBox">
+                                <property name="selection-mode">none</property>
+                                <property name="show-separators">True</property>
+                                <style>
+                                  <class name="frame"/>
+                                </style>
+                              </object>
+                            </child>
+                          </object>
+                        </child>
+                      </object>
+                    </property>
+                  </object>
+                </property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </property>
+  </template>
+</interface>

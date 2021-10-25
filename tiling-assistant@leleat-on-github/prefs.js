@@ -1,11 +1,13 @@
 'use strict';
 
 const { Gdk, Gio, GLib, Gtk, GObject } = imports.gi;
+const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const LayoutPrefs = Me.imports.src.prefs.layoutsPrefs.Prefs;
+const { Changelog } = Me.imports.src.prefs.changelog;
 const { ListRow } = Me.imports.src.prefs.listRow;
 const { ShortcutListener } = Me.imports.src.prefs.shortcutListener;
 const { Settings, Shortcuts } = Me.imports.src.common;
@@ -63,6 +65,7 @@ const PrefsWidget = GObject.registerClass({
         'reload_layouts_button',
         'hidden_settings_page',
         'enable_advanced_experimental_features',
+        'show_changelog_on_update',
         'enable_tile_animations',
         'enable_untile_animations',
         'edge_tiling_row',
@@ -120,7 +123,7 @@ const PrefsWidget = GObject.registerClass({
             actionGroup.add_action(userGuideAction);
 
             const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
-            changelogAction.connect('activate', this._openChangelog.bind(this, prefsDialog));
+            changelogAction.connect('activate', this._openChangelogWebsite.bind(this, prefsDialog));
             actionGroup.add_action(changelogAction);
 
             const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
@@ -130,6 +133,17 @@ const PrefsWidget = GObject.registerClass({
             const hiddenSettingsAction = new Gio.SimpleAction({ name: 'open-hidden-settings' });
             hiddenSettingsAction.connect('activate', this._openHiddenSettings.bind(this));
             actionGroup.add_action(hiddenSettingsAction);
+
+            // Show Changelog after an update.
+            if (!this._settings.get_boolean(Settings.SHOW_CHANGE_ON_UPDATE))
+                return;
+
+            // Only show Changelog only once after an update.
+            if (this._settings.get_int(Settings.CHANGELOG_VERSION) >= Me.metadata.version)
+                return;
+
+            this._settings.set_int(Settings.CHANGELOG_VERSION, Me.metadata.version);
+            this._openChangelogDialog();
         });
     }
 
@@ -155,7 +169,7 @@ const PrefsWidget = GObject.registerClass({
         );
     }
 
-    _openChangelog(prefsDialog) {
+    _openChangelogWebsite(prefsDialog) {
         Gio.AppInfo.launch_default_for_uri(
             'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md',
             prefsDialog.get_display().get_app_launch_context()
@@ -174,6 +188,26 @@ const PrefsWidget = GObject.registerClass({
         hiddenSettings.set_visible(!hiddenSettings.get_visible());
     }
 
+    _openChangelogDialog() {
+        const path = GLib.build_filenamev([Me.path, 'changelog.json']);
+        const file = Gio.File.new_for_path(path);
+        if (!file.query_exists(null))
+            return;
+
+        const [success, contents] = file.load_contents(null);
+        if (!success || !contents.length)
+            return;
+
+        const prefsDialog = this.get_root();
+        const changes = JSON.parse(ByteArray.toString(contents));
+        const changelogDialog = new Changelog({
+            transient_for: this.get_root()
+        }, changes);
+        changelogDialog.set_css_classes(prefsDialog.get_css_classes());
+        changelogDialog.add_css_class('tiling-changelog');
+        changelogDialog.present();
+    }
+
     _bindSwitches() {
         const switches = [
             Settings.ENABLE_TILING_POPUP,
@@ -181,6 +215,7 @@ const PrefsWidget = GObject.registerClass({
             Settings.RAISE_TILE_GROUPS,
             Settings.MAXIMIZE_WITH_GAPS,
             Settings.ENABLE_ADV_EXP_SETTINGS,
+            Settings.SHOW_CHANGE_ON_UPDATE,
             Settings.ENABLE_TILE_ANIMATIONS,
             Settings.ENABLE_UNTILE_ANIMATIONS,
             Settings.ENABLE_HOLD_INVERSE_LANDSCAPE,

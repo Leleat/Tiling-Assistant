@@ -728,6 +728,18 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Show Changelog after Update</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="show_changelog_on_update">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>
