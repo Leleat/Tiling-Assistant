@@ -2,21 +2,21 @@
 
 ## v27
 **Added**
-- 'Favorite Layout', a new window movement mode, as an alternative to the default Edge Tiling (#94)
-    - It allows people to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
+- `Favorite Layout`, a new window movement mode, as an alternative to the default Edge Tiling (issue #94)
+    - It allows users to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
     - It also adapts the keyboard shortcuts and edge previews to the favorite layout
 - Changelog dialog to prefs window on new extension version (deactivatable in `Hidden Settings`)
 
-**Changed**
-- `Tile to top` & `Toggle Maximization` cycle between top tiling and maximization in `Tiling State` and `Tiling State (Windows)`
-- reworked the preference window to follow GNOME's HIG a bit more closely
-    - use titlebar, listBoxes, etc...
-- moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Setting`
-- moved the 'Include apps from all workspaces' for the Tiling Popup to the general settings
-- and some other minor settings tweaks
-
 **Removed**
 - the color selection for the Tile Editing Mode because now we can always follow the system's native Tile-Preview style
+
+**Changed**
+- Split gaps into `Window Gaps` and `Screen Gaps` (i. e. when windows are touching the screen edges) (discussion #109)
+- `Tile to top` & `Toggle Maximization` cycle between top tiling and maximization in `Tiling State` and `Tiling State (Windows)`
+- reworked the preference window to follow GNOME's HIG a bit more closely
+- moved the `Inverse Top Screen Edge Action` settings to the `Hidden Setting`
+- moved the `Include apps from all workspaces` for the Tiling Popup to the general settings
+- and some other minor settings tweaks
 
 
 ## v26

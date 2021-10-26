@@ -84,6 +84,11 @@ function enable() {
 
     // Restore tiled window properties after session was unlocked.
     _loadAfterSessionLock();
+
+    // TODO: remove: new setting compatibility code
+    const windowGap = Settings.getInt(Settings.WINDOW_GAP);
+    const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+    screenGap === -1 && Settings.setInt(Settings.SCREEN_GAP, windowGap);
 }
 
 function disable() {

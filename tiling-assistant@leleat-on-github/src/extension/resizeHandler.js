@@ -231,7 +231,8 @@ var Handler = class TilingResizeHandler {
         if (!window.isTiled)
             return;
 
-        const gap = Settings.getInt(Settings.WINDOW_GAP);
+        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
         const workArea = window.get_work_area_for_monitor(window.get_monitor());
 
         // First calculate the new tiledRect for window:
@@ -242,27 +243,30 @@ var Handler = class TilingResizeHandler {
         const grabbedsOldRect = this._preGrabRects.get(window);
 
         const isResizingW = (grabOp & Meta.GrabOp.RESIZING_W) > 1;
-        const newGrabbedTiledRectX = window.tiledRect.x +
-                (grabbedsNewRect.x - grabbedsOldRect.x) +
-                (isResizingW && window.tiledRect.x === workArea.x ? gap / 2 : 0);
+        // Shift the tiledRect by the resize amount
+        let newGrabbedTiledRectX = window.tiledRect.x + (grabbedsNewRect.x - grabbedsOldRect.x);
+        // Switch the screenGap for a windowGap
+        if (isResizingW && window.tiledRect.x === workArea.x)
+            newGrabbedTiledRectX = newGrabbedTiledRectX + screenGap - windowGap / 2;
 
+        // Same as W but different orientation
         const isResizingN = (grabOp & Meta.GrabOp.RESIZING_N) > 1;
-        const newGrabbedTiledRectY = window.tiledRect.y +
-                (grabbedsNewRect.y - grabbedsOldRect.y) +
-                (isResizingN && window.tiledRect.y === workArea.y ? gap / 2 : 0);
+        let newGrabbedTiledRectY = window.tiledRect.y + (grabbedsNewRect.y - grabbedsOldRect.y);
+        if (isResizingN && window.tiledRect.y === workArea.y)
+            newGrabbedTiledRectY = newGrabbedTiledRectY + screenGap - windowGap / 2;
 
         // If resizing on the E side, you can simply rely on get_frame_rect's
         // new width else x2 should stick to where it was (manual calc due
         // special cases like gnome-terminal)
         const isResizingE = (grabOp & Meta.GrabOp.RESIZING_E) > 1;
         const newGrabbedTiledRectWidth = isResizingE
-            ? grabbedsNewRect.width + gap + (workArea.x === newGrabbedTiledRectX ? gap / 2 : 0)
+            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenGap : windowGap / 2)
             : window.tiledRect.x2 - newGrabbedTiledRectX;
 
         // Same principal applies to the height and resizing on the S side
         const isResizingS = (grabOp & Meta.GrabOp.RESIZING_S) > 1;
         const newGrabbedTiledRectHeight = isResizingS
-            ? grabbedsNewRect.height + gap + (workArea.y === newGrabbedTiledRectY ? gap / 2 : 0)
+            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenGap : windowGap / 2)
             : window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
@@ -337,28 +341,28 @@ var Handler = class TilingResizeHandler {
         const resizedRect = new Rect(resizedWindow.get_frame_rect());
         const wRect = new Rect(window.get_frame_rect());
         const preGrabRect = this._preGrabRects.get(window);
-        const gap = Settings.getInt(Settings.WINDOW_GAP);
+        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
 
         switch (grabOp) {
             case Meta.GrabOp.RESIZING_N:
                 return resizeOnSameSide
                     ? [wRect.x, resizedRect.y, wRect.width, preGrabRect.y2 - resizedRect.y]
-                    : [wRect.x, wRect.y, wRect.width, resizedRect.y - wRect.y - gap];
+                    : [wRect.x, wRect.y, wRect.width, resizedRect.y - wRect.y - windowGap];
 
             case Meta.GrabOp.RESIZING_S:
                 return resizeOnSameSide
                     ? [wRect.x, wRect.y, wRect.width, resizedRect.y2 - preGrabRect.y]
-                    : [wRect.x, resizedRect.y2 + gap, wRect.width, preGrabRect.y2 - resizedRect.y2 - gap];
+                    : [wRect.x, resizedRect.y2 + windowGap, wRect.width, preGrabRect.y2 - resizedRect.y2 - windowGap];
 
             case Meta.GrabOp.RESIZING_W:
                 return resizeOnSameSide
                     ? [resizedRect.x, wRect.y, preGrabRect.x2 - resizedRect.x, wRect.height]
-                    : [wRect.x, wRect.y, resizedRect.x - wRect.x - gap, wRect.height];
+                    : [wRect.x, wRect.y, resizedRect.x - wRect.x - windowGap, wRect.height];
 
             case Meta.GrabOp.RESIZING_E:
                 return resizeOnSameSide
                     ? [wRect.x, wRect.y, resizedRect.x2 - preGrabRect.x, wRect.height]
-                    : [resizedRect.x2 + gap, wRect.y, preGrabRect.x2 - resizedRect.x2 - gap, wRect.height];
+                    : [resizedRect.x2 + windowGap, wRect.y, preGrabRect.x2 - resizedRect.x2 - windowGap, wRect.height];
         }
     }
 };

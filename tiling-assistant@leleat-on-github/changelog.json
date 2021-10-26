@@ -17,6 +17,10 @@
     ],
     "changed": [
         {
+            "title": "Split gaps into <i>Window Gaps</i> and <i>Screen Gaps</i> (discussion #109)",
+            "subtitle": "Window Gaps are the gaps between tiled windows. Screen Gaps are the gaps between tiled windows and the screen edges"
+        },
+        {
             "title": "Changed the behaviour of <i>Tile to top</i> and <i>Toggle Maximization</i> under certain circumstances (discussion #107)",
             "subtitle": "These keyboard shortcuts now always cycle between each other when using the dynamic keybinding behaviours <i>Tiling State</i> or <i>Tiling State (Windows)</i>"
         },

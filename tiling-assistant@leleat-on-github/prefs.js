@@ -39,6 +39,7 @@ const PrefsWidget = GObject.registerClass({
         'tiling_popup_all_workspace',
         'enable_raise_tile_group',
         'window_gap',
+        'screen_gap',
         'maximize_with_gap',
         'dynamic_keybinding_disabled_row',
         'dynamic_keybinding_window_focus_row',
@@ -147,7 +148,7 @@ const PrefsWidget = GObject.registerClass({
             if (!this._settings.get_boolean(Settings.SHOW_CHANGE_ON_UPDATE))
                 return;
 
-            // TODO: properly solve this. Modal property doesn't seem to work
+            // TODO: solve this. Modal property doesn't seem to work
             // properly, if we immediately open the changelog...
             GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
                 this._openChangelog(prefsDialog);
@@ -231,6 +232,7 @@ const PrefsWidget = GObject.registerClass({
     _bindSpinbuttons() {
         const spinButtons = [
             Settings.WINDOW_GAP,
+            Settings.SCREEN_GAP,
             Settings.INVERSE_TOP_MAXIMIZE_TIMER,
             Settings.VERTICAL_PREVIEW_AREA,
             Settings.HORIZONTAL_PREVIEW_AREA

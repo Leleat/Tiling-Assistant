@@ -553,7 +553,6 @@ var Util = class Utility {
         this.dissolveTileGroup(window.get_id());
 
         const oldRect = new Rect(window.get_frame_rect());
-        const gap = Settings.getInt(Settings.WINDOW_GAP);
         const monitor = window.get_monitor();
         const workArea = new Rect(window.get_work_area_for_monitor(monitor));
         const maximize = newRect.equal(workArea);
@@ -562,7 +561,8 @@ var Util = class Utility {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        const maxUsesGap = gap && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
+        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+        const maxUsesGap = screenGap && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
         if (maximize && !maxUsesGap) {
             window.tiledRect = null;
             window.maximize(Meta.MaximizeFlags.BOTH);
@@ -574,16 +574,7 @@ var Util = class Utility {
         // For ex. which only resize in full rows/columns like gnome-terminal
         window.tiledRect = newRect.copy();
 
-        const x = newRect.x + (gap - (workArea.x === newRect.x ? 0 : gap / 2));
-        const y = newRect.y + (gap - (workArea.y === newRect.y ? 0 : gap / 2));
-        // Lessen gap by half when the window isn't on the
-        // left or the right edge of the screen
-        const width = newRect.width -
-                (2 * gap - (workArea.x === newRect.x ? 0 : gap / 2) -
-                (workArea.x2 === newRect.x2 ? 0 : gap / 2));
-        const height = newRect.height -
-                (2 * gap - (workArea.y === newRect.y ? 0 : gap / 2) -
-                (workArea.y2 === newRect.y2 ? 0 : gap / 2));
+        const { x, y, width, height } = this.getRectWithGap(newRect, workArea);
 
         // Animations
         const wActor = window.get_compositor_private();
@@ -828,6 +819,34 @@ var Util = class Utility {
         return favoriteLayout;
     }
 
+    /**
+     * gets the rect taking the gaps from the settings into account.
+     *
+     * @param {Rect} rect a tiled Rect
+     * @returns {Rect}
+     */
+    static getRectWithGap(rect, workArea) {
+        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
+        const r = new Rect(rect.meta);
+
+        [['x', 'width'], ['y', 'height']].forEach(([pos, dim]) => {
+            if (rect[pos] === workArea[pos]) {
+                r[pos] = rect[pos] + screenGap;
+                r[dim] -= screenGap;
+            } else {
+                r[pos] = rect[pos] + windowGap / 2;
+                r[dim] -= windowGap / 2;
+            }
+
+            if (rect[pos] + rect[dim] === workArea[pos] + workArea[dim])
+                r[dim] -= screenGap;
+            else
+                r[dim] -= windowGap / 2;
+        });
+
+        return r;
+    }
 
     /**
      * Delegates to the TileGroupmanager. See tileGroupManager.js' function.

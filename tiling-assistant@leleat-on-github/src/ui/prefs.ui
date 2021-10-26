@@ -79,6 +79,11 @@
     <property name="step-increment">2</property>
     <property name="page-increment">8</property>
   </object>
+  <object class="GtkAdjustment" id="screen-gaps-adjustment">
+    <property name="upper">100</property>
+    <property name="step-increment">2</property>
+    <property name="page-increment">8</property>
+  </object>
 
   <!-- ======================================================================================== -->
   <!-- ======================================================================================== -->
@@ -199,7 +204,7 @@
                         <property name="can-focus">True</property>
                         <property name="halign">start</property>
                         <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">Window Gaps</property>
+                        <property name="label" translatable="yes">Gaps</property>
                         <attributes>
                           <attribute name="weight" value="bold"/>
                         </attributes>
@@ -217,13 +222,26 @@
                         </style>
                         <child>
                           <object class="TilingListRow">
-                            <property name="title" translatable="yes">Size</property>
+                            <property name="title" translatable="yes">Windows</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="window_gap">
                                 <property name="can-focus">True</property>
                                 <property name="halign">end</property>
                                 <property name="hexpand">True</property>
                                 <property name="adjustment">window-gaps-adjustment</property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="TilingListRow">
+                            <property name="title" translatable="yes">Screen Edges</property>
+                            <property name="suffix">
+                              <object class="GtkSpinButton" id="screen_gap">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="adjustment">screen-gaps-adjustment</property>
                               </object>
                             </property>
                           </object>

@@ -207,42 +207,19 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
      * @param {Meta.Window|null} window the window at `rect`'s position.
      */
     focus(rect, window = null) {
-        const gap = Settings.getInt('window-gap');
         const monitor = global.display.get_current_monitor();
         const display = global.display.get_monitor_geometry(monitor);
         const activeWs = global.workspace_manager.get_active_workspace();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
-        // We need to adjust the indicator here because if the user uses a
-        // window `gap`, the tiled windows will shrink by gap / 2 on all sides,
-        // so that the gap between 2 windows is 1 full gap. If the tiled windows
-        // borders the workArea at the start, we shift the window by gap / 2.
-        // So that the gap between 2 windows and the workArea is uniform. Same
-        // goes for, if the window ends on the workArea. Adjust the indicator's
-        // size accordingly.
-        let xAdj = gap / 2;
-        let yAdj = gap / 2;
-        let widthAdj = -gap;
-        let heightAdj = -gap;
-
-        if (rect.x === workArea.x)
-            xAdj += gap / 2;
-        if (rect.y === workArea.y)
-            yAdj += gap / 2;
-        if (rect.x === workArea.x)
-            widthAdj -= gap / 2;
-        if (rect.x2 === workArea.x2)
-            widthAdj -= gap / 2;
-        if (rect.y === workArea.y)
-            heightAdj -= gap / 2;
-        if (rect.y2 === workArea.y2)
-            heightAdj -= gap / 2;
+        // Adjusted for window / screen gaps
+        const { x, y, width, height } = Util.getRectWithGap(rect, workArea);
 
         this.ease({
-            x: rect.x - display.x + xAdj,
-            y: rect.y - display.y + yAdj,
-            width: rect.width + widthAdj,
-            height: rect.height + heightAdj,
+            x: x - display.x,
+            y: y - display.y,
+            width,
+            height,
             opacity: 255,
             duration: 150,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD

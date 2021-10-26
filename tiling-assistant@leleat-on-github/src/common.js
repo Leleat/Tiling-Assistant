@@ -14,6 +14,7 @@ var Settings = class Settings {
     static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
     static WINDOW_GAP = 'window-gap';
+    static SCREEN_GAP = 'screen-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
@@ -68,6 +69,7 @@ var Settings = class Settings {
             this.POPUP_ALL_WORKSPACES,
             this.RAISE_TILE_GROUPS,
             this.WINDOW_GAP,
+            this.SCREEN_GAP,
             this.MAXIMIZE_WITH_GAPS,
             this.DYNAMIC_KEYBINDINGS,
             this.ENABLE_ADV_EXP_SETTINGS,

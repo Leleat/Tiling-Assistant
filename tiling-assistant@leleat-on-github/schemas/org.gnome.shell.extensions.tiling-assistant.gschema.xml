@@ -30,6 +30,9 @@
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
+		<key name="screen-gap" type="i">
+			<default>-1</default>
+		</key>
 		<key name="maximize-with-gap" type="b">
 			<default>false</default>
 		</key>
