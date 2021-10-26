@@ -1,16 +1,39 @@
 {
     "added": [
-        "- Added a 'Favorite Layout' feature. It's a new window movement mode as an alternative to the default Edge Tiling (#94). It allows you to define an arbritrary layout to drag windows to. Checkout the 'User Guide' for details",
-        "- Added a Changelog dialog in the prefs window on release of a new extension version (deactivatable in the 'Hidden Settings')"
+        {
+            "title": "Added a 'Favorite Layout' feature (issue #94)",
+            "subtitle": "This is an alternative to the default Edge Tiling. It adapts the keyboard shortcuts and allows you to drag windows to a predefined layout. Checkout the <i>User Guide</i> for details"
+        },
+        {
+            "title": "Added Changelog dialog",
+            "subtitle": "On each new release of this extension the Changelog opens when you open the preference window. You can disable this behaviour in the <i>Hidden Settings</i>"
+        }
     ],
     "removed": [
-        "- Removed the color selection for the Tile Editing Mode. Always follow the system's native Tile-Preview style"
+        {
+            "title": "Removed the Tile Editing Mode's focus color",
+            "subtitle": "The previous setting was only meant as a workaround. Now we can always follow the system's native Tile-Preview style"
+        }
     ],
     "changed": [
-        "- 'Tile to top' & 'Toggle Maximization' cycle between top tiling and maximization in 'Tiling State' and 'Tiling State (Windows)' mode",
-        "- Reworked the preference window to follow GNOME's HIG a bit more closely",
-        "- Moved the 'Inverse Top Screen Edge Action' settings to the `Hidden Settings`",
-        "- Moved the 'Include apps from all workspaces' for the Tiling Popup to the general settings"
+        {
+            "title": "Changed the behaviour of <i>Tile to top</i> and <i>Toggle Maximization</i> under certain circumstances (discussion #107)",
+            "subtitle": "These keyboard shortcuts now always cycle between each other when using the dynamic keybind behaviours <i>Tiling State</i> or <i>Tiling State (Windows)</i>"
+        },
+        {
+            "title": "Turned the setting <i>Tiling Popup: Current Workspace only</i> into <i>Include apps from all workspaces</i> and moved it to the general settings page",
+            "subtitle": "Since GNOME's native app switcher exposes this setting now, follow suit"
+        },
+        {
+            "title": "Moved the <i>Inverse Top Screen Edge Action</i> settings to the <i>Hidden Settings</i>",
+            "subtitle": "This is probably too niche for the general settings"
+        },
+        {
+            "title": "Reworked the preference window to follow GNOME's design more closely",
+            "subtitle": ""
+        }
     ],
-    "fixed": []
+    "fixed": [
+
+    ]
 }

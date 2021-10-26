@@ -123,7 +123,7 @@ const PrefsWidget = GObject.registerClass({
             actionGroup.add_action(userGuideAction);
 
             const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
-            changelogAction.connect('activate', this._openChangelogWebsite.bind(this, prefsDialog));
+            changelogAction.connect('activate', this._openChangelog.bind(this, prefsDialog));
             actionGroup.add_action(changelogAction);
 
             const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
@@ -135,15 +135,24 @@ const PrefsWidget = GObject.registerClass({
             actionGroup.add_action(hiddenSettingsAction);
 
             // Show Changelog after an update.
+            const lastVersion = this._settings.get_int(Settings.CHANGELOG_VERSION);
+            const firstInstall = lastVersion === -1;
+            const noUpdate = lastVersion >= Me.metadata.version;
+
+            this._settings.set_int(Settings.CHANGELOG_VERSION, Me.metadata.version);
+
+            if (firstInstall || noUpdate)
+                return;
+
             if (!this._settings.get_boolean(Settings.SHOW_CHANGE_ON_UPDATE))
                 return;
 
-            // Only show Changelog only once after an update.
-            if (this._settings.get_int(Settings.CHANGELOG_VERSION) >= Me.metadata.version)
-                return;
-
-            this._settings.set_int(Settings.CHANGELOG_VERSION, Me.metadata.version);
-            this._openChangelogDialog();
+            // TODO: properly solve this. Modal property doesn't seem to work
+            // properly, if we immediately open the changelog...
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
+                this._openChangelog(prefsDialog);
+                return GLib.SOURCE_REMOVE;
+            });
         });
     }
 
@@ -169,11 +178,22 @@ const PrefsWidget = GObject.registerClass({
         );
     }
 
-    _openChangelogWebsite(prefsDialog) {
-        Gio.AppInfo.launch_default_for_uri(
-            'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md',
-            prefsDialog.get_display().get_app_launch_context()
-        );
+    _openChangelog(prefsDialog) {
+        const path = GLib.build_filenamev([Me.path, 'changelog.json']);
+        const file = Gio.File.new_for_path(path);
+        if (!file.query_exists(null))
+            return;
+
+        const [success, contents] = file.load_contents(null);
+        if (!success || !contents.length)
+            return;
+
+        const changes = JSON.parse(ByteArray.toString(contents));
+        const changelogDialog = new Changelog({
+            transient_for: prefsDialog,
+            css_classes: [...prefsDialog.get_css_classes(), 'tiling-changelog']
+        }, changes);
+        changelogDialog.present();
     }
 
     _openLicense(prefsDialog) {
@@ -186,26 +206,6 @@ const PrefsWidget = GObject.registerClass({
     _openHiddenSettings() {
         const hiddenSettings = this._hidden_settings_page;
         hiddenSettings.set_visible(!hiddenSettings.get_visible());
-    }
-
-    _openChangelogDialog() {
-        const path = GLib.build_filenamev([Me.path, 'changelog.json']);
-        const file = Gio.File.new_for_path(path);
-        if (!file.query_exists(null))
-            return;
-
-        const [success, contents] = file.load_contents(null);
-        if (!success || !contents.length)
-            return;
-
-        const prefsDialog = this.get_root();
-        const changes = JSON.parse(ByteArray.toString(contents));
-        const changelogDialog = new Changelog({
-            transient_for: this.get_root()
-        }, changes);
-        changelogDialog.set_css_classes(prefsDialog.get_css_classes());
-        changelogDialog.add_css_class('tiling-changelog');
-        changelogDialog.present();
     }
 
     _bindSwitches() {

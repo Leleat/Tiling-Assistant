@@ -19,12 +19,12 @@
         <attribute name="action">prefs.open-user-guide</attribute>
       </item>
       <item>
-        <attribute name="label" translatable="yes">Changelog</attribute>
-        <attribute name="action">prefs.open-changelog</attribute>
-      </item>
-      <item>
         <attribute name="label" translatable="yes">License</attribute>
         <attribute name="action">prefs.open-license</attribute>
+      </item>
+      <item>
+        <attribute name="label" translatable="yes">Changelog</attribute>
+        <attribute name="action">prefs.open-changelog</attribute>
       </item>
       <item>
         <attribute name="label" translatable="yes">Advanced...</attribute>
@@ -730,7 +730,7 @@
                         </child>
                         <child>
                           <object class="TilingListRow">
-                            <property name="title" translatable="yes">Show Changelog after Update</property>
+                            <property name="title" translatable="yes">Show Changes in Prefs Window after an Update</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="show_changelog_on_update">
                                 <property name="can-focus">True</property>

@@ -162,7 +162,7 @@
 			<default>true</default>
 		</key>
 		<key name="changelog-version" type="i">
-			<default>-1</default>
+			<default>26</default>
 		</key>
 		<key name="show-changelog-on-update" type="b">
 			<default>true</default>

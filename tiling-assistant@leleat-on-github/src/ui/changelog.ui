@@ -3,9 +3,9 @@
   <requires lib="gtk" version="4.0"/>
   <template class="TilingChangelog" parent="GtkDialog">
     <property name="visible">1</property>
-    <property name="decorated">False</property>
     <property name="modal">True</property>
-    <property name="default_width">500</property>
+    <property name="decorated">False</property>
+    <property name="default_width">550</property>
     <property name="default_height">500</property>
     <property name="destroy-with-parent">True</property>
     <property name="child">
@@ -46,13 +46,24 @@
                         </child>
                         <child>
                           <object class="GtkLabel">
-                            <property name="label">Changelog</property>
+                            <property name="label">What's new?</property>
                             <style>
                               <class name="large-title"/>
                             </style>
                             <attributes>
                               <attribute name="weight" value="bold"></attribute>
                             </attributes>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="GtkLinkButton">
+                            <property name="label">View full change history</property>
+                            <property name="can-focus">False</property>
+                            <property name="use-underline">True</property>
+                            <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+                            <style>
+                              <class name="caption"/>
+                            </style>
                           </object>
                         </child>
                         <child>
@@ -65,17 +76,18 @@
                               <object class="GtkBox">
                                 <property name="spacing">12</property>
                                 <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">document-new-symbolic</property>
+                                    <property name="margin-start">6</property>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Added</property>
                                     <attributes>
                                       <attribute name="weight" value="bold"></attribute>
                                     </attributes>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="icon-name">document-new-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -101,17 +113,18 @@
                               <object class="GtkBox">
                                 <property name="spacing">12</property>
                                 <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">edit-delete-symbolic</property>
+                                    <property name="margin-start">6</property>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Removed</property>
                                     <attributes>
                                       <attribute name="weight" value="bold"></attribute>
                                     </attributes>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="icon-name">edit-delete-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -137,17 +150,18 @@
                               <object class="GtkBox">
                                 <property name="spacing">12</property>
                                 <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">document-edit-symbolic</property>
+                                    <property name="margin-start">6</property>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Changed</property>
                                     <attributes>
                                       <attribute name="weight" value="bold"></attribute>
                                     </attributes>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="icon-name">document-edit-symbolic</property>
                                   </object>
                                 </child>
                               </object>
@@ -173,17 +187,18 @@
                               <object class="GtkBox">
                                 <property name="spacing">12</property>
                                 <child>
+                                  <object class="GtkImage">
+                                    <property name="icon-name">emblem-default-symbolic</property>
+                                    <property name="margin-start">6</property>
+                                  </object>
+                                </child>
+                                <child>
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Fixed</property>
                                     <attributes>
                                       <attribute name="weight" value="bold"></attribute>
                                     </attributes>
-                                  </object>
-                                </child>
-                                <child>
-                                  <object class="GtkImage">
-                                    <property name="icon-name">emblem-default-symbolic</property>
                                   </object>
                                 </child>
                               </object>

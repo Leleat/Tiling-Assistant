@@ -55,8 +55,8 @@ var ListRow = GObject.registerClass({
         )
     }
 }, class TilingListRow extends Gtk.ListBoxRow {
-    _init() {
-        super._init();
+    _init(params = {}) {
+        super._init(params);
 
         this.connect('realize', () => {
             this.prefix && this._box.prepend(this.prefix);
@@ -88,6 +88,10 @@ var ListRow = GObject.registerClass({
         } else if (widget instanceof Gtk.ComboBox) {
             widget?.popup_shown ? widget?.popdown() : widget?.popup();
         }
+    }
+
+    getContentBox() {
+        return this._box;
     }
 
     _onSubtitleChanged() {

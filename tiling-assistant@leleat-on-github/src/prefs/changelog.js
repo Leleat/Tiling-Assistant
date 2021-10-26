@@ -5,6 +5,8 @@ const { Gio, Gtk, GObject, Pango } = imports.gi;
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
+const { ListRow } = Me.imports.src.prefs.listRow;
+
 var Changelog = GObject.registerClass({
     GTypeName: 'TilingChangelog',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/changelog.ui`).get_uri(),
@@ -19,7 +21,7 @@ var Changelog = GObject.registerClass({
         'fixedListBox'
     ]
 }, class TilingChangelog extends Gtk.Dialog {
-    _init(params, changes) {
+    _init(params = {}, changes) {
         super._init(params);
 
         Object.entries(changes).forEach(([type, changeItems]) => {
@@ -47,23 +49,20 @@ var Changelog = GObject.registerClass({
             }
 
             changeItems.forEach(change => {
-                const row = new Gtk.ListBoxRow({
+                const row = new ListRow({
                     can_focus: false,
                     activatable: false
                 });
-                row.set_child(new Gtk.Label({
-                    label: change,
-                    halign: Gtk.Align.START,
-                    margin_start: 18,
-                    margin_end: 18,
-                    margin_top: 18,
-                    margin_bottom: 18,
-                    wrap: true,
-                    wrap_mode: Pango.WrapMode.WORD_CHAR,
-                    xalign: 0
-                }));
+                row.getContentBox().set_margin_start(18);
+                row.getContentBox().set_margin_end(18);
+                row.getContentBox().set_margin_top(18);
+                row.getContentBox().set_margin_bottom(18);
+                row.title = change.title;
+                row.subtitle = change.subtitle;
+
                 listBox.append(row);
             });
+
             box.show();
         });
     }
