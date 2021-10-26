@@ -5,7 +5,7 @@
             "subtitle": "This is an alternative to the default Edge Tiling. It adapts the keyboard shortcuts and allows you to drag windows to a predefined layout. Checkout the <i>User Guide</i> for details"
         },
         {
-            "title": "Added Changelog dialog",
+            "title": "Added an in-app Changelog dialog",
             "subtitle": "On each new release of this extension the Changelog opens when you open the preference window. You can disable this behaviour in the <i>Hidden Settings</i>"
         }
     ],
@@ -18,7 +18,7 @@
     "changed": [
         {
             "title": "Changed the behaviour of <i>Tile to top</i> and <i>Toggle Maximization</i> under certain circumstances (discussion #107)",
-            "subtitle": "These keyboard shortcuts now always cycle between each other when using the dynamic keybind behaviours <i>Tiling State</i> or <i>Tiling State (Windows)</i>"
+            "subtitle": "These keyboard shortcuts now always cycle between each other when using the dynamic keybinding behaviours <i>Tiling State</i> or <i>Tiling State (Windows)</i>"
         },
         {
             "title": "Turned the setting <i>Tiling Popup: Current Workspace only</i> into <i>Include apps from all workspaces</i> and moved it to the general settings page",

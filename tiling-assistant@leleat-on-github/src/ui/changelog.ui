@@ -5,13 +5,12 @@
     <property name="visible">1</property>
     <property name="modal">True</property>
     <property name="decorated">False</property>
-    <property name="default_width">550</property>
-    <property name="default_height">500</property>
+    <property name="default-width">550</property>
+    <property name="default-height">500</property>
     <property name="destroy-with-parent">True</property>
+    <property name="hide-on-close">False</property>
     <property name="child">
       <object class="GtkWindowHandle">
-        <property name="vexpand">True</property>
-        <property name="hexpand">True</property>
         <child>
           <object class="GtkOverlay">
             <child type="overlay">
@@ -25,11 +24,9 @@
             </child>
             <child>
               <object class="GtkScrolledWindow">
-                <property name="vexpand">1</property>
                 <property name="vscrollbar-policy">3</property>
                 <property name="child">
                   <object class="GtkViewport">
-                    <property name="vexpand">1</property>
                     <property name="child">
                       <object class="GtkBox">
                         <property name="margin-start">48</property>
