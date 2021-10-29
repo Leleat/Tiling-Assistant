@@ -19,13 +19,15 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 - **Do NOT use GNOME's tiling keybindings. Instead use the keybindings from this extension's settings. By default, the keybindings for tiling are `Super`+`NUM_PAD`.**
 
-- **Tiling Popup**: This is the popup, which shows up when a window is tiled and there is an (unambiguous) free screen rectangle. It lists all open windows on the current workspace. Activating one of the popup's icons will tile the window to fill the remaining screen space.
+- **Tiling Popup** offers to automatically tile a window to fill the available screen space.
 
-- **Tile Groups**: Tiled windows are considered in a group, if they don't overlap each other and aren't interrupted by non-tiled windows. If one of the windows is focused, the rest of the group will be raised to the foreground as well. A Tile Group also resizes together.
+- **Tile Groups**  are focused and resized together.
 
-- **Layouts**:...
+- **Layouts**
 
-Please see the ![Guide](GUIDE.md) for an explanation of every feature.
+- ...
+
+Please see the ![User Guide](GUIDE.md) for a list and an explanation of every feature.
 
 ## Preview
 

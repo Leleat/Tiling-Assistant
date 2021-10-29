@@ -31,8 +31,7 @@ const Modes = {
  */
 
 var TileEditor = GObject.registerClass(
-class TileEditingMode extends St.Widget { // eslint-disable-line
-
+class TileEditingMode extends St.Widget {
     _init() {
         const monitor = global.display.get_current_monitor();
         const display = global.display.get_monitor_geometry(monitor);
@@ -83,6 +82,7 @@ class TileEditingMode extends St.Widget { // eslint-disable-line
         // tile group to get entire tile group to the foreground.
         const window = this._windows[0];
         window.raise();
+        this._windows = Util.getTileGroupFor(window);
 
         // Create the active selection indicator.
         const params = { style_class: 'tile-preview' };

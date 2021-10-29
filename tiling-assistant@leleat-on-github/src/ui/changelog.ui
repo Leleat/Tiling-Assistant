@@ -24,7 +24,6 @@
             </child>
             <child>
               <object class="GtkScrolledWindow">
-                <property name="vscrollbar-policy">3</property>
                 <property name="child">
                   <object class="GtkViewport">
                     <property name="child">
@@ -39,6 +38,9 @@
                             <property name="margin-bottom">6</property>
                             <property name="icon-name">org.gnome.Logs</property>
                             <property name="pixel-size">48</property>
+                            <style>
+                              <class name="lowres-icon"/>
+                            </style>
                           </object>
                         </child>
                         <child>
@@ -82,9 +84,9 @@
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Added</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"></attribute>
-                                    </attributes>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
                                   </object>
                                 </child>
                               </object>
@@ -119,9 +121,9 @@
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Removed</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"></attribute>
-                                    </attributes>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
                                   </object>
                                 </child>
                               </object>
@@ -156,9 +158,9 @@
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Changed</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"></attribute>
-                                    </attributes>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
                                   </object>
                                 </child>
                               </object>
@@ -193,9 +195,9 @@
                                   <object class="GtkLabel">
                                     <property name="halign">start</property>
                                     <property name="label">Fixed</property>
-                                    <attributes>
-                                      <attribute name="weight" value="bold"></attribute>
-                                    </attributes>
+                                    <style>
+                                      <class name="heading"/>
+                                    </style>
                                   </object>
                                 </child>
                               </object>

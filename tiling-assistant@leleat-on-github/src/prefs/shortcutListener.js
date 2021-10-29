@@ -20,7 +20,7 @@ const Me = ExtensionUtils.getCurrentExtension();
  */
 
 var ShortcutListener = GObject.registerClass({
-    GTypeName: 'TilingShortcutListener',
+    GTypeName: 'ShortcutListener',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/shortcutListener.ui`).get_uri(),
     InternalChildren: ['button', 'clearButton', 'eventKeyController'],
     Properties: {
@@ -32,7 +32,7 @@ var ShortcutListener = GObject.registerClass({
             null
         )
     }
-}, class TilingShortcutListener extends Gtk.Box {
+}, class ShortcutListener extends Gtk.Box {
     initialize(key, setting) {
         this._key = key;
         this._setting = setting;

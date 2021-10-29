@@ -6,7 +6,7 @@
     <signal name="key-pressed" handler="_onKeyPressed" swapped="no"/>
   </object>
 
-  <template class="TilingShortcutListener" parent="GtkBox">
+  <template class="ShortcutListener" parent="GtkBox">
     <property name="hexpand">1</property>
     <property name="spacing">6</property>
     <signal name="notify::keybinding" handler="_onKeybindingChanged" swapped="no"/>

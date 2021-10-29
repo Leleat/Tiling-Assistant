@@ -41,7 +41,7 @@ var LayoutRowEntry = GObject.registerClass({
 
         // Show a placeholder on the first entry, if it's empty
         if (idx === 0 && Object.keys(rect).length === 0) {
-            const placeholder = _("Read the 'User Guide'...");
+            const placeholder = _("'User Guide' for help...");
             this._rectEntry.set_placeholder_text(placeholder);
         }
 

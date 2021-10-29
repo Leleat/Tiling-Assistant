@@ -1,22 +1,40 @@
-window.tiling-changelog {
-	border-radius: 12px;
-	border: 1px solid #8d8d8d;
-}
-
+window.tiling-assistant,
 window.tiling-assistant list.frame {
 	border-radius: 12px;
 }
 
+window.tiling-assistant list.frame {
+	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15);
+}
+
+window.tiling-assistant list.frame row:first-child {
+	border-top-left-radius: 12px;
+	border-top-right-radius: 12px;
+}
+
 window.tiling-assistant list.frame row:last-child {
+	border-bottom-left-radius: 12px;
+	border-bottom-right-radius: 12px;
 	border-bottom: none;
 }
 
-window.tiling-assistant combobox button.combo {
-	background: none;
+window.tiling-assistant spinbutton button,
+window.tiling-assistant combobox button.combo,
+window.tiling-assistant scrollbar.vertical {
 	border: none;
 	box-shadow: none;
 }
 
+window.tiling-assistant combobox button.combo,
+window.tiling-assistant scrollbar.vertical {
+	background: none;
+}
+
 window.tiling-assistant combobox button.combo arrow {
 	padding-left: 6px;
+}
+
+window.tiling-assistant scrollbar.vertical slider {
+	margin-top: 8px;
+	margin-bottom: 8px;
 }

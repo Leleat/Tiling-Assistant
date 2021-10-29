@@ -8,7 +8,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const { ShortcutListener } = Me.imports.src.prefs.shortcutListener;
 
 var ListRow = GObject.registerClass({
-    GTypeName: 'TilingListRow',
+    GTypeName: 'ListRow',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/listRow.ui`).get_uri(),
     InternalChildren: ['box', 'subtitleLabel', 'titleLabel'],
     Properties: {
@@ -54,7 +54,7 @@ var ListRow = GObject.registerClass({
             null
         )
     }
-}, class TilingListRow extends Gtk.ListBoxRow {
+}, class ListRow extends Gtk.ListBoxRow {
     _init(params = {}) {
         super._init(params);
 

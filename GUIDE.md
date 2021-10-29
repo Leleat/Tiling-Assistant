@@ -5,7 +5,7 @@
 - [Usage](#Usage)
     - [Mouse-driven Workflow](#Mouse-driven-Workflow)
     - [Keyboard-driven Workflow](#Keyboard-driven-Workflow)
-- [Terminology](#Terminology)
+- [Features](#Features)
     - [Tiling Popup](#Tiling-Popup)
     - [Tile Groups](#Tile-Groups)
     - [Tile Editing Mode](#Tile-Editing-Mode)
@@ -32,7 +32,7 @@ See [Favorite Layout](#Favorite-Layout) for information regarding the last mode.
 
 Use the the shortcuts from the `Keybindings` settings, the [Popup Layouts](#Popup-Layouts) and the [Tile Editing Mode](#Tile-Editing-Mode).
 
-## Terminology
+## Features
 
 ### Tiling Popup
 

@@ -159,7 +159,7 @@ const PrefsWidget = GObject.registerClass({
 
     /**
      * @param {Gtk.ListBox} listBox
-     * @param {TilingListRow} row
+     * @param {ListRow} row
      */
     _onListRowActivated(listBox, row) {
         row.activate();
@@ -180,7 +180,7 @@ const PrefsWidget = GObject.registerClass({
     }
 
     _openChangelog(prefsDialog) {
-        const path = GLib.build_filenamev([Me.path, 'changelog.json']);
+        const path = GLib.build_filenamev([Me.path, 'src/changelog.json']);
         const file = Gio.File.new_for_path(path);
         if (!file.query_exists(null))
             return;
@@ -192,7 +192,7 @@ const PrefsWidget = GObject.registerClass({
         const changes = JSON.parse(ByteArray.toString(contents));
         const changelogDialog = new Changelog({
             transient_for: prefsDialog,
-            css_classes: [...prefsDialog.get_css_classes(), 'tiling-changelog']
+            css_classes: prefsDialog.get_css_classes()
         }, changes);
         changelogDialog.present();
     }

@@ -37,7 +37,7 @@
               </object>
             </child>
             <child>
-              <object class="TilingShortcutListener" id="shortcut"/>
+              <object class="ShortcutListener" id="shortcut"/>
             </child>
             <child>
               <object class="GtkButton" id="favoriteButton">
