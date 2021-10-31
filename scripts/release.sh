@@ -57,4 +57,3 @@ echo TODO:
 echo
 echo [] Push the commits and tags to Github
 echo [] Upload the extension to EGO
-echo [] Update the AUR package
