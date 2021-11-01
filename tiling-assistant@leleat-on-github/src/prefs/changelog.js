@@ -8,7 +8,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 const { ListRow } = Me.imports.src.prefs.listRow;
 
 var Changelog = GObject.registerClass({
-    GTypeName: 'TilingChangelog',
+    GTypeName: 'ChangelogDialog',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/changelog.ui`).get_uri(),
     InternalChildren: [
         'addedBox',
@@ -20,7 +20,7 @@ var Changelog = GObject.registerClass({
         'fixedBox',
         'fixedListBox'
     ]
-}, class TilingChangelog extends Gtk.Dialog {
+}, class ChangelogDialog extends Gtk.Dialog {
     _init(params = {}, changes) {
         super._init(params);
 
