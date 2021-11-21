@@ -35,34 +35,30 @@ var Handler = class TilingMoveHandler {
         });
         this._displaySignals.push(g2Id);
 
-        // Adapt the size of tiled windows when moving them the across monitors
-        const w1Id = global.display.connect('window-left-monitor', (src, monitorNr, window) => {
-            // Use this._isGrabOp because when tiling the window during
-            // the grace period on a monitor change, the window will first
-            // be tiled and then moved to the old monitor, which fires another
-            // window-left / window-entered signal. UntiledRect -> also include
-            // maximized windows with gaps
-            if (this._isGrabOp || !window.untiledRect)
-                return;
-
-            const activeWs = global.workspace_manager.get_active_workspace();
-            const workArea = activeWs.get_work_area_for_monitor(monitorNr);
-            const windowRect = window.tiledRect || workArea;
-            this._scaleFactors = {
-                x: (windowRect.x - workArea.x) / workArea.width,
-                y: (windowRect.y - workArea.y) / workArea.height,
-                width: windowRect.width / workArea.width,
-                height: windowRect.height / workArea.height
-            };
+        const w1Id = global.display.connect('window-left-monitor', (src, monitorNr) => {
+            this._windowLeftMonitorNr = monitorNr;
         });
         this._displaySignals.push(w1Id);
 
-        // See window-left-monitor signal connection.
+        // Restore a tiled (+ maximized)  window's size, if it changes monitors.
+        // Previously, we tried to adapt the tiled window's size to the new monitor
+        // but that is probably too unpredictable. First, it may introduce rounding
+        // errors when moving multipe windows of the same tileGroup and second (and
+        // more importantly) the behaviour with regards to tileGroups isn't clear...
+        // Should the entire tileGroup move, if 1 tiled window is moved? If not,
+        // there should probably be a way to just detach 1 window from a group. What
+        // happens on the new monitor, if 1 window is moved? Should it create a new
+        // tileGroup? Should it try to integrate into existing tileGroups on that
+        // monitor etc... there are too many open questions. Instead just untile
+        // and leave it up to the user to re-tile a window.
         const w2Id = global.display.connect('window-entered-monitor', (src, monitorNr, window) => {
+            // During the grace period of a grab a window will tile to the old
+            // monitor triggering a monitor enter event... don't register that
+            // as a monitor change. See _edgeTilingPreview()
             if (this._isGrabOp || !window.untiledRect)
                 return;
 
-            this._onMonitorChanged(window, monitorNr, this._scaleFactors);
+            this._onMonitorChanged(window, monitorNr);
         });
         this._displaySignals.push(w2Id);
 
@@ -87,27 +83,19 @@ var Handler = class TilingMoveHandler {
         this._tilePreview.destroy();
     }
 
-    // Adapt the size of tiled windows when moving them the across monitors.
-    // Windows, which are *way too* large for the new monitor, won't be moved
-    // ... bug or intentional design in mutter / gnome shell?
-    _onMonitorChanged(tiledWindow, monitorNr, scaleFactors) {
-        const activeWs = global.workspace_manager.get_active_workspace();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitorNr));
-        const newRect = new Rect(
-            workArea.x + (workArea.width * scaleFactors.x),
-            workArea.y + (workArea.height * scaleFactors.y),
-            workArea.width * scaleFactors.width,
-            workArea.height * scaleFactors.height
-        );
-
-        // Try to stick the newRect to other tiled windows already on the
-        // workArea and to the workArea itself to workaround rounding errors
-        const topTileGroup = Util.getTopTileGroup(true, monitorNr);
-        topTileGroup.forEach(w => newRect.tryAlignWith(w));
-        newRect.tryAlignWith(workArea);
-
-        // Retile to update tiledRects, tileGroups etc...
-        Util.tile(tiledWindow, newRect, { openTilingPopup: false, skipAnim: true });
+    // Only applies to tiled / maximized windows.
+    // Untile tiled windows and adapt maximized windows' sizes to the new monitor.
+    _onMonitorChanged(window, newMonitorNr) {
+        const oldWorkArea = window.get_work_area_for_monitor(this._windowLeftMonitorNr);
+        if (Util.isMaximized(window, oldWorkArea)) {
+            Util.tile(
+                window,
+                new Rect(window.get_work_area_for_monitor(newMonitorNr)),
+                { openTilingPopup: false, skipAnim: true }
+            );
+        } else {
+            Util.untile(window, { restoreFullPos: false, skipAnim: true });
+        }
     }
 
     _onMoveStarted(window, grabOp) {
@@ -208,6 +196,7 @@ var Handler = class TilingMoveHandler {
                 }
             );
 
+            this._isGrabOp = false;
             return;
         }
 

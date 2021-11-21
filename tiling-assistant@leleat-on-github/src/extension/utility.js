@@ -118,13 +118,14 @@ var Util = class Utility {
 
     /**
      * @param {Meta.Window} window a Meta.Window.
+     * @param {Meta.WorkArea|Rect|null} workArea useful for the grace period
      * @returns wether the window is maximized. Be it using GNOME's native
      *      maximization or the maximization by this extension when using gaps.
      */
-    static isMaximized(window) {
-        const workArea = window.get_work_area_current_monitor();
+    static isMaximized(window, workArea = null) {
+        const area = workArea ?? window.get_work_area_current_monitor();
         return window.get_maximized() === Meta.MaximizeFlags.BOTH ||
-                window.tiledRect?.equal(workArea);
+                window.tiledRect?.equal(area);
     }
 
     /**
@@ -220,11 +221,12 @@ var Util = class Utility {
      * (for ex.: 2 diagonally opposing quarters). In that case we return null.
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
+     * @param {number} [monitorNr=-1] used for the grace period during dnd
      * @returns {Rect|null} a Rect, which represent the free screen space.
      */
-    static getFreeScreen(rectList) {
+    static getFreeScreen(rectList, monitorNr = -1) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = global.display.get_current_monitor();
+        const monitor = monitorNr === -1 ? global.display.get_current_monitor() : monitorNr;
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeScreenRects = workArea.minus(rectList);
         if (!freeScreenRects.length)
@@ -661,13 +663,14 @@ var Util = class Utility {
         window.raise();
 
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
-        if (!wasMaximized && !skipAnim && untileAnim)
-        { Main.wm._prepareAnimationInfo(
-            global.window_manager,
-            window.get_compositor_private(),
-            window.get_frame_rect(),
-            Meta.SizeChange.UNMAXIMIZE
-        ); }
+        if (!wasMaximized && !skipAnim && untileAnim) {
+            Main.wm._prepareAnimationInfo(
+                global.window_manager,
+                window.get_compositor_private(),
+                window.get_frame_rect(),
+                Meta.SizeChange.UNMAXIMIZE
+            );
+        }
 
         const oldRect = window.untiledRect;
         if (restoreFullPos) {
@@ -679,9 +682,19 @@ var Util = class Utility {
             const relativeMouseX = (xAnchor - currWindowFrame.x) / currWindowFrame.width;
             const newPosX = xAnchor - oldRect.width * relativeMouseX;
 
+            // When moving a tiled window to a new monitor (with shortcut or
+            // the overview), we restore the original size. Terminal will partly
+            // restored to the old monitor for some reason... so clamp the pos
+            // to the new workArea.
+            const monitor = window.get_monitor();
+            const workArea = new Rect(window.get_work_area_for_monitor(monitor));
+            const x = Math.max(workArea.x, newPosX);
+            const y = Math.max(workArea.y, currWindowFrame.y);
+
             // Wayland workaround for DND / restore position
             Meta.is_wayland_compositor() && window.move_frame(true, newPosX, currWindowFrame.y);
-            window.move_resize_frame(true, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
+
+            window.move_resize_frame(true, x, y, oldRect.width, oldRect.height);
         }
 
         this.dissolveTileGroup(window.get_id());
@@ -706,7 +719,8 @@ var Util = class Utility {
             return;
 
         const tRects = topTileGroup.map(w => w.tiledRect);
-        const freeSpace = this.getFreeScreen(tRects);
+        const monitor = topTileGroup[0]?.get_monitor() ?? -1; // for the grace period
+        const freeSpace = this.getFreeScreen(tRects, monitor);
         if (!freeSpace)
             return;
 
