@@ -133,7 +133,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Open after tiling a window</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_tiling_popup">
@@ -146,7 +146,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Include apps from all workspaces</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="tiling_popup_all_workspace">
@@ -185,7 +185,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Raise together</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_raise_tile_group">
@@ -221,7 +221,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Windows</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="window_gap">
@@ -234,7 +234,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Screen Edges</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="screen_gap">
@@ -247,7 +247,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Maximized Windows</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="maximize_with_gap">
@@ -281,7 +281,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow" id="dynamic_keybinding_disabled_row">
+                          <object class="TilingAssistantListRow" id="dynamic_keybinding_disabled_row">
                             <property name="title" translatable="yes">Disabled</property>
                             <property name="subtitle" translatable="yes">The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state</property>
                             <property name="prefix">
@@ -298,7 +298,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="dynamic_keybinding_window_focus_row">
+                          <object class="TilingAssistantListRow" id="dynamic_keybinding_window_focus_row">
                             <property name="title" translatable="yes">Window Focus</property>
                             <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut, if there is one.</property>
                             <property name="prefix">
@@ -316,7 +316,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="dynamic_keybinding_tiling_state_row">
+                          <object class="TilingAssistantListRow" id="dynamic_keybinding_tiling_state_row">
                             <property name="title" translatable="yes">Tiling State</property>
                             <property name="subtitle" translatable="yes">Adapt the current window's tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated.</property>
                             <property name="prefix">
@@ -334,7 +334,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="dynamic_keybinding_tiling_state_windows_row">
+                          <object class="TilingAssistantListRow" id="dynamic_keybinding_tiling_state_windows_row">
                             <property name="title" translatable="yes">Tiling State (Windows)</property>
                             <property name="subtitle" translatable="yes">Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom and the 'tile to bottom' shortcut is activated, minimize the window</property>
                             <property name="prefix">
@@ -352,7 +352,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="dynamic_keybinding_favorite_layout_row">
+                          <object class="TilingAssistantListRow" id="dynamic_keybinding_favorite_layout_row">
                             <property name="title" translatable="yes">Favorite Layout</property>
                             <property name="subtitle" translatable="yes">Move the window along your favorite Layout</property>
                             <property name="visible"
@@ -423,7 +423,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Toggle 'Tiling Popup'</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="toggle_tiling_popup"/>
@@ -431,7 +431,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile Editing Mode</property>
                             <property name="subtitle" translatable="yes">A keyboard-driven mode to manage your tiled windows</property>
                             <property name="suffix">
@@ -440,7 +440,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Auto-Tile</property>
                             <property name="subtitle" translatable="yes">Un/tile the current window based on the visible tiles</property>
                             <property name="suffix">
@@ -449,7 +449,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Toggle Maximization</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_maximize"/>
@@ -480,7 +480,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to top</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_top_half"/>
@@ -488,7 +488,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to bottom</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_bottom_half"/>
@@ -496,7 +496,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to left</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_left_half"/>
@@ -504,7 +504,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to right</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_right_half"/>
@@ -534,7 +534,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to top-left</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_topleft_quarter"/>
@@ -542,7 +542,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to top-right</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_topright_quarter"/>
@@ -550,7 +550,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to bottom-left</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_bottomleft_quarter"/>
@@ -558,7 +558,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tile to bottom-right</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="tile_bottomright_quarter"/>
@@ -617,7 +617,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Search for a Layout</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="search_popup_layout"/>
@@ -625,7 +625,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Change favorite Layout</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="change_favorite_layout"/>
@@ -735,7 +735,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Advanced / Experimental Settings</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_advanced_experimental_features">
@@ -747,7 +747,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Show Changelog in Preferences after an Update</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="show_changelog_on_update">
@@ -782,7 +782,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Tiling</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_tile_animations">
@@ -794,7 +794,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Untiling</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_untile_animations">
@@ -829,7 +829,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow" id="edge_tiling_row">
+                          <object class="TilingAssistantListRow" id="edge_tiling_row">
                             <property name="title" translatable="yes">Edge Tiling</property>
                             <property name="subtitle" translatable="yes">Moving the window to the screen edges or corners will open the default tile preview</property>
                             <property name="prefix">
@@ -846,7 +846,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="split_tiles_row">
+                          <object class="TilingAssistantListRow" id="split_tiles_row">
                             <property name="title" translatable="yes">Split Tiles</property>
                             <property name="subtitle" translatable="yes">Releasing the grab while hovering over a tile will push the neighbouring window(s) aside</property>
                             <property name="prefix">
@@ -864,7 +864,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow" id="favorite_layout_row">
+                          <object class="TilingAssistantListRow" id="favorite_layout_row">
                             <property name="title" translatable="yes">Favorite Layout</property>
                             <property name="subtitle" translatable="yes">The tile preview will stick to your favorite layout from the 'Layouts' page</property>
                             <property name="prefix">
@@ -882,7 +882,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">'Split Tiles' Activator</property>
                             <property name="suffix">
                               <object class="GtkComboBoxText" id="move_split_tiles_mod">
@@ -900,7 +900,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">'Favorite Layout' Activator</property>
                             <property name="suffix">
                               <object class="GtkComboBoxText" id="move_favorite_layout_mod">
@@ -918,7 +918,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Vertical Edge Preview Trigger Area</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="vertical_preview_area">
@@ -932,7 +932,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Horizontal Edge Preview Trigger Area</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="horizontal_preview_area">
@@ -946,7 +946,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Inverse Top Screen Edge Action Timer</property>
                             <property name="suffix">
                               <object class="GtkSpinButton" id="toggle_maximize_tophalf_timer">
@@ -962,7 +962,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_hold_maximize_inverse_landscape">
@@ -974,7 +974,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_hold_maximize_inverse_portrait">
@@ -986,7 +986,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Restore Window Size on</property>
                             <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;</property>
                             <property name="suffix">
@@ -1027,7 +1027,7 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Show Tiled Rects</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="debugging_show_tiled_rects"/>
@@ -1035,7 +1035,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="ListRow">
+                          <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Show Free Screen Rects</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="debugging_free_rects"/>
