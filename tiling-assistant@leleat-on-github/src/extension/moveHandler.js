@@ -1,7 +1,7 @@
 'use strict';
 
-const { Clutter, GLib, Meta } = imports.gi;
-const WindowManager = imports.ui.windowManager;
+const { Clutter, GLib, GObject, Meta } = imports.gi;
+const { main: Main, windowManager: WindowManager } = imports.ui;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -70,12 +70,7 @@ var Handler = class TilingMoveHandler {
         // (it may differ from the tilePreview's rect)
         this._tileRect = null;
 
-        this._tilePreview = new WindowManager.TilePreview();
-        this._tilePreview.needsUpdate = rect =>
-            !this._tilePreview._rect || !rect.equal(this._tilePreview._rect);
-        // Don't bother with rounded corners since we have more than 2 previews
-        this._tilePreview.style_class = 'tile-preview';
-        this._tilePreview._updateStyle = () => {};
+        this._tilePreview = new TilePreview();
     }
 
     destroy() {
@@ -159,6 +154,7 @@ var Handler = class TilingMoveHandler {
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
             this._favoriteLayout = Util.getFavoriteLayout();
+            this._favoritePreviews = [];
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -185,7 +181,12 @@ var Handler = class TilingMoveHandler {
             this._posChangedId = 0;
         }
 
-        if (!this._tilePreview._showing) {
+        this._favoriteLayout = [];
+        this._favoritePreviews?.forEach(p => p.destroy());
+        this._favoritePreviews = [];
+        this._tilePreview.close();
+
+        if (!this._tileRect) {
             const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
             const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;
             restoreOnEnd && Util.untile(
@@ -200,14 +201,15 @@ var Handler = class TilingMoveHandler {
             return;
         }
 
+        // During the grace period tiling may move the the window across monitors
+        // triggering a monitor-change (aka a window enter signal). To prevent that
+        // 'end' the grab (via this._isGrabOp) after the tiling
         this._splitRects.forEach((rect, w) => Util.tile(w, rect, {
             openTilingPopup: false
         }));
         Util.tile(window, this._tileRect);
 
-        this._favoriteLayout = [];
         this._splitRects.clear();
-        this._tilePreview.close();
         this._tileRect = null;
         this._isGrabOp = false;
     }
@@ -237,22 +239,52 @@ var Handler = class TilingMoveHandler {
         const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
         const splitActivator = Settings.getString(Settings.SPLIT_TILE_MOD);
         const favActivator = Settings.getString(Settings.FAVORITE_LAYOUT_MOD);
+        let newMode = '';
 
         if (pressed[splitActivator]) {
-            defaultMode === MoveModes.SPLIT_TILES
-                ? this._edgeTilingPreview(window, grabOp)
-                : this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+            newMode = defaultMode === MoveModes.SPLIT_TILES
+                ? MoveModes.EDGE_TILING
+                : MoveModes.SPLIT_TILES;
         } else if (pressed[favActivator]) {
-            defaultMode === MoveModes.FAVORITE_LAYOUT
-                ? this._edgeTilingPreview(window, grabOp)
-                : this._favoriteLayoutTilingPreview(window);
+            newMode = defaultMode === MoveModes.FAVORITE_LAYOUT
+                ? MoveModes.EDGE_TILING
+                : MoveModes.FAVORITE_LAYOUT;
         } else if (defaultMode === MoveModes.SPLIT_TILES) {
-            this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+            newMode = MoveModes.SPLIT_TILES;
         } else if (defaultMode === MoveModes.FAVORITE_LAYOUT) {
-            this._favoriteLayoutTilingPreview(window);
+            newMode = MoveModes.FAVORITE_LAYOUT;
         } else {
-            this._edgeTilingPreview(window, grabOp);
+            newMode = MoveModes.EDGE_TILING;
         }
+
+        if (this._currPreviewMode !== newMode)
+            this._preparePreviewModeChange();
+
+        switch (newMode) {
+            case MoveModes.EDGE_TILING:
+                this._edgeTilingPreview(window, grabOp);
+                break;
+            case MoveModes.SPLIT_TILES:
+                this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+                break;
+            case MoveModes.FAVORITE_LAYOUT:
+                this._favoriteLayoutTilingPreview(window);
+        }
+
+        this._currPreviewMode = newMode;
+    }
+
+    _preparePreviewModeChange() {
+        this._favoritePreviews.forEach(p => {
+            p.ease({
+                opacity: 0,
+                duration: 100,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                onComplete: () => p.destroy()
+            });
+        });
+        this._favoritePreviews = [];
+        this._tileRect = null;
     }
 
     _restoreSizeAndRestartGrab(window, eventX, eventY, grabOp) {
@@ -631,10 +663,27 @@ var Handler = class TilingMoveHandler {
     }
 
     _favoriteLayoutTilingPreview(window) {
+        if (!this._favoritePreviews.length) {
+            this._favoriteLayout.forEach(rect => {
+                const tilePreview = new TilePreview();
+                tilePreview.open(window, rect, this._monitorNr, {
+                    opacity: 255,
+                    duration: 150
+                });
+                this._favoritePreviews.push(tilePreview);
+            });
+        }
+
         for (const rect of this._favoriteLayout) {
             if (rect.containsPoint(this._lastPointerPos)) {
                 this._tileRect = rect.copy();
-                this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+                this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
+                    x: this._tileRect.x,
+                    y: this._tileRect.y,
+                    width: this._tileRect.width,
+                    height: this._tileRect.height,
+                    opacity: 200
+                });
                 return;
             }
         }
@@ -643,3 +692,73 @@ var Handler = class TilingMoveHandler {
         this._tilePreview.close();
     }
 };
+
+const TilePreview = GObject.registerClass(
+class TilePreview extends WindowManager.TilePreview {
+    _init() {
+        super._init();
+        this.set_style_class_name('tile-preview');
+    }
+
+    needsUpdate(rect) {
+        return !this._rect || !rect.equal(this._rect);
+    }
+
+    // Added param for animation and remove style changes for rounded corners
+    open(window, tileRect, monitorIndex, animateTo = undefined) {
+        const windowActor = window.get_compositor_private();
+        if (!windowActor)
+            return;
+
+        global.window_group.set_child_below_sibling(this, windowActor);
+
+        if (this._rect && this._rect.equal(tileRect))
+            return;
+
+        const changeMonitor = this._monitorIndex === -1 ||
+            this._monitorIndex !== monitorIndex;
+
+        this._monitorIndex = monitorIndex;
+        this._rect = tileRect;
+
+        const monitor = Main.layoutManager.monitors[monitorIndex];
+
+        if (!this._showing || changeMonitor) {
+            const monitorRect = new Meta.Rectangle({
+                x: monitor.x,
+                y: monitor.y,
+                width: monitor.width,
+                height: monitor.height
+            });
+            const [, rect] = window.get_frame_rect().intersect(monitorRect);
+            this.set_size(rect.width, rect.height);
+            this.set_position(rect.x, rect.y);
+            this.opacity = 0;
+        }
+
+        this._showing = true;
+        this.show();
+
+        if (!animateTo) {
+            animateTo = {
+                x: tileRect.x,
+                y: tileRect.y,
+                width: tileRect.width,
+                height: tileRect.height,
+                opacity: 255,
+                duration: WindowManager.WINDOW_ANIMATION_TIME,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD
+            };
+        } else {
+            animateTo.x === undefined && this.set_x(tileRect.x);
+            animateTo.y === undefined && this.set_y(tileRect.y);
+            animateTo.width === undefined && this.set_width(tileRect.width);
+            animateTo.height === undefined && this.set_height(tileRect.height);
+            animateTo.opacity === undefined && this.set_opacity(255);
+            animateTo.duration = animateTo.duration ?? WindowManager.WINDOW_ANIMATION_TIME;
+            animateTo.mode = animateTo.mode ?? Clutter.AnimationMode.EASE_OUT_QUAD;
+        }
+
+        this.ease(animateTo);
+    }
+});
