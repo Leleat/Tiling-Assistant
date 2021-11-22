@@ -284,6 +284,7 @@ var Handler = class TilingMoveHandler {
             });
         });
         this._favoritePreviews = [];
+        this._favoriteAnchor = null;
         this._tileRect = null;
     }
 
@@ -674,9 +675,19 @@ var Handler = class TilingMoveHandler {
             });
         }
 
+        // Holding Super will make the window span multiple rects of the favorite
+        // layout starting from the rect, which the user starting holding Super in.
+        const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
         for (const rect of this._favoriteLayout) {
             if (rect.containsPoint(this._lastPointerPos)) {
-                this._tileRect = rect.copy();
+                if (isSuperPressed) {
+                    this._favoriteAnchor = this._favoriteAnchor ?? rect;
+                    this._tileRect = rect.union(this._favoriteAnchor);
+                } else {
+                    this._tileRect = rect.copy();
+                    this._favoriteAnchor = null;
+                }
+
                 this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
                     x: this._tileRect.x,
                     y: this._tileRect.y,
@@ -704,7 +715,7 @@ class TilePreview extends WindowManager.TilePreview {
         return !this._rect || !rect.equal(this._rect);
     }
 
-    // Added param for animation and remove style changes for rounded corners
+    // Added param for animation and removed style for rounded corners
     open(window, tileRect, monitorIndex, animateTo = undefined) {
         const windowActor = window.get_compositor_private();
         if (!windowActor)
