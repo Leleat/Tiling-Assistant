@@ -83,6 +83,9 @@
 		<key name="import-layout-examples" type="b">
 			<default>true</default>
 		</key>
+		<key name="show-layout-panel-indicator" type="b">
+			<default>false</default>
+		</key>
 		<key name="search-popup-layout" type="as">
 			<default>[]</default>
 		</key>

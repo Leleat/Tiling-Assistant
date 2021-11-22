@@ -598,6 +598,29 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
+                        <property name="show-separators">True</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <style>
+                          <class name="frame"/>
+                        </style>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Panel Indicator</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="show_layout_panel_indicator">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkLabel">
                         <property name="halign">start</property>
                         <property name="hexpand">1</property>

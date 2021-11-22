@@ -1,7 +1,7 @@
 'use strict';
 
 const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
-const Main = imports.ui.main;
+const { main: Main, panelMenu: PanelMenu, popupMenu: PopupMenu } = imports.ui;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
@@ -58,11 +58,27 @@ var LayoutManager = class TilingLayoutsManager {
         // Bind the keyboard shortcuts for each layout and the layout searchers
         this._keyBindings = [];
         this._bindKeybindings();
+
+        // Add panel indicator
+        this._panelIndicator = new PanelIndicator();
+        Main.panel.addToStatusArea(Me.metadata.uuid, this._panelIndicator);
+        Settings.changed(Settings.SHOW_LAYOUT_INDICATOR, () => {
+            this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
+        });
+        this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
+
+        this._panelIndicator.connect('layout-activated', (src, idx) => this.startLayouting(idx));
+        this._panelIndicator.connect('favorite-changed', (src, idx) => {
+            const currFav = Settings.getInt(Settings.FAVORITE_LAYOUT);
+            Settings.setInt(Settings.FAVORITE_LAYOUT, currFav === idx ? -1 : idx);
+        });
     }
 
     destroy() {
-        this._finish();
+        this._finishLayouting();
         this._keyBindings.forEach(key => Main.wm.removeKeybinding(key));
+        this._panelIndicator.destroy();
+        this._panelIndicator = null;
     }
 
     /**
@@ -127,7 +143,7 @@ var LayoutManager = class TilingLayoutsManager {
         this._step();
     }
 
-    _finish() {
+    _finishLayouting() {
         this._items = [];
         this._currItem = null;
         this._currRect = null;
@@ -147,7 +163,7 @@ var LayoutManager = class TilingLayoutsManager {
         if (!loopType) {
             // We're at the last item and not looping, so there are no more items.
             if (this._currItem === this._items[this._items.length - 1]) {
-                this._finish();
+                this._finishLayouting();
                 return;
             }
 
@@ -181,7 +197,7 @@ var LayoutManager = class TilingLayoutsManager {
         const app = Shell.AppSystem.get_default().lookup_app(appId);
         if (!app) {
             Main.notify('Tiling Assistant', _('Popup Layouts: App not found.'));
-            this._finish();
+            this._finishLayouting();
             return;
         }
 
@@ -229,7 +245,7 @@ var LayoutManager = class TilingLayoutsManager {
         const tileGroup = stacked.reverse();
         if (!popup.show(tileGroup)) {
             popup.destroy();
-            this._finish();
+            this._finishLayouting();
             return;
         }
 
@@ -242,7 +258,7 @@ var LayoutManager = class TilingLayoutsManager {
                 this._tiledWithLoop = [];
                 this._step();
             } else {
-                this._finish();
+                this._finishLayouting();
             }
         } else {
             const tiledWindow = tilingPopup.tiledWindow;
@@ -447,5 +463,105 @@ const SearchItem = GObject.registerClass(class TilingLayoutsSearchItem extends S
                 margin-bottom: 2px`,
             reactive: true
         });
+    }
+});
+
+/**
+ * A panel indicator to activate and favoritize a layout.
+ */
+const PanelIndicator = GObject.registerClass({
+    Signals: {
+        'layout-activated': { param_types: [GObject.TYPE_INT] },
+        'favorite-changed': { param_types: [GObject.TYPE_INT] }
+    }
+}, class PanelIndicator extends PanelMenu.Button {
+    _init() {
+        super._init(0.0, 'Layout Indicator (Tiling Assistant)');
+
+        this.add_child(new St.Icon({
+            icon_name: 'preferences-desktop-apps-symbolic',
+            style_class: 'system-status-icon'
+        }));
+
+        const menuAlignment = 0.0;
+        this.setMenu(new PopupMenu.PopupMenu(this, menuAlignment, St.Side.TOP));
+    }
+
+    vfunc_event(event) {
+        if (this.menu &&
+            (event.type() === Clutter.EventType.TOUCH_BEGIN ||
+             event.type() === Clutter.EventType.BUTTON_PRESS)
+        ) {
+            this._updateItems();
+            this.menu.toggle();
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    _updateItems() {
+        this.menu.removeAll();
+
+        const layouts = Util.getLayouts();
+        if (!layouts.length) {
+            const item = new PopupMenu.PopupMenuItem(_('No valid popup layouts defined.'));
+            item.setSensitive(false);
+            this.menu.addMenuItem(item);
+        } else {
+            const favoriteIdx = Settings.getInt(Settings.FAVORITE_LAYOUT);
+            layouts.forEach((layout, idx) => {
+                const name = layout._name || `Layout ${idx + 1}`;
+                const item = new PopupFavoriteMenuItem(name, favoriteIdx === idx);
+                item.connect('activate', () => {
+                    Main.overview.hide();
+                    this.emit('layout-activated', idx);
+                });
+                item.favoriteButton.connect('clicked', () => {
+                    this.emit('favorite-changed', idx);
+                    this._updateItems();
+                });
+                this.menu.addMenuItem(item);
+            });
+        }
+
+        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+        const settingsButton = new PopupMenu.PopupImageMenuItem('Preferences', 'emblem-system-symbolic');
+        // Center button without changing the size (for the hover highlight)
+        settingsButton._icon.set_x_expand(true);
+        settingsButton.label.set_x_expand(true);
+        settingsButton.connect('activate', () => {
+            try {
+                Main.overview.hide();
+                const cmd = `gnome-extensions prefs ${Me.metadata.uuid}`;
+                GLib.spawn_command_line_async(cmd);
+            } catch (e) {
+                logError(e);
+            }
+        });
+        this.menu.addMenuItem(settingsButton);
+    }
+});
+
+/**
+ * A PopupMenuItem for the PopupMenu of the PanelIndicator.
+ */
+const PopupFavoriteMenuItem = GObject.registerClass(
+class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
+    _init(text, isFavorite) {
+        super._init();
+
+        this.add_child(new St.Label({
+            text,
+            x_expand: true
+        }));
+
+        this.favoriteButton = new St.Button({
+            child: new St.Icon({
+                icon_name: isFavorite ? 'starred-symbolic' : 'non-starred-symbolic',
+                style_class: 'popup-menu-icon'
+            })
+        });
+        this.add_child(this.favoriteButton);
     }
 });

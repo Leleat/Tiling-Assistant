@@ -17,6 +17,7 @@ var Settings = class Settings {
     static SCREEN_GAP = 'screen-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
+    static SHOW_LAYOUT_INDICATOR = 'show-layout-panel-indicator';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
     static SHOW_CHANGE_ON_UPDATE = 'show-changelog-on-update';
     static CHANGELOG_VERSION = 'changelog-version';
@@ -72,6 +73,7 @@ var Settings = class Settings {
             this.SCREEN_GAP,
             this.MAXIMIZE_WITH_GAPS,
             this.DYNAMIC_KEYBINDINGS,
+            this.SHOW_LAYOUT_INDICATOR,
             this.ENABLE_ADV_EXP_SETTINGS,
             this.SHOW_CHANGE_ON_UPDATE,
             this.CHANGELOG_VERSION,
