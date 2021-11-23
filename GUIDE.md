@@ -80,7 +80,7 @@ The `Search for a Layout` keybinding enables you to activate layouts by name. Th
 
 #### Favorite Layout
 
-The `Favorite Layout` is one single layout marked by the 'favorite button' from the list of (popup) layouts. It can be used to have a fixed layout when you move a window around. The default `Favorite Layout Activator` is `Alt`. An example illustrates this feature clearly.
+The `Favorite Layout` is a layout (per monitor) marked by the 'favorite button' in the Panel Indicator. It can be used to have a fixed layout when you move a window around. The default `Favorite Layout Activator` is `Alt`. An example illustrates this feature clearly.
 
 ![](media/Guide_layouts3.gif)
 

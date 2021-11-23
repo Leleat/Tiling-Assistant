@@ -1,5 +1,10 @@
 # Changelog
 
+## v28+
+
+https://github.com/Leleat/Tiling-Assistant/blob/main/tiling-assistant%40leleat-on-github/src/changelog.json (see git history)
+
+
 ## v27
 **Added**
 - `Favorite Layout`, a new window movement mode, as an alternative to the default Edge Tiling (issue #94)

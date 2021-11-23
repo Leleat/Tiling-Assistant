@@ -1,43 +1,50 @@
 {
     "added": [
         {
-            "title": "Added a 'Favorite Layout' feature (issue #94)",
-            "subtitle": "This is an alternative to the default Edge Tiling. It adapts the keyboard shortcuts and allows you to drag windows to a predefined layout. Checkout the <i>User Guide</i> for details"
+            "title": "Added a Panel Indicator for the layouts",
+            "subtitle": "Using the indicator, you can activate a layout with your pointer. You can also change your 'Favorite Layout' (per monitor) with it. The indicator is disabled by default."
         },
         {
-            "title": "Added an in-app Changelog dialog",
-            "subtitle": "On each new release of this extension the Changelog opens when you open the preference window. You can disable this behaviour in the <i>Hidden Settings</i>"
+            "title": "Added a setting to group tileGroups in the AppSwitcher (altTab)",
+            "subtitle": ""
+        },
+        {
+            "title": "Holding Super when dragging a window over the 'Favorite Layout' will make the preview span multiple rectangles",
+            "subtitle": ""
         }
     ],
     "removed": [
         {
-            "title": "Removed the Tile Editing Mode's focus color",
-            "subtitle": "The previous setting was only meant as a workaround. Now we can always follow the system's native Tile-Preview style"
+            "title": "Removed the 'Change favorite layouts' keyboard shortcut",
+            "subtitle": "This is replaced by the Panel Indicator."
+        },
+        {
+            "title": "Removed the favorite button from the 'Layouts' in the preferences",
+            "subtitle": "This is replaced by the Panel Indicator."
         }
     ],
     "changed": [
         {
-            "title": "Split gaps into <i>Window Gaps</i> and <i>Screen Gaps</i> (discussion #109)",
-            "subtitle": "Window Gaps are the gaps between tiled windows. Screen Gaps are the gaps between tiled windows and the screen edges"
+            "title": "Show the entire Layout when moving a window with the 'Favorite Layout' preview mode",
+            "subtitle": ""
         },
         {
-            "title": "Changed the behaviour of <i>Tile to top</i> and <i>Toggle Maximization</i> under certain circumstances (discussion #107)",
-            "subtitle": "These keyboard shortcuts now always cycle between each other when using the dynamic keybinding behaviours <i>Tiling State</i> or <i>Tiling State (Windows)</i>"
+            "title": "Updated the jp translation (by k-fog #112)",
+            "subtitle": ""
         },
         {
-            "title": "Turned the setting <i>Tiling Popup: Current Workspace only</i> into <i>Include apps from all workspaces</i> and moved it to the general settings page",
-            "subtitle": "Since GNOME's native app switcher exposes this setting now, follow suit"
-        },
-        {
-            "title": "Moved the <i>Inverse Top Screen Edge Action</i> settings to the <i>Hidden Settings</i>",
-            "subtitle": "This is probably too niche for the general settings"
-        },
-        {
-            "title": "Reworked the preference window to follow GNOME's design more closely",
+            "title": "Untile windows, if they are moved to a new monitor (#114)",
             "subtitle": ""
         }
     ],
     "fixed": [
-
+        {
+            "title": "The Tiling Popup will appear on the correct monitor during the 'Grace Period'",
+            "subtitle": "When dragging a window to a new monitor there is a short 'Grace Period' (150 ms), in which, if the grab is released on the window, the window will tile to the old monitor."
+        },
+        {
+            "title": "Fixed artifacts due to the rounded corners of the Changelog window",
+            "subtitle": "This only works on Wayland."
+        }
     ]
 }
