@@ -87,6 +87,12 @@ function enable() {
 
     // Restore tiled window properties after session was unlocked.
     _loadAfterSessionLock();
+
+    // TODO: remove compatibility code for single favorite layout
+    if (!Settings.getStrv(Settings.FAVORITE_LAYOUTS).length) {
+        const currFav = `${Settings.getInt('favorite-layout')}`;
+        Settings.setStrv(Settings.FAVORITE_LAYOUTS, [currFav]);
+    }
 }
 
 function disable() {

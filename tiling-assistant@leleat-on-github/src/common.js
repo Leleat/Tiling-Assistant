@@ -24,7 +24,7 @@ var Settings = class Settings {
     static CHANGELOG_VERSION = 'changelog-version';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
-    static FAVORITE_LAYOUT = 'favorite-layout';
+    static FAVORITE_LAYOUTS = 'favorite-layouts';
     static DEFAULT_MOVE_MODE = 'default-move-mode';
     static SPLIT_TILE_MOD = 'move-split-tiles-mod';
     static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
@@ -81,7 +81,7 @@ var Settings = class Settings {
             this.CHANGELOG_VERSION,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
-            this.FAVORITE_LAYOUT,
+            this.FAVORITE_LAYOUTS,
             this.DEFAULT_MOVE_MODE,
             this.SPLIT_TILE_MOD,
             this.FAVORITE_LAYOUT_MOD,

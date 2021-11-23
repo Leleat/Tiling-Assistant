@@ -29,8 +29,7 @@ const _ = Domain.gettext;
  *
  * Additionally, there the user can select a 'favorite' layout among the
  * PopupLayouts. That layout will then be used as an fixed alternative mode to
- * the Edge Tiling. This class only handles setting the favorite layout with a
- * keyboard shortcut.
+ * the Edge Tiling.
  */
 
 var LayoutManager = class TilingLayoutsManager {
@@ -66,12 +65,7 @@ var LayoutManager = class TilingLayoutsManager {
             this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
         });
         this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
-
         this._panelIndicator.connect('layout-activated', (src, idx) => this.startLayouting(idx));
-        this._panelIndicator.connect('favorite-changed', (src, idx) => {
-            const currFav = Settings.getInt(Settings.FAVORITE_LAYOUT);
-            Settings.setInt(Settings.FAVORITE_LAYOUT, currFav === idx ? -1 : idx);
-        });
     }
 
     destroy() {
@@ -88,7 +82,7 @@ var LayoutManager = class TilingLayoutsManager {
     openPopupSearch() {
         const layouts = Util.getLayouts();
         if (!layouts.length) {
-            Main.notify('Tiling Assistant', _('No valid popup layouts defined.'));
+            Main.notify('Tiling Assistant', _('No valid layouts defined.'));
             return;
         }
 
@@ -445,10 +439,7 @@ class TilingLayoutsSearchItem extends St.Label {
  * A panel indicator to activate and favoritize a layout.
  */
 const PanelIndicator = GObject.registerClass({
-    Signals: {
-        'layout-activated': { param_types: [GObject.TYPE_INT] },
-        'favorite-changed': { param_types: [GObject.TYPE_INT] }
-    }
+    Signals: { 'layout-activated': { param_types: [GObject.TYPE_INT] } }
 }, class PanelIndicator extends PanelMenu.Button {
     _init() {
         super._init(0.0, 'Layout Indicator (Tiling Assistant)');
@@ -479,22 +470,27 @@ const PanelIndicator = GObject.registerClass({
 
         const layouts = Util.getLayouts();
         if (!layouts.length) {
-            const item = new PopupMenu.PopupMenuItem(_('No valid popup layouts defined.'));
+            const item = new PopupMenu.PopupMenuItem(_('No valid layouts defined.'));
             item.setSensitive(false);
             this.menu.addMenuItem(item);
         } else {
-            const favoriteIdx = Settings.getInt(Settings.FAVORITE_LAYOUT);
+            // Update favorites with monitor count and fill with '-1', if necessary
+            const tmp = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+            const count = Math.max(Main.layoutManager.monitors.length, tmp.length);
+            const favorites = [...new Array(count)].map((m, monitorIndex) => {
+                return tmp[monitorIndex] ?? '-1';
+            });
+            Settings.setStrv(Settings.FAVORITE_LAYOUTS, favorites);
+
+            // Create popup menu items
             layouts.forEach((layout, idx) => {
                 const name = layout._name || `Layout ${idx + 1}`;
-                const item = new PopupFavoriteMenuItem(name, favoriteIdx === idx);
+                const item = new PopupFavoriteMenuItem(name, idx);
                 item.connect('activate', () => {
                     Main.overview.hide();
                     this.emit('layout-activated', idx);
                 });
-                item.favoriteButton.connect('clicked', () => {
-                    this.emit('favorite-changed', idx);
-                    this._updateItems();
-                });
+                item.connect('favorite-changed', this._updateItems.bind(this));
                 this.menu.addMenuItem(item);
             });
         }
@@ -521,9 +517,10 @@ const PanelIndicator = GObject.registerClass({
 /**
  * A PopupMenuItem for the PopupMenu of the PanelIndicator.
  */
-const PopupFavoriteMenuItem = GObject.registerClass(
-class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
-    _init(text, isFavorite) {
+const PopupFavoriteMenuItem = GObject.registerClass({
+    Signals: { 'favorite-changed': { param_types: [GObject.TYPE_INT] } }
+}, class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
+    _init(text, layoutIndex) {
         super._init();
 
         this.add_child(new St.Label({
@@ -531,12 +528,23 @@ class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
             x_expand: true
         }));
 
-        this.favoriteButton = new St.Button({
-            child: new St.Icon({
-                icon_name: isFavorite ? 'starred-symbolic' : 'non-starred-symbolic',
-                style_class: 'popup-menu-icon'
-            })
+        const favorites = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+        Main.layoutManager.monitors.forEach((m, monitorIndex) => {
+            const favoriteButton = new St.Button({
+                child: new St.Icon({
+                    icon_name: favorites[monitorIndex] === `${layoutIndex}` ? 'starred-symbolic' : 'non-starred-symbolic',
+                    style_class: 'popup-menu-icon'
+                })
+            });
+            this.add_child(favoriteButton);
+
+            // Update gSetting with new Favorite (act as a toggle button)
+            favoriteButton.connect('clicked', () => {
+                const currFavorites = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+                currFavorites[monitorIndex] = currFavorites[monitorIndex] === `${layoutIndex}` ? '-1' : `${layoutIndex}`;
+                Settings.setStrv(Settings.FAVORITE_LAYOUTS, currFavorites);
+                this.emit('favorite-changed', monitorIndex);
+            });
         });
-        this.add_child(this.favoriteButton);
     }
 });

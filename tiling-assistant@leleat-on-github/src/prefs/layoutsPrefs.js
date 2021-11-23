@@ -78,17 +78,6 @@ var Prefs = class TilingLayoutsPrefs {
             shortcut.initialize(key, this._settings);
         });
 
-        // Update the 'favorite' icons, if the setting changes.
-        this._settings.connect('changed::favorite-layout', () => {
-            Util.forEachChild(this, this._layoutsListBox, r => {
-                r.setFavoriteIcon(false);
-            });
-
-            const newFav = this._settings.get_int('favorite-layout');
-            if (newFav !== -1)
-                Util.getChild(this._layoutsListBox, newFav).setFavoriteIcon(true);
-        });
-
         // Finally, load the existing settings.
         this._loadLayouts();
     }
@@ -154,8 +143,6 @@ var Prefs = class TilingLayoutsPrefs {
                 const keys = this._settings.get_strv(`activate-layout${layoutRow.getIdx()}`);
                 this._settings.set_strv(`activate-layout${layouts.length - 1}`, keys);
                 this._settings.set_strv(`activate-layout${layoutRow.getIdx()}`, []);
-                const currFav = this._settings.get_int('favorite-layout');
-                this._settings.set_int('favorite-layout', currFav - 1);
             } else {
                 // Remove keyboard shortcuts, if they aren't assigned to a
                 // valid layout, because they won't be visible to the user

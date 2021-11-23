@@ -39,18 +39,6 @@
             <child>
               <object class="ShortcutListener" id="shortcut"/>
             </child>
-            <child>
-              <object class="GtkButton" id="favoriteButton">
-                <property name="margin-start">6</property>
-                <property name="has-frame">0</property>
-                <property name="icon-name">non-starred-symbolic</property>
-                <property name="tooltip-text" translatable="yes">Your favorite layout will be used as the &apos;Favorite Layout&apos; when moving a window.</property>
-                <property name="valign">center</property>
-                <property name="focus-on-click">0</property>
-                <property name="receives-default">1</property>
-                <signal name="clicked" handler="_onfavoriteButtonClicked" swapped="no"/>
-              </object>
-            </child>
           </object>
         </child>
         <child>

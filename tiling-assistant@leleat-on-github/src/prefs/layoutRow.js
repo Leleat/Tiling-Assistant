@@ -29,7 +29,6 @@ var LayoutRow = GObject.registerClass({
         'drawingArea',
         'entryBox',
         'errorLabel',
-        'favoriteButton',
         'nameEntry',
         'rectCountLabel',
         'shortcut',
@@ -90,10 +89,6 @@ var LayoutRow = GObject.registerClass({
         // Add one empty entry row
         this._onAddRowEntryButtonClicked();
 
-        // Set the favorite icon
-        if (this._settings.get_int('favorite-layout') === this._idx)
-            this.setFavoriteIcon(true);
-
         // Update the preview / show the errorLabel
         this._updatePreview();
     }
@@ -136,16 +131,6 @@ var LayoutRow = GObject.registerClass({
         }
 
         return this._layout.getItemCount() ? this._layout : null;
-    }
-
-    /**
-     * Un/Sets the favorite's icon.
-     *
-     * @param {boolean} favorite wether this is the new favorite.
-     */
-    setFavoriteIcon(favorite) {
-        const iconName = favorite ? 'starred-symbolic' : 'non-starred-symbolic';
-        this._favoriteButton.set_icon_name(iconName);
     }
 
     /**
@@ -218,13 +203,6 @@ var LayoutRow = GObject.registerClass({
         const rowEntry = new LayoutRowEntry(this._layout.getItemCount(), this._layout.addItem());
         rowEntry.connect('changed', this._onRowEntryChanged.bind(this));
         this._entryBox.append(rowEntry);
-    }
-
-    _onfavoriteButtonClicked() {
-        const currIcon = this._favoriteButton.get_icon_name();
-        const willFavorite = currIcon !== 'starred-symbolic';
-        // The actual update of the icon happens in layoutsPrefs with a settings signal
-        this._settings.set_int('favorite-layout', willFavorite ? this._idx : -1);
     }
 
     _onRowEntryChanged(entry, ok) {

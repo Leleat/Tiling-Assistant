@@ -797,20 +797,21 @@ var Util = class Utility {
     }
 
     /**
-     * @returns {Rect[]} the rects of the 'Favorite layout'
+     * @param {number|null} monitorNr
+     * @returns {Rect[]}
      */
-    static getFavoriteLayout() {
+    static getFavoriteLayout(monitorNr = null) {
         // I don't know when the layout may have changed on the disk(?),
         // so always get it anew.
+        const monitor = monitorNr ?? global.display.get_current_monitor();
         const favoriteLayout = [];
         const layouts = this.getLayouts();
-        const layout = layouts?.[Settings.getInt(Settings.FAVORITE_LAYOUT)];
+        const layout = layouts?.[Settings.getStrv(Settings.FAVORITE_LAYOUTS)[monitor]];
 
         if (!layout)
             return [];
 
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
         // Scale the rect's ratios to the workArea. Try to align the rects to
