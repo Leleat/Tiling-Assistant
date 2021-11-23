@@ -1,32 +1,39 @@
+window.changelog,
+window.changelog list.frame,
 window.tiling-assistant,
 window.tiling-assistant list.frame {
 	border-radius: 12px;
 }
 
+window.changelog list.frame,
 window.tiling-assistant list.frame {
 	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15);
 }
 
+window.changelog list.frame row:first-child,
 window.tiling-assistant list.frame row:first-child {
 	border-top-left-radius: 12px;
 	border-top-right-radius: 12px;
 }
 
+window.changelog list.frame row:last-child,
 window.tiling-assistant list.frame row:last-child {
 	border-bottom-left-radius: 12px;
 	border-bottom-right-radius: 12px;
 	border-bottom: none;
 }
 
+window.changelog scrollbar.vertical,
+window.tiling-assistant scrollbar.vertical,
 window.tiling-assistant spinbutton button,
-window.tiling-assistant combobox button.combo,
-window.tiling-assistant scrollbar.vertical {
+window.tiling-assistant combobox button.combo {
 	border: none;
 	box-shadow: none;
 }
 
-window.tiling-assistant combobox button.combo,
-window.tiling-assistant scrollbar.vertical {
+window.changelog scrollbar.vertical,
+window.tiling-assistant scrollbar.vertical,
+window.tiling-assistant combobox button.combo {
 	background: none;
 }
 
@@ -34,6 +41,7 @@ window.tiling-assistant combobox button.combo arrow {
 	padding-left: 6px;
 }
 
+window.changelog scrollbar.vertical slider,
 window.tiling-assistant scrollbar.vertical slider {
 	margin-top: 8px;
 	margin-bottom: 8px;

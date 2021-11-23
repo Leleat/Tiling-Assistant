@@ -9,6 +9,9 @@
     <property name="default-height">500</property>
     <property name="destroy-with-parent">True</property>
     <property name="hide-on-close">False</property>
+    <style>
+      <class name="changelog"/>
+    </style>
     <property name="child">
       <object class="GtkWindowHandle">
         <child>

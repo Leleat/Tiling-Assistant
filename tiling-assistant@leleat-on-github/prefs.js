@@ -191,10 +191,7 @@ const PrefsWidget = GObject.registerClass({
             return;
 
         const changes = JSON.parse(ByteArray.toString(contents));
-        const changelogDialog = new Changelog({
-            transient_for: prefsDialog,
-            css_classes: prefsDialog.get_css_classes()
-        }, changes);
+        const changelogDialog = new Changelog({ transient_for: prefsDialog }, changes);
         changelogDialog.present();
     }
 
