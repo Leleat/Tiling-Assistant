@@ -24,6 +24,9 @@
 		<key name="enable-raise-tile-group" type="b">
 			<default>true</default>
 		</key>
+		<key name="tilegroups-in-app-switcher" type="b">
+			<default>true</default>
+		</key>
 		<key name="dynamic-keybinding-behaviour" type="s">
 			<default>"Disabled"</default>
 		</key>

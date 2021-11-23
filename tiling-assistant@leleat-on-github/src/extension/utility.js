@@ -1,6 +1,6 @@
 'use strict';
 
-const { Clutter, Gio, GLib, Meta, Shell, St } = imports.gi;
+const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
 const { altTab: AltTab, main: Main } = imports.ui;
 const ByteArray = imports.byteArray;
 

@@ -58,6 +58,9 @@ function enable() {
     const LayoutsManager = Me.imports.src.extension.layoutsManager;
     this._layoutsManager = new LayoutsManager.LayoutManager();
 
+    const AltTabOverride = Me.imports.src.extension.altTab.Override;
+    this._altTabOverride = new AltTabOverride();
+
     // Disable native tiling.
     this._gnomeMutterSettings = ExtensionUtils.getSettings('org.gnome.mutter');
     this._gnomeMutterSettings.set_boolean('edge-tiling', false);
@@ -99,6 +102,9 @@ function disable() {
     this._keybindingHandler = null;
     this._layoutsManager.destroy();
     this._layoutsManager = null;
+
+    this._altTabOverride.destroy();
+    this._altTabOverride = null;
 
     Util.destroy();
     Util = null;

@@ -197,6 +197,19 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Group in App Switcher</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="tilegroups_in_app_switcher">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
+                                <property name="active">True</property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

@@ -425,7 +425,8 @@ const LayoutSearch = GObject.registerClass({
 /**
  * An Item representing a Layout within the Popup Layout search.
  */
-const SearchItem = GObject.registerClass(class TilingLayoutsSearchItem extends St.Label {
+const SearchItem = GObject.registerClass(
+class TilingLayoutsSearchItem extends St.Label {
     _init(text, fontSize) {
         super._init({
             // Add some spaces to the beginning to align it better

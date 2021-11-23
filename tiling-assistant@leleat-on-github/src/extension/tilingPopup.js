@@ -349,7 +349,8 @@ var TilingSwitcherPopup = GObject.registerClass({
     }
 });
 
-const TSwitcherList = GObject.registerClass(class TilingSwitcherList extends SwitcherPopup.SwitcherList {
+const TSwitcherList = GObject.registerClass(
+class TilingSwitcherList extends SwitcherPopup.SwitcherList {
     _init(openWindows, apps, altTabPopup) {
         super._init(true);
 
