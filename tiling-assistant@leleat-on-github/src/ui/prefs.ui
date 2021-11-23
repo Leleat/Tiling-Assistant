@@ -598,6 +598,16 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
+                      <object class="GtkLabel">
+                        <property name="halign">start</property>
+                        <property name="hexpand">1</property>
+                        <property name="label" translatable="yes">General</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkListBox">
                         <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
@@ -618,40 +628,11 @@
                             </property>
                           </object>
                         </child>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="halign">start</property>
-                        <property name="hexpand">1</property>
-                        <property name="label" translatable="yes">Keyboard Shortcuts</property>
-                        <style>
-                          <class name="heading"/>
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkListBox">
-                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
-                        <property name="show-separators">True</property>
-                        <property name="margin-bottom">24</property>
-                        <property name="selection-mode">none</property>
-                        <style>
-                          <class name="frame"/>
-                        </style>
                         <child>
                           <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Search for a Layout</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="search_popup_layout"/>
-                            </property>
-                          </object>
-                        </child>
-                        <child>
-                          <object class="TilingAssistantListRow">
-                            <property name="title" translatable="yes">Change favorite Layout</property>
-                            <property name="suffix">
-                              <object class="ShortcutListener" id="change_favorite_layout"/>
                             </property>
                           </object>
                         </child>

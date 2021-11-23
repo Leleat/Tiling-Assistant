@@ -73,7 +73,7 @@ var Prefs = class TilingLayoutsPrefs {
         });
 
         // Bind the general layouts keyboard shortcuts.
-        ['search-popup-layout', 'change-favorite-layout'].forEach(key => {
+        ['search-popup-layout'].forEach(key => {
             const shortcut = mainPrefs[`_${key.replaceAll('-', '_')}`];
             shortcut.initialize(key, this._settings);
         });

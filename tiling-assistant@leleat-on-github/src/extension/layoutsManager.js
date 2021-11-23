@@ -97,23 +97,6 @@ var LayoutManager = class TilingLayoutsManager {
     }
 
     /**
-     * Opens a popup so the user can choose a new favorite layout to use for
-     * the 'Favorite Layout'.
-     */
-    openFavoriteSearch() {
-        const layouts = Util.getLayouts();
-        if (!layouts.length) {
-            Main.notify('Tiling Assistant', _('No valid popup layouts defined.'));
-            return;
-        }
-
-        const search = new LayoutSearch(layouts);
-        search.connect('item-activated', (s, index) => {
-            Settings.setInt(Settings.FAVORITE_LAYOUT, index);
-        });
-    }
-
-    /**
      * Starts tiling to a Popup Layout.
      *
      * @param {number} index the index of the layout we start tiling to.
@@ -305,15 +288,6 @@ var LayoutManager = class TilingLayoutsManager {
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL,
             this.openPopupSearch.bind(this)
-        );
-
-        this._keyBindings.push('change-favorite-layout');
-        Main.wm.addKeybinding(
-            'change-favorite-layout',
-            Settings.getGioObject(),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL,
-            this.openFavoriteSearch.bind(this)
         );
     }
 };

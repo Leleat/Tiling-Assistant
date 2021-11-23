@@ -60,7 +60,6 @@ const PrefsWidget = GObject.registerClass({
         'tile_bottomright_quarter',
         'show_layout_panel_indicator',
         'search_popup_layout',
-        'change_favorite_layout',
         'layouts_listbox',
         'add_layout_button',
         'save_layouts_button',

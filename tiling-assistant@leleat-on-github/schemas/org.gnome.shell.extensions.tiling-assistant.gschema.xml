@@ -89,9 +89,6 @@
 		<key name="search-popup-layout" type="as">
 			<default>[]</default>
 		</key>
-		<key name="change-favorite-layout" type="as">
-			<default>[]</default>
-		</key>
 		<key name="favorite-layout" type="i">
 			<default>-1</default>
 		</key>
