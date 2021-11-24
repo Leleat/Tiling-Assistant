@@ -186,6 +186,7 @@ var Handler = class TilingMoveHandler {
             this._posChangedId = 0;
         }
 
+        this._currPreviewMode = '';
         this._favoriteLayout = [];
         this._favoritePreviews?.forEach(p => p.destroy());
         this._favoritePreviews = [];
@@ -281,20 +282,19 @@ var Handler = class TilingMoveHandler {
     }
 
     _preparePreviewModeChange(newMode, window) {
+        // Cleanups / resets
         this._tileRect = null;
-
-        switch (this._currPreviewMode) {
-            case MoveModes.FAVORITE_LAYOUT:
-                this._favoritePreviews.forEach(p => {
-                    p.ease({
-                        opacity: 0,
-                        duration: 100,
-                        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                        onComplete: () => p.destroy()
-                    });
-                });
-                this._favoritePreviews = [];
-        }
+        this._splitRects.clear();
+        this._favoritePreviews.forEach(p => {
+            p.ease({
+                opacity: 0,
+                duration: 100,
+                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                onComplete: () => p.destroy()
+            });
+        });
+        this._favoritePreviews = [];
+        this._favoriteAnchor = null;
 
         switch (newMode) {
             case MoveModes.FAVORITE_LAYOUT:
