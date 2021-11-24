@@ -40,26 +40,7 @@ var Handler = class TilingMoveHandler {
         });
         this._displaySignals.push(w1Id);
 
-        // Restore a tiled (+ maximized)  window's size, if it changes monitors.
-        // Previously, we tried to adapt the tiled window's size to the new monitor
-        // but that is probably too unpredictable. First, it may introduce rounding
-        // errors when moving multipe windows of the same tileGroup and second (and
-        // more importantly) the behaviour with regards to tileGroups isn't clear...
-        // Should the entire tileGroup move, if 1 tiled window is moved? If not,
-        // there should probably be a way to just detach 1 window from a group. What
-        // happens on the new monitor, if 1 window is moved? Should it create a new
-        // tileGroup? Should it try to integrate into existing tileGroups on that
-        // monitor etc... there are too many open questions. Instead just untile
-        // and leave it up to the user to re-tile a window.
-        const w2Id = global.display.connect('window-entered-monitor', (src, monitorNr, window) => {
-            // During the grace period of a grab a window will tile to the old
-            // monitor triggering a monitor enter event... don't register that
-            // as a monitor change. See _edgeTilingPreview()
-            if (this._isGrabOp || !window.untiledRect)
-                return;
-
-            this._onMonitorChanged(window, monitorNr);
-        });
+        const w2Id = global.display.connect('window-entered-monitor', this._onMonitorEntered.bind(this));
         this._displaySignals.push(w2Id);
 
         // Save the windows, which need to make space for the
@@ -70,6 +51,7 @@ var Handler = class TilingMoveHandler {
         // (it may differ from the tilePreview's rect)
         this._tileRect = null;
 
+        this._favoritePreviews = [];
         this._tilePreview = new TilePreview();
     }
 
@@ -78,9 +60,34 @@ var Handler = class TilingMoveHandler {
         this._tilePreview.destroy();
     }
 
-    // Only applies to tiled / maximized windows.
-    // Untile tiled windows and adapt maximized windows' sizes to the new monitor.
-    _onMonitorChanged(window, newMonitorNr) {
+    // Only called for maximized / tiled windows: untile tiled windows
+    // Previously, we tried to adapt the tiled window's size to the new monitor
+    // but that is probably too unpredictable. First, it may introduce rounding
+    // errors when moving multipe windows of the same tileGroup and second (and
+    // more importantly) the behaviour with regards to tileGroups isn't clear...
+    // Should the entire tileGroup move, if 1 tiled window is moved? If not,
+    // there should probably be a way to just detach 1 window from a group. What
+    // happens on the new monitor, if 1 window is moved? Should it create a new
+    // tileGroup? Should it try to integrate into existing tileGroups on that
+    // monitor etc... there are too many open questions. Instead just untile
+    // and leave it up to the user to re-tile a window.
+    _onMonitorEntered(src, newMonitorNr, window) {
+        // During the grace period of a grab a window will tile to the old
+        // monitor triggering a monitor-enter-event... Don't register that.
+        // See _edgeTilingPreview() for more about the grace period.
+        if (this._isGrabOp) {
+            // Reset preview mode:
+            // Currently only needed to grab the favorite layout for the new monitor.
+            this._preparePreviewModeChange(this._currPreviewMode, window);
+            return;
+        }
+
+        // Only proceed with existing *maximized and tiled windows*. That means past this
+        // point, this is a 'monitor-changed' signal for those windows
+        if (!window.untiledRect)
+            return;
+
+        // Adapt maximized windows to the new monitor or untile tiled windows
         const oldWorkArea = window.get_work_area_for_monitor(this._windowLeftMonitorNr);
         if (Util.isMaximized(window, oldWorkArea)) {
             Util.tile(
@@ -88,7 +95,7 @@ var Handler = class TilingMoveHandler {
                 new Rect(window.get_work_area_for_monitor(newMonitorNr)),
                 { openTilingPopup: false, skipAnim: true }
             );
-        } else {
+        } else if (window.isTiled) {
             Util.untile(window, { restoreFullPos: false, skipAnim: true });
         }
     }
@@ -153,8 +160,6 @@ var Handler = class TilingMoveHandler {
             this._isGrabOp = true;
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
-            this._favoriteLayout = Util.getFavoriteLayout();
-            this._favoritePreviews = [];
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -184,6 +189,7 @@ var Handler = class TilingMoveHandler {
         this._favoriteLayout = [];
         this._favoritePreviews?.forEach(p => p.destroy());
         this._favoritePreviews = [];
+        this._favoriteAnchor = null;
         this._tilePreview.close();
 
         if (!this._tileRect) {
@@ -258,7 +264,7 @@ var Handler = class TilingMoveHandler {
         }
 
         if (this._currPreviewMode !== newMode)
-            this._preparePreviewModeChange();
+            this._preparePreviewModeChange(newMode, window);
 
         switch (newMode) {
             case MoveModes.EDGE_TILING:
@@ -274,18 +280,34 @@ var Handler = class TilingMoveHandler {
         this._currPreviewMode = newMode;
     }
 
-    _preparePreviewModeChange() {
-        this._favoritePreviews.forEach(p => {
-            p.ease({
-                opacity: 0,
-                duration: 100,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => p.destroy()
-            });
-        });
-        this._favoritePreviews = [];
-        this._favoriteAnchor = null;
+    _preparePreviewModeChange(newMode, window) {
         this._tileRect = null;
+
+        switch (this._currPreviewMode) {
+            case MoveModes.FAVORITE_LAYOUT:
+                this._favoritePreviews.forEach(p => {
+                    p.ease({
+                        opacity: 0,
+                        duration: 100,
+                        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                        onComplete: () => p.destroy()
+                    });
+                });
+                this._favoritePreviews = [];
+        }
+
+        switch (newMode) {
+            case MoveModes.FAVORITE_LAYOUT:
+                this._favoriteLayout = Util.getFavoriteLayout();
+                this._favoriteLayout.forEach(rect => {
+                    const tilePreview = new TilePreview();
+                    tilePreview.open(window, rect, this._monitorNr, {
+                        opacity: 255,
+                        duration: 150
+                    });
+                    this._favoritePreviews.push(tilePreview);
+                });
+        }
     }
 
     _restoreSizeAndRestartGrab(window, eventX, eventY, grabOp) {
@@ -664,17 +686,6 @@ var Handler = class TilingMoveHandler {
     }
 
     _favoriteLayoutTilingPreview(window) {
-        if (!this._favoritePreviews.length) {
-            this._favoriteLayout.forEach(rect => {
-                const tilePreview = new TilePreview();
-                tilePreview.open(window, rect, this._monitorNr, {
-                    opacity: 255,
-                    duration: 150
-                });
-                this._favoritePreviews.push(tilePreview);
-            });
-        }
-
         // Holding Super will make the window span multiple rects of the favorite
         // layout starting from the rect, which the user starting holding Super in.
         const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
