@@ -199,11 +199,13 @@
                         </child>
                         <child>
                           <object class="TilingAssistantListRow">
-                            <property name="title" translatable="yes">Group in App Switcher</property>
+                            <property name="title" translatable="yes">App Switcher</property>
+                            <property name="subtitle" translatable="yes">This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You may need to re-enable this or the other extension after toggling this setting</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="tilegroups_in_app_switcher">
                                 <property name="can-focus">True</property>
                                 <property name="halign">end</property>
+                                <property name="valign">center</property>
                                 <property name="hexpand">True</property>
                                 <property name="active">True</property>
                               </object>
@@ -313,7 +315,7 @@
                         <child>
                           <object class="TilingAssistantListRow" id="dynamic_keybinding_window_focus_row">
                             <property name="title" translatable="yes">Window Focus</property>
-                            <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut, if there is one.</property>
+                            <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut, if there is one</property>
                             <property name="prefix">
                               <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
@@ -331,7 +333,7 @@
                         <child>
                           <object class="TilingAssistantListRow" id="dynamic_keybinding_tiling_state_row">
                             <property name="title" translatable="yes">Tiling State</property>
-                            <property name="subtitle" translatable="yes">Adapt the current window's tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated.</property>
+                            <property name="subtitle" translatable="yes">Adapt the current window's tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated</property>
                             <property name="prefix">
                               <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>

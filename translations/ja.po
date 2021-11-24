@@ -109,10 +109,10 @@ msgstr "ウィンドウフォーカス"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:303
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut, "
-"if there is one."
+"if there is one"
 msgstr ""
 "押されたショートカットの方向に整列したウィンドウがある場合、"
-"そのウィンドウにフォーカスを切り替えます。"
+"そのウィンドウにフォーカスを切り替えます"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
 msgid "Tiling State"
@@ -122,11 +122,11 @@ msgstr "整列状態"
 msgid ""
 "Adapt the current window's tiling state to the pressed shortcut. For "
 "instance, a window tiled to the right half will tile to the bottom-right "
-"quarter, if 'tile to bottom' is activated."
+"quarter, if 'tile to bottom' is activated"
 msgstr ""
 "現在のウィンドウの整列状態を、押されたショートカットに適応させます。"
 "例えば、右半分に配置されたウィンドウは、[下に配置]が実行された場合、"
-"右下に配置されます。"
+"右下に配置されます"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:338
 msgid "Tiling State (Windows)"

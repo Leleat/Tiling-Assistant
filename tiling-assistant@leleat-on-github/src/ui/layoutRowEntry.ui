@@ -17,6 +17,9 @@
       <object class="GtkButton" id="rectAppButton">
         <property name="receives-default">1</property>
         <signal name="clicked" handler="_onAppButtonClicked" swapped="no"/>
+        <style>
+          <class name="round-button"/>
+        </style>
       </object>
     </child>
   </template>

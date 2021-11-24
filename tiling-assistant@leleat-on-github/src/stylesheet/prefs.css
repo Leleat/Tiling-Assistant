@@ -1,47 +1,70 @@
-window.changelog,
-window.changelog list.frame,
+.round-button {
+	border-radius: 99px;
+}
+
 window.tiling-assistant,
 window.tiling-assistant list.frame {
 	border-radius: 12px;
 }
 
-window.changelog list.frame,
 window.tiling-assistant list.frame {
-	box-shadow: 0px 1px 1px rgba(0, 0, 0, 0.15);
+	box-shadow: 0px 1px 0px 1px rgba(0, 0, 0, 0.1);
 }
 
-window.changelog list.frame row:first-child,
 window.tiling-assistant list.frame row:first-child {
 	border-top-left-radius: 12px;
 	border-top-right-radius: 12px;
 }
 
-window.changelog list.frame row:last-child,
 window.tiling-assistant list.frame row:last-child {
 	border-bottom-left-radius: 12px;
 	border-bottom-right-radius: 12px;
 	border-bottom: none;
 }
 
-window.changelog scrollbar.vertical,
-window.tiling-assistant scrollbar.vertical,
-window.tiling-assistant spinbutton button,
-window.tiling-assistant combobox button.combo {
-	border: none;
-	box-shadow: none;
+window.tiling-assistant text selection:not(:focus) {
+	background-color: rgb(160, 160, 160); /* alpha causes some artifects in light theme...? */
 }
 
-window.changelog scrollbar.vertical,
-window.tiling-assistant scrollbar.vertical,
-window.tiling-assistant combobox button.combo {
+window.tiling-assistant entry {
+	border: none;
+	border-bottom: 1px solid rgba(128, 128, 128, .5);
+	border-radius: 0px;
 	background: none;
+	outline: none;
+}
+
+window.tiling-assistant spinbutton {
+	border: none;
+	background: none;
+	outline: none;
+}
+
+window.tiling-assistant spinbutton button {
+	background: rgba(128, 128, 128, .1);
+	border: none;
+	border-radius: 99px;
+}
+
+window.tiling-assistant spinbutton button:hover {
+	background: rgba(128, 128, 128, .2);
+}
+
+window.tiling-assistant spinbutton button.up {
+	margin-left: 6px;
+}
+
+window.tiling-assistant combobox button.combo,
+window.tiling-assistant scrollbar.vertical {
+	background: none;
+	border: none;
+	box-shadow: none;
 }
 
 window.tiling-assistant combobox button.combo arrow {
 	padding-left: 6px;
 }
 
-window.changelog scrollbar.vertical slider,
 window.tiling-assistant scrollbar.vertical slider {
 	margin-top: 8px;
 	margin-bottom: 8px;

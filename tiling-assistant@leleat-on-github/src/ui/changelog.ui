@@ -10,7 +10,7 @@
     <property name="destroy-with-parent">True</property>
     <property name="hide-on-close">False</property>
     <style>
-      <class name="changelog"/>
+      <class name="tiling-assistant"/>
     </style>
     <property name="child">
       <object class="GtkWindowHandle">
