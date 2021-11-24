@@ -54,10 +54,11 @@ class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
 
         item.cachedWindows.forEach(w => w.delete(global.get_current_time()));
         item.cachedWindows = [];
-        this._switcherList._removeIcon(item); // tileGroups
+        this._switcherList._removeIcon(item);
     }
 
     // Called when closing a window with the thumbnail switcher
+    // meaning that .cachedWindow of an item was updated via signals
     _windowRemoved(thumbnailSwitcher, n) {
         const item = this._items[this._selectedIndex];
         if (!item)
@@ -66,20 +67,9 @@ class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
         if (item.cachedWindows.length) {
             const newIndex = Math.min(n, item.cachedWindows.length - 1);
             this._select(this._selectedIndex, newIndex);
-
-            // Update AppIcons for tileGroups with multiple AppIcons
-            const winTracker = Shell.WindowTracker.get_default();
-            const apps = item.cachedWindows.map(w => winTracker.get_window_app(w));
-            const uniqueApps = [...new Set(apps)];
-            for (let i = item.appIcons.length - 1; i >= 0; i--) {
-                if (!uniqueApps.includes(item.appIcons[i].app)) {
-                    item.appIcons[i].destroy();
-                    item.appIcons.splice(i, 1);
-                    item.chains[Math.max(0, i - 1)].destroy();
-                    item.chains.splice(Math.max(0, i - 1), 1);
-                }
-            }
         }
+
+        item.updateAppIcons();
     }
 });
 
@@ -129,6 +119,7 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         // Construct the AppIcons and add them to the popup.
         groupedWindows.forEach(group => {
             const item = new AppSwitcherItem(group);
+            item.connect('all-icons-removed', () => this._removeIcon(item));
             this._addIcon(item);
         });
 
@@ -137,18 +128,8 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         const allApps = allWindows.map(w => winTracker.get_window_app(w));
         this._apps = [...new Set(allApps)];
         this._stateChangedIds = this._apps.map(app => app.connect('notify::state', () => {
-            if (app.state !== Shell.AppState.RUNNING) {
-                const index = this.icons.findIndex(icon => {
-                    // TODO: Doesn't work for tileGroups...
-                    // Currently, we just manually remove the tileGroup in
-                    // _appSwitcherPopupQuitApplication()
-                    return icon.appIcons.every(appIcon => appIcon.app === app);
-                });
-                if (index === -1)
-                    return;
-
-                this._removeIcon(this.icons[index]);
-            }
+            if (app.state !== Shell.AppState.RUNNING)
+                this.icons.forEach(item => item.removeApp(app));
         }));
 
         this.connect('destroy', this._onDestroy.bind(this));
@@ -181,43 +162,23 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
  * This may contain multiple AppIcons to represent a tileGroup with chain icons
  * between the AppIcons.
  */
-const AppSwitcherItem = GObject.registerClass(
-class AppSwitcherItem extends St.BoxLayout {
+const AppSwitcherItem = GObject.registerClass({
+    Signals: { 'all-icons-removed': {} }
+}, class AppSwitcherItem extends St.BoxLayout {
     _init(windows) {
         super._init({ vertical: false });
 
-        const winTracker = Shell.WindowTracker.get_default();
-
+        // A tiled window in a tileGroup of length 1, doesn't get a separate
+        // AppSwitcherItem. It gets added to the non-tiled windows' AppSwitcherItem
+        const tileGroup = windows[0].isTiled && Util.getTileGroupFor(windows[0]);
+        this.isTileGroup = tileGroup && tileGroup.every(w => windows.includes(w)) && tileGroup?.length > 1;
         this.cachedWindows = windows;
         this.appIcons = [];
-        this.chains = [];
-        const uniqueApps = windows.reduce((apps, w) => {
-            const a = winTracker.get_window_app(w);
-            !apps.includes(a) && apps.push(a);
-            return apps;
-        }, []);
-        uniqueApps.forEach((app, idx) => {
-            // AppIcon
-            const appIcon = new AppIcon(app);
-            this.add_child(appIcon);
-            this.appIcons.push(appIcon);
-
-            if (idx >= uniqueApps.length - 1)
-                return;
-
-            // Chain icon
-            const path = Me.dir.get_child('media/insert-link-symbolic.svg').get_path();
-            const chain = new St.Icon({
-                gicon: new Gio.FileIcon({ file: Gio.File.new_for_path(path) }),
-                icon_size: 18
-            });
-            this.add_child(chain);
-            this.chains.push(chain);
-        });
+        this.chainIcons = [];
 
         // Compatibility with AltTab.AppIcon
         this.set_size = size => this.appIcons.forEach(i => i.set_size(size));
-        this.label = this.appIcons[0].label;
+        this.label = null;
         this.app = {
             // Only raise the first window since we split up apps and tileGroups
             activate_window: (window, timestamp) => {
@@ -226,6 +187,74 @@ class AppSwitcherItem extends St.BoxLayout {
             // Listening to the app-stop now happens in the custom _init func
             connect: () => {}
         };
+
+        this.updateAppIcons();
+    }
+
+    // Re/Create the AppIcons based on the cached window list
+    updateAppIcons() {
+        this.appIcons.forEach(i => i.destroy());
+        this.appIcons = [];
+        this.chainIcons.forEach(i => i.destroy());
+        this.chainIcons = [];
+
+        const winTracker = Shell.WindowTracker.get_default();
+        const path = Me.dir.get_child('media/insert-link-symbolic.svg').get_path();
+        const icon = new Gio.FileIcon({ file: Gio.File.new_for_path(path) });
+
+        const apps = this.isTileGroup
+            // All apps (even duplicates)
+            ? this.cachedWindows.map(w => winTracker.get_window_app(w))
+            // Only unique apps
+            : this.cachedWindows.reduce((allApps, w) => {
+                const a = winTracker.get_window_app(w);
+                !allApps.includes(a) && allApps.push(a);
+                return allApps;
+            }, []);
+
+        apps.forEach((app, idx) => {
+            // AppIcon
+            const appIcon = new AppIcon(app);
+            this.add_child(appIcon);
+            this.appIcons.push(appIcon);
+
+            // Add chain to the right AppIcon except for the last AppIcon
+            if (idx >= apps.length - 1)
+                return;
+
+            // Chain
+            const chain = new St.Icon({
+                gicon: icon,
+                icon_size: 18
+            });
+            this.add_child(chain);
+            this.chainIcons.push(chain);
+        });
+
+        if (!this.appIcons.length) {
+            this.emit('all-icons-removed');
+            return;
+        }
+
+        this.label = this.appIcons[0].label;
+    }
+
+    // Remove an AppIcon to the corresponding app.
+    // This doesn't update cached window list!
+    removeApp(app) {
+        for (let i = this.appIcons.length - 1; i >= 0; i--) {
+            const appIcon = this.appIcons[i];
+            if (appIcon.app !== app)
+                continue;
+
+            this.appIcons.splice(i, 1);
+            appIcon.destroy();
+            const chain = this.chainIcons.splice(Math.max(0, i - 1), 1)[0];
+            chain?.destroy();
+        }
+
+        if (!this.appIcons.length)
+            this.emit('all-icons-removed');
     }
 });
 
