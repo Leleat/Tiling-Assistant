@@ -21,7 +21,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         // (or if a window was tiled with this popup)
         'closed': { param_types: [GObject.TYPE_BOOLEAN] }
     }
-}, class TilingSwitcherPopup extends SwitcherPopup.SwitcherPopup {
+}, class TilingSwitcherPopup extends AltTab.AppSwitcherPopup {
     /**
      * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
@@ -35,7 +35,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         this._freeScreenRect = freeScreenRect;
         this._shadeBG = null;
 
-        super._init();
+        SwitcherPopup.SwitcherPopup.prototype._init.call(this);
 
         this._thumbnails = null;
         this._thumbnailTimeoutId = 0;
@@ -220,14 +220,6 @@ var TilingSwitcherPopup = GObject.registerClass({
         return super.vfunc_button_press_event(buttonEvent);
     }
 
-    _nextWindow() {
-        return AltTab.AppSwitcherPopup.prototype._nextWindow.apply(this);
-    }
-
-    _previousWindow() {
-        return AltTab.AppSwitcherPopup.prototype._previousWindow.apply(this);
-    }
-
     _keyPressHandler(keysym) {
         const moveUp = Util.isDirection(keysym, Direction.N);
         const moveDown = Util.isDirection(keysym, Direction.S);
@@ -256,37 +248,17 @@ var TilingSwitcherPopup = GObject.registerClass({
         return Clutter.EVENT_STOP;
     }
 
-    _scrollHandler(...params) {
-        return AltTab.AppSwitcherPopup.prototype._scrollHandler.apply(this, params);
-    }
-
-    _itemActivatedHandler(...params) {
-        return AltTab.AppSwitcherPopup.prototype._itemActivatedHandler.apply(this, params);
-    }
-
-    _itemEnteredHandler(...params) {
-        return AltTab.AppSwitcherPopup.prototype._itemEnteredHandler.apply(this, params);
-    }
-
     _windowActivated(thumbnailSwitcher, n) {
         const window = this._items[this._selectedIndex].cachedWindows[n];
         this._tileWindow(window);
         this.fadeAndDestroy();
     }
 
-    _windowEntered(...params) {
-        return AltTab.AppSwitcherPopup.prototype._windowEntered.apply(this, params);
-    }
-
-    _windowRemoved(...params) {
-        return AltTab.AppSwitcherPopup.prototype._windowRemoved.apply(this, params);
-    }
-
     _finish(timestamp) {
         const appIcon = this._items[this._selectedIndex];
         const window = appIcon.cachedWindows[Math.max(0, this._currentWindow)];
         this._tileWindow(window);
-        super._finish(timestamp);
+        SwitcherPopup.SwitcherPopup.prototype._finish.call(this, timestamp);
     }
 
     fadeAndDestroy() {
@@ -296,14 +268,6 @@ var TilingSwitcherPopup = GObject.registerClass({
         this._shadeBG?.destroy();
         this._shadeBG = null;
         super.fadeAndDestroy();
-    }
-
-    _onDestroy() {
-        return AltTab.AppSwitcherPopup.prototype._onDestroy.apply(this);
-    }
-
-    _select(...params) {
-        return AltTab.AppSwitcherPopup.prototype._select.apply(this, params);
     }
 
     _tileWindow(window) {
@@ -332,27 +296,15 @@ var TilingSwitcherPopup = GObject.registerClass({
         window.activate(global.get_current_time());
     }
 
-    _timeoutPopupThumbnails() {
-        return AltTab.AppSwitcherPopup.prototype._timeoutPopupThumbnails.apply(this);
-    }
-
-    _destroyThumbnails() {
-        return AltTab.AppSwitcherPopup.prototype._destroyThumbnails.apply(this);
-    }
-
-    _createThumbnails() {
-        return AltTab.AppSwitcherPopup.prototype._createThumbnails.apply(this);
-    }
-
     // Dont _finish(), if no mods are pressed
     _resetNoModsTimeout() {
     }
 });
 
 const TSwitcherList = GObject.registerClass(
-class TilingSwitcherList extends SwitcherPopup.SwitcherList {
+class TilingSwitcherList extends AltTab.AppSwitcher {
     _init(openWindows, apps, altTabPopup) {
-        super._init(true);
+        SwitcherPopup.SwitcherList.prototype._init.call(this, true);
 
         this.icons = [];
         this._arrows = [];
@@ -373,10 +325,6 @@ class TilingSwitcherList extends SwitcherPopup.SwitcherList {
         this._mouseTimeOutId = 0;
 
         this.connect('destroy', this._onDestroy.bind(this));
-    }
-
-    _onDestroy() {
-        return AltTab.AppSwitcher.prototype._onDestroy.apply(this);
     }
 
     _setIconSize() {
@@ -421,33 +369,5 @@ class TilingSwitcherList extends SwitcherPopup.SwitcherList {
                 break;
             this.icons[i].set_size(iconSize);
         }
-    }
-
-    vfunc_get_preferred_height(...params) {
-        return AltTab.AppSwitcher.prototype.vfunc_get_preferred_height.apply(this, params);
-    }
-
-    vfunc_allocate(...params) {
-        return AltTab.AppSwitcher.prototype.vfunc_allocate.apply(this, params);
-    }
-
-    _onItemEnter(...params) {
-        return AltTab.AppSwitcher.prototype._onItemEnter.apply(this, params);
-    }
-
-    _enterItem(...params) {
-        return AltTab.AppSwitcher.prototype._enterItem.apply(this, params);
-    }
-
-    highlight(...params) {
-        return AltTab.AppSwitcher.prototype.highlight.apply(this, params);
-    }
-
-    _addIcon(...params) {
-        return AltTab.AppSwitcher.prototype._addIcon.apply(this, params);
-    }
-
-    _removeIcon(...params) {
-        return AltTab.AppSwitcher.prototype._removeIcon.apply(this, params);
     }
 });
