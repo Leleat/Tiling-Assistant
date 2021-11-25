@@ -190,7 +190,7 @@ var Handler = class TilingMoveHandler {
         this._favoriteLayout = [];
         this._favoritePreviews?.forEach(p => p.destroy());
         this._favoritePreviews = [];
-        this._favoriteAnchor = null;
+        this._anchorRect = null;
         this._tilePreview.close();
 
         if (!this._tileRect) {
@@ -294,7 +294,7 @@ var Handler = class TilingMoveHandler {
             });
         });
         this._favoritePreviews = [];
-        this._favoriteAnchor = null;
+        this._anchorRect = null;
 
         switch (newMode) {
             case MoveModes.FAVORITE_LAYOUT:
@@ -483,19 +483,36 @@ var Handler = class TilingMoveHandler {
         const hoveredRect = screenRects.find(r => r.containsPoint(this._lastPointerPos));
         if (!hoveredRect) {
             this._tilePreview.close();
+            this._tileRect = null;
             return;
         }
 
-        const edgeRadius = 50;
-        const atTopEdge = this._lastPointerPos.y < hoveredRect.y + edgeRadius;
-        const atBottomEdge = this._lastPointerPos.y > hoveredRect.y2 - edgeRadius;
-        const atLeftEdge = this._lastPointerPos.x < hoveredRect.x + edgeRadius;
-        const atRightEdge = this._lastPointerPos.x > hoveredRect.x2 - edgeRadius;
+        const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
+        if (isSuperPressed) {
+            this._anchorRect = this._anchorRect ?? hoveredRect;
+            this._tileRect = hoveredRect.union(this._anchorRect);
+            this._splitRects.clear();
 
-        atTopEdge || atBottomEdge || atLeftEdge || atRightEdge
-            ? this._splitTilingPreviewGroup(window, hoveredRect, topTileGroup,
-                { atTopEdge, atBottomEdge, atLeftEdge, atRightEdge })
-            : this._splitTilingPreviewSingle(window, hoveredRect, topTileGroup);
+            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
+                x: this._tileRect.x,
+                y: this._tileRect.y,
+                width: this._tileRect.width,
+                height: this._tileRect.height,
+                opacity: 200
+            });
+        } else {
+            this._anchorRect = null;
+            const edgeRadius = 50;
+            const atTopEdge = this._lastPointerPos.y < hoveredRect.y + edgeRadius;
+            const atBottomEdge = this._lastPointerPos.y > hoveredRect.y2 - edgeRadius;
+            const atLeftEdge = this._lastPointerPos.x < hoveredRect.x + edgeRadius;
+            const atRightEdge = this._lastPointerPos.x > hoveredRect.x2 - edgeRadius;
+
+            atTopEdge || atBottomEdge || atLeftEdge || atRightEdge
+                ? this._splitTilingPreviewGroup(window, hoveredRect, topTileGroup,
+                    { atTopEdge, atBottomEdge, atLeftEdge, atRightEdge })
+                : this._splitTilingPreviewSingle(window, hoveredRect, topTileGroup);
+        }
     }
 
     /**
@@ -692,11 +709,11 @@ var Handler = class TilingMoveHandler {
         for (const rect of this._favoriteLayout) {
             if (rect.containsPoint(this._lastPointerPos)) {
                 if (isSuperPressed) {
-                    this._favoriteAnchor = this._favoriteAnchor ?? rect;
-                    this._tileRect = rect.union(this._favoriteAnchor);
+                    this._anchorRect = this._anchorRect ?? rect;
+                    this._tileRect = rect.union(this._anchorRect);
                 } else {
                     this._tileRect = rect.copy();
-                    this._favoriteAnchor = null;
+                    this._anchorRect = null;
                 }
 
                 this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
