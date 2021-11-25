@@ -17,6 +17,9 @@
         <property name="label">Disabled</property>
         <property name="has-frame">0</property>
         <signal name="clicked" handler="_onButtonClicked" swapped="no"/>
+        <style>
+          <class name="round-button"/>
+        </style>
       </object>
     </child>
     <child>

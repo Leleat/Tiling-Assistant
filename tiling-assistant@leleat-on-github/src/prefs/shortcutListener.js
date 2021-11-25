@@ -8,11 +8,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 /**
  * A Widget to implement the shortcuts in the preference window. It's a GtkBox,
  * which contains a button to activate listening for a shortcut and a shortcut-
- * clear-button. Currently, this implementation allows multiple shortcut
- * listeners to be activated. They then would listen for a shortcut one after
- * another. The user can even switch the preference pages. A modal window would
- * solve this but I don't like the feel of that... so let's see, if users notice
- * these issues.
+ * clear-button.
  *
  * Some parts are from https://extensions.gnome.org/extension/2236/night-theme-switcher/.
  * _isBindingValid & _isKeyvalForbidden are straight up copied from its util.js
@@ -33,10 +29,16 @@ var ShortcutListener = GObject.registerClass({
         )
     }
 }, class ShortcutListener extends Gtk.Box {
+    /**
+     * Only allow 1 active ShortcutListener at a time
+     */
+    static isListening = false;
+    static listener = null;
+
     initialize(key, setting) {
         this._key = key;
         this._setting = setting;
-        this._isListening = false;
+        this.isActive = false;
 
         this.connect('realize', () => this.get_root().add_controller(this._eventKeyController));
 
@@ -47,34 +49,38 @@ var ShortcutListener = GObject.registerClass({
      * Toggles the listening.
      */
     activate() {
-        if (this.isListening())
-            this.stopListening();
-        else
-            this.listen();
+        if (this.isActive) {
+            this._stopListening();
+        } else {
+            ShortcutListener.listener?._stopListening();
+            this._listen();
+        }
     }
 
     /**
      * Starts listening for a keyboard shortcut.
      */
-    listen() {
+    _listen() {
+        if (ShortcutListener.isListening)
+            return;
+
+        this.isActive = true;
         this._button.set_label('Press a shortcut...');
-        this._isListening = true;
+        ShortcutListener.isListening = true;
+        ShortcutListener.listener = this;
     }
 
     /**
      * Stops listening for a keyboard shortcut.
      */
-    stopListening() {
-        this._button.set_label(this._getKeybindingLabel() || 'Disabled');
-        this._isListening = false;
-    }
+    _stopListening() {
+        if (!ShortcutListener.isListening)
+            return;
 
-    /**
-     * @returns {boolean} wether this widget is currently listening for
-     *      a shortcut.
-     */
-    isListening() {
-        return this._isListening;
+        this.isActive = false;
+        this._button.set_label(this._getKeybindingLabel() || 'Disabled');
+        ShortcutListener.isListening = false;
+        ShortcutListener.listener = null;
     }
 
     _onButtonClicked() {
@@ -98,7 +104,7 @@ var ShortcutListener = GObject.registerClass({
     }
 
     _onKeyPressed(eventControllerKey, keyval, keycode, state) {
-        if (!this._isListening)
+        if (!ShortcutListener.isListening)
             return Gdk.EVENT_PROPAGATE;
 
         let mask = state & Gtk.accelerator_get_default_mod_mask();
@@ -110,7 +116,7 @@ var ShortcutListener = GObject.registerClass({
                     this.keybinding = '';
                     // falls through
                 case Gdk.KEY_Escape:
-                    this.stopListening();
+                    this._stopListening();
                     return Gdk.EVENT_STOP;
             }
         }
@@ -122,7 +128,7 @@ var ShortcutListener = GObject.registerClass({
         this.keybinding =
             Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask);
 
-        this._isListening = false;
+        ShortcutListener.isListening = false;
         return Gdk.EVENT_STOP;
     }
 
