@@ -60,6 +60,7 @@
                         <child>
                           <object class="GtkLinkButton">
                             <property name="label">View full change history</property>
+                            <property name="halign">center</property>
                             <property name="can-focus">False</property>
                             <property name="use-underline">True</property>
                             <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>

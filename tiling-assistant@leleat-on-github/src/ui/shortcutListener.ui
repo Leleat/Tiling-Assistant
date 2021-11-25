@@ -8,6 +8,7 @@
 
   <template class="ShortcutListener" parent="GtkBox">
     <property name="hexpand">1</property>
+    <property name="spacing">3</property>
     <signal name="notify::keybinding" handler="_onKeybindingChanged" swapped="no"/>
     <child>
       <object class="GtkButton" id="button">
@@ -18,7 +19,7 @@
         <property name="has-frame">0</property>
         <signal name="clicked" handler="_onButtonClicked" swapped="no"/>
         <style>
-          <class name="round-button"/>
+          <class name="round-button-no-frame"/>
         </style>
       </object>
     </child>
@@ -32,7 +33,7 @@
         <property name="icon-name">edit-undo-symbolic</property>
         <signal name="clicked" handler="_onClearButtonClicked" swapped="no"/>
         <style>
-          <class name="round-button"/>
+          <class name="round-button-no-frame"/>
         </style>
       </object>
     </child>

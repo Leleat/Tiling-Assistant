@@ -199,7 +199,7 @@
                         </child>
                         <child>
                           <object class="TilingAssistantListRow">
-                            <property name="title" translatable="yes">App Switcher</property>
+                            <property name="title" translatable="yes">App Switcher and Tiling Popup</property>
                             <property name="subtitle" translatable="yes">This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You may need to re-enable this or the other extension after toggling this setting</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="tilegroups_in_app_switcher">

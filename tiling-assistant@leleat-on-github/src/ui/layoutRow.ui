@@ -21,7 +21,7 @@
                 <property name="icon-name">edit-delete-symbolic</property>
                 <signal name="clicked" handler="_onDeleteButtonClicked" swapped="no"/>
                 <style>
-                  <class name="round-button"/>
+                  <class name="round-button-no-frame"/>
                 </style>
               </object>
             </child>

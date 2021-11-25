@@ -1,4 +1,14 @@
 .round-button {
+	background: rgba(128, 128, 128, .15);
+	border: none;
+	border-radius: 99px;
+}
+
+.round-button:hover {
+	background: rgba(128, 128, 128, .25);
+}
+
+.round-button-no-frame {
 	border-radius: 99px;
 }
 
@@ -34,24 +44,8 @@ window.tiling-assistant entry {
 	outline: none;
 }
 
-window.tiling-assistant spinbutton {
-	border: none;
-	background: none;
-	outline: none;
-}
-
 window.tiling-assistant spinbutton button {
-	background: rgba(128, 128, 128, .1);
 	border: none;
-	border-radius: 99px;
-}
-
-window.tiling-assistant spinbutton button:hover {
-	background: rgba(128, 128, 128, .2);
-}
-
-window.tiling-assistant spinbutton button.up {
-	margin-left: 6px;
 }
 
 window.tiling-assistant combobox button.combo,
