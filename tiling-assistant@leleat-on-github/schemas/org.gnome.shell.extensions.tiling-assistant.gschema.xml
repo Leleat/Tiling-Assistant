@@ -179,6 +179,9 @@
 		<key name="default-move-mode" type="s">
 			<default>"Edge Tiling"</default>
 		</key>
+		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
+			<default>true</default>
+		</key>
 		<key name="move-split-tiles-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
 			<default>"Ctrl"</default>
 		</key>

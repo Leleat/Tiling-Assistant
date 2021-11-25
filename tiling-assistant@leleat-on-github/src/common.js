@@ -26,6 +26,7 @@ var Settings = class Settings {
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
     static FAVORITE_LAYOUTS = 'favorite-layouts';
     static DEFAULT_MOVE_MODE = 'default-move-mode';
+    static ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT = 'adapt-edge-tiling-to-favorite-layout';
     static SPLIT_TILE_MOD = 'move-split-tiles-mod';
     static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
     static VERTICAL_PREVIEW_AREA = 'vertical-preview-area';
@@ -83,6 +84,7 @@ var Settings = class Settings {
             this.ENABLE_UNTILE_ANIMATIONS,
             this.FAVORITE_LAYOUTS,
             this.DEFAULT_MOVE_MODE,
+            this.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
             this.SPLIT_TILE_MOD,
             this.FAVORITE_LAYOUT_MOD,
             this.VERTICAL_PREVIEW_AREA,

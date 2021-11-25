@@ -416,9 +416,12 @@ var Util = class Utility {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         const topTileGroup = this.getTopTileGroup(true, monitor);
-        const existingRects = topTileGroup.length >= 1
-            ? topTileGroup.map(w => w.tiledRect)
-            : this.getFavoriteLayout();
+        let existingRects = [];
+        if (topTileGroup.length >= 1)
+            existingRects = topTileGroup.map(w => w.tiledRect);
+        else if (Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT))
+            existingRects = this.getFavoriteLayout();
+
         const screenRects = existingRects.concat(workArea.minus(existingRects));
 
         switch (shortcut) {

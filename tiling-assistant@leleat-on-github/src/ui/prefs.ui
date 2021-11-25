@@ -744,6 +744,17 @@
                     <property name="orientation">vertical</property>
                     <property name="spacing">12</property>
                     <child>
+                      <object class="GtkLabel">
+                        <property name="can-focus">True</property>
+                        <property name="halign">start</property>
+                        <property name="hexpand">True</property>
+                        <property name="label" translatable="yes">General</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
                       <object class="GtkListBox">
                         <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
                         <property name="show-separators">True</property>
@@ -831,7 +842,7 @@
                         <property name="can-focus">True</property>
                         <property name="halign">start</property>
                         <property name="hexpand">True</property>
-                        <property name="label" translatable="yes">Moving Windows</property>
+                        <property name="label" translatable="yes">Default Window Movement Mode</property>
                         <style>
                           <class name="heading"/>
                         </style>
@@ -896,6 +907,41 @@
                                 <style>
                                   <class name="linked"/>
                                 </style>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="can-focus">True</property>
+                        <property name="halign">start</property>
+                        <property name="hexpand">True</property>
+                        <property name="label" translatable="yes">Other Window Movement Settings</property>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
+                        <property name="show-separators">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <style>
+                          <class name="frame"/>
+                        </style>
+                         <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Adapt 'Edge Tiling' to your Favorite Layout</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="adapt_edge_tiling_to_favorite_layout">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="hexpand">True</property>
                               </object>
                             </property>
                           </object>
