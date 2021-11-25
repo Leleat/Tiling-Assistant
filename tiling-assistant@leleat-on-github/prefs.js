@@ -110,7 +110,7 @@ const PrefsWidget = GObject.registerClass({
             const prefsDialog = this.get_root();
             prefsDialog.set_titlebar(this._title_bar);
             prefsDialog.add_css_class('tiling-assistant');
-            prefsDialog.set_default_size(575, 750);
+            prefsDialog.set_default_size(550, 750);
 
             // Info-popup-menu actions
             const actionGroup = new Gio.SimpleActionGroup();
