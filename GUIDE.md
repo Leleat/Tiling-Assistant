@@ -46,7 +46,7 @@ Holding `Shift` or `Alt` while activating an app icon, will tile the window to t
 
 ### Tile Groups
 
-When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is raised. Resizing one of the windows will also affect the other windows in the group.
+When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is raised. Resizing one of the windows will also affect the other windows in the group. Tile groups can be show as one item in the App Switcher.
 
 ### Tile Editing Mode
 
@@ -78,12 +78,14 @@ The `Search for a Layout` keybinding enables you to activate layouts by name. Th
 
 ![](media/Guide_layouts2.gif)
 
-#### Favorite Layout
+#### Favorite Layout(s)
 
-The `Favorite Layout` is a layout (per monitor) marked by the 'favorite button' in the Panel Indicator. It can be used to have a fixed layout when you move a window around. The default `Favorite Layout Activator` is `Alt`. An example illustrates this feature clearly.
+The `Favorite Layout` is a layout (per monitor) marked by the 'favorite button(s)' in the Panel Indicator. It can be used to have a fixed layout when you move a window around. The default `Favorite Layout Activator` is `Alt`. Holding `Super` while dragging a window across your favorite layout, will make the preview span multipe rectangles. An example illustrates these feature clearly.
 
-![](media/Guide_layouts3.gif)
+![](media/Guide_panelIndicator.png)
+
+![](media/Guide_layouts3.mp4)
 
 ### Hidden Settings
 
-This is a 'hidden settings' page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking the 'Advanced...' menu item, which appears when clicking the titlebar button.
+This is a hidden settings page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking the `Advanced...` menu item, which appears when clicking the titlebar button.
