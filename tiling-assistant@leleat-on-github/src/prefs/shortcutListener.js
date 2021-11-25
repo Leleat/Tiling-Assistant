@@ -35,6 +35,36 @@ var ShortcutListener = GObject.registerClass({
     static isListening = false;
     static listener = null;
 
+    /**
+     * Starts listening for a keyboard shortcut.
+     *
+     * @param {ShortcutListener} shortcutListener the new active ShortcutListener
+     */
+    static listen(shortcutListener) {
+        if (shortcutListener === ShortcutListener.listener)
+            return;
+
+        ShortcutListener.stopListening();
+
+        shortcutListener.isActive = true;
+        shortcutListener.setLabel('Press a shortcut...');
+        ShortcutListener.listener = shortcutListener;
+        ShortcutListener.isListening = true;
+    }
+
+    /**
+     * Stops listening for a keyboard shortcut.
+     */
+    static stopListening() {
+        if (!ShortcutListener.isListening)
+            return;
+
+        ShortcutListener.isListening = false;
+        ShortcutListener.listener.isActive = false;
+        ShortcutListener.listener.setLabel(ShortcutListener.listener.getKeybindingLabel() || 'Disabled');
+        ShortcutListener.listener = null;
+    }
+
     initialize(key, setting) {
         this._key = key;
         this._setting = setting;
@@ -46,41 +76,25 @@ var ShortcutListener = GObject.registerClass({
     }
 
     /**
-     * Toggles the listening.
+     * Toggles this to listen for a keyboard shortcut.
      */
     activate() {
-        if (this.isActive) {
-            this._stopListening();
-        } else {
-            ShortcutListener.listener?._stopListening();
-            this._listen();
-        }
+        this.isActive ? ShortcutListener.stopListening() : ShortcutListener.listen(this);
     }
 
     /**
-     * Starts listening for a keyboard shortcut.
+     * Gets the keybinding in a more pleasant to read format.
+     * For example: <Control><Super>e -> Ctrl+Super+E
+     *
+     * @returns {string}
      */
-    _listen() {
-        if (ShortcutListener.isListening)
-            return;
-
-        this.isActive = true;
-        this._button.set_label('Press a shortcut...');
-        ShortcutListener.isListening = true;
-        ShortcutListener.listener = this;
+    getKeybindingLabel() {
+        const [, keyval, mask] = Gtk.accelerator_parse(this.keybinding);
+        return Gtk.accelerator_get_label(keyval, mask);
     }
 
-    /**
-     * Stops listening for a keyboard shortcut.
-     */
-    _stopListening() {
-        if (!ShortcutListener.isListening)
-            return;
-
-        this.isActive = false;
-        this._button.set_label(this._getKeybindingLabel() || 'Disabled');
-        ShortcutListener.isListening = false;
-        ShortcutListener.listener = null;
+    setLabel(label) {
+        this._button.set_label(label);
     }
 
     _onButtonClicked() {
@@ -95,7 +109,7 @@ var ShortcutListener = GObject.registerClass({
         } else {
             this._setting.set_strv(this._key, [this.keybinding]);
             this._clearButton.set_sensitive(true);
-            this._button.set_label(this._getKeybindingLabel());
+            this._button.set_label(this.getKeybindingLabel());
         }
     }
 
@@ -104,7 +118,7 @@ var ShortcutListener = GObject.registerClass({
     }
 
     _onKeyPressed(eventControllerKey, keyval, keycode, state) {
-        if (!ShortcutListener.isListening)
+        if (this !== ShortcutListener.listener)
             return Gdk.EVENT_PROPAGATE;
 
         let mask = state & Gtk.accelerator_get_default_mod_mask();
@@ -116,7 +130,7 @@ var ShortcutListener = GObject.registerClass({
                     this.keybinding = '';
                     // falls through
                 case Gdk.KEY_Escape:
-                    this._stopListening();
+                    ShortcutListener.stopListening();
                     return Gdk.EVENT_STOP;
             }
         }
@@ -128,19 +142,8 @@ var ShortcutListener = GObject.registerClass({
         this.keybinding =
             Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask);
 
-        ShortcutListener.isListening = false;
+        ShortcutListener.stopListening();
         return Gdk.EVENT_STOP;
-    }
-
-    /**
-     * Transforms the keybinding into a more pleasant to read format.
-     * For example: <Control><Super>e -> Ctrl+Super+E
-     *
-     * @returns {string}
-     */
-    _getKeybindingLabel() {
-        const [, keyval, mask] = Gtk.accelerator_parse(this.keybinding);
-        return Gtk.accelerator_get_label(keyval, mask);
     }
 
     /**
