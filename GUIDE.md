@@ -84,7 +84,7 @@ The `Favorite Layout` is a layout (per monitor) marked by the 'favorite button(s
 
 ![](media/Guide_panelIndicator.png)
 
-![](media/Guide_layouts3.mp4)
+![](media/Guide_layouts3.gif)
 
 ### Hidden Settings
 
