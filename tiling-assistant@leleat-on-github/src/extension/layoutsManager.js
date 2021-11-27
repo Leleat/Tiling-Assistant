@@ -444,8 +444,10 @@ const PanelIndicator = GObject.registerClass({
     _init() {
         super._init(0.0, 'Layout Indicator (Tiling Assistant)');
 
+        const path = Me.dir.get_child('media/preferences-desktop-apps-symbolic.svg').get_path();
+        const gicon = new Gio.FileIcon({ file: Gio.File.new_for_path(path) });
         this.add_child(new St.Icon({
-            icon_name: 'preferences-desktop-apps-symbolic',
+            gicon,
             style_class: 'system-status-icon'
         }));
 
