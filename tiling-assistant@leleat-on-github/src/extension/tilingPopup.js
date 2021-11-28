@@ -1,13 +1,14 @@
 'use strict';
 
 const { Clutter, GObject, Meta, Shell, St } = imports.gi;
-const { altTab: AltTab, main: Main, switcherPopup: SwitcherPopup } = imports.ui;
+const { main: Main, switcherPopup: SwitcherPopup } = imports.ui;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Direction, Orientation } = Me.imports.src.common;
 const Util = Me.imports.src.extension.utility.Util;
+const AltTab = Me.imports.src.extension.altTab;
 
 /**
  * Classes for the Tiling Popup, which opens when tiling a window
@@ -21,7 +22,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         // (or if a window was tiled with this popup)
         'closed': { param_types: [GObject.TYPE_BOOLEAN] }
     }
-}, class TilingSwitcherPopup extends AltTab.AppSwitcherPopup {
+}, class TilingSwitcherPopup extends AltTab.TilingAppSwitcherPopup {
     /**
      * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
@@ -46,8 +47,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         this.tiledWindow = null;
         this._allowConsecutivePopup = allowConsecutivePopup;
 
-        const apps = Shell.AppSystem.get_default().get_running();
-        this._switcherList = new TSwitcherList(openWindows, apps, this);
+        this._switcherList = new TSwitcherList(this, openWindows);
         this._items = this._switcherList.icons;
 
         // Destroy popup when touching outside of popup
@@ -302,31 +302,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 });
 
 const TSwitcherList = GObject.registerClass(
-class TilingSwitcherList extends AltTab.AppSwitcher {
-    _init(openWindows, apps, altTabPopup) {
-        SwitcherPopup.SwitcherList.prototype._init.call(this, true);
-
-        this.icons = [];
-        this._arrows = [];
-
-        const winTracker = Shell.WindowTracker.get_default();
-        for (const app of apps) {
-            const appIcon = new AltTab.AppIcon(app);
-            appIcon.cachedWindows = openWindows.filter(w => {
-                return winTracker.get_window_app(w) === app;
-            });
-
-            if (appIcon.cachedWindows.length)
-                this._addIcon(appIcon);
-        }
-
-        this._curApp = -1;
-        this._altTabPopup = altTabPopup;
-        this._mouseTimeOutId = 0;
-
-        this.connect('destroy', this._onDestroy.bind(this));
-    }
-
+class TilingSwitcherList extends AltTab.TilingAppSwitcher {
     _setIconSize() {
         let j = 0;
         while (this._items.length > 1 && this._items[j].style_class !== 'item-box')
@@ -364,10 +340,7 @@ class TilingSwitcherList extends AltTab.AppSwitcher {
 
         this._iconSize = iconSize;
 
-        for (let i = 0; i < this.icons.length; i++) {
-            if (this.icons[i].icon !== null)
-                break;
+        for (let i = 0; i < this.icons.length; i++)
             this.icons[i].set_size(iconSize);
-        }
     }
 });

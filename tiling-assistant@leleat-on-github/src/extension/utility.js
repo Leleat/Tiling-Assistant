@@ -548,14 +548,14 @@ var Util = class Utility {
         if (!window.allows_resize() || !window.allows_move())
             return;
 
+        // Remove window from the other windows' tileGroups so it
+        // doesn't falsely get raised with them.
+        this.dissolveTileGroup(window.get_id());
+
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
         window.raise();
-
-        // Remove window from the other windows' tileGroups so it
-        // doesn't falsely get raised with them.
-        this.dissolveTileGroup(window.get_id());
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = window.get_monitor();

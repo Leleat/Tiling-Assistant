@@ -15,15 +15,7 @@ const Util = Me.imports.src.extension.utility.Util;
 var Override = class AltTabOverride {
     constructor() {
         this._originalAltTab = AltTab.AppSwitcherPopup;
-
-        if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
-            AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
-
-        Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
-            AltTab.AppSwitcherPopup = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)
-                ? TilingAppSwitcherPopup
-                : this._originalAltTab;
-        });
+        AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
     }
 
     destroy() {
@@ -31,7 +23,7 @@ var Override = class AltTabOverride {
     }
 };
 
-const TilingAppSwitcherPopup = GObject.registerClass(
+var TilingAppSwitcherPopup = GObject.registerClass(
 class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
     _init() {
         SwitcherPopup.SwitcherPopup.prototype._init.call(this);
@@ -42,7 +34,13 @@ class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
 
         this.thumbnailsVisible = false;
 
-        this._switcherList = new TilingAppSwitcher(this);
+        const settings = new Gio.Settings({ schema_id: 'org.gnome.shell.app-switcher' });
+        const workspace = settings.get_boolean('current-workspace-only')
+            ? global.workspace_manager.get_active_workspace()
+            : null;
+        const windows = global.display.get_tab_list(Meta.TabList.NORMAL, workspace);
+
+        this._switcherList = new TilingAppSwitcher(this, windows);
         this._items = this._switcherList.icons;
     }
 
@@ -73,9 +71,9 @@ class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
     }
 });
 
-const TilingAppSwitcher = GObject.registerClass(
+var TilingAppSwitcher = GObject.registerClass(
 class TilingAppSwitcher extends AltTab.AppSwitcher {
-    _init(altTabPopup) {
+    _init(altTabPopup, windows) {
         // Don't make the SwitcherButtons squares since 1 SwitcherButton
         // may contain multiple AppIcons for a tileGroup.
         const squareItems = false;
@@ -88,33 +86,46 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         this._altTabPopup = altTabPopup;
         this._mouseTimeOutId = 0;
 
-        const settings = new Gio.Settings({ schema_id: 'org.gnome.shell.app-switcher' });
-        const workspace = settings.get_boolean('current-workspace-only')
-            ? global.workspace_manager.get_active_workspace()
-            : null;
-        const allWindows = global.display.get_tab_list(Meta.TabList.NORMAL, workspace);
         const winTracker = Shell.WindowTracker.get_default();
+        const groupTileGroups = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER);
+        let groupedWindows;
 
         // Group windows based on their tileGroup, if tileGroup.length > 1.
         // Otherwise group them based on their respective apps.
-        const groupedWindows = allWindows.reduce((allGroups, w) => {
-            for (const group of allGroups) {
-                if (w.isTiled && Util.getTileGroupFor(w).length > 1) {
-                    if (Util.getTileGroupFor(w).includes(group[0])) {
+        if (groupTileGroups) {
+            groupedWindows = windows.reduce((allGroups, w) => {
+                for (const group of allGroups) {
+                    if (w.isTiled && Util.getTileGroupFor(w).length > 1) {
+                        if (Util.getTileGroupFor(w).includes(group[0])) {
+                            group.push(w);
+                            return allGroups;
+                        }
+                    } else if ((!group[0].isTiled || group[0].isTiled && Util.getTileGroupFor(group[0]).length <= 1) &&
+                            winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
                         group.push(w);
                         return allGroups;
                     }
-                } else if ((!group[0].isTiled || group[0].isTiled && Util.getTileGroupFor(group[0]).length <= 1) &&
-                         winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
-                    group.push(w);
-                    return allGroups;
                 }
-            }
 
-            const newGroup = [w];
-            allGroups.push(newGroup);
-            return allGroups;
-        }, []);
+                const newGroup = [w];
+                allGroups.push(newGroup);
+                return allGroups;
+            }, []);
+        // Group windows based on apps
+        } else {
+            groupedWindows = windows.reduce((allGroups, w) => {
+                for (const group of allGroups) {
+                    if (winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
+                        group.push(w);
+                        return allGroups;
+                    }
+                }
+
+                const newGroup = [w];
+                allGroups.push(newGroup);
+                return allGroups;
+            }, []);
+        }
 
         // Construct the AppIcons and add them to the popup.
         groupedWindows.forEach(group => {
@@ -125,7 +136,7 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
 
         // Listen for the app stop state in case the app got closed outside
         // of the app switcher along with closing via the app switcher
-        const allApps = allWindows.map(w => winTracker.get_window_app(w));
+        const allApps = windows.map(w => winTracker.get_window_app(w));
         this._apps = [...new Set(allApps)];
         this._stateChangedIds = this._apps.map(app => app.connect('notify::state', () => {
             if (app.state !== Shell.AppState.RUNNING)
@@ -162,7 +173,7 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
  * This may contain multiple AppIcons to represent a tileGroup with chain icons
  * between the AppIcons.
  */
-const AppSwitcherItem = GObject.registerClass({
+var AppSwitcherItem = GObject.registerClass({
     Signals: { 'all-icons-removed': {} }
 }, class AppSwitcherItem extends St.BoxLayout {
     _init(windows) {
