@@ -10,9 +10,24 @@ const { Orientation, Settings, Shortcuts } = Me.imports.src.common;
 const { Axis, Rect, Util } = Me.imports.src.extension.utility;
 
 const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
+const TilingSignals = GObject.registerClass({
+    Signals: {
+        'window-tiled': { param_types: [Meta.Window.$gtype] },
+        'window-untiled': { param_types: [Meta.Window.$gtype] },
+        // tiled / maximized windows only: window, old workspace, new workspace
+        'window-changed-workspace': { param_types: [Meta.Window.$gtype, Meta.Workspace.$gtype, Meta.Workspace.$gtype] },
+        // tiled / maximized windows only: window, old monitor index, new monitor index
+        'window-changed-monitor': { param_types: [Meta.Window.$gtype, GObject.TYPE_INT, GObject.TYPE_INT] }
+    }
+}, class TilingSignals extends Clutter.Actor {});
 
+/**
+ * Singleton responsible for tiling
+ */
 var TilingWindowManager = class TilingWindowManager {
     static initialize() {
+        this._signals = new TilingSignals();
+
         // { windowId1: int, windowId2: int, ... }
         this._groupRaiseIds = new Map();
         // { windowId1: int, windowId2: int, ... }
@@ -22,17 +37,26 @@ var TilingWindowManager = class TilingWindowManager {
     }
 
     static destroy() {
-        this._groupRaiseIds.forEach((signalId, windowId) => {
-            this._getWindow(windowId).disconnect(signalId);
-        });
+        this._signals.destroy();
+        this._signals = null;
+
+        this._groupRaiseIds.forEach((sId, wId) => this._getWindow(wId).disconnect(sId));
         this._groupRaiseIds.clear();
-
-        this._unmanagedIds.forEach((signalId, windowId) => {
-            this._getWindow(windowId).disconnect(signalId);
-        });
+        this._unmanagedIds.forEach((sId, wId) => this._getWindow(wId).disconnect(sId));
         this._unmanagedIds.clear();
-
         this._tileGroups.clear();
+    }
+
+    static connect(signal, func) {
+        return this._signals.connect(signal, func);
+    }
+
+    static disconnect(id) {
+        this._signals.disconnect(id);
+    }
+
+    static emit(...params) {
+        this._signals.emit(...params);
     }
 
     /**
@@ -183,6 +207,8 @@ var TilingWindowManager = class TilingWindowManager {
         topTileGroup.forEach(w => this.dissolveTileGroup(w.get_id()));
         this.updateTileGroup(topTileGroup);
 
+        this.emit('window-tiled', window);
+
         openTilingPopup && this.tryOpeningTilingPopup();
     }
 
@@ -252,6 +278,8 @@ var TilingWindowManager = class TilingWindowManager {
         window.isTiled = false;
         window.tiledRect = null;
         window.untiledRect = null;
+
+        this.emit('window-untiled', window);
     }
 
     /**
