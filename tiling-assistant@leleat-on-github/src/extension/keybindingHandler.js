@@ -7,8 +7,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Direction, DynamicKeybindings, Settings, Shortcuts } = Me.imports.src.common;
-const Rect = Me.imports.src.extension.geometry.Rect;
-const Util = Me.imports.src.extension.utility.Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -74,13 +74,13 @@ var Handler = class TilingKeybindingHandler {
         // Auto-tile: tile to empty space. If there's none: untile,
         // if it's already tiled else maximize
         if (shortcutName === Shortcuts.AUTO_FILL) {
-            if (Util.isMaximized(window)) {
-                Util.untile(window);
+            if (Twm.isMaximized(window)) {
+                Twm.untile(window);
             } else {
-                const topTileGroup = Util.getTopTileGroup(!window.isTiled);
+                const topTileGroup = Twm.getTopTileGroup(!window.isTiled);
                 const tRects = topTileGroup.map(w => w.tiledRect);
-                const tileRect = Util.getBestFreeRect(tRects, window.tiledRect);
-                Util.toggleTiling(window, tileRect);
+                const tileRect = Twm.getBestFreeRect(tRects, window.tiledRect);
+                Twm.toggleTiling(window, tileRect);
             }
 
         // Tile Editing Mode
@@ -96,7 +96,7 @@ var Handler = class TilingKeybindingHandler {
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;
             const workArea = new Rect(window.get_work_area_current_monitor());
-            const rect = Util.getTileFor(shortcutName, workArea);
+            const rect = Twm.getTileFor(shortcutName, workArea);
 
             switch (dynamicSetting) {
                 case DynamicKeybindings.FOCUS:
@@ -110,7 +110,7 @@ var Handler = class TilingKeybindingHandler {
                     this._dynamicFavoriteLayout(window, shortcutName);
                     break;
                 default:
-                    Util.toggleTiling(window, rect);
+                    Twm.toggleTiling(window, rect);
             }
         }
     }
@@ -123,14 +123,14 @@ var Handler = class TilingKeybindingHandler {
      *      the focus to.
      */
     _dynamicFocus(window, shortcutName) {
-        const topTileGroup = Util.getTopTileGroup(false);
+        const topTileGroup = Twm.getTopTileGroup(false);
         const workArea = new Rect(window.get_work_area_current_monitor());
 
         // Toggle tile state of the window, if it isn't tiled
         // or if it is the only window which is.
         if (!window.isTiled || topTileGroup.length === 1) {
-            const rect = Util.getTileFor(shortcutName, workArea);
-            Util.toggleTiling(window, rect);
+            const rect = Twm.getTileFor(shortcutName, workArea);
+            Twm.toggleTiling(window, rect);
             return;
         }
 
@@ -150,7 +150,7 @@ var Handler = class TilingKeybindingHandler {
                 direction = Direction.E;
         }
 
-        const nearestWindow = Util.getNearestWindow(
+        const nearestWindow = Twm.getNearestWindow(
             window,
             topTileGroup,
             direction,
@@ -158,8 +158,8 @@ var Handler = class TilingKeybindingHandler {
         );
 
         if (!nearestWindow) {
-            const rect = Util.getTileFor(shortcutName, workArea);
-            Util.toggleTiling(window, rect);
+            const rect = Twm.getTileFor(shortcutName, workArea);
+            Twm.toggleTiling(window, rect);
             return;
         }
 
@@ -212,19 +212,19 @@ var Handler = class TilingKeybindingHandler {
     _dynamicTilingState(window, shortcutName, isWindowsStyle) {
         const workArea = new Rect(window.get_work_area_current_monitor());
 
-        if (Util.isMaximized(window)) {
+        if (Twm.isMaximized(window)) {
             switch (shortcutName) {
                 case Shortcuts.MAXIMIZE:
                 case Shortcuts.TOP: {
-                    const rect = Util.getTileFor(Shortcuts.TOP, workArea);
-                    Util.tile(window, rect, { skipAnim: true });
+                    const rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    Twm.tile(window, rect, { skipAnim: true });
                     break;
                 } case Shortcuts.BOTTOM: {
-                    Util.untile(window);
+                    Twm.untile(window);
                     break;
                 } default: {
-                    const rect = Util.getTileFor(shortcutName, workArea);
-                    Util.toggleTiling(window, rect);
+                    const rect = Twm.getTileFor(shortcutName, workArea);
+                    Twm.toggleTiling(window, rect);
                 }
             }
 
@@ -238,8 +238,8 @@ var Handler = class TilingKeybindingHandler {
                     }
                 // falls through
                 } default: {
-                    const rect = Util.getTileFor(shortcutName, workArea);
-                    Util.toggleTiling(window, rect);
+                    const rect = Twm.getTileFor(shortcutName, workArea);
+                    Twm.toggleTiling(window, rect);
                 }
             }
 
@@ -293,133 +293,133 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    Util.untile(window);
+                    Twm.untile(window);
                     return;
             }
         } else if (isRightHalf) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
-                    Util.untile(window);
+                    Twm.untile(window);
                     return;
             }
         } else if (isTopHalf) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
-                    rect = Util.getTileFor(Shortcuts.MAXIMIZE, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.MAXIMIZE, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
-                    rect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    Util.untile(window);
+                    Twm.untile(window);
                     return;
             }
         } else if (isBottomHalf) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    Util.untile(window);
+                    Twm.untile(window);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isTopLeftQuarter) {
             switch (shortcutName) {
                 case Shortcuts.RIGHT:
-                    rect = Util.getTileFor(Shortcuts.TOP, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isTopRightQuarter) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
-                    rect = Util.getTileFor(Shortcuts.TOP, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isBottomLeftQuarter) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Util.getTileFor(Shortcuts.LEFT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isBottomRightQuarter) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Util.getTileFor(Shortcuts.RIGHT, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                    Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Util.getTileFor(Shortcuts.BOTTOM, workArea);
-                    isWindowsStyle ? window.minimize() : Util.toggleTiling(window, rect);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
         }
 
-        Util.toggleTiling(window, Util.getTileFor(shortcutName, workArea));
+        Twm.toggleTiling(window, Twm.getTileFor(shortcutName, workArea));
     }
 
     _dynamicFavoriteLayout(window, shortcutName) {
         const workArea = new Rect(window.get_work_area_current_monitor());
         const toggleTiling = () => {
-            const rect = Util.getTileFor(shortcutName, workArea);
-            Util.toggleTiling(window, rect);
+            const rect = Twm.getTileFor(shortcutName, workArea);
+            Twm.toggleTiling(window, rect);
         };
 
         if (!window.isTiled) {
@@ -451,7 +451,7 @@ var Handler = class TilingKeybindingHandler {
 
         if (direction) {
             const neighbor = window.tiledRect.getNeighbor(direction, favoriteLayout);
-            Util.tile(window, neighbor, { openTilingPopup: false });
+            Twm.tile(window, neighbor, { openTilingPopup: false });
         } else {
             toggleTiling();
         }

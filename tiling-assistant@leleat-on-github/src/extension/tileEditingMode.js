@@ -7,8 +7,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Direction, Orientation, Settings } = Me.imports.src.common;
-const Rect = Me.imports.src.extension.geometry.Rect;
-const Util = Me.imports.src.extension.utility.Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -67,9 +67,9 @@ class TileEditingMode extends St.Widget {
         }
 
         this._haveModal = true;
-        this._windows = Util.getTopTileGroup(false);
+        this._windows = Twm.getTopTileGroup(false);
 
-        const openWindows = Util.getWindows();
+        const openWindows = Twm.getWindows();
         if (!openWindows.length || !this._windows.length) {
             const msg = _("Can't enter 'Tile Editing Mode', if no tiled window is visible.");
             Main.notify('Tiling Assistant', msg);
@@ -82,7 +82,7 @@ class TileEditingMode extends St.Widget {
         // tile group to get entire tile group to the foreground.
         const window = this._windows[0];
         window.raise();
-        this._windows = Util.getTileGroupFor(window);
+        this._windows = Twm.getTileGroupFor(window);
 
         // Create the active selection indicator.
         const params = { style_class: 'tile-preview' };
@@ -213,7 +213,7 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
         // Adjusted for window / screen gaps
-        const { x, y, width, height } = Util.getRectWithGap(rect, workArea);
+        const { x, y, width, height } = rect.addGaps(workArea);
 
         this.ease({
             x: x - display.x,
@@ -267,7 +267,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.DEFAULT;
 
             const tiledRect = this._windows.map(w => w.tiledRect);
-            const tileRect = Util.getBestFreeRect(tiledRect, window.tiledRect);
+            const tileRect = Twm.getBestFreeRect(tiledRect, window.tiledRect);
             if (window.tiledRect.equal(tileRect))
                 return Modes.DEFAULT;
 
@@ -276,7 +276,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             if (maximize && this._windows.length > 1)
                 return Modes.DEFAULT;
 
-            Util.tile(window, tileRect, { openTilingPopup: false });
+            Twm.tile(window, tileRect, { openTilingPopup: false });
 
             if (maximize)
                 return Modes.CLOSE;
@@ -290,7 +290,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.DEFAULT;
 
             const tiledRects = this._windows.map(w => w.tiledRect);
-            const fullRect = Util.getBestFreeRect(tiledRects, window.tiledRect);
+            const fullRect = Twm.getBestFreeRect(tiledRects, window.tiledRect);
             const topHalf = fullRect.getUnitAt(0, fullRect.height / 2, Orientation.H);
             const rightHalf = fullRect.getUnitAt(1, fullRect.width / 2, Orientation.V);
             const bottomHalf = fullRect.getUnitAt(1, fullRect.height / 2, Orientation.H);
@@ -299,7 +299,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             const currIdx = rects.findIndex(r => r.equal(window.tiledRect));
             const newIndex = (currIdx + 1) % 4;
 
-            Util.tile(window, rects[newIndex], { openTilingPopup: false });
+            Twm.tile(window, rects[newIndex], { openTilingPopup: false });
             this._selectIndicator.focus(window.tiledRect, window);
 
         // [Q]uit a window
@@ -324,7 +324,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
 
             const selectedRect = window.tiledRect.copy();
             this._windows.splice(this._windows.indexOf(window), 1);
-            Util.untile(window);
+            Twm.untile(window);
             if (!this._windows.length)
                 return Modes.CLOSE;
 
@@ -347,7 +347,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             } else {
                 const notEditing = w => !this._windows.includes(w);
                 const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
-                const openWindows = Util.getWindows(allWs).filter(notEditing);
+                const openWindows = Twm.getWindows(allWs).filter(notEditing);
                 const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
                 const tilingPopup = new TilingSwitcherPopup(
                     openWindows,
@@ -464,12 +464,12 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
 
     _swap() {
         if (this._anchorIndicator.window)
-        { Util.tile(this._anchorIndicator.window, this._selectIndicator.rect, {
+        { Twm.tile(this._anchorIndicator.window, this._selectIndicator.rect, {
             openTilingPopup: false
         }); }
 
         if (this._selectIndicator.window)
-        { Util.tile(this._selectIndicator.window, this._anchorIndicator.rect, {
+        { Twm.tile(this._selectIndicator.window, this._anchorIndicator.rect, {
             openTilingPopup: false
         }); }
 
@@ -592,11 +592,11 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
             if (this._isSameSide(resizedRect, w.tiledRect)) {
                 const newRect = w.tiledRect.copy();
                 updateRectSize(newRect, this._currEdge);
-                Util.tile(w, newRect, { openTilingPopup: false });
+                Twm.tile(w, newRect, { openTilingPopup: false });
             } else if (this._isOppositeSide(resizedRect, w.tiledRect)) {
                 const newRect = w.tiledRect.copy();
                 updateRectSize(newRect, Direction.opposite(this._currEdge));
-                Util.tile(w, newRect, { openTilingPopup: false });
+                Twm.tile(w, newRect, { openTilingPopup: false });
             }
         });
     }

@@ -24,10 +24,8 @@ const Main = imports.ui.main;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-const Rect = Me.imports.src.extension.geometry.Rect;
 
-let Settings;
-let Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
 
 /**
  * 2 entry points:
@@ -43,11 +41,11 @@ function init() {
 }
 
 function enable() {
-    Settings = Me.imports.src.common.Settings;
-    Settings.initialize();
+    this._settings = Me.imports.src.common.Settings;
+    this._settings.initialize();
 
-    Util = Me.imports.src.extension.utility.Util;
-    Util.initialize();
+    this._twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+    this._twm.initialize();
 
     const MoveHandler = Me.imports.src.extension.moveHandler;
     this._moveHandler = new MoveHandler.Handler();
@@ -89,9 +87,9 @@ function enable() {
     _loadAfterSessionLock();
 
     // TODO: remove compatibility code for single favorite layout
-    if (!Settings.getStrv(Settings.FAVORITE_LAYOUTS).length) {
-        const currFav = `${Settings.getInt('favorite-layout')}`;
-        Settings.setStrv(Settings.FAVORITE_LAYOUTS, [currFav]);
+    if (!this._settings.getStrv(this._settings.FAVORITE_LAYOUTS).length) {
+        const currFav = `${this._settings.getInt('favorite-layout')}`;
+        this._settings.setStrv(this._settings.FAVORITE_LAYOUTS, [currFav]);
     }
 }
 
@@ -112,10 +110,11 @@ function disable() {
     this._altTabOverride.destroy();
     this._altTabOverride = null;
 
-    Util.destroy();
-    Util = null;
-    Settings.destroy();
-    Settings = null;
+    this._twm.destroy();
+    this._twm = null;
+
+    this._settings.destroy();
+    this._settings = null;
 
     // Re-enable native tiling.
     this._gnomeMutterSettings.reset('edge-tiling');
@@ -153,7 +152,7 @@ function _saveBeforeSessionLock() {
 
     // can't just check for isTiled because maximized windows may
     // have an untiledRect as well in case window gaps are used
-    const openWindows = Util.getWindows(false);
+    const openWindows = this._twm.getWindows(false);
     const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
         return {
             windowId: w.get_stable_sequence(),
@@ -165,7 +164,7 @@ function _saveBeforeSessionLock() {
 
     const saveObj = {
         'windows': savedWindows,
-        'tileGroups': Array.from(Util.getTileGroups())
+        'tileGroups': Array.from(this._twm.getTileGroups())
     };
 
     const userPath = GLib.get_user_config_dir();
@@ -200,7 +199,7 @@ function _loadAfterSessionLock() {
     if (!success || !contents.length)
         return;
 
-    const openWindows = Util.getWindows(false);
+    const openWindows = this._twm.getWindows(false);
     const saveObj = JSON.parse(ByteArray.toString(contents));
 
     const windowObjects = saveObj['windows'];
@@ -220,11 +219,11 @@ function _loadAfterSessionLock() {
     });
 
     const tileGroups = new Map(saveObj['tileGroups']);
-    Util.setTileGroups(tileGroups);
+    this._twm.setTileGroups(tileGroups);
     openWindows.forEach(w => {
         if (tileGroups.has(w.get_id())) {
-            const group = Util.getTileGroupFor(w);
-            Util.updateTileGroup(group);
+            const group = this._twm.getTileGroupFor(w);
+            this._twm.updateTileGroup(group);
         }
     });
 }

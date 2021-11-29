@@ -7,8 +7,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } = Me.imports.src.common;
-const Rect = Me.imports.src.extension.geometry.Rect;
-const Util = Me.imports.src.extension.utility.Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
@@ -89,14 +89,14 @@ var Handler = class TilingMoveHandler {
 
         // Adapt maximized windows to the new monitor or untile tiled windows
         const oldWorkArea = window.get_work_area_for_monitor(this._windowLeftMonitorNr);
-        if (Util.isMaximized(window, oldWorkArea)) {
-            Util.tile(
+        if (Twm.isMaximized(window, oldWorkArea)) {
+            Twm.tile(
                 window,
                 new Rect(window.get_work_area_for_monitor(newMonitorNr)),
                 { openTilingPopup: false, skipAnim: true }
             );
         } else if (window.isTiled) {
-            Util.untile(window, { restoreFullPos: false, skipAnim: true });
+            Twm.untile(window, { restoreFullPos: false, skipAnim: true });
         }
     }
 
@@ -165,7 +165,7 @@ var Handler = class TilingMoveHandler {
             const monitor = global.display.get_current_monitor();
             const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
-            const topTileGroup = Util.getTopTileGroup();
+            const topTileGroup = Twm.getTopTileGroup();
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
             this._posChangedId = window.connect('position-changed',
@@ -196,7 +196,7 @@ var Handler = class TilingMoveHandler {
         if (!this._tileRect) {
             const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
             const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;
-            restoreOnEnd && Util.untile(
+            restoreOnEnd && Twm.untile(
                 window, {
                     restoreFullPos: false,
                     xAnchor: this._lastPointerPos.x,
@@ -211,10 +211,10 @@ var Handler = class TilingMoveHandler {
         // During the grace period tiling may move the the window across monitors
         // triggering a monitor-change (aka a window enter signal). To prevent that
         // 'end' the grab (via this._isGrabOp) after the tiling
-        this._splitRects.forEach((rect, w) => Util.tile(w, rect, {
+        this._splitRects.forEach((rect, w) => Twm.tile(w, rect, {
             openTilingPopup: false
         }));
-        Util.tile(window, this._tileRect);
+        Twm.tile(window, this._tileRect);
 
         this._splitRects.clear();
         this._tileRect = null;
@@ -317,7 +317,7 @@ var Handler = class TilingMoveHandler {
         const x = eventX - rect.x;
         const relativeX = x / rect.width;
         let untiledRect = window.untiledRect;
-        Util.untile(window, {
+        Twm.untile(window, {
             restoreFullPos: false,
             xAnchor: eventX,
             skipAnim: this._wasMaximizedOnStart
@@ -398,16 +398,16 @@ var Handler = class TilingMoveHandler {
         const tileBottomRightQuarter = pointerAtRightEdge && (pointerAtBottomEdge || windowAtBottomEdge);
 
         if (tileTopLeftQuarter) {
-            this._tileRect = Util.getTileFor(Shortcuts.TOP_LEFT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileTopRightQuarter) {
-            this._tileRect = Util.getTileFor(Shortcuts.TOP_RIGHT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileBottomLeftQuarter) {
-            this._tileRect = Util.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileBottomRightQuarter) {
-            this._tileRect = Util.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtTopEdge) {
             // Switch between maximize & top tiling when keeping the mouse at the top edge.
@@ -418,9 +418,9 @@ var Handler = class TilingMoveHandler {
                     !isLandscape && !Settings.getBoolean(Settings.ENABLE_HOLD_INVERSE_PORTRAIT);
             const tileRect = shouldMaximize
                 ? workArea
-                : Util.getTileFor(Shortcuts.TOP, workArea, this._monitorNr);
+                : Twm.getTileFor(Shortcuts.TOP, workArea, this._monitorNr);
             const holdTileRect = shouldMaximize
-                ? Util.getTileFor(Shortcuts.TOP, workArea, this._monitorNr)
+                ? Twm.getTileFor(Shortcuts.TOP, workArea, this._monitorNr)
                 : workArea;
             // Dont open preview / start new timer if preview was already one for the top
             if (this._tilePreview._rect &&
@@ -447,13 +447,13 @@ var Handler = class TilingMoveHandler {
                 });
             timerId = this._latestPreviewTimerId;
         } else if (pointerAtBottomEdge) {
-            this._tileRect = Util.getTileFor(Shortcuts.BOTTOM, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtLeftEdge) {
-            this._tileRect = Util.getTileFor(Shortcuts.LEFT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtRightEdge) {
-            this._tileRect = Util.getTileFor(Shortcuts.RIGHT, workArea, this._monitorNr);
+            this._tileRect = Twm.getTileFor(Shortcuts.RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else {
             this._tileRect = null;

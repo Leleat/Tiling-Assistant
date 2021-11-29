@@ -7,7 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Settings } = Me.imports.src.common;
-const Util = Me.imports.src.extension.utility.Util;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 /**
  * Optionally, override GNOME's altTab / appSwitcher to group tileGroups
@@ -95,12 +95,12 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         if (groupTileGroups) {
             groupedWindows = windows.reduce((allGroups, w) => {
                 for (const group of allGroups) {
-                    if (w.isTiled && Util.getTileGroupFor(w).length > 1) {
-                        if (Util.getTileGroupFor(w).includes(group[0])) {
+                    if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {
+                        if (Twm.getTileGroupFor(w).includes(group[0])) {
                             group.push(w);
                             return allGroups;
                         }
-                    } else if ((!group[0].isTiled || group[0].isTiled && Util.getTileGroupFor(group[0]).length <= 1) &&
+                    } else if ((!group[0].isTiled || group[0].isTiled && Twm.getTileGroupFor(group[0]).length <= 1) &&
                             winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
                         group.push(w);
                         return allGroups;
@@ -181,7 +181,7 @@ var AppSwitcherItem = GObject.registerClass({
 
         // A tiled window in a tileGroup of length 1, doesn't get a separate
         // AppSwitcherItem. It gets added to the non-tiled windows' AppSwitcherItem
-        const tileGroup = windows[0].isTiled && Util.getTileGroupFor(windows[0]);
+        const tileGroup = windows[0].isTiled && Twm.getTileGroupFor(windows[0]);
         this.isTileGroup = tileGroup && tileGroup.every(w => windows.includes(w)) && tileGroup?.length > 1;
         this.cachedWindows = windows;
         this.appIcons = [];

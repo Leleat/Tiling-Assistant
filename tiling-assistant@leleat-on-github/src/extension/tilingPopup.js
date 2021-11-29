@@ -8,6 +8,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 
 const { Direction, Orientation } = Me.imports.src.common;
 const Util = Me.imports.src.extension.utility.Util;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 const AltTab = Me.imports.src.extension.altTab;
 
 /**
@@ -292,7 +293,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 
         window.change_workspace(global.workspace_manager.get_active_workspace());
         window.move_to_monitor(global.display.get_current_monitor());
-        Util.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
+        Twm.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
         window.activate(global.get_current_time());
     }
 

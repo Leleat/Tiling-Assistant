@@ -6,8 +6,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const Settings = Me.imports.src.common.Settings;
-const Rect = Me.imports.src.extension.geometry.Rect;
-const Util = Me.imports.src.extension.utility.Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 const Side = {
     NONE: 0,
@@ -74,7 +74,7 @@ var Handler = class TilingResizeHandler {
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
-        const topTileGroup = Util.getTopTileGroup(false);
+        const topTileGroup = Twm.getTopTileGroup(false);
         topTileGroup.forEach(w => {
             this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
 

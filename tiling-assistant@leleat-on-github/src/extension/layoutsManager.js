@@ -7,8 +7,8 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Layout, Settings } = Me.imports.src.common;
-const Rect = Me.imports.src.extension.geometry.Rect;
-const Util = Me.imports.src.extension.utility.Util;
+const { Rect, Util } = Me.imports.src.extension.utility;
+const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 const Gettext = imports.gettext;
 const Domain = Gettext.domain(Me.metadata.uuid);
@@ -101,7 +101,7 @@ var LayoutManager = class TilingLayoutsManager {
             return;
 
         const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
-        this._remainingWindows = Util.getWindows(allWs);
+        this._remainingWindows = Twm.getWindows(allWs);
         this._items = new Layout(layout).getItems();
         this._currItem = null;
 
@@ -179,7 +179,7 @@ var LayoutManager = class TilingLayoutsManager {
         }
 
         if (app.can_open_new_window()) {
-            Util.openAppTiled(app, this._currRect);
+            Twm.openAppTiled(app, this._currRect);
         } else {
             // Should we search for an open instance of the app and tile that?
             // Would we move it across workspaces and monitors?
@@ -255,7 +255,7 @@ var LayoutManager = class TilingLayoutsManager {
                         : ['x', 'width'];
                     rect[dimension] /= this._tiledWithLoop.length;
                     rect[pos] += idx * rect[dimension];
-                    Util.tile(w, rect, { openTilingPopup: false, skipAnim: true });
+                    Twm.tile(w, rect, { openTilingPopup: false, skipAnim: true });
                 });
             }
 
