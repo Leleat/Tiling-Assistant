@@ -13,7 +13,6 @@ METADATA=tiling-assistant@leleat-on-github/metadata.json
 VERSION_LINE=$(cat $METADATA | grep \"version\":)
 # split after ":" and trim the spaces
 VERSION_NR=$(echo $(echo $VERSION_LINE | cut -d ':' -f 2) | xargs)
-PREV_VERSION_NR=$((VERSION_NR - 1))
 
 # reset version bump commit
 echo resetting version bump commit...
