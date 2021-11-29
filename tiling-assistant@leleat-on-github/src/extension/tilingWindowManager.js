@@ -550,30 +550,38 @@ var TilingWindowManager = class TilingWindowManager {
                 return result;
             }, { before: [], after: [] });
 
-            // An Axis oject is just an axis-aligned (finite) line. If we want
-            // to check wether the current rect can expand on a certain axis
-            // (let's say we expand the height), we need to check the *other*
-            // (unexpanded) axis. So wether the current rect is bordering free
-            // screen rects along its entire *width*. We do this by 'linking'
-            // the free screen rects along the relevant axis (width). link()
-            // simply combines 2 axes / lines, if they overlap. For this reason
-            // we needed to sort the free rects in ascending order before to
-            // make sure they overlap. After the linking, we just check, if the
-            // combinded link fully contains the current rects unexpanded axis.
-            const currAxis = new Axis(currRect[unxpndPos1], currRect[unxpndPos2]);
-            const freeRectsEncompassCurrRectAxis = freeR => {
-                const linkedAxes = freeR.reduce((linked, r) => {
-                    return linked.link(new Axis(r[unxpndPos1], r[unxpndPos2]));
-                }, new Axis(freeR[0][unxpndPos1], freeR[0][unxpndPos2]));
+            // If we want to check wether the current rect can expand on a certain
+            // side (let's say we expand the height), we need to check the *other*
+            // (unexpanded) side. So wether the current rect is bordering the free
+            // screen rects along its *entire width*. We do this by 'union-ing' the
+            // free screen rects along the relevant side (our ex.: width). For this
+            // reason we needed to sort the free rects in ascending order before
+            // to make sure they overlap before trying to 'union' them. After the
+            // union-ing, we just check, if the union-ed rect contains the current
+            // rects unexpanded side.
 
-                return linkedAxes.contains(currAxis);
+            // Orientation doesn't matter here since we are always comparing sides
+            // of the same orientation. So just make the side always horizontal.
+            const makeSide = (startPoint, endPoint) => new Meta.Rectangle({
+                x: startPoint,
+                width: endPoint - startPoint,
+                height: 1
+            });
+            const freeRectsContainCurrRectSide = rects => {
+                const currRectSide = makeSide(currRect[unxpndPos1], currRect[unxpndPos2]);
+                const linkedSides = rects.reduce((linked, r) => {
+                    const side = makeSide(r[unxpndPos1], r[unxpndPos2]);
+                    return linked.overlap(side) ? linked.union(side) : linked;
+                }, makeSide(rects[0][unxpndPos1], rects[0][unxpndPos2]));
+
+                return linkedSides.contains_rect(currRectSide);
             };
 
             const newRect = currRect.copy();
 
             // Expand to the left / top.
             if (before.length) {
-                if (freeRectsEncompassCurrRectAxis(before)) {
+                if (freeRectsContainCurrRectSide(before)) {
                     const expandStartTo = before.reduce((currSize, rect) => {
                         return Math.max(currSize, rect[xpndPos1]);
                     }, before[0][xpndPos1]);
@@ -585,7 +593,7 @@ var TilingWindowManager = class TilingWindowManager {
 
             // Expand to the right / bottom.
             if (after.length) {
-                if (freeRectsEncompassCurrRectAxis(after)) {
+                if (freeRectsContainCurrRectSide(after)) {
                     const expandEndTo = after.reduce((currSize, rect) => {
                         return Math.min(currSize, rect[xpndPos2]);
                     }, after[0][xpndPos2]);
