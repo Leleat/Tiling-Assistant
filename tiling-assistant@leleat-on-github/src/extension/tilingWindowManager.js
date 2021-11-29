@@ -13,11 +13,7 @@ const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
 const TilingSignals = GObject.registerClass({
     Signals: {
         'window-tiled': { param_types: [Meta.Window.$gtype] },
-        'window-untiled': { param_types: [Meta.Window.$gtype] },
-        // tiled / maximized windows only: window, old workspace, new workspace
-        'window-changed-workspace': { param_types: [Meta.Window.$gtype, Meta.Workspace.$gtype, Meta.Workspace.$gtype] },
-        // tiled / maximized windows only: window, old monitor index, new monitor index
-        'window-changed-monitor': { param_types: [Meta.Window.$gtype, GObject.TYPE_INT, GObject.TYPE_INT] }
+        'window-untiled': { param_types: [Meta.Window.$gtype] }
     }
 }, class TilingSignals extends Clutter.Actor {});
 
@@ -31,6 +27,8 @@ var TilingWindowManager = class TilingWindowManager {
         // { windowId1: int, windowId2: int, ... }
         this._groupRaiseIds = new Map();
         // { windowId1: int, windowId2: int, ... }
+        this._wsChangedIds = new Map();
+        // { windowId1: int, windowId2: int, ... }
         this._unmanagedIds = new Map();
         // { windowId1: [windowIdX, windowIdY, ...], windowId2: [,,,]... }
         this._tileGroups = new Map();
@@ -42,6 +40,8 @@ var TilingWindowManager = class TilingWindowManager {
 
         this._groupRaiseIds.forEach((sId, wId) => this._getWindow(wId).disconnect(sId));
         this._groupRaiseIds.clear();
+        this._wsChangedIds.forEach((sId, wId) => this._getWindow(wId).disconnect(sId));
+        this._wsChangedIds.clear();
         this._unmanagedIds.forEach((sId, wId) => this._getWindow(wId).disconnect(sId));
         this._unmanagedIds.clear();
         this._tileGroups.clear();
@@ -198,14 +198,21 @@ var TilingWindowManager = class TilingWindowManager {
         // user_op as false needed for some apps
         window.move_resize_frame(false, x, y, width, height);
 
-        if (maximize)
+        // Maximized with gaps
+        if (maximize) {
+            const wsId = window.connect('workspace-changed', () => this._onWorkspaceChanged(window));
+            this._wsChangedIds.set(window.get_id(), wsId);
             return;
+        }
 
         // Setup the (new) tileGroup to raise tiled windows as a group
         // but only allow a window to be part of 1 tileGroup at a time
         const topTileGroup = this.getTopTileGroup(false);
         topTileGroup.forEach(w => this.dissolveTileGroup(w.get_id()));
         this.updateTileGroup(topTileGroup);
+
+        const wsId = window.connect('workspace-changed', () => this._onWorkspaceChanged(window));
+        this._wsChangedIds.set(window.get_id(), wsId);
 
         this.emit('window-tiled', window);
 
@@ -349,6 +356,11 @@ var TilingWindowManager = class TilingWindowManager {
             this._groupRaiseIds.delete(windowId);
         }
 
+        if (this._wsChangedIds.has(windowId)) {
+            window && window.disconnect(this._wsChangedIds.get(windowId));
+            this._wsChangedIds.delete(windowId);
+        }
+
         if (this._unmanagedIds.has(windowId)) {
             window && window.disconnect(this._unmanagedIds.get(windowId));
             this._unmanagedIds.delete(windowId);
@@ -392,23 +404,6 @@ var TilingWindowManager = class TilingWindowManager {
         return this._getAllWindows().filter(w => tileGroup.includes(w.get_id()));
     }
 
-    /**
-     * @returns {[Meta.Window]} an array of *all* windows
-     * (and not just the ones relevant to altTab)
-     */
-    static _getAllWindows() {
-        return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
-    }
-
-    /**
-     * Gets the window matching a window id
-     *
-     * @param {number} id
-     * @returns {Meta.Window}
-     */
-    static _getWindow(id) {
-        return this._getAllWindows().find(w => w.get_id() === id);
-    }
     /**
      * Gets the top most tiled window group; that means they complement each
      * other and don't intersect. This may differ from the TileGroupManager's
@@ -855,5 +850,41 @@ var TilingWindowManager = class TilingWindowManager {
         });
 
         app.open_new_window(-1);
+    }
+
+    /**
+     * @returns {[Meta.Window]} an array of *all* windows
+     * (and not just the ones relevant to altTab)
+     */
+    static _getAllWindows() {
+        return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
+    }
+
+    /**
+     * Gets the window matching a window id
+     *
+     * @param {number} id
+     * @returns {Meta.Window}
+     */
+    static _getWindow(id) {
+        return this._getAllWindows().find(w => w.get_id() === id);
+    }
+
+    /**
+     * This is only called for tiled and maximized (with gaps) windows.
+     * Untile tiled windows. Re-tile maximized windows to fit the whole workArea
+     * since a monitor change will also trigger a workspace-change signal
+     */
+    static _onWorkspaceChanged(window) {
+        if (this.isMaximized(window)) {
+            const wA = window.get_work_area_for_monitor(window.get_monitor());
+            const workArea = new Rect(wA);
+            if (workArea.equal(window.tiledRect))
+                return;
+
+            this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
+        } else if (window.isTiled) {
+            this.untile(window, { restoreFullPos: false, skipAnim: Main.overview.visible });
+        }
     }
 };

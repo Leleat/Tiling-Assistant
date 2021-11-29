@@ -35,13 +35,8 @@ var Handler = class TilingMoveHandler {
         });
         this._displaySignals.push(g2Id);
 
-        const w1Id = global.display.connect('window-left-monitor', (src, monitorNr) => {
-            this._windowLeftMonitorNr = monitorNr;
-        });
-        this._displaySignals.push(w1Id);
-
-        const w2Id = global.display.connect('window-entered-monitor', this._onMonitorEntered.bind(this));
-        this._displaySignals.push(w2Id);
+        const wId = global.display.connect('window-entered-monitor', this._onMonitorEntered.bind(this));
+        this._displaySignals.push(wId);
 
         // Save the windows, which need to make space for the
         // grabbed window (this is for the so called 'secondary mode'):
@@ -60,7 +55,6 @@ var Handler = class TilingMoveHandler {
         this._tilePreview.destroy();
     }
 
-    // Only called for maximized / tiled windows: untile tiled windows
     // Previously, we tried to adapt the tiled window's size to the new monitor
     // but that is probably too unpredictable. First, it may introduce rounding
     // errors when moving multipe windows of the same tileGroup and second (and
@@ -71,33 +65,14 @@ var Handler = class TilingMoveHandler {
     // tileGroup? Should it try to integrate into existing tileGroups on that
     // monitor etc... there are too many open questions. Instead just untile
     // and leave it up to the user to re-tile a window.
-    _onMonitorEntered(src, newMonitorNr, window) {
+    _onMonitorEntered(src, monitorNr, window) {
         // During the grace period of a grab a window will tile to the old
         // monitor triggering a monitor-enter-event... Don't register that.
         // See _edgeTilingPreview() for more about the grace period.
-        if (this._isGrabOp) {
+        if (this._isGrabOp)
             // Reset preview mode:
             // Currently only needed to grab the favorite layout for the new monitor.
             this._preparePreviewModeChange(this._currPreviewMode, window);
-            return;
-        }
-
-        // Only proceed with existing *maximized and tiled windows*. That means past this
-        // point, this is a 'monitor-changed' signal for those windows
-        if (!window.untiledRect)
-            return;
-
-        // Adapt maximized windows to the new monitor or untile tiled windows
-        const oldWorkArea = window.get_work_area_for_monitor(this._windowLeftMonitorNr);
-        if (Twm.isMaximized(window, oldWorkArea)) {
-            Twm.tile(
-                window,
-                new Rect(window.get_work_area_for_monitor(newMonitorNr)),
-                { openTilingPopup: false, skipAnim: true }
-            );
-        } else if (window.isTiled) {
-            Twm.untile(window, { restoreFullPos: false, skipAnim: true });
-        }
     }
 
     _onMoveStarted(window, grabOp) {
