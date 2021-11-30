@@ -148,14 +148,13 @@ var Handler = class TilingMoveHandler {
             this._posChangedId = 0;
         }
 
-        this._currPreviewMode = '';
-        this._favoriteLayout = [];
-        this._favoritePreviews?.forEach(p => p.destroy());
-        this._favoritePreviews = [];
-        this._anchorRect = null;
-        this._tilePreview.close();
+        if (this._tileRect) {
+            this._splitRects.forEach((rect, w) => Twm.tile(w, rect, { openTilingPopup: false }));
+            this._splitRects.clear();
 
-        if (!this._tileRect) {
+            Twm.tile(window, this._tileRect);
+            this._tileRect = null;
+        } else {
             const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
             const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;
             restoreOnEnd && Twm.untile(
@@ -165,18 +164,14 @@ var Handler = class TilingMoveHandler {
                     skipAnim: this._wasMaximizedOnStart
                 }
             );
-
-            this._isGrabOp = false;
-            return;
         }
 
-        this._splitRects.forEach((rect, w) => Twm.tile(w, rect, {
-            openTilingPopup: false
-        }));
-        Twm.tile(window, this._tileRect);
-
-        this._splitRects.clear();
-        this._tileRect = null;
+        this._favoriteLayout = [];
+        this._favoritePreviews?.forEach(p => p.destroy());
+        this._favoritePreviews = [];
+        this._anchorRect = null;
+        this._tilePreview.close();
+        this._currPreviewMode = '';
         this._isGrabOp = false;
     }
 
