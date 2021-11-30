@@ -896,6 +896,12 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Window} window
      */
     static _onWorkspaceChanged(window) {
+        // There is a workspace-changed signal when quitting a tiled window.
+        // Not sure, what the proper method for checking a window's status is
+        // but this seems to do the trick...
+        if (!window.get_workspace())
+            return;
+
         if (this.isMaximized(window)) {
             const wA = window.get_work_area_for_monitor(window.get_monitor());
             const workArea = new Rect(wA);
