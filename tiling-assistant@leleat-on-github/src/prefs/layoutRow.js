@@ -29,6 +29,7 @@ var LayoutRow = GObject.registerClass({
         'drawingArea',
         'entryBox',
         'errorLabel',
+        'expanderButton',
         'nameEntry',
         'rectCountLabel',
         'shortcut',
@@ -95,6 +96,10 @@ var LayoutRow = GObject.registerClass({
 
     destroy() {
         this.get_parent().remove(this);
+    }
+
+    activate() {
+        this._nameEntry.grab_focus();
     }
 
     /**
@@ -193,6 +198,10 @@ var LayoutRow = GObject.registerClass({
         this._settings.set_strv(this._shortcutKey, []);
         this.emit('changed', true);
         this.destroy();
+    }
+
+    _onExpanderButtonClicked() {
+        this.toggleReveal();
     }
 
     _onClearShortcutButtonClicked() {

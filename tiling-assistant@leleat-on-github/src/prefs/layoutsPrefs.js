@@ -48,7 +48,6 @@ var Prefs = class TilingLayoutsPrefs {
 
         // The Gtk.ListBox, which LayoutRows are added to
         this._layoutsListBox = mainPrefs._layouts_listbox;
-        this._layoutsListBox.connect('row-activated', (listBox, row) => row.toggleReveal());
 
         // Unique button to save changes made to all layouts to the disk. For
         // simplicity, reload from file after saving to get rid of invalid input.

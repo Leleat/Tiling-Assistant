@@ -11,9 +11,9 @@
             <property name="margin-end">12</property>
             <property name="margin-top">12</property>
             <property name="margin-bottom">12</property>
+            <property name="spacing">12</property>
             <child>
               <object class="GtkButton" id="deleteButton">
-                <property name="margin-end">12</property>
                 <property name="valign">center</property>
                 <property name="has-frame">0</property>
                 <property name="focus-on-click">0</property>
@@ -49,8 +49,6 @@
             </child>
             <child>
               <object class="GtkLabel" id="rectCountLabel">
-                <property name="margin-start">12</property>
-                <property name="margin-end">18</property>
                 <property name="visible">0</property>
                 <style>
                   <class name="dim-label"/>
@@ -59,6 +57,21 @@
             </child>
             <child>
               <object class="ShortcutListener" id="shortcut"/>
+            </child>
+            <child>
+              <object class="GtkSeparator">
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="expanderButton">
+                <property name="valign">center</property>
+                <property name="has-frame">0</property>
+                <property name="icon-name">pan-down-symbolic</property>
+                <signal name="clicked" handler="_onExpanderButtonClicked" swapped="no"/>
+                <style>
+                  <class name="round-button-no-frame"/>
+                </style>
+              </object>
             </child>
           </object>
         </child>

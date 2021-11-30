@@ -31,7 +31,7 @@ var LayoutRowEntry = GObject.registerClass({
 
         this._item = item;
 
-        this._rectLabel.set_label(`${idx}:`);
+        this._rectLabel.set_label(`<span size="x-small">Rect ${idx}</span>`);
         const loop = item.loopType ? `--${item.loopType}` : '';
         const rect = item.rect;
         const text = Object.keys(rect).length !== 0
@@ -40,9 +40,13 @@ var LayoutRowEntry = GObject.registerClass({
         this._rectEntry.get_buffer().set_text(text, -1);
 
         // Show a placeholder on the first entry, if it's empty
-        if (idx === 0 && Object.keys(rect).length === 0) {
-            const placeholder = _("'User Guide' for help...");
-            this._rectEntry.set_placeholder_text(placeholder);
+        if (!text) {
+            if (idx === 0) {
+                const placeholder = _("'User Guide' for help...");
+                this._rectEntry.set_placeholder_text(placeholder);
+            } else {
+                this._rectEntry.set_placeholder_text('x--y--width--height[--h|v]');
+            }
         }
 
         const appInfo = item.appId && Gio.DesktopAppInfo.new(item.appId);
