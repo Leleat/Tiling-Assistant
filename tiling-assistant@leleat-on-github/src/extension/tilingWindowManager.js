@@ -881,7 +881,19 @@ var TilingWindowManager = class TilingWindowManager {
     /**
      * This is only called for tiled and maximized (with gaps) windows.
      * Untile tiled windows. Re-tile maximized windows to fit the whole workArea
-     * since a monitor change will also trigger a workspace-change signal
+     * since a monitor change will also trigger a workspace-change signal.
+     * Previously, we tried to adapt the tiled window's size to the new monitor
+     * but that is probably too unpredictable. First, it may introduce rounding
+     * errors when moving multipe windows of the same tileGroup and second (and
+     * more importantly) the behaviour with regards to tileGroups isn't clear...
+     * Should the entire tileGroup move, if 1 tiled window is moved? If not,
+     * there should probably be a way to just detach 1 window from a group. What
+     * happens on the new monitor, if 1 window is moved? Should it create a new
+     * tileGroup? Should it try to integrate into existing tileGroups on that
+     * monitor etc... there are too many open questions. Instead just untile
+     * and leave it up to the user to re-tile a window.
+     *
+     * @param {Meta.Window} window
      */
     static _onWorkspaceChanged(window) {
         if (this.isMaximized(window)) {

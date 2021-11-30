@@ -55,20 +55,7 @@ var Handler = class TilingMoveHandler {
         this._tilePreview.destroy();
     }
 
-    // Previously, we tried to adapt the tiled window's size to the new monitor
-    // but that is probably too unpredictable. First, it may introduce rounding
-    // errors when moving multipe windows of the same tileGroup and second (and
-    // more importantly) the behaviour with regards to tileGroups isn't clear...
-    // Should the entire tileGroup move, if 1 tiled window is moved? If not,
-    // there should probably be a way to just detach 1 window from a group. What
-    // happens on the new monitor, if 1 window is moved? Should it create a new
-    // tileGroup? Should it try to integrate into existing tileGroups on that
-    // monitor etc... there are too many open questions. Instead just untile
-    // and leave it up to the user to re-tile a window.
     _onMonitorEntered(src, monitorNr, window) {
-        // During the grace period of a grab a window will tile to the old
-        // monitor triggering a monitor-enter-event... Don't register that.
-        // See _edgeTilingPreview() for more about the grace period.
         if (this._isGrabOp)
             // Reset preview mode:
             // Currently only needed to grab the favorite layout for the new monitor.
@@ -183,9 +170,6 @@ var Handler = class TilingMoveHandler {
             return;
         }
 
-        // During the grace period tiling may move the the window across monitors
-        // triggering a monitor-change (aka a window enter signal). To prevent that
-        // 'end' the grab (via this._isGrabOp) after the tiling
         this._splitRects.forEach((rect, w) => Twm.tile(w, rect, {
             openTilingPopup: false
         }));
