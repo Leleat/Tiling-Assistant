@@ -31,7 +31,7 @@ Please see the ![User Guide](GUIDE.md) for a list and an explanation of every fe
 
 ## Preview
 
-![Preview](media/preview.gif)
+![Preview](media/ReadMe_Preview.gif)
 
 ## Installation
 
