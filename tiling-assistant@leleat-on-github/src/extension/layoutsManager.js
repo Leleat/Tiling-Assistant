@@ -291,12 +291,16 @@ var LayoutManager = class TilingLayoutsManager {
  */
 const LayoutSearch = GObject.registerClass({
     Signals: { 'item-activated': { param_types: [GObject.TYPE_INT] } }
-}, class TilingLayoutsSearch extends St.BoxLayout {
+}, class TilingLayoutsSearch extends St.Widget {
     _init(layouts) {
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const allWorkArea = activeWs.get_work_area_all_monitors();
         super._init({
-            width: 500,
-            vertical: true,
-            style_class: 'osd-window'
+            reactive: true,
+            x: allWorkArea.x,
+            y: allWorkArea.y,
+            width: allWorkArea.width,
+            height: allWorkArea.height
         });
         Main.uiGroup.add_child(this);
 
@@ -313,6 +317,15 @@ const LayoutSearch = GObject.registerClass({
         this._focused = -1;
         this._items = [];
 
+        this.connect('button-press-event', () => this.destroy());
+
+        const popup = new St.BoxLayout({
+            style_class: 'osd-window',
+            vertical: true,
+            width: 500
+        });
+        this.add_child(popup);
+
         const fontSize = 18;
         const entry = new St.Entry({
             style: `font-size: ${fontSize}px;\
@@ -323,12 +336,12 @@ const LayoutSearch = GObject.registerClass({
         const entryClutterText = entry.get_clutter_text();
         entryClutterText.connect('key-press-event', this._onKeyPressed.bind(this));
         entryClutterText.connect('text-changed', this._onTextChanged.bind(this));
-        this.add_child(entry);
+        popup.add_child(entry);
 
         this._items = layouts.map(layout => {
             const item = new SearchItem(layout._name, fontSize);
             item.connect('button-press-event', this._onItemClicked.bind(this));
-            this.add_child(item);
+            popup.add_child(item);
             return item;
         });
 
@@ -337,11 +350,10 @@ const LayoutSearch = GObject.registerClass({
             return;
         }
 
-        const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
         const workArea = activeWs.get_work_area_for_monitor(monitor);
-        this.set_position(workArea.x + workArea.width / 2 - this.width / 2,
-            workArea.y + workArea.height / 2 - this.height / 2);
+        popup.set_position(workArea.x + workArea.width / 2 - popup.width / 2,
+            workArea.y + workArea.height / 2 - popup.height / 2);
 
         entry.grab_key_focus();
         this._focus(0);
