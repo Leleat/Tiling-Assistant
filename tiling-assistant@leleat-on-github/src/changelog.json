@@ -2,14 +2,18 @@
     "added": [
         {
             "title": "Added a Panel Indicator for the layouts",
-            "subtitle": "Using the indicator, you can activate a layout with your pointer. You can also change your 'Favorite Layout' (per monitor) with it. The indicator is disabled by default."
+            "subtitle": "Activate a layout with your pointer or change your 'Favorite Layout' (per monitor). The indicator is disabled by default."
         },
         {
-            "title": "Added a setting to group tileGroups in the AppSwitcher (altTab)",
+            "title": "Added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup",
             "subtitle": ""
         },
         {
-            "title": "Holding Super when dragging a window over the 'Favorite Layout' will make the preview span multiple rectangles",
+            "title": "When dnd-ing a window, hold Super to make the tile preview span multiple rectangles",
+            "subtitle": "This only works in the 'Favorite Layout' or 'Split Tiles' preview modes."
+        },
+        {
+            "title": "Added a (hidden) setting to not adapt the Edge-Tiling to the favorite layouts",
             "subtitle": ""
         }
     ],
@@ -33,7 +37,15 @@
             "subtitle": ""
         },
         {
-            "title": "Untile windows, if they are moved to a new monitor (#114)",
+            "title": "Untile tiled windows, if they are moved to a new monitor or workspace (#114)",
+            "subtitle": ""
+        },
+        {
+            "title": "Tile Editing Mode: 'Space' will always open the Tiling Popup",
+            "subtitle": ""
+        },
+        {
+            "title": "Visual tweaks to the preference window",
             "subtitle": ""
         }
     ],

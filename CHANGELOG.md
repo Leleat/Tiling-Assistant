@@ -1,8 +1,26 @@
 # Changelog
 
 ## v28+
+**Added**
+- added a Panel Indicator for the layouts (disabled by default). With it you can activate a layout with your pointer or change your `Favorite Layout` (per monitor)
+- added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup
+- when dnd-ing a window, hold `Super` to make the tile preview span multiple rectangles. This only works in the `Favorite Layout` or `Split Tiles` preview modes
+- added a `hidden` setting to not adapt the Edge-Tiling to the favorite layouts
 
-https://github.com/Leleat/Tiling-Assistant/blob/main/tiling-assistant%40leleat-on-github/src/changelog.json (see git history)
+**Removed**
+- removed the `Change favorite layouts` keyboard shortcut (Use the Panel Indicator instead)
+- removed the favorite button from the `Layouts` in the preferences (Use the Panel Indicator instead)
+
+**Changed**
+- show the entire Layout when moving a window with the `Favorite Layout` preview mode
+- updated the jp translation (by k-fog #112)
+- untile tiled windows, if they are moved to a new monitor or workspace (#114)
+- `Tile Editing Mode`: Pressing `Space` will always open the Tiling Popup (even if there is already a window in that spot)
+- visual tweaks to the preference window
+
+**Fixed**
+- When dragging a window to a new monitor there is a short `Grace Period` (150 ms), in which, if the grab is released, the window will tile to the old monitor. Fix: The `Tiling Popup` will appear on the correct monitor now.
+- fixed artifacts due to the rounded corners of the `Changelog Dialog` (only works on Wayland)
 
 
 ## v27
