@@ -25,7 +25,7 @@ There are three ways to tile windows with your mouse: `Edge Tiling`, the `Split 
 
  This mode is used when you grab a window and drag it to the screen edges. A `Tile Preview` will open and show the area the window will tile to once the grab is released. By default, the `Tile Preview` will either be a screen half or quarter depending on the position of your mouse. If there are tiled windows visible on the screen, the `Tile Preview` will adapt its size. The top screen edge is used for maximizing. Keeping the maximized preview open for a short time will switch to the top-half preview.
 
- If you use multiple monitors: There is a very short `Grace Period` (150 ms) when you pointer changes monitors, in which the `Tile Preview` will stick to the old monitor. This way you can _throw_ (tile) your windows without needing to slowly inch towards the screen edge, if there is another monitor beyond that edge.
+ If you use multiple monitors: There is a very short `Grace Period` (150 ms) when your mouse changes monitors, in which the `Tile Preview` will stick to the old monitor. This way you can _throw_ (tile) your windows without needing to slowly inch towards a screen edge, if there is another monitor beyond that edge.
 
 #### Split Tiles
 
@@ -45,7 +45,7 @@ https://user-images.githubusercontent.com/53054301/144303875-ec29707a-0c27-4420-
 
 Use the the keyboard shortcuts from the `Keybindings` settings page, the [Layouts](#Layouts) and the [Tile Editing Mode](#Tile-Editing-Mode).
 
-## Features
+## Terminology
 
 ### Tiling Popup
 
@@ -82,6 +82,8 @@ By default, the layouts' settings page is [hidden](#Hidden-Settings) behind the 
 A layout is defined by a list of rectangles. Each rectangle can have an app attached to it and loopType set. Optionally, a layout may be assigned a name and a keyboard shortcut for activation. If you activate a layout, you will spawn a Tiling Popup at each rectangle — one after the other. If you attached an app to the rectangle, instead of calling the Tiling Popup, a new instance of the app will be opened and tiled to that rectangle. If you set a loopType, you will keep tiling windows to that specific rectangle and make the tiled windows share that space evenly. This way you can setup layouts similiar to a Master-and-Stack layout. Other than using the assigned keyboard shortcut for a layout activation, you can also activate a layout using the `Panel Indicator` or the `Search for a layout` keyboard shortcut. The later will show a list of all layouts, which you can choose one from.
 
 You define a layout's rectangles by entering their `x` and `y` coordinate as well as their `width` and `height` into a text entry separated by `--`. They are floating point values and can range from 0 to 1. The point (0,0) represents the top-left of your workspace and (1,1) the bottom-right. A loopType is set by appending `--h` or `--v` to the text entry for a horizontal and a vertical loop respectively. You can attach an app by using the `Add Button` to the right of a text entry. It acts like a toggle. If you already attached an app to it, clicking it again, will remove the app.
+
+![](media/Guide_LayoutsSettings.png)
 
 Here is a video to illustrate it. The text entry at row 0 defines a horizontal loop for the top-right quarter (`.5--0--.5--.5--h`) of my workspace and row 1 defines a non-looped rectangle at the bottom-right quarter (`.5--.5--.5--.5`) with an app (`Calender`) attached to it.
 
