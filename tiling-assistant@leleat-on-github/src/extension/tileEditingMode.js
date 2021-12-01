@@ -332,43 +332,36 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             this._windows[0].raise();
             this._selectIndicator.focus(selectedRect, null);
 
-        // [Esc]ape Tile Editing Mode
-        } else if (keyVal === Clutter.KEY_Escape) {
+        // [Enter] / [Esc]ape Tile Editing Mode
+        } else if (keyVal === Clutter.KEY_Escape || keyVal === Clutter.KEY_Return) {
             return Modes.CLOSE;
 
-        // [Enter / Space] to activate
-        } else if (keyVal === Clutter.KEY_Return || keyVal === Clutter.KEY_space) {
-            // a window: quit Tile Editing Mode
-            const window = this._selectIndicator.window;
-            if (window) {
-                return Modes.CLOSE;
+        // [Space] to activate the Tiling Popup
+        } else if (keyVal === Clutter.KEY_space) {
+            const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+            const openWindows = Twm.getWindows(allWs).filter(w => !this._windows.includes(w));
+            const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
+            const tilingPopup = new TilingSwitcherPopup(
+                openWindows,
+                this._selectIndicator.rect,
+                false
+            );
 
-            // an empty spot: open Tiling Popup
-            } else {
-                const notEditing = w => !this._windows.includes(w);
-                const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
-                const openWindows = Twm.getWindows(allWs).filter(notEditing);
-                const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
-                const tilingPopup = new TilingSwitcherPopup(
-                    openWindows,
-                    this._selectIndicator.rect,
-                    false
-                );
-
-                if (!tilingPopup.show(this._windows)) {
-                    tilingPopup.destroy();
-                    return Modes.DEFAULT;
-                }
-
-                tilingPopup.connect('closed', (popup, canceled) => {
-                    if (canceled)
-                        return;
-
-                    const { tiledWindow } = popup;
-                    this._windows.unshift(tiledWindow);
-                    this._selectIndicator.focus(tiledWindow.tiledRect, tiledWindow);
-                });
+            if (!tilingPopup.show(this._windows)) {
+                tilingPopup.destroy();
+                return Modes.DEFAULT;
             }
+
+            tilingPopup.connect('closed', (popup, canceled) => {
+                if (canceled)
+                    return;
+
+                const { tiledWindow } = popup;
+                const replaced = this._windows.findIndex(w => w.tiledRect.equal(tiledWindow.tiledRect));
+                replaced !== -1 && this._windows.splice(replaced, 1);
+                this._windows.unshift(tiledWindow);
+                this._selectIndicator.focus(tiledWindow.tiledRect, tiledWindow);
+            });
         }
 
         return Modes.DEFAULT;
