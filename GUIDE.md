@@ -31,7 +31,7 @@ There are three ways to tile windows with your mouse: `Edge Tiling`, the `Split 
 
 You use this by dragging a window around while holding `Ctrl`. In this mode you split or replace tiles (that means either tiled windows or the free screen space created by tiled windows), if you hover over them. If you hover at the center of the tile, the full tile will be covered. If you hover off-center, the grabbed window will only tile to one half of the full tile. If the hovered tile is a tiled window, the tiled window will take the remaining half. If you hover at the edges of a tile (i. e. within 50 px of an edge), multiple tiled windows will be affected by that. If you _additionally_ hold `Super`, the grabbed window will span multiple tiles.
 
-![](media/Guide_SplitTiles.mp4)
+https://user-images.githubusercontent.com/53054301/144303811-97f532c1-9a02-47c7-ae57-4e1d7e960276.mp4
 
 #### Favorite Layout
 
@@ -39,7 +39,7 @@ The `Favorite Layout` is a user-defined layout, which doesn't adapt its tiles' s
 
 ![](media/Guide_PanelIndicator.png)
 
-![](media/Guide_FavoriteLayout.mp4)
+https://user-images.githubusercontent.com/53054301/144303875-ec29707a-0c27-4420-bb0c-a99858222455.mp4
 
 ### Keyboard-based Workflow
 
@@ -85,7 +85,7 @@ You define a layout's rectangles by entering their `x` and `y` coordinate as wel
 
 Here is a video to illustrate it. The text entry at row 0 defines a horizontal loop for the top-right quarter (`.5--0--.5--.5--h`) of my workspace and row 1 defines a non-looped rectangle at the bottom-right quarter (`.5--.5--.5--.5`) with an app (`Calender`) attached to it.
 
-![](media/Guide_Layouts.mp4)
+https://user-images.githubusercontent.com/53054301/144303907-fd3e5d1b-da42-4b6c-8b13-dbad701e5ba7.mp4
 
 You can mark one layout (per monitor) as a favorite. See [Favorite Layout](#Favorite-Layout) for more information.
 
