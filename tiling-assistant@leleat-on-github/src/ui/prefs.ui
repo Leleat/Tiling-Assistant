@@ -187,10 +187,12 @@
                         <child>
                           <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Raise together</property>
+                            <property name="subtitle" translatable="yes">If a window is tiled, the non-overlapping windows will be grouped together. If a tiled window is raised, raise the other windows of the tile group</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_raise_tile_group">
                                 <property name="can-focus">True</property>
                                 <property name="halign">end</property>
+                                <property name="valign">center</property>
                                 <property name="hexpand">True</property>
                                 <property name="active">True</property>
                               </object>
@@ -646,6 +648,7 @@
                         <child>
                           <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Search for a Layout</property>
+                            <property name="subtitle" translatable="yes">Open a popup listing all the available layouts</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="search_popup_layout"/>
                             </property>
