@@ -155,41 +155,16 @@ var TilingWindowManager = class TilingWindowManager {
 
         // Animations
         const wActor = window.get_compositor_private();
-        if (Settings.getBoolean(Settings.ENABLE_TILE_ANIMATIONS) && !skipAnim && wActor) {
-            const onlyMove = oldRect.width === width && oldRect.height === height;
-            if (onlyMove) { // Custom anims because they don't exist
-                const clone = new St.Widget({
-                    content: GNOME_VERSION < 41
-                        ? Shell.util_get_content_for_window_actor(wActor, oldRect.meta)
-                        : wActor.paint_to_content(oldRect.meta),
-                    x: oldRect.x,
-                    y: oldRect.y,
-                    width: oldRect.width,
-                    height: oldRect.height
-                });
-                Main.uiGroup.add_child(clone);
-                wActor.hide();
-
-                clone.ease({
-                    x, y, width, height,
-                    duration: 250,
-                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                    onComplete: () => {
-                        wActor.show();
-                        clone.destroy();
-                    }
-                });
-            } else if (wasMaximized) {
-                //
-            } else {
-                // HACK => journalctl: 'error in size change accounting'...
-                Main.wm._prepareAnimationInfo(
-                    global.window_manager,
-                    wActor,
-                    oldRect.meta,
-                    Meta.SizeChange.MAXIMIZE
-                );
-            }
+        if (Settings.getBoolean(Settings.ENABLE_TILE_ANIMATIONS) && wActor && !skipAnim) {
+            wActor.remove_all_transitions();
+            // HACK => journalctl: 'error in size change accounting'...?
+            // TODO: no animation if going from maximized -> tiled and back to back multiple times?
+            Main.wm._prepareAnimationInfo(
+                global.window_manager,
+                wActor,
+                oldRect.meta,
+                Meta.SizeChange.MAXIMIZE
+            );
         }
 
         // Wayland workaround because some apps dont work properly
@@ -247,10 +222,12 @@ var TilingWindowManager = class TilingWindowManager {
         window.raise();
 
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
-        if (!wasMaximized && !skipAnim && untileAnim) {
+        const wActor = window.get_compositor_private();
+        if (untileAnim && !wasMaximized && wActor && !skipAnim) {
+            wActor.remove_all_transitions();
             Main.wm._prepareAnimationInfo(
                 global.window_manager,
-                window.get_compositor_private(),
+                wActor,
                 window.get_frame_rect(),
                 Meta.SizeChange.UNMAXIMIZE
             );
