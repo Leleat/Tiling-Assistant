@@ -153,6 +153,7 @@ const PrefsWidget = GObject.registerClass({
             // properly, if we immediately open the changelog...
             this._changelogTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
                 this._openChangelog(prefsDialog);
+                this._changelogTimerId = null;
                 return GLib.SOURCE_REMOVE;
             });
         });
@@ -162,7 +163,7 @@ const PrefsWidget = GObject.registerClass({
 
             if (this._changelogTimerId) {
                 GLib.Source.remove(this._changelogTimerId);
-                this._changelogTimerId = 0;
+                this._changelogTimerId = null;
             }
         });
     }

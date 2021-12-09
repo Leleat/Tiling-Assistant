@@ -30,7 +30,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         if (this._openAppTiledTimerId) {
             GLib.Source.remove(this._openAppTiledTimerId);
-            this._openAppTiledTimerId = 0;
+            this._openAppTiledTimerId = null;
         }
     }
 
@@ -839,6 +839,7 @@ var TilingWindowManager = class TilingWindowManager {
                 createId = 0;
                 firstFrameId && wActor.disconnect(firstFrameId);
                 firstFrameId = 0;
+                this._openAppTiledTimerId = null;
                 return GLib.SOURCE_REMOVE;
             });
         });

@@ -56,22 +56,22 @@ var Handler = class TilingMoveHandler {
 
         if (this._latestMonitorLockTimerId) {
             GLib.Source.remove(this._latestMonitorLockTimerId);
-            this._latestMonitorLockTimerId = 0;
+            this._latestMonitorLockTimerId = null;
         }
 
         if (this._latestPreviewTimerId) {
             GLib.Source.remove(this._latestPreviewTimerId);
-            this._latestPreviewTimerId = 0;
+            this._latestPreviewTimerId = null;
         }
 
         if (this._cursorChangeTimerId) {
             GLib.Source.remove(this._cursorChangeTimerId);
-            this._cursorChangeTimerId = 0;
+            this._cursorChangeTimerId = null;
         }
 
         if (this._restoreSizeTimerId) {
             GLib.Source.remove(this._restoreSizeTimerId);
-            this._restoreSizeTimerId = 0;
+            this._restoreSizeTimerId = null;
         }
     }
 
@@ -112,18 +112,22 @@ var Handler = class TilingMoveHandler {
             this._cursorChangeTimerId = GLib.timeout_add(GLib.PRIORITY_LOW, 400, () => {
                 cursorId && global.display.disconnect(cursorId);
                 cursorId = 0;
+                this._cursorChangeTimerId = null;
                 return GLib.SOURCE_REMOVE;
             });
 
             let counter = 0;
             this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
-                if (grabReleased)
+                if (grabReleased) {
+                    this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
+                }
 
                 counter += 10;
                 if (counter >= 400) {
                     this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
+                    this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
 
@@ -133,6 +137,7 @@ var Handler = class TilingMoveHandler {
                 const moveDist = Util.getDistance(currPoint, oldPoint);
                 if (moveDist > 10) {
                     this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
+                    this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
 
@@ -347,6 +352,8 @@ var Handler = class TilingMoveHandler {
                     if (global.display.get_grab_op() === grabOp) // !
                         this._edgeTilingPreview(window, grabOp);
                 }
+
+                this._latestMonitorLockTimerId = null;
                 return GLib.SOURCE_REMOVE;
             });
             timerId = this._latestMonitorLockTimerId;
@@ -421,6 +428,7 @@ var Handler = class TilingMoveHandler {
                         this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
                     }
 
+                    this._latestPreviewTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 });
             timerId = this._latestPreviewTimerId;
