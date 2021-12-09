@@ -20,6 +20,9 @@ var TilingWindowManager = class TilingWindowManager {
 
         // { windowId1: [windowIdX, windowIdY, ...], windowId2: [...], ... }
         this._tileGroups = new Map();
+
+        // [windowIds]
+        this._unmanagingWindows = [];
     }
 
     static destroy() {
@@ -27,6 +30,7 @@ var TilingWindowManager = class TilingWindowManager {
         this._signals = null;
 
         this._tileGroups.clear();
+        this._unmanagingWindows = [];
 
         if (this._openAppTiledTimerId) {
             GLib.Source.remove(this._openAppTiledTimerId);
@@ -272,12 +276,15 @@ var TilingWindowManager = class TilingWindowManager {
              * Just in case, also try to disconnect old signals...
              */
 
-            // Reconnect unmanaged signal
-            const unmanagedSignal = signals.get(TilingSignals.UNMANAGED);
-            unmanagedSignal && window.disconnect(unmanagedSignal);
+            // Reconnect unmanaging signal
+            const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
+            unmanagingSignal && window.disconnect(unmanagingSignal);
 
-            const umId = window.connect('unmanaged', () => this.dissolveTileGroup(windowId));
-            signals.set(TilingSignals.UNMANAGED, umId);
+            const umId = window.connect('unmanaging', w => {
+                this.dissolveTileGroup(windowId);
+                this._unmanagingWindows.push(w.get_stable_sequence());
+            });
+            signals.set(TilingSignals.UNMANAGING, umId);
 
             // Reconnect ws-changed signal
             const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
@@ -345,9 +352,9 @@ var TilingWindowManager = class TilingWindowManager {
             signals.set(TilingSignals.WS_CHANGED, 0);
         }
 
-        if (signals.get(TilingSignals.UNMANAGED)) {
-            window && window.disconnect(signals.get(TilingSignals.UNMANAGED));
-            signals.set(TilingSignals.UNMANAGED, 0);
+        if (signals.get(TilingSignals.UNMANAGING)) {
+            window && window.disconnect(signals.get(TilingSignals.UNMANAGING));
+            signals.set(TilingSignals.UNMANAGING, 0);
         }
 
         if (!this._tileGroups.has(windowId))
@@ -883,10 +890,11 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Window} window
      */
     static _onWorkspaceChanged(window) {
-        // There is a workspace-changed signal when quitting a tiled window.
-        // Not sure, what the proper method for checking a window's status is
-        // but this seems to do the trick...
-        if (!window.get_workspace())
+        // Closing a window triggers a ws-changed signal, which may lead to a
+        // crash, if we try to operate on it any further. So we listen to the
+        // 'unmanaging'-signal to see, if there is a 'true  workspace change'
+        // or wether the window was just closed
+        if (this._unmanagingWindows.includes(window.get_stable_sequence()))
             return;
 
         if (this.isMaximized(window)) {
@@ -907,7 +915,7 @@ var TilingWindowManager = class TilingWindowManager {
  * signals and tracks the signal( id)s, which are relevant for tiling:
  * Raise: for group raising.
  * Ws-changed: for untiling a tiled window after its ws changed.
- * Unmanaged: to remove unmanaged tiled windows from the other tileGroups.
+ * Unmanaging: to remove unmanaging tiled windows from the other tileGroups.
  */
 const TilingSignals = GObject.registerClass({
     Signals: {
@@ -918,12 +926,12 @@ const TilingSignals = GObject.registerClass({
     // Relevant 'signal types' (sorta used as an enum / key for the signal map)
     static RAISE = 'RAISE';
     static WS_CHANGED = 'WS_CHANGED';
-    static UNMANAGED = 'UNMANAGED';
+    static UNMANAGING = 'UNMANAGING';
 
     _init() {
         super._init();
 
-        // { windowId1: { RAISE: signalId1, WS_CHANGED: signalId2, UNMANAGED: signalId3 }, ... }
+        // { windowId1: { RAISE: signalId1, WS_CHANGED: signalId2, UNMANAGING: signalId3 }, ... }
         this._ids = new Map();
     }
 
@@ -939,7 +947,7 @@ const TilingSignals = GObject.registerClass({
     }
 
     /**
-     * Gets the signal ids for the raise, ws-changed and unmanaged signals
+     * Gets the signal ids for the raise, ws-changed and unmanaging signals
      * for a specific window
      *
      * @param {number} windowId Meta.Window's id
