@@ -19,8 +19,9 @@
 - visual tweaks to the preference window
 
 **Fixed**
-- When dragging a window to a new monitor there is a short `Grace Period` (150 ms), in which, if the grab is released, the window will tile to the old monitor. Fix: The `Tiling Popup` will appear on the correct monitor now.
+- when dragging a window to a new monitor there is a short `Grace Period` (150 ms), in which, if the grab is released, the window will tile to the old monitor. Fix: The `Tiling Popup` will appear on the correct monitor now.
 - fixed artifacts due to the rounded corners of the `Changelog Dialog` (only works on Wayland)
+- fixed animations being skipped, if an animation was already running (#58)
 
 
 ## v27

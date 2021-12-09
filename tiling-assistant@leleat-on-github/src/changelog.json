@@ -57,6 +57,10 @@
         {
             "title": "Fixed artifacts due to the rounded corners of the Changelog window",
             "subtitle": "This only works on Wayland."
+        },
+        {
+            "title": "Fixed animations being skipped, if an animation was already running (#58)",
+            "subtitle": ""
         }
     ]
 }
