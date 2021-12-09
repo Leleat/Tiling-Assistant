@@ -27,6 +27,11 @@ var TilingWindowManager = class TilingWindowManager {
         this._signals = null;
 
         this._tileGroups.clear();
+
+        if (this._openAppTiledTimerId) {
+            GLib.Source.remove(this._openAppTiledTimerId);
+            this._openAppTiledTimerId = 0;
+        }
     }
 
     static connect(signal, func) {
@@ -828,9 +833,12 @@ var TilingWindowManager = class TilingWindowManager {
             // window doesn't match the original app. It may be a loading screen
             // or the user started an app inbetween etc... but in case the checks/
             // signals above fail disconnect the signals after 1 min at the latest
-            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
+            this._openAppTiledTimerId && GLib.Source.remove(this._openAppTiledTimerId);
+            this._openAppTiledTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
                 createId && global.display.disconnect(createId);
+                createId = 0;
                 firstFrameId && wActor.disconnect(firstFrameId);
+                firstFrameId = 0;
                 return GLib.SOURCE_REMOVE;
             });
         });

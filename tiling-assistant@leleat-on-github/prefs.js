@@ -93,7 +93,6 @@ const PrefsWidget = GObject.registerClass({
         // class, so we don't have to keep track of the signal connections, which
         // would need cleanup after the prefs window was closed.
         this._settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
-        this.connect('destroy', () => this._settings.run_dispose());
 
         // Bind settings to GUI
         this._bindSwitches();
@@ -152,10 +151,19 @@ const PrefsWidget = GObject.registerClass({
 
             // TODO: solve this. Modal property doesn't seem to work
             // properly, if we immediately open the changelog...
-            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
+            this._changelogTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
                 this._openChangelog(prefsDialog);
                 return GLib.SOURCE_REMOVE;
             });
+        });
+
+        this.connect('unrealize', () => {
+            this._settings.run_dispose();
+
+            if (this._changelogTimerId) {
+                GLib.Source.remove(this._changelogTimerId);
+                this._changelogTimerId = 0;
+            }
         });
     }
 

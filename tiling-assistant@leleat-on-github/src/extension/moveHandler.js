@@ -53,6 +53,26 @@ var Handler = class TilingMoveHandler {
     destroy() {
         this._displaySignals.forEach(sId => global.display.disconnect(sId));
         this._tilePreview.destroy();
+
+        if (this._latestMonitorLockTimerId) {
+            GLib.Source.remove(this._latestMonitorLockTimerId);
+            this._latestMonitorLockTimerId = 0;
+        }
+
+        if (this._latestPreviewTimerId) {
+            GLib.Source.remove(this._latestPreviewTimerId);
+            this._latestPreviewTimerId = 0;
+        }
+
+        if (this._cursorChangeTimerId) {
+            GLib.Source.remove(this._cursorChangeTimerId);
+            this._cursorChangeTimerId = 0;
+        }
+
+        if (this._restoreSizeTimerId) {
+            GLib.Source.remove(this._restoreSizeTimerId);
+            this._restoreSizeTimerId = 0;
+        }
     }
 
     _onMonitorEntered(src, monitorNr, window) {
@@ -88,14 +108,16 @@ var Handler = class TilingMoveHandler {
             });
             // Clean up in case my assumption mentioned above is wrong
             // and the cursor never gets updated or something else...
-            GLib.timeout_add(GLib.PRIORITY_LOW, 400, () => {
+            this._cursorChangeTimerId && GLib.Source.remove(this._cursorChangeTimerId);
+            this._cursorChangeTimerId = GLib.timeout_add(GLib.PRIORITY_LOW, 400, () => {
                 cursorId && global.display.disconnect(cursorId);
                 cursorId = 0;
                 return GLib.SOURCE_REMOVE;
             });
 
             let counter = 0;
-            GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
+            this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
+            this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
                 if (grabReleased)
                     return GLib.SOURCE_REMOVE;
 
@@ -317,6 +339,7 @@ var Handler = class TilingMoveHandler {
         if (this._lastMonitorNr !== currMonitorNr) {
             this._monitorNr = this._lastMonitorNr;
             let timerId = 0;
+            this._latestMonitorLockTimerId && GLib.Source.remove(this._latestMonitorLockTimerId);
             this._latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
                 // Only update the monitorNr, if the latest timer timed out.
                 if (timerId === this._latestMonitorLockTimerId) {
@@ -386,6 +409,7 @@ var Handler = class TilingMoveHandler {
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
 
             let timerId = 0;
+            this._latestPreviewTimerId && GLib.Source.remove(this._latestPreviewTimerId);
             this._latestPreviewTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
                 Settings.getInt(Settings.INVERSE_TOP_MAXIMIZE_TIMER), () => {
                 // Only open the alternative preview, if the timeout-ed timer

@@ -1,6 +1,10 @@
 # Changelog
 
-## v28+
+## v29
+**Fixed**
+- removed timer sources according to EGO review
+
+## v28
 **Added**
 - added a Panel Indicator for the layouts (disabled by default). With it you can activate a layout with your pointer or change your `Favorite Layout` (per monitor)
 - added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup
