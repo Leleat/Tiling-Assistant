@@ -890,23 +890,23 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Window} window
      */
     static _onWorkspaceChanged(window) {
-        // Closing a window triggers a ws-changed signal, which may lead to a
-        // crash, if we try to operate on it any further. So we listen to the
-        // 'unmanaging'-signal to see, if there is a 'true  workspace change'
-        // or wether the window was just closed
-        if (this._unmanagingWindows.includes(window.get_stable_sequence()))
-            return;
+        // // Closing a window triggers a ws-changed signal, which may lead to a
+        // // crash, if we try to operate on it any further. So we listen to the
+        // // 'unmanaging'-signal to see, if there is a 'true  workspace change'
+        // // or wether the window was just closed
+        // if (this._unmanagingWindows.includes(window.get_stable_sequence()))
+        //     return;
 
-        if (this.isMaximized(window)) {
-            const wA = window.get_work_area_for_monitor(window.get_monitor());
-            const workArea = new Rect(wA);
-            if (workArea.equal(window.tiledRect))
-                return;
+        // if (this.isMaximized(window)) {
+        //     const wA = window.get_work_area_for_monitor(window.get_monitor());
+        //     const workArea = new Rect(wA);
+        //     if (workArea.equal(window.tiledRect))
+        //         return;
 
-            this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
-        } else if (window.isTiled) {
-            this.untile(window, { restoreFullPos: false, skipAnim: Main.overview.visible });
-        }
+        //     this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
+        // } else if (window.isTiled) {
+        //     this.untile(window, { restoreFullPos: false, skipAnim: Main.overview.visible });
+        // }
     }
 };
 
