@@ -1,5 +1,13 @@
 # Changelog
 
+## v31
+**Fixed**
+- fixed crash introduced in v28 (#125)
+
+## v30
+**Fixed**
+- fixed crash introduced in v28 (#124)
+
 ## v29
 **Fixed**
 - removed timer sources according to EGO review
