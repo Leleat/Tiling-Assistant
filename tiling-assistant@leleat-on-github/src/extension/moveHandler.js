@@ -225,20 +225,20 @@ var Handler = class TilingMoveHandler {
         };
 
         const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
-        const splitActivator = Settings.getString(Settings.SPLIT_TILE_MOD);
+        const splitActivator = Settings.getString(Settings.ADAPTIVE_TILING_MOD);
         const favActivator = Settings.getString(Settings.FAVORITE_LAYOUT_MOD);
         let newMode = '';
 
         if (pressed[splitActivator]) {
-            newMode = defaultMode === MoveModes.SPLIT_TILES
+            newMode = defaultMode === MoveModes.ADAPTIVE_TILING
                 ? MoveModes.EDGE_TILING
-                : MoveModes.SPLIT_TILES;
+                : MoveModes.ADAPTIVE_TILING;
         } else if (pressed[favActivator]) {
             newMode = defaultMode === MoveModes.FAVORITE_LAYOUT
                 ? MoveModes.EDGE_TILING
                 : MoveModes.FAVORITE_LAYOUT;
-        } else if (defaultMode === MoveModes.SPLIT_TILES) {
-            newMode = MoveModes.SPLIT_TILES;
+        } else if (defaultMode === MoveModes.ADAPTIVE_TILING) {
+            newMode = MoveModes.ADAPTIVE_TILING;
         } else if (defaultMode === MoveModes.FAVORITE_LAYOUT) {
             newMode = MoveModes.FAVORITE_LAYOUT;
         } else {
@@ -252,8 +252,8 @@ var Handler = class TilingMoveHandler {
             case MoveModes.EDGE_TILING:
                 this._edgeTilingPreview(window, grabOp);
                 break;
-            case MoveModes.SPLIT_TILES:
-                this._splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
+            case MoveModes.ADAPTIVE_TILING:
+                this._adaptiveTilingPreview(window, grabOp, topTileGroup, freeScreenRects);
                 break;
             case MoveModes.FAVORITE_LAYOUT:
                 this._favoriteLayoutTilingPreview(window);
@@ -451,15 +451,15 @@ var Handler = class TilingMoveHandler {
      * Activates the secondary preview mode. By default, it's activated with
      * `Ctrl`. When tiling using this mode, it will not only affect the grabbed
      * window but possibly others as well. It's split into a 'single' and a
-     * 'group' mode. Take a look at _splitTilingPreviewSingle() and
-     * _splitTilingPreviewGroup() for details.
+     * 'group' mode. Take a look at _adaptiveTilingPreviewSingle() and
+     * _adaptiveTilingPreviewGroup() for details.
      *
      * @param {Meta.Window} window
      * @param {Meta.GrabOp} grabOp
      * @param {Meta.Window[]} topTileGroup
      * @param {Rect[]} freeScreenRects
      */
-    _splitTilingPreview(window, grabOp, topTileGroup, freeScreenRects) {
+    _adaptiveTilingPreview(window, grabOp, topTileGroup, freeScreenRects) {
         if (!topTileGroup.length) {
             this._edgeTilingPreview(window, grabOp);
             return;
@@ -495,9 +495,9 @@ var Handler = class TilingMoveHandler {
             const atRightEdge = this._lastPointerPos.x > hoveredRect.x2 - edgeRadius;
 
             atTopEdge || atBottomEdge || atLeftEdge || atRightEdge
-                ? this._splitTilingPreviewGroup(window, hoveredRect, topTileGroup,
+                ? this._adaptiveTilingPreviewGroup(window, hoveredRect, topTileGroup,
                     { atTopEdge, atBottomEdge, atLeftEdge, atRightEdge })
-                : this._splitTilingPreviewSingle(window, hoveredRect, topTileGroup);
+                : this._adaptiveTilingPreviewSingle(window, hoveredRect, topTileGroup);
         }
     }
 
@@ -514,7 +514,7 @@ var Handler = class TilingMoveHandler {
      * @param {Rect} hoveredRect
      * @param {Meta.Window[]} topTileGroup
      */
-    _splitTilingPreviewSingle(window, hoveredRect, topTileGroup) {
+    _adaptiveTilingPreviewSingle(window, hoveredRect, topTileGroup) {
         const atTop = this._lastPointerPos.y < hoveredRect.y + hoveredRect.height * .25;
         const atBottom = this._lastPointerPos.y > hoveredRect.y + hoveredRect.height * .75;
         const atRight = this._lastPointerPos.x > hoveredRect.x + hoveredRect.width * .75;
@@ -555,7 +555,7 @@ var Handler = class TilingMoveHandler {
     }
 
     /**
-     * Similiar to _splitTilingPreviewSingle(). But it's activated by hovering
+     * Similiar to _adaptiveTilingPreviewSingle(). But it's activated by hovering
      * the very edges of a tiled window. And instead of affecting just 1 window
      * it can possibly re-tile multiple windows. A tiled window will be affected,
      * if it aligns with the edge that is being hovered. It's probably easier
@@ -567,7 +567,7 @@ var Handler = class TilingMoveHandler {
      * @param {object} hovered contains booleans at which position the
      *      `hoveredRect` is hovered.
      */
-    _splitTilingPreviewGroup(window, hoveredRect, topTileGroup, hovered) {
+    _adaptiveTilingPreviewGroup(window, hoveredRect, topTileGroup, hovered) {
         // Find the smallest window that will be affected and use it to calcuate
         // the sizes of the preview. Determine the new tileRects for the rest
         // of the tileGroup via Rect.minus().

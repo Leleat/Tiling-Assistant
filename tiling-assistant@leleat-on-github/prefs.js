@@ -71,9 +71,9 @@ const PrefsWidget = GObject.registerClass({
         'enable_tile_animations',
         'enable_untile_animations',
         'edge_tiling_row',
-        'split_tiles_row',
+        'adaptive_tiling_row',
         'favorite_layout_row',
-        'move_split_tiles_mod',
+        'move_adaptive_tiling_mod',
         'move_favorite_layout_mod',
         'adapt_edge_tiling_to_favorite_layout',
         'vertical_preview_area',
@@ -257,7 +257,7 @@ const PrefsWidget = GObject.registerClass({
 
     _bindComboBoxes() {
         const comboBoxes = [
-            Settings.SPLIT_TILE_MOD,
+            Settings.ADAPTIVE_TILING_MOD,
             Settings.FAVORITE_LAYOUT_MOD,
             Settings.RESTORE_SIZE_ON
         ];
@@ -290,7 +290,7 @@ const PrefsWidget = GObject.registerClass({
                 key: Settings.DEFAULT_MOVE_MODE,
                 rowNames: [
                     'edge_tiling_row',
-                    'split_tiles_row',
+                    'adaptive_tiling_row',
                     'favorite_layout_row'
                 ]
             }

@@ -879,9 +879,9 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingAssistantListRow" id="split_tiles_row">
-                            <property name="title" translatable="yes">Split Tiles</property>
-                            <property name="subtitle" translatable="yes">Releasing the grab while hovering over a tile will push the neighbouring window(s) aside</property>
+                          <object class="TilingAssistantListRow" id="adaptive_tiling_row">
+                            <property name="title" translatable="yes">Adaptive Tiling</property>
+                            <property name="subtitle" translatable="yes">Releasing the grab on a window while hovering over a tile will push the overlapped window(s) aside</property>
                             <property name="prefix">
                               <object class="GtkCheckButton">
                                 <property name="can-focus">True</property>
@@ -951,9 +951,9 @@
                         </child>
                         <child>
                           <object class="TilingAssistantListRow">
-                            <property name="title" translatable="yes">'Split Tiles' Activator</property>
+                            <property name="title" translatable="yes">'Adaptive Tiling' Move Mode Activator</property>
                             <property name="suffix">
-                              <object class="GtkComboBoxText" id="move_split_tiles_mod">
+                              <object class="GtkComboBoxText" id="move_adaptive_tiling_mod">
                                 <property name="has-frame">0</property>
                                 <property name="halign">end</property>
                                 <property name="hexpand">1</property>
@@ -969,7 +969,7 @@
                         </child>
                         <child>
                           <object class="TilingAssistantListRow">
-                            <property name="title" translatable="yes">'Favorite Layout' Activator</property>
+                            <property name="title" translatable="yes">'Favorite Layout' Move Mode Activator</property>
                             <property name="suffix">
                               <object class="GtkComboBoxText" id="move_favorite_layout_mod">
                                 <property name="has-frame">0</property>

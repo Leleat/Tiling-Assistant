@@ -5,7 +5,7 @@
 - [Usage](#Usage)
     - [Mouse-based Workflow](#Mouse-based-Workflow)
         - [Edge Tiling](#Edge-Tiling)
-        - [Split Tiles](#Split-Tiles)
+        - [Adaptive Tiling](#Adaptive-Tiling)
         - [Favorite Layout](#Favorite-Layout)
     - [Keyboard-based Workflow](#Keyboard-based-Workflow)
 - [Terminology](#Terminology)
@@ -19,7 +19,7 @@
 
 ### Mouse-based Workflow
 
-There are three ways to tile windows with your mouse: `Edge Tiling`, the `Split Tiles` mode and the `Favorite Layout`.
+There are three ways to tile windows with your mouse: `Edge Tiling`, `Adaptive Tiling` and the `Favorite Layout`.
 
 #### Edge Tiling
 
@@ -27,7 +27,7 @@ There are three ways to tile windows with your mouse: `Edge Tiling`, the `Split 
 
  If you use multiple monitors: There is a very short `Grace Period` (150 ms) when your mouse changes monitors, in which the `Tile Preview` will stick to the old monitor. This way you can _throw_ (tile) your windows without needing to slowly inch towards a screen edge, if there is another monitor beyond that edge.
 
-#### Split Tiles
+#### Adaptive Tiling
 
 You use this by dragging a window around while holding `Ctrl`. In this mode you split or replace tiles (that means either tiled windows or the free screen space created by tiled windows), if you hover over them. If you hover at the center of the tile, the full tile will be covered. If you hover off-center, the grabbed window will only tile to one half of the full tile. If the hovered tile is a tiled window, the tiled window will take the remaining half. If you hover at the edges of a tile (i. e. within 50 px of an edge), multiple tiled windows will be affected by that. If you _additionally_ hold `Super`, the grabbed window will span multiple tiles.
 

@@ -182,7 +182,7 @@
 		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
 			<default>true</default>
 		</key>
-		<key name="move-split-tiles-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
+		<key name="move-adaptive-tiling-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
 			<default>"Ctrl"</default>
 		</key>
 		<key name="move-favorite-layout-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
