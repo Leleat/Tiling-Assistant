@@ -15,7 +15,15 @@ const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 var Override = class AltTabOverride {
     constructor() {
         this._originalAltTab = AltTab.AppSwitcherPopup;
-        AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
+
+        if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
+            AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
+
+        Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
+            AltTab.AppSwitcherPopup = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)
+                ? TilingAppSwitcherPopup
+                : this._originalAltTab;
+        });
     }
 
     destroy() {
@@ -87,45 +95,27 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         this._mouseTimeOutId = 0;
 
         const winTracker = Shell.WindowTracker.get_default();
-        const groupTileGroups = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER);
-        let groupedWindows;
 
         // Group windows based on their tileGroup, if tileGroup.length > 1.
         // Otherwise group them based on their respective apps.
-        if (groupTileGroups) {
-            groupedWindows = windows.reduce((allGroups, w) => {
-                for (const group of allGroups) {
-                    if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {
-                        if (Twm.getTileGroupFor(w).includes(group[0])) {
-                            group.push(w);
-                            return allGroups;
-                        }
-                    } else if ((!group[0].isTiled || group[0].isTiled && Twm.getTileGroupFor(group[0]).length <= 1) &&
-                            winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
+        const groupedWindows = windows.reduce((allGroups, w) => {
+            for (const group of allGroups) {
+                if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {
+                    if (Twm.getTileGroupFor(w).includes(group[0])) {
                         group.push(w);
                         return allGroups;
                     }
+                } else if ((!group[0].isTiled || group[0].isTiled && Twm.getTileGroupFor(group[0]).length <= 1) &&
+                        winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
+                    group.push(w);
+                    return allGroups;
                 }
+            }
 
-                const newGroup = [w];
-                allGroups.push(newGroup);
-                return allGroups;
-            }, []);
-        // Group windows based on apps
-        } else {
-            groupedWindows = windows.reduce((allGroups, w) => {
-                for (const group of allGroups) {
-                    if (winTracker.get_window_app(group[0]) === winTracker.get_window_app(w)) {
-                        group.push(w);
-                        return allGroups;
-                    }
-                }
-
-                const newGroup = [w];
-                allGroups.push(newGroup);
-                return allGroups;
-            }, []);
-        }
+            const newGroup = [w];
+            allGroups.push(newGroup);
+            return allGroups;
+        }, []);
 
         // Construct the AppIcons and add them to the popup.
         groupedWindows.forEach(group => {
