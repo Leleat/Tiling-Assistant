@@ -19,6 +19,7 @@ const Modes = {
     DEFAULT: 1,
     SWAP: 2,
     RESIZE: 4,
+    MOVE: 8,
     CLOSE: 16
 };
 
@@ -83,6 +84,12 @@ class TileEditingMode extends St.Widget {
         const window = this._windows[0];
         window.raise();
         this._windows = Twm.getTileGroupFor(window);
+        // Shouldn't technically happen but just in case since this should be
+        // the only possible case of failure left...
+        if (!this._windows?.length) {
+            this.close();
+            return;
+        }
 
         // Create the active selection indicator.
         const params = { style_class: 'tile-preview' };
@@ -120,20 +127,24 @@ class TileEditingMode extends St.Widget {
     }
 
     vfunc_button_press_event() {
+        this._keyHandler.prepareLeave();
         this.close();
     }
 
     vfunc_key_press_event(keyEvent) {
         const mods = keyEvent.modifier_state;
-        const isCtrlPressed = mods & Clutter.ModifierType.CONTROL_MASK;
-        const isSuperPressed = mods & Clutter.ModifierType.MOD4_MASK;
-
         let newMode;
 
-        if (isSuperPressed)
-            newMode = Modes.RESIZE;
-        else if (isCtrlPressed)
+        // Swap windows
+        if (mods & Clutter.ModifierType.CONTROL_MASK)
             newMode = Modes.SWAP;
+        // Move group to different workspace / monitor
+        else if (mods & Clutter.ModifierType.SHIFT_MASK)
+            newMode = Modes.MOVE;
+        // Resize windows
+        else if (mods & Clutter.ModifierType.MOD4_MASK)
+            newMode = Modes.RESIZE;
+        // Default keys
         else
             newMode = Modes.DEFAULT;
 
@@ -144,13 +155,13 @@ class TileEditingMode extends St.Widget {
         // Handle the key press and get mode depending on that.
         newMode = this._keyHandler.handleKeyPress(keyEvent);
 
-        if (newMode !== this._mode)
+        if (newMode && newMode !== this._mode)
             this._switchMode(newMode);
     }
 
     vfunc_key_release_event(keyEvent) {
         const newMode = this._keyHandler.handleKeyRelease(keyEvent);
-        if (newMode !== this._mode)
+        if (newMode && newMode !== this._mode)
             this._switchMode(newMode);
     }
 
@@ -167,6 +178,9 @@ class TileEditingMode extends St.Widget {
                 break;
             case Modes.SWAP:
                 this._keyHandler = new SwapKeyHandler(this);
+                break;
+            case Modes.MOVE:
+                this._keyHandler = new MoveKeyHandler(this);
                 break;
             case Modes.RESIZE:
                 this._keyHandler = new ResizeKeyHandler(this);
@@ -371,10 +385,10 @@ const DefaultKeyHandler = class DefaultKeyHandler {
      * Automatically called on a keyEvent.
      *
      * @param {number} keyEvent
-     * @returns {Modes} The mode to enter after the event was handled.
+     * @returns {Modes|undefined} The mode to enter after the event was handled.
      */
     handleKeyRelease() {
-        return Modes.DEFAULT;
+        return undefined;
     }
 
     /**
@@ -471,6 +485,74 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
     }
 };
 
+/**
+ * Move the tile group to a different workspace / monitor.
+ *
+ * @param {TileEditingMode} tileEditor
+ */
+const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
+    handleKeyPress(keyEvent) {
+        const direction = Util.getDirection(keyEvent.keyval);
+        const moveWorkspace = keyEvent.modifier_state & Clutter.ModifierType.MOD1_MASK;
+
+        // [Directions] to move the tile group
+        if (direction) {
+            // To new workspace
+            if (moveWorkspace) {
+                let metaDir = Meta.MotionDirection.UP;
+                if (direction === Direction.N)
+                    metaDir = Meta.MotionDirection.UP;
+                else if (direction === Direction.S)
+                    metaDir = Meta.MotionDirection.DOWN;
+                else if (direction === Direction.W)
+                    metaDir = Meta.MotionDirection.LEFT;
+                else if (direction === Direction.E)
+                    metaDir = Meta.MotionDirection.RIGHT;
+
+                const activeWs = global.workspace_manager.get_active_workspace();
+                const newWs = activeWs.get_neighbor(metaDir);
+                if (activeWs === newWs)
+                    return Modes.MOVE;
+
+                Twm.moveGroupToWorkspace(this._tileEditor._windows, newWs);
+
+            // To new monitor
+            } else {
+                let metaDir = Meta.DisplayDirection.UP;
+                if (direction === Direction.N)
+                    metaDir = Meta.DisplayDirection.UP;
+                else if (direction === Direction.S)
+                    metaDir = Meta.DisplayDirection.DOWN;
+                else if (direction === Direction.W)
+                    metaDir = Meta.DisplayDirection.LEFT;
+                else if (direction === Direction.E)
+                    metaDir = Meta.DisplayDirection.RIGHT;
+
+                // get_current_monitor isn't accurate for our case
+                const currMonitor = this._tileEditor._windows[0].get_monitor();
+                const newMonitor = global.display.get_monitor_neighbor_index(currMonitor, metaDir);
+                if (newMonitor === -1)
+                    return Modes.MOVE;
+
+                Twm.moveGroupToMonitor(this._tileEditor._windows, currMonitor, newMonitor);
+            }
+
+            return Modes.CLOSE;
+
+        // [Esc] to return to default mode
+        } else if (keyEvent.keyval === Clutter.KEY_Escape) {
+            return Modes.DEFAULT;
+        }
+
+        return Modes.MOVE;
+    }
+};
+
+/**
+ * Handler to resize the highlighted window.
+ *
+ * @param {TileEditor} tileEditor
+ */
 const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
     constructor(tileEditor) {
         super(tileEditor);

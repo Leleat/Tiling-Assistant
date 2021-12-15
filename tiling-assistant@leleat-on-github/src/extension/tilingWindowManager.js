@@ -99,8 +99,10 @@ var TilingWindowManager = class TilingWindowManager {
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
      * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
+     * @param {boolean} [fakeTile=false] don't create a new tile group, don't
+     *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, { openTilingPopup = true, skipAnim = false } = {}) {
+    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, fakeTile = false } = {}) {
         if (!window || window.is_skip_taskbar())
             return;
 
@@ -169,7 +171,7 @@ var TilingWindowManager = class TilingWindowManager {
             this._updateGappedMaxWindowSignals(window);
 
         // Tiled window
-        } else {
+        } else if (!fakeTile) {
             // Setup the (new) tileGroup to raise tiled windows as a group
             // but only allow a window to be part of 1 tileGroup at a time
             const topTileGroup = this.getTopTileGroup(false);
@@ -194,7 +196,7 @@ var TilingWindowManager = class TilingWindowManager {
      *      we use the pointer position.
      * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
      */
-    static untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false } = {}) {
+    static untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false, clampToWorkspace = false } = {}) {
         const wasMaximized = window.get_maximized();
         if (wasMaximized)
             window.unmaximize(wasMaximized);
@@ -232,19 +234,12 @@ var TilingWindowManager = class TilingWindowManager {
             const relativeMouseX = (xAnchor - currWindowFrame.x) / currWindowFrame.width;
             const newPosX = xAnchor - oldRect.width * relativeMouseX;
 
-            // When moving a tiled window to a new monitor (with shortcut or
-            // the overview), we restore the original size. Terminal will partly
-            // restored to the old monitor for some reason... so clamp the pos
-            // to the new workArea.
-            const monitor = window.get_monitor();
-            const workArea = new Rect(window.get_work_area_for_monitor(monitor));
-            const x = Math.max(workArea.x, newPosX);
-            const y = Math.max(workArea.y, currWindowFrame.y);
-
             // Wayland workaround for DND / restore position
             Meta.is_wayland_compositor() && window.move_frame(true, newPosX, currWindowFrame.y);
 
-            window.move_resize_frame(true, x, y, oldRect.width, oldRect.height);
+            // userOp means that the window won't clamp to the workspace
+            const userOp = !clampToWorkspace;
+            window.move_resize_frame(userOp, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
         }
 
         this._clearTilingProps(window.get_id());
@@ -253,6 +248,61 @@ var TilingWindowManager = class TilingWindowManager {
         window.untiledRect = null;
 
         this.emit('window-untiled', window);
+    }
+
+    /**
+     * Moves the tile group to a different workspace
+     *
+     * @param {Meta.Window[]} tileGroup
+     * @param {Meta.Workspace} workspace
+     */
+    static moveGroupToWorkspace(tileGroup, workspace) {
+        tileGroup.forEach(w => {
+            this._blockTilingSignalsFor(w);
+            w.change_workspace(workspace);
+            this._unblockTilingSignalsFor(w);
+        });
+    }
+
+    /**
+     * Moves the tile group to a different monitor
+     *
+     * @param {Meta.Window[]} tileGroup
+     * @param {number} oldMon
+     * @param {number} newMon
+     */
+    static moveGroupToMonitor(tileGroup, oldMon, newMon) {
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const oldWorkArea = new Rect(activeWs.get_work_area_for_monitor(oldMon));
+        const newWorkArea = new Rect(activeWs.get_work_area_for_monitor(newMon));
+
+        const hScale = oldWorkArea.width / newWorkArea.width;
+        const vScale = oldWorkArea.height / newWorkArea.height;
+
+        tileGroup.forEach((w, idx) => {
+            const newTile = w.tiledRect.copy();
+            newTile.x = newWorkArea.x + Math.floor(newWorkArea.width * ((w.tiledRect.x - oldWorkArea.x) / oldWorkArea.width));
+            newTile.y = newWorkArea.y + Math.floor(newWorkArea.height * ((w.tiledRect.y - oldWorkArea.y) / oldWorkArea.height));
+            newTile.width = Math.floor(w.tiledRect.width * (1 / hScale));
+            newTile.height = Math.floor(w.tiledRect.height * (1 / vScale));
+
+            // Try to align with all previously scaled tiles and the workspace to prevent gaps
+            for (let i = 0; i < idx; i++)
+                newTile.tryAlignWith(tileGroup[i].tiledRect);
+
+            newTile.tryAlignWith(newWorkArea, 10);
+
+            this.tile(w, newTile, {
+                skipAnim: true,
+                fakeTile: true
+            });
+        });
+
+        // The tiling signals got disconnected during the tile() call but not
+        // (re-)connected with it since it may have been possible that wrong tile
+        // groups would have been created when moving one window after the other
+        // to the new monitor. So update the tileGroup now with the full/old group.
+        this._updateTileGroup(tileGroup);
     }
 
     /**
@@ -741,6 +791,35 @@ var TilingWindowManager = class TilingWindowManager {
     }
 
     /**
+     * Blocks all tiling signals for a window.
+     *
+     * @param {Meta.Window} window
+     */
+    static _blockTilingSignalsFor(window) {
+        const signals = this._signals.getSignalsFor(window.get_id());
+        const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
+        blockedSignals.forEach(s => {
+            const id = signals.get(s);
+            id && window.block_signal_handler(id);
+        });
+    }
+
+    /**
+     * Unblocks all tiling signals for a window.
+     * Should only be called after _blockTilingSignalsFor().
+     *
+     * @param {Meta.Window} window
+     */
+    static _unblockTilingSignalsFor(window) {
+        const signals = this._signals.getSignalsFor(window.get_id());
+        const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
+        blockedSignals.forEach(s => {
+            const id = signals.get(s);
+            id && window.unblock_signal_handler(id);
+        });
+    }
+
+    /**
      * Updates the signals after maximizing a window with gaps.
      *
      * @param {Meta.Window} window
@@ -929,7 +1008,7 @@ var TilingWindowManager = class TilingWindowManager {
 
             this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
         } else if (window.isTiled) {
-            this.untile(window, { restoreFullPos: false, skipAnim: Main.overview.visible });
+            this.untile(window, { restoreFullPos: false, clampToWorkspace: true, skipAnim: Main.overview.visible });
         }
     }
 };

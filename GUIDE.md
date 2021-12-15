@@ -65,15 +65,19 @@ When a window is tiled, the top-most tiled windows, which don't overlap each oth
 
 ### Tile Editing Mode
 
-This is a special mode to manage your tiled windows with your keyboard.
+This is a special mode to manage your tiled windows with your keyboard. The `Direction keys` are either `WASD`, `hjkl` or the `Arrow keys`.
 
-You can navigate focus with the direction keys (`WASD`, `hjkl` or the `arrows`). Holding `Ctrl` while moving the focus and then releasing `Ctrl` will swap the highlighted windows.
-
-`Super` + `Directions` resizes the selected window. This follows GNOME's native resizing behaviour. That means, if you resize on one side and then want to resize on the opposite side, you first need to go to a neighbouring side of your current side before you can go to the opposite side. For intance, if you are currently in-/decreasing the window size on the North side using the `up` and `down` arrows (or `w`/`s` and `j`/`k`) and then want to resize on the South, you first need to go the West or East side with the `left` or `right` arrows before you can use `down` to reach the South side.
-
-When a window is highlighted, press `Q` to [q]uit it, `R` to [r]estore its size. `E` to [e]xpand it to fill the available space, `C` to [c]ycle through 'half' states of a window and `Space` to open the `Tiling Popup` for the currently highlighted tile.
-
-Pressing `Esc` or `Enter` will leave the Tile Editing Mode.
+- `Direction keys`: navigate focus.
+- `Ctrl` + `Direction key`: swaps the highlighted window(s) when `Ctrl`is released.
+- `Shift` + `Direction key`: moves the tile group to the _monitor_ in the direction of the pressed `Direction key`.
+- `Shift` + `Alt` + `Direction key`: moves the tile group to the _workspace_ in the direction of the pressed `Direction key`.
+- `Super` + `Direction key`: resizes the highlighted window. This follows GNOME's native resizing behaviour. That means, if you resize on one side and then want to resize on the opposite side, you first need to go to a neighbouring side of your current side before you can go to the opposite side. For intance, if you are currently resizing a window on the North side using the `up` and `down` direction keys and then want to resize on the South, you first need to go the West or East side with the `left` or `right` direction keys before you can use `down` to reach the South side.
+- `Q`: quits the highlighted window.
+- `R`: restores the highlighted window's original size (a.k.a. untiles it).
+- `E`: expands the highlighted window to fill the available space around it.
+- `C`: cycles through the half-sized tiling states' of the highlighted window.
+- `Space`: opens the Tiling Popup for the highlighted tile.
+- `Esc` / `Enter`: leaves the Tile Editing Mode.
 
 ### Layouts
 
