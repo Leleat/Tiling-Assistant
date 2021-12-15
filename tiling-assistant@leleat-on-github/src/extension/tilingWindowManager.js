@@ -23,11 +23,17 @@ var TilingWindowManager = class TilingWindowManager {
 
         // [windowIds]
         this._unmanagingWindows = [];
+
+        this._wsAddedId = global.workspace_manager.connect('workspace-added', this._onWorkspaceAdded.bind(this));
+        this._wsRemovedId = global.workspace_manager.connect('workspace-removed', this._onWorkspaceRemoved.bind(this));
     }
 
     static destroy() {
         this._signals.destroy();
         this._signals = null;
+
+        global.workspace_manager.disconnect(this._wsAddedId);
+        global.workspace_manager.disconnect(this._wsRemovedId);
 
         this._tileGroups.clear();
         this._unmanagingWindows = [];
@@ -35,6 +41,16 @@ var TilingWindowManager = class TilingWindowManager {
         if (this._openAppTiledTimerId) {
             GLib.Source.remove(this._openAppTiledTimerId);
             this._openAppTiledTimerId = null;
+        }
+
+        if (this._wsAddedTimer) {
+            GLib.Source.remove(this._wsAddedTimer);
+            this._wsAddedTimer = null;
+        }
+
+        if (this._wsRemovedTimer) {
+            GLib.Source.remove(this._wsRemovedTimer);
+            this._wsRemovedTimer = null;
         }
     }
 
@@ -839,7 +855,7 @@ var TilingWindowManager = class TilingWindowManager {
         signals.set(TilingSignals.UNMANAGING, umId);
 
         // Refresh 'workspace-changed' signal
-        const wsId = window.connect('workspace-changed', () => this._onWorkspaceChanged(window));
+        const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
         this._signals.getSignalsFor(wId).set(TilingSignals.WS_CHANGED, wsId);
     }
 
@@ -877,7 +893,7 @@ var TilingWindowManager = class TilingWindowManager {
             const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
             wsChangeSignal && window.disconnect(wsChangeSignal);
 
-            const wsId = window.connect('workspace-changed', () => this._onWorkspaceChanged(window));
+            const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
             signals.set(TilingSignals.WS_CHANGED, wsId);
 
             // Reconnect raise signal
@@ -976,6 +992,40 @@ var TilingWindowManager = class TilingWindowManager {
     }
 
     /**
+     * A window's workspace-changed signal is used to untile it when the user
+     * changes its workspace. However, dynamic workspaces *may* also trigger a
+     * ws-changed signal. So listen to the workspace-added/removed signals and
+     * 'ignore' the next ws-changed signal. A ws addition/removal doesn't guarantuee
+     * a ws-changed signal (e. g. the workspace is at the end), so reset after
+     * a short timer.
+     */
+    static _onWorkspaceAdded() {
+        this._ignoreWsChange = true;
+        this._wsAddedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+            this._ignoreWsChange = false;
+            this._wsAddedTimer = null;
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    /**
+     * A window's workspace-changed signal is used to untile it when the user
+     * changes its workspace. However, dynamic workspaces *may* also trigger a
+     * ws-changed signal. So listen to the workspace-added/removed signals and
+     * 'ignore' the next ws-changed signal. A ws addition/removal doesn't guarantuee
+     * a ws-changed signal (e. g. the workspace is at the end), so reset after
+     * a short timer.
+     */
+    static _onWorkspaceRemoved() {
+        this._ignoreWsChange = true;
+        this._wsRemovedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
+            this._ignoreWsChange = false;
+            this._wsRemovedTimer = null;
+            return GLib.SOURCE_REMOVE;
+        });
+    }
+
+    /**
      * This is only called for tiled and maximized (with gaps) windows.
      * Untile tiled windows. Re-tile maximized windows to fit the whole workArea
      * since a monitor change will also trigger a workspace-change signal.
@@ -992,12 +1042,15 @@ var TilingWindowManager = class TilingWindowManager {
      *
      * @param {Meta.Window} window
      */
-    static _onWorkspaceChanged(window) {
+    static _onWindowWorkspaceChanged(window) {
         // Closing a window triggers a ws-changed signal, which may lead to a
         // crash, if we try to operate on it any further. So we listen to the
         // 'unmanaging'-signal to see, if there is a 'true  workspace change'
         // or wether the window was just closed
         if (this._unmanagingWindows.includes(window.get_stable_sequence()))
+            return;
+
+        if (this._ignoreWsChange)
             return;
 
         if (this.isMaximized(window)) {
