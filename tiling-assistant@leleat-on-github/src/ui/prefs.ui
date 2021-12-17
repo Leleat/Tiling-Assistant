@@ -187,7 +187,7 @@
                         <child>
                           <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Raise together</property>
-                            <property name="subtitle" translatable="yes">If a window is tiled, the non-overlapping windows will be grouped together. If a tiled window is raised, raise the other windows of the tile group</property>
+                            <property name="subtitle" translatable="yes">A Tile Group is created when a window gets tiled. If a tiled window is raised, raise the other windows of its Tile Group as well</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_raise_tile_group">
                                 <property name="can-focus">True</property>
@@ -209,9 +209,16 @@
                                 <property name="halign">end</property>
                                 <property name="valign">center</property>
                                 <property name="hexpand">True</property>
-                                <property name="active">True</property>
                               </object>
                             </property>
+                            <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
+                            <property name="sensitive"
+                                      bind-source="enable_raise_tile_group"
+                                      bind-property="active"
+                                      bind-flags="default"/>
                           </object>
                         </child>
                       </object>
@@ -445,6 +452,10 @@
                             <property name="suffix">
                               <object class="ShortcutListener" id="toggle_tiling_popup"/>
                             </property>
+                            <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
                           </object>
                         </child>
                         <child>
@@ -463,6 +474,10 @@
                             <property name="suffix">
                               <object class="ShortcutListener" id="auto_tile"/>
                             </property>
+                            <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
                           </object>
                         </child>
                         <child>
