@@ -74,7 +74,7 @@ var Handler = class TilingResizeHandler {
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
-        const topTileGroup = Twm.getTopTileGroup(false);
+        const topTileGroup = Twm.getTopTileGroup();
         topTileGroup.forEach(w => {
             this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
 

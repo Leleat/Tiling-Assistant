@@ -68,7 +68,7 @@ class TileEditingMode extends St.Widget {
         }
 
         this._haveModal = true;
-        this._windows = Twm.getTopTileGroup(false);
+        this._windows = Twm.getTopTileGroup();
 
         const openWindows = Twm.getWindows();
         if (!openWindows.length || !this._windows.length) {

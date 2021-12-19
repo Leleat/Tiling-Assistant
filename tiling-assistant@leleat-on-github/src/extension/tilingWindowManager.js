@@ -115,10 +115,11 @@ var TilingWindowManager = class TilingWindowManager {
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
      * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
+     * @param {boolean} [tileGroup=null] forces the creation of this tile group.
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, fakeTile = false } = {}) {
+    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, tileGroup = null, fakeTile = false } = {}) {
         if (!window || window.is_skip_taskbar())
             return;
 
@@ -189,9 +190,7 @@ var TilingWindowManager = class TilingWindowManager {
         // Tiled window
         } else if (!fakeTile) {
             // Setup the (new) tileGroup to raise tiled windows as a group
-            // but only allow a window to be part of 1 tileGroup at a time
-            const topTileGroup = this.getTopTileGroup(false);
-            topTileGroup.forEach(w => this._clearTilingProps(w.get_id()));
+            const topTileGroup = tileGroup ?? this._getWindowsForBuildingTileGroup(window.get_monitor());
             this._updateTileGroup(topTileGroup);
 
             this.emit('window-tiled', window);
@@ -339,11 +338,14 @@ var TilingWindowManager = class TilingWindowManager {
 
     /**
      * @param {Meta.Window} window a Meta.Window.
-     * @returns {[Meta.Window]} an array of Meta.Windows, which are in `window`'s
+     * @returns {Meta.Window[]} an array of Meta.Windows, which are in `window`'s
      *      tile group (including the `window` itself).
      */
     static getTileGroupFor(window) {
         const tileGroup = this._tileGroups.get(window.get_id());
+        if (!tileGroup)
+            return [];
+
         return this._getAllWindows().filter(w => tileGroup.includes(w.get_id()));
     }
 
@@ -358,54 +360,45 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {number} [monitor=null] get the group for the monitor number.
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
-    static getTopTileGroup(ignoreTopWindow = true, monitor = null) {
-        const openWindows = this.getWindows();
-        const groupedWindows = [];
-        const notGroupedWindows = [];
-        // Optionally, set a custom monitorNr. This is used for the 'grace period'.
-        // When trying to tile window by quickly dragging (and releasing) a window
-        // over a screen edge. Even if there is a different monitor there, we want
-        // to stick to the old monitor for a short period of time.
-        monitor = monitor ?? openWindows[0]?.get_monitor();
+    static getTopTileGroup({ ignoreTopWindow = false, monitor = null } = {}) {
+        // 'Raise Tile Group' setting is enabled
+        if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
+            const openWindows = this.getWindows();
+            const ignoredWindows = [];
+            const mon = monitor ?? openWindows[0]?.get_monitor();
 
-        for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
-            const window = openWindows[i];
-            if (window.get_monitor() !== monitor)
-                continue;
-
-            if (window.isTiled) {
-                const wRect = window.tiledRect;
-
-                // If a non-grouped window in a higher stack order overlaps the
-                // currently tested tiled window, the currently tested tiled
-                // window isn't part of the top tile group.
-                const overlapsNonGroupedWindows = notGroupedWindows.some(w => {
-                    const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
-                    return rect.overlap(wRect);
-                });
-                // Same applies for already grouped windows; but only check if,
-                // it doesn't already overlap non-grouped windows.
-                const overlapsGroupedWindows = !overlapsNonGroupedWindows &&
-                        groupedWindows.some(w => w.tiledRect.overlap(wRect));
-
-                if (overlapsNonGroupedWindows || overlapsGroupedWindows)
-                    notGroupedWindows.push(window);
-                else
-                    groupedWindows.push(window);
-            } else {
-                // The window is maximized, so all windows below it can't belong
-                // to this group anymore.
-                if (this.isMaximized(window))
-                    break;
+            for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
+                const window = openWindows[i];
+                if (window.get_monitor() !== mon)
+                    continue;
 
                 // Ignore non-tiled windows, which are always-on-top, for the
                 // calculation since they are probably some utility apps etc.
-                if (!window.is_above())
-                    notGroupedWindows.push(window);
-            }
-        }
+                if (window.is_above())
+                    continue;
 
-        return groupedWindows;
+                // Find the first not overlapped tile group, if it exists
+                if (window.isTiled) {
+                    const overlapsIgnoredWindow = ignoredWindows.some(w => {
+                        const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
+                        return rect.overlap(window.tiledRect);
+                    });
+
+                    if (overlapsIgnoredWindow)
+                        ignoredWindows.push(window);
+                    else
+                        return this.getTileGroupFor(window);
+                } else {
+                    ignoredWindows.push(window);
+                }
+            }
+
+            return [];
+
+        // 'Raise Tile Group' setting is disabled
+        } else {
+            return this._getTopTiledWindows({ ignoreTopWindow, monitor });
+        }
     }
 
     /**
@@ -606,7 +599,7 @@ var TilingWindowManager = class TilingWindowManager {
      * bottom left screen corner etc... If there is no other rect to adapt to
      * we default to half the workArea.
      *
-     * @param {Shortcut} shortcut the side / quarter to get the tile rect for.
+     * @param {Shortcuts} shortcut the side / quarter to get the tile rect for.
      * @param {Rect} workArea the workArea.
      * @param {number} [monitor=null] the monitor number we want to get the
      *      rect for. This may not always be the current monitor. It is only
@@ -616,99 +609,101 @@ var TilingWindowManager = class TilingWindowManager {
      * @returns a Rect.
      */
     static getTileFor(shortcut, workArea, monitor = null) {
-        const topTileGroup = this.getTopTileGroup(true, monitor);
-        let existingRects = [];
-        if (topTileGroup.length >= 1)
-            existingRects = topTileGroup.map(w => w.tiledRect);
-        else if (Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT))
-            existingRects = Util.getFavoriteLayout();
+        const favLayout = Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
+        const twRects = favLayout ? Util.getFavoriteLayout() : this.getTopTileGroup(true, monitor).map(w => w.tiledRect);
+        if (!twRects.length)
+            return this.getDefaultTileFor(shortcut, workArea);
 
-        const screenRects = existingRects.concat(workArea.minus(existingRects));
+        // Return the adapted rect only if it doesn't overlap an existing tile
+        const getTile = rect => {
+            if (favLayout)
+                return rect;
 
+            const overlapsTiles = twRects.some(r => r.overlap(rect));
+            return overlapsTiles ? this.getDefaultTileFor(shortcut, workArea) : rect;
+        };
+
+        const screenRects = twRects.concat(workArea.minus(twRects));
         switch (shortcut) {
             case Shortcuts.MAXIMIZE: {
                 return workArea.copy();
             } case Shortcuts.LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-                return new Rect(
-                    workArea.x,
-                    workArea.y,
-                    width,
-                    workArea.height
-                );
+                const result = new Rect(workArea.x, workArea.y, width, workArea.height);
+                return getTile(result);
             } case Shortcuts.RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-                return new Rect(
-                    workArea.x2 - width,
-                    workArea.y,
-                    width,
-                    workArea.height
-                );
+                const result = new Rect(workArea.x2 - width, workArea.y, width, workArea.height);
+                return getTile(result);
             } case Shortcuts.TOP: {
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x,
-                    workArea.y,
-                    workArea.width,
-                    height
-                );
+                const result = new Rect(workArea.x, workArea.y, workArea.width, height);
+                return getTile(result);
             } case Shortcuts.BOTTOM: {
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x,
-                    workArea.y2 - height,
-                    workArea.width,
-                    height
-                );
+                const result = new Rect(workArea.x, workArea.y2 - height, workArea.width, height);
+                return getTile(result);
             } case Shortcuts.TOP_LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x,
-                    workArea.y,
-                    width,
-                    height
-                );
+                const result = new Rect(workArea.x, workArea.y, width, height);
+                return getTile(result);
             } case Shortcuts.TOP_RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x2 - width,
-                    workArea.y,
-                    width,
-                    height
-                );
+                const result = new Rect(workArea.x2 - width, workArea.y, width, height);
+                return getTile(result);
             } case Shortcuts.BOTTOM_LEFT: {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x,
-                    workArea.y2 - height,
-                    width,
-                    height
-                );
+                const result = new Rect(workArea.x, workArea.y2 - height, width, height);
+                return getTile(result);
             } case Shortcuts.BOTTOM_RIGHT: {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                return new Rect(
-                    workArea.x2 - width,
-                    workArea.y2 - height,
-                    width,
-                    height
-                );
+                const result = new Rect(workArea.x2 - width, workArea.y2 - height, width, height);
+                return getTile(result);
             }
+        }
+    }
+
+    /**
+     * @param {Shortcuts} shortcut determines, which half/quarter to get the tile for
+     * @param {Rect} workArea
+     * @returns
+     */
+    static getDefaultTileFor(shortcut, workArea) {
+        switch (shortcut) {
+            case Shortcuts.MAXIMIZE:
+                return workArea.copy();
+            case Shortcuts.LEFT:
+                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+            case Shortcuts.RIGHT:
+                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+            case Shortcuts.TOP:
+                return workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+            case Shortcuts.BOTTOM:
+                return workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+            case Shortcuts.TOP_LEFT:
+                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+            case Shortcuts.TOP_RIGHT:
+                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+            case Shortcuts.BOTTOM_LEFT:
+                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
+            case Shortcuts.BOTTOM_RIGHT:
+                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
         }
     }
 
@@ -722,7 +717,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
         const openWindows = this.getWindows(allWs);
-        const topTileGroup = this.getTopTileGroup(false);
+        const topTileGroup = this.getTopTileGroup();
         topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));
         if (!openWindows.length)
             return;
@@ -804,6 +799,110 @@ var TilingWindowManager = class TilingWindowManager {
         });
 
         app.open_new_window(-1);
+    }
+
+    /**
+     * Gets the top windows, which are supposed to be in a tile group. That
+     * means windows, which are tiled, and don't overlap each other.
+     */
+    static _getWindowsForBuildingTileGroup(monitor = null) {
+        const openWindows = this.getWindows();
+        const ignoredWindows = [];
+        const result = [];
+        const mon = monitor ?? openWindows[0]?.get_monitor();
+
+        for (const window of openWindows) {
+            if (window.get_monitor() !== mon)
+                continue;
+
+            if (window.is_above())
+                continue;
+
+            if (window.isTiled) {
+                // Window was already checked as part of another's tileGroup.
+                if (ignoredWindows.includes(window) || result.includes(window))
+                    continue;
+
+                // Check for the other windows in the tile group as well regardless
+                // of the 'raise tile group' setting so that once the setting is
+                // enabled the tile groups are already set properly.
+
+                const tileGroup = this.getTileGroupFor(window);
+
+                // This means `window` is the window that was just tiled and
+                // thus has no tileGroup set at this point yet.
+                if (!tileGroup.length) {
+                    result.push(window);
+                    continue;
+                }
+
+                const tileGroupOverlaps = tileGroup.some(w =>
+                    result.some(r => r.tiledRect.overlap(w.tiledRect)) ||
+                    ignoredWindows.some(r => (r.tiledRect ?? new Rect(r.get_frame_rect())).overlap(w.tiledRect)));
+
+                tileGroupOverlaps
+                    ? tileGroup.forEach(w => ignoredWindows.push(w))
+                    : tileGroup.forEach(w => result.push(w));
+            } else {
+                // The window is maximized, so all windows below it can't belong
+                // to this group anymore.
+                if (this.isMaximized(window))
+                    break;
+
+                ignoredWindows.push(window);
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     * Gets the top most non-overlapped/ing tiled windows ignoring
+     * the stacking order and tile groups.
+     *
+     * @param {{boolean, number}} param1
+     */
+    static _getTopTiledWindows({ ignoreTopWindow = false, monitor = null } = {}) {
+        const openWindows = this.getWindows();
+        const topTiledWindows = [];
+        const ignoredWindows = [];
+        const mon = monitor ?? openWindows[0]?.get_monitor();
+
+        for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
+            const window = openWindows[i];
+            if (window.get_monitor() !== mon)
+                continue;
+
+            if (window.is_above())
+                continue;
+
+            if (window.isTiled) {
+                const wRect = window.tiledRect;
+
+                // If a ignored window in a higher stack order overlaps the
+                // currently tested tiled window, the currently tested tiled
+                // window isn't part of the top tile group.
+                const overlapsIgnoredWindow = ignoredWindows.some(w => {
+                    const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
+                    return rect.overlap(wRect);
+                });
+                // Same applies for already grouped windows
+                const overlapsTopTiledWindows = topTiledWindows.some(w => w.tiledRect.overlap(wRect));
+
+                overlapsIgnoredWindow || overlapsTopTiledWindows
+                    ? ignoredWindows.push(window)
+                    : topTiledWindows.push(window);
+            } else {
+                // The window is maximized, so all windows below it can't belong
+                // to this group anymore.
+                if (this.isMaximized(window))
+                    break;
+
+                ignoredWindows.push(window);
+            }
+        }
+
+        return topTiledWindows;
     }
 
     /**
@@ -974,7 +1073,7 @@ var TilingWindowManager = class TilingWindowManager {
     }
 
     /**
-     * @returns {[Meta.Window]} an array of *all* windows
+     * @returns {Meta.Window[]} an array of *all* windows
      * (and not just the ones relevant to altTab)
      */
     static _getAllWindows() {

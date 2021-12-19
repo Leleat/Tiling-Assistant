@@ -168,7 +168,7 @@ var Util = class Utility {
      */
     static ___debugShowTiledRects() {
         const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-        const topTileGroup = twm.getTopTileGroup(false);
+        const topTileGroup = twm.getTopTileGroup();
         if (!topTileGroup.length) {
             Main.notify('Tiling Assistant', 'No tiled windows / tiled rects.');
             return null;
@@ -202,7 +202,7 @@ var Util = class Utility {
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-        const topTileGroup = twm.getTopTileGroup(false);
+        const topTileGroup = twm.getTopTileGroup();
         const tRects = topTileGroup.map(w => w.tiledRect);
         const freeScreenSpace = twm.getFreeScreen(tRects);
         const rects = freeScreenSpace ? [freeScreenSpace] : workArea.minus(tRects);

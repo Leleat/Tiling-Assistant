@@ -154,7 +154,7 @@ var Handler = class TilingMoveHandler {
             const monitor = global.display.get_current_monitor();
             const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
-            const topTileGroup = Twm.getTopTileGroup();
+            const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: true });
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
             this._posChangedId = window.connect('position-changed',
