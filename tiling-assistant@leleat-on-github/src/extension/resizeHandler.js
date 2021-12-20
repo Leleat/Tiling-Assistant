@@ -86,6 +86,39 @@ var Handler = class TilingResizeHandler {
                 // other are meant to align and resize them together.
                 w.tiledRect.tryAlignWith(window.tiledRect, margin);
         });
+
+        // Windows can be part of multiple tile groups. We however only resize
+        // the top most visible tile group. That means a tile group in a lower
+        // stack position may share windows with the top tile group and after
+        // the resize op those windows will no longer match with the lower tile
+        // group's tiles. So remove the shared windows from the lower tile group.
+        const allWindows = Twm.getWindows();
+        allWindows.forEach(w => {
+            if (!w.isTiled)
+                return;
+
+            if (topTileGroup.includes(w))
+                return;
+
+            // Gets a tile group of windows without the ones
+            // which are about to be resized
+            const group = Twm.getTileGroupFor(w);
+            const newGroup = group.reduce((gr, win) => {
+                !topTileGroup.includes(win) && gr.push(win);
+                return gr;
+            }, []);
+
+            // Tile groups are the same
+            if (group.length === newGroup.length)
+                return;
+
+            // Remove old tile group and create new one
+            Twm.clearTilingProps(w.get_id());
+            Twm.updateTileGroup(newGroup);
+        });
+
+        // Remove the actively resizing window to get the windows, which will
+        // be passively resized.
         topTileGroup.splice(topTileGroup.indexOf(window), 1);
         const grabbedRect = window.tiledRect;
 

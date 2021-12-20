@@ -132,7 +132,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         // Remove window from the other windows' tileGroups so it
         // doesn't falsely get raised with them.
-        this._clearTilingProps(window.get_id());
+        this.clearTilingProps(window.get_id());
 
         window.unminimize();
         // Raise window since tiling with the popup means that
@@ -257,7 +257,7 @@ var TilingWindowManager = class TilingWindowManager {
             window.move_resize_frame(userOp, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
         }
 
-        this._clearTilingProps(window.get_id());
+        this.clearTilingProps(window.get_id());
         window.isTiled = false;
         window.tiledRect = null;
         window.untiledRect = null;
@@ -356,7 +356,7 @@ var TilingWindowManager = class TilingWindowManager {
             this._tileGroups.set(windowId, tileGroup.map(w => w.get_id()));
 
             /**
-             * _clearTilingProps may have been called before this function,
+             * clearTilingProps may have been called before this function,
              * so we need to reconnect all the signals on the tileGroup.
              * Just in case, also try to disconnect old signals...
              */
@@ -366,7 +366,7 @@ var TilingWindowManager = class TilingWindowManager {
             unmanagingSignal && window.disconnect(unmanagingSignal);
 
             const umId = window.connect('unmanaging', w => {
-                this._clearTilingProps(windowId);
+                this.clearTilingProps(windowId);
                 this._unmanagingWindows.push(w.get_stable_sequence());
             });
             signals.set(TilingSignals.UNMANAGING, umId);
@@ -390,11 +390,11 @@ var TilingWindowManager = class TilingWindowManager {
                         const w = this._getWindow(wId);
                         const otherRaiseId = this._signals.getSignalsFor(wId).get(TilingSignals.RAISE);
                         // May be undefined, if w was just closed. This would
-                        // automatically call _clearTilingProps() with the signal
+                        // automatically call clearTilingProps() with the signal
                         // but in case I missed / don't know about other cases where
                         // w may be nullish, dissolve the tileGroups anyway.
                         if (!w || !otherRaiseId) {
-                            this._clearTilingProps(wId);
+                            this.clearTilingProps(wId);
                             return;
                         }
 
@@ -422,6 +422,44 @@ var TilingWindowManager = class TilingWindowManager {
                 this.updateTileGroup(raisedTileGroup);
             });
             signals.set(TilingSignals.RAISE, raiseId);
+        });
+    }
+
+    /**
+     * Deletes the tile group of a window and remove that window from other
+     * tiled windows' tile groups. Also disconnects the signals for windows
+     * which are maximized-with-gaps.
+     *
+     * @param {number} windowId the id of a Meta.Window.
+     */
+    static clearTilingProps(windowId) {
+        const window = this._getWindow(windowId);
+        const signals = this._signals.getSignalsFor(windowId);
+
+        if (signals.get(TilingSignals.RAISE)) {
+            window && window.disconnect(signals.get(TilingSignals.RAISE));
+            signals.set(TilingSignals.RAISE, 0);
+        }
+
+        if (signals.get(TilingSignals.WS_CHANGED)) {
+            window && window.disconnect(signals.get(TilingSignals.WS_CHANGED));
+            signals.set(TilingSignals.WS_CHANGED, 0);
+        }
+
+        if (signals.get(TilingSignals.UNMANAGING)) {
+            window && window.disconnect(signals.get(TilingSignals.UNMANAGING));
+            signals.set(TilingSignals.UNMANAGING, 0);
+        }
+
+        if (!this._tileGroups.has(windowId))
+            return;
+
+        // Delete window's tileGroup
+        this._tileGroups.delete(windowId);
+        // Delete window from other windows' tileGroup
+        this._tileGroups.forEach(tileGroup => {
+            const idx = tileGroup.indexOf(windowId);
+            idx !== -1 && tileGroup.splice(idx, 1);
         });
     }
 
@@ -1037,7 +1075,7 @@ var TilingWindowManager = class TilingWindowManager {
         unmanagingSignal && window.disconnect(unmanagingSignal);
 
         const umId = window.connect('unmanaging', w => {
-            this._clearTilingProps(window.get_id());
+            this.clearTilingProps(window.get_id());
             this._unmanagingWindows.push(w.get_stable_sequence());
         });
         signals.set(TilingSignals.UNMANAGING, umId);
@@ -1045,44 +1083,6 @@ var TilingWindowManager = class TilingWindowManager {
         // Refresh 'workspace-changed' signal
         const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
         this._signals.getSignalsFor(wId).set(TilingSignals.WS_CHANGED, wsId);
-    }
-
-    /**
-     * Deletes the tile group of a window and remove that window from other
-     * tiled windows' tile groups. Also disconnects the signals for windows
-     * which are maximized-with-gaps.
-     *
-     * @param {number} windowId the id of a Meta.Window.
-     */
-    static _clearTilingProps(windowId) {
-        const window = this._getWindow(windowId);
-        const signals = this._signals.getSignalsFor(windowId);
-
-        if (signals.get(TilingSignals.RAISE)) {
-            window && window.disconnect(signals.get(TilingSignals.RAISE));
-            signals.set(TilingSignals.RAISE, 0);
-        }
-
-        if (signals.get(TilingSignals.WS_CHANGED)) {
-            window && window.disconnect(signals.get(TilingSignals.WS_CHANGED));
-            signals.set(TilingSignals.WS_CHANGED, 0);
-        }
-
-        if (signals.get(TilingSignals.UNMANAGING)) {
-            window && window.disconnect(signals.get(TilingSignals.UNMANAGING));
-            signals.set(TilingSignals.UNMANAGING, 0);
-        }
-
-        if (!this._tileGroups.has(windowId))
-            return;
-
-        // Delete window's tileGroup
-        this._tileGroups.delete(windowId);
-        // Delete window from other windows' tileGroup
-        this._tileGroups.forEach(tileGroup => {
-            const idx = tileGroup.indexOf(windowId);
-            idx !== -1 && tileGroup.splice(idx, 1);
-        });
     }
 
     /**
