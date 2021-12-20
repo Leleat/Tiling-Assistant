@@ -39,7 +39,7 @@ var Handler = class TilingMoveHandler {
         this._displaySignals.push(wId);
 
         // Save the windows, which need to make space for the
-        // grabbed window (this is for the so called 'secondary mode'):
+        // grabbed window (this is for the so called 'adaptive mode'):
         // { window1: newTileRect1, window2: newTileRect2, ... }
         this._splitRects = new Map();
         // The rect the grabbed window will tile to
@@ -176,11 +176,31 @@ var Handler = class TilingMoveHandler {
         }
 
         if (this._tileRect) {
+            // Ctrl-drag to replace some windows in a tile group / create a new tile group
+            // with at least 1 window being part of multiple tile groups.
+            let isCtrlReplacement = false;
+            const ctrlReplacedTileGroup = [];
+            const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: true });
+            const pointerPos = { x: global.get_pointer()[0], y: global.get_pointer()[1] };
+            const twHovered = topTileGroup.some(w => w.tiledRect.containsPoint(pointerPos));
+            if (this._currPreviewMode === MoveModes.ADAPTIVE_TILING && !this._splitRects.size && twHovered) {
+                isCtrlReplacement = true;
+                ctrlReplacedTileGroup.push(window);
+                topTileGroup.forEach(w => {
+                    if (!this._tileRect.containsRect(w.tiledRect))
+                        ctrlReplacedTileGroup.push(w);
+                });
+            }
+
             this._splitRects.forEach((rect, w) => Twm.tile(w, rect, { openTilingPopup: false }));
             this._splitRects.clear();
-
-            Twm.tile(window, this._tileRect);
+            Twm.tile(window, this._tileRect, { openTilingPopup: this._currPreviewMode !== MoveModes.ADAPTIVE_TILING });
             this._tileRect = null;
+
+            // Create a new tile group, in which some windows are already part
+            // of a different tile group, with ctrl-(super)-drag. The window may
+            // be maximized by ctrl-super-drag.
+            isCtrlReplacement && window.isTiled && Twm.updateTileGroup(ctrlReplacedTileGroup);
         } else {
             const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
             const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;

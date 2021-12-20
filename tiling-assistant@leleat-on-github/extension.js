@@ -223,7 +223,7 @@ function _loadAfterSessionLock() {
     openWindows.forEach(w => {
         if (tileGroups.has(w.get_id())) {
             const group = this._twm.getTileGroupFor(w);
-            this._twm._updateTileGroup(group);
+            this._twm.updateTileGroup(group);
         }
     });
 }

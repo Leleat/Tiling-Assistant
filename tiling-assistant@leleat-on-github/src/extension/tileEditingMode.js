@@ -365,6 +365,10 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 const { tiledWindow } = popup;
                 const replaced = this._windows.findIndex(w => w.tiledRect.equal(tiledWindow.tiledRect));
                 replaced !== -1 && this._windows.splice(replaced, 1);
+
+                // Create the new tile group to allow 1 window to be part of multiple tile groups
+                Twm.updateTileGroup([tiledWindow, ...this._windows]);
+
                 this._windows.unshift(tiledWindow);
                 this._selectIndicator.focus(tiledWindow.tiledRect, tiledWindow);
             });

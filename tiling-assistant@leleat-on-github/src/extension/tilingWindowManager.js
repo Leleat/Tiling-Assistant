@@ -119,7 +119,7 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, tileGroup = null, fakeTile = false } = {}) {
+    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, fakeTile = false } = {}) {
         if (!window || window.is_skip_taskbar())
             return;
 
@@ -190,8 +190,8 @@ var TilingWindowManager = class TilingWindowManager {
         // Tiled window
         } else if (!fakeTile) {
             // Setup the (new) tileGroup to raise tiled windows as a group
-            const topTileGroup = tileGroup ?? this._getWindowsForBuildingTileGroup(window.get_monitor());
-            this._updateTileGroup(topTileGroup);
+            const topTileGroup = this._getWindowsForBuildingTileGroup(window.get_monitor());
+            this.updateTileGroup(topTileGroup);
 
             this.emit('window-tiled', window);
 
@@ -317,7 +317,7 @@ var TilingWindowManager = class TilingWindowManager {
         // (re-)connected with it since it may have been possible that wrong tile
         // groups would have been created when moving one window after the other
         // to the new monitor. So update the tileGroup now with the full/old group.
-        this._updateTileGroup(tileGroup);
+        this.updateTileGroup(tileGroup);
     }
 
     /**
@@ -334,6 +334,95 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static setTileGroups(tileGroups) {
         this._tileGroups = tileGroups;
+    }
+
+    /**
+     * Creates a tile group of windows to raise them together, if one of them
+     * is raised by (re)connecting signals. Usually, this is done automatically
+     * by calling tile() and thus shouldn't be done manually. tile() only alllows
+     * unique/non-overlapping tile groups, so 1 window can't be part of multiple
+     * tile groups. But we specifically allow the user to do that sometimes
+     * (i. e. ctrl-drag or tile editing mode+space). So manually create the
+     * tile group in those cases.
+     *
+     * @param {Meta.Windows[]} tileGroup an array of Meta.Windows to group
+     *      together.
+     */
+    static updateTileGroup(tileGroup) {
+        tileGroup.forEach(window => {
+            const windowId = window.get_id();
+            const signals = this._signals.getSignalsFor(windowId);
+
+            this._tileGroups.set(windowId, tileGroup.map(w => w.get_id()));
+
+            /**
+             * _clearTilingProps may have been called before this function,
+             * so we need to reconnect all the signals on the tileGroup.
+             * Just in case, also try to disconnect old signals...
+             */
+
+            // Reconnect unmanaging signal
+            const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
+            unmanagingSignal && window.disconnect(unmanagingSignal);
+
+            const umId = window.connect('unmanaging', w => {
+                this._clearTilingProps(windowId);
+                this._unmanagingWindows.push(w.get_stable_sequence());
+            });
+            signals.set(TilingSignals.UNMANAGING, umId);
+
+            // Reconnect ws-changed signal
+            const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
+            wsChangeSignal && window.disconnect(wsChangeSignal);
+
+            const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
+            signals.set(TilingSignals.WS_CHANGED, wsId);
+
+            // Reconnect raise signal
+            const raiseSignal = signals.get(TilingSignals.RAISE);
+            raiseSignal && window.disconnect(raiseSignal);
+
+            const raiseId = window.connect('raised', raisedWindow => {
+                const raisedWindowId = raisedWindow.get_id();
+                if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
+                    const raisedWindowsTileGroup = this._tileGroups.get(raisedWindowId);
+                    raisedWindowsTileGroup.forEach(wId => {
+                        const w = this._getWindow(wId);
+                        const otherRaiseId = this._signals.getSignalsFor(wId).get(TilingSignals.RAISE);
+                        // May be undefined, if w was just closed. This would
+                        // automatically call _clearTilingProps() with the signal
+                        // but in case I missed / don't know about other cases where
+                        // w may be nullish, dissolve the tileGroups anyway.
+                        if (!w || !otherRaiseId) {
+                            this._clearTilingProps(wId);
+                            return;
+                        }
+
+                        // Prevent an infinite loop of windows raising each other
+                        w.block_signal_handler(otherRaiseId);
+                        w.raise();
+                        w.unblock_signal_handler(otherRaiseId);
+                    });
+
+                    // Re-raise the just raised window so it may not be below
+                    // other tiled windows otherwise when untiling via keyboard
+                    // it may be below other tiled windows.
+                    const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
+                    raisedWindow.block_signal_handler(signalId);
+                    raisedWindow.raise();
+                    raisedWindow.unblock_signal_handler(signalId);
+                }
+
+                // Update the tileGroup (and reconnect the raised signals) to allow windows
+                // to be part of multiple tileGroups: for ex.: tiling a window over another
+                // tiled window with ctrl-drag will replace the overlapped window in the old
+                // tileGroup but the overlapped window will remember its old tile group to
+                // raise them as well, if it is raised.
+                const raisedTileGroup = this.getTileGroupFor(raisedWindow);
+                this.updateTileGroup(raisedTileGroup);
+            });
+            signals.set(TilingSignals.RAISE, raiseId);
+        });
     }
 
     /**
@@ -956,82 +1045,6 @@ var TilingWindowManager = class TilingWindowManager {
         // Refresh 'workspace-changed' signal
         const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
         this._signals.getSignalsFor(wId).set(TilingSignals.WS_CHANGED, wsId);
-    }
-
-    /**
-     * Creates a tile group of windows to raise them together, if one of them
-     * is raised by (re)connecting signals.
-     *
-     * @param {Meta.Windows[]} tileGroup an array of Meta.Windows to group
-     *      together.
-     */
-    static _updateTileGroup(tileGroup) {
-        tileGroup.forEach(window => {
-            const windowId = window.get_id();
-            const signals = this._signals.getSignalsFor(windowId);
-
-            this._tileGroups.set(windowId, tileGroup.map(w => w.get_id()));
-
-            /**
-             * _clearTilingProps may have been called before this function,
-             * so we need to reconnect all the signals on the tileGroup.
-             * Just in case, also try to disconnect old signals...
-             */
-
-            // Reconnect unmanaging signal
-            const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
-            unmanagingSignal && window.disconnect(unmanagingSignal);
-
-            const umId = window.connect('unmanaging', w => {
-                this._clearTilingProps(windowId);
-                this._unmanagingWindows.push(w.get_stable_sequence());
-            });
-            signals.set(TilingSignals.UNMANAGING, umId);
-
-            // Reconnect ws-changed signal
-            const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
-            wsChangeSignal && window.disconnect(wsChangeSignal);
-
-            const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
-            signals.set(TilingSignals.WS_CHANGED, wsId);
-
-            // Reconnect raise signal
-            const raiseSignal = signals.get(TilingSignals.RAISE);
-            raiseSignal && window.disconnect(raiseSignal);
-
-            const raiseId = window.connect('raised', raisedWindow => {
-                const raisedWindowId = raisedWindow.get_id();
-                if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
-                    const raisedWindowsTileGroup = this._tileGroups.get(raisedWindowId);
-                    raisedWindowsTileGroup.forEach(wId => {
-                        const w = this._getWindow(wId);
-                        const otherRaiseId = this._signals.getSignalsFor(wId).get(TilingSignals.RAISE);
-                        // May be undefined, if w was just closed. This would
-                        // automatically call _clearTilingProps() with the signal
-                        // but in case I missed / don't know about other cases where
-                        // w may be nullish, dissolve the tileGroups anyway.
-                        if (!w || !otherRaiseId) {
-                            this._clearTilingProps(wId);
-                            return;
-                        }
-
-                        // Prevent an infinite loop of windows raising each other
-                        w.block_signal_handler(otherRaiseId);
-                        w.raise();
-                        w.unblock_signal_handler(otherRaiseId);
-                    });
-
-                    // Re-raise the just raised window so it may not be below
-                    // other tiled windows otherwise when untiling via keyboard
-                    // it may be below other tiled windows.
-                    const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
-                    raisedWindow.block_signal_handler(signalId);
-                    raisedWindow.raise();
-                    raisedWindow.unblock_signal_handler(signalId);
-                }
-            });
-            signals.set(TilingSignals.RAISE, raiseId);
-        });
     }
 
     /**
