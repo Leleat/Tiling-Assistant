@@ -78,28 +78,20 @@ class TileEditingMode extends St.Widget {
             return;
         }
 
-        // The first window may not be tiled. It just wasn't overlapping a
-        // window from the top tile group. So raise the first window of the
-        // tile group to get entire tile group to the foreground.
-        const window = this._windows[0];
-        window.raise();
-        this._windows = Twm.getTileGroupFor(window);
-        // Shouldn't technically happen but just in case since this should be
-        // the only possible case of failure left...
-        if (!this._windows?.length) {
-            this.close();
-            return;
-        }
+        // Enter initial state.
+        this._mode = Modes.DEFAULT;
+        this._keyHandler = new DefaultKeyHandler(this);
+
+        // The windows may not be at the foreground. They just weren't
+        // overlapping other windows. So raise the entire tile group.
+        this._windows.forEach(w => w.raise());
 
         // Create the active selection indicator.
+        const window = this._windows[0];
         const params = { style_class: 'tile-preview' };
         this._selectIndicator = new Indicator(params, window.tiledRect);
         this._selectIndicator.focus(window.tiledRect, window);
         this.add_child(this._selectIndicator);
-
-        // Enter initial state.
-        this._mode = Modes.DEFAULT;
-        this._keyHandler = new DefaultKeyHandler(this);
     }
 
     close() {
