@@ -27,6 +27,12 @@
 		<key name="tilegroups-in-app-switcher" type="b">
 			<default>false</default>
 		</key>
+		<key name="use-window-switcher" type="b">
+			<default>false</default>
+		</key>
+		<key name="window-switcher-group-by-apps" type="b">
+			<default>true</default>
+		</key>
 		<key name="dynamic-keybinding-behaviour" type="s">
 			<default>"Disabled"</default>
 		</key>

@@ -14,6 +14,8 @@ var Settings = class Settings {
     static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
     static TILEGROUPS_IN_APP_SWITCHER = 'tilegroups-in-app-switcher';
+    static USE_WINDOW_SWITCHER = 'use-window-switcher';
+    static WINDOW_SWITCHER_GROUP_BY_APPS = 'window-switcher-group-by-apps';
     static WINDOW_GAP = 'window-gap';
     static SCREEN_GAP = 'screen-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
@@ -72,6 +74,8 @@ var Settings = class Settings {
             this.POPUP_ALL_WORKSPACES,
             this.RAISE_TILE_GROUPS,
             this.TILEGROUPS_IN_APP_SWITCHER,
+            this.USE_WINDOW_SWITCHER,
+            this.WINDOW_SWITCHER_GROUP_BY_APPS,
             this.WINDOW_GAP,
             this.SCREEN_GAP,
             this.MAXIMIZE_WITH_GAPS,

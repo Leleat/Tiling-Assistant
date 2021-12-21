@@ -187,7 +187,7 @@
                         <child>
                           <object class="TilingAssistantListRow">
                             <property name="title" translatable="yes">Raise together</property>
-                            <property name="subtitle" translatable="yes">A Tile Group is created when a window gets tiled. If a tiled window is raised, raise the other windows of its Tile Group as well</property>
+                            <property name="subtitle" translatable="yes">A tile group is created when a window gets tiled. If a tiled window is raised, raise the other windows of its tile group as well</property>
                             <property name="suffix">
                               <object class="GtkSwitch" id="enable_raise_tile_group">
                                 <property name="can-focus">True</property>
@@ -219,6 +219,69 @@
                                       bind-source="enable_raise_tile_group"
                                       bind-property="active"
                                       bind-flags="default"/>
+                          </object>
+                        </child>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkLabel">
+                        <property name="can-focus">True</property>
+                        <property name="halign">start</property>
+                        <property name="hexpand">True</property>
+                        <property name="label" translatable="yes">Tiling Window Switcher</property>
+                        <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
+                        <style>
+                          <class name="heading"/>
+                        </style>
+                      </object>
+                    </child>
+                    <child>
+                      <object class="GtkListBox">
+                        <signal name="row-activated" handler="_onListRowActivated" swapped="no"/>
+                        <property name="show-separators">True</property>
+                        <property name="can-focus">True</property>
+                        <property name="margin-bottom">24</property>
+                        <property name="selection-mode">none</property>
+                        <property name="visible"
+                                      bind-source="enable_advanced_experimental_features"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
+                        <style>
+                          <class name="frame"/>
+                        </style>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Replace App Switcher</property>
+                            <property name="subtitle" translatable="yes">Replace the App Switcher (a. k. a. Alt+Tab) with a window switcher, which previews the windows and tile groups</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="use_window_switcher">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                              </object>
+                            </property>
+                          </object>
+                        </child>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Group Windows by App</property>
+                            <property name="subtitle" translatable="yes">Windows of the same app are displayed as one item and can be cycled through with the key above Tab</property>
+                            <property name="suffix">
+                              <object class="GtkSwitch" id="window_switcher_group_by_apps">
+                                <property name="can-focus">True</property>
+                                <property name="halign">end</property>
+                                <property name="valign">center</property>
+                                <property name="hexpand">True</property>
+                              </object>
+                            </property>
+                            <property name="sensitive"
+                                      bind-source="use_window_switcher"
+                                      bind-property="active"
+                                      bind-flags="sync-create"/>
                           </object>
                         </child>
                       </object>
