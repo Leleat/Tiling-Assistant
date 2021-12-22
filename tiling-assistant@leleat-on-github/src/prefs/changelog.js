@@ -21,7 +21,7 @@ var Changelog = GObject.registerClass({
         'fixedListBox'
     ]
 }, class ChangelogDialog extends Gtk.Dialog {
-    _init(params = {}, changes) {
+    _init(params = {}, changes, allowAdvExpSettings) {
         super._init(params);
 
         Object.entries(changes).forEach(([type, changeItems]) => {
@@ -57,6 +57,10 @@ var Changelog = GObject.registerClass({
                 row.getContentBox().set_margin_end(18);
                 row.getContentBox().set_margin_top(18);
                 row.getContentBox().set_margin_bottom(18);
+
+                if (change.isExperimental && !allowAdvExpSettings)
+                    return;
+
                 row.title = change.title;
                 row.subtitle = change.subtitle;
 

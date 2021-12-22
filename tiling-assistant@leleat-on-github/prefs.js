@@ -203,7 +203,8 @@ const PrefsWidget = GObject.registerClass({
             return;
 
         const changes = JSON.parse(ByteArray.toString(contents));
-        const changelogDialog = new Changelog({ transient_for: prefsDialog }, changes);
+        const allowAdvExpSettings = this._settings.get_boolean(Settings.ENABLE_ADV_EXP_SETTINGS);
+        const changelogDialog = new Changelog({ transient_for: prefsDialog }, changes, allowAdvExpSettings);
         changelogDialog.present();
     }
 
