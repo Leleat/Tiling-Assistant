@@ -60,6 +60,9 @@
 		<key name="tile-maximize" type="as">
 			<default><![CDATA[['<Super>KP_5']]]></default>
 		</key>
+		<key name="restore-window" type="as">
+			<default>[]</default>
+		</key>
 		<key name="tile-top-half" type="as">
 			<default><![CDATA[['<Super>KP_8']]]></default>
 		</key>

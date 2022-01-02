@@ -158,6 +158,7 @@ var Shortcuts = class Shortcuts {
     static EDIT_MODE = 'tile-edit-mode';
     static AUTO_FILL = 'auto-tile';
     static MAXIMIZE = 'tile-maximize';
+    static RESTORE_WINDOW = 'restore-window';
     static TOP = 'tile-top-half';
     static BOTTOM = 'tile-bottom-half';
     static LEFT = 'tile-left-half';
@@ -179,6 +180,7 @@ var Shortcuts = class Shortcuts {
             this.EDIT_MODE,
             this.AUTO_FILL,
             this.MAXIMIZE,
+            this.RESTORE_WINDOW,
             this.TOP,
             this.BOTTOM,
             this.LEFT,

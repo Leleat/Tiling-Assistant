@@ -545,6 +545,14 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Restore Window Size</property>
+                            <property name="suffix">
+                              <object class="ShortcutListener" id="restore_window"/>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

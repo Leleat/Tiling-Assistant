@@ -89,6 +89,13 @@ var Handler = class TilingKeybindingHandler {
             const tileEditor = new TileEditingMode.TileEditor();
             tileEditor.open();
 
+        // Restore window size
+        } else if (shortcutName === Shortcuts.RESTORE_WINDOW) {
+            if (window.isTiled)
+                Twm.untile(window, { clampToWorkspace: true });
+            else if (window.get_maximized())
+                window.unmaximize(window.get_maximized());
+
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
