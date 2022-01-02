@@ -239,9 +239,12 @@ var TilingWindowManager = class TilingWindowManager {
             );
         }
 
+        // userOp means that the window won't clamp to the workspace. For DND
+        // we don't want to clamp to the workspace, so it's false by default.
+        const userOp = !clampToWorkspace;
         const oldRect = window.untiledRect;
         if (restoreFullPos) {
-            window.move_resize_frame(false, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
+            window.move_resize_frame(userOp, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
         } else {
             // Resize the window while keeping the relative x pos (of the pointer)
             const currWindowFrame = new Rect(window.get_frame_rect());
@@ -252,8 +255,6 @@ var TilingWindowManager = class TilingWindowManager {
             // Wayland workaround for DND / restore position
             Meta.is_wayland_compositor() && window.move_frame(true, newPosX, currWindowFrame.y);
 
-            // userOp means that the window won't clamp to the workspace
-            const userOp = !clampToWorkspace;
             window.move_resize_frame(userOp, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
         }
 
