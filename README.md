@@ -17,8 +17,6 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 ## Usage and Features
 
-- **Do NOT use GNOME's tiling keybindings. Instead use the keybindings from this extension's settings. By default, the keybindings for tiling are `Super`+`NUM_PAD`.**
-
 - **Tiling Popup** offers to automatically tile a window to fill the available screen space.
 
 - **Tile Groups**  are focused and resized together.

@@ -65,6 +65,27 @@ function enable() {
     this._gnomeShellSettings = ExtensionUtils.getSettings('org.gnome.shell.overrides');
     this._gnomeShellSettings.set_boolean('edge-tiling', false);
 
+    // Disable native keybindings for Super+Up/Down/Left/Right
+    this._gnomeMutterKeybindings = ExtensionUtils.getSettings('org.gnome.mutter.keybindings');
+    this._gnomeDesktopKeybindings = ExtensionUtils.getSettings('org.gnome.desktop.wm.keybindings');
+    this._nativeKeybindings = [];
+    if (this._gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up')) {
+        this._gnomeDesktopKeybindings.set_strv('maximize', []);
+        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'maximize']);
+    }
+    if (this._gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down')) {
+        this._gnomeDesktopKeybindings.set_strv('unmaximize', []);
+        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'unmaximize']);
+    }
+    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left')) {
+        this._gnomeMutterKeybindings.set_strv('toggle-tiled-left', []);
+        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-left']);
+    }
+    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right')) {
+        this._gnomeMutterKeybindings.set_strv('toggle-tiled-right', []);
+        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-right']);
+    }
+
     // Include tiled windows when dragging from the top panel.
     this._getDraggableWindowForPosition = Main.panel._getDraggableWindowForPosition;
     Main.panel._getDraggableWindowForPosition = function (stageX) {
@@ -118,7 +139,15 @@ function disable() {
 
     // Re-enable native tiling.
     this._gnomeMutterSettings.reset('edge-tiling');
+    this._gnomeMutterSettings = null;
     this._gnomeShellSettings.reset('edge-tiling');
+    this._gnomeShellSettings = null;
+
+    // Restore native keybindings for Super+Up/Down/Left/Right
+    this._nativeKeybindings.forEach(([kbSetting, kbName]) => kbSetting.reset(kbName));
+    this._nativeKeybindings = [];
+    this._gnomeMutterKeybindings = null;
+    this._gnomeDesktopKeybindings = null;
 
     // Restore old functions.
     Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;

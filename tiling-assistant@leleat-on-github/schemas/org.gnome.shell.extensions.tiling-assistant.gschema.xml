@@ -58,34 +58,34 @@
 			<default>[]</default>
 		</key>
 		<key name="tile-maximize" type="as">
-			<default><![CDATA[['<Super>KP_5']]]></default>
+			<default><![CDATA[['<Super>Up']]]></default>
 		</key>
 		<key name="restore-window" type="as">
-			<default>[]</default>
+			<default><![CDATA[['<Super>Down']]]></default>
 		</key>
 		<key name="tile-top-half" type="as">
-			<default><![CDATA[['<Super>KP_8']]]></default>
+			<default>[]</default>
 		</key>
 		<key name="tile-bottom-half" type="as">
-			<default><![CDATA[['<Super>KP_2']]]></default>
+			<default>[]</default>
 		</key>
 		<key name="tile-left-half" type="as">
-			<default><![CDATA[['<Super>KP_4']]]></default>
+			<default><![CDATA[['<Super>Left']]]></default>
 		</key>
 		<key name="tile-right-half" type="as">
-			<default><![CDATA[['<Super>KP_6']]]></default>
+			<default><![CDATA[['<Super>Right']]]></default>
 		</key>
 		<key name="tile-topleft-quarter" type="as">
-			<default><![CDATA[['<Super>KP_7']]]></default>
+			<default>[]</default>
 		</key>
 		<key name="tile-topright-quarter" type="as">
-			<default><![CDATA[['<Super>KP_9']]]></default>
+			<default>[]</default>
 		</key>
 		<key name="tile-bottomleft-quarter" type="as">
-			<default><![CDATA[['<Super>KP_1']]]></default>
+			<default>[]</default>
 		</key>
 		<key name="tile-bottomright-quarter" type="as">
-			<default><![CDATA[['<Super>KP_3']]]></default>
+			<default>[]</default>
 		</key>
 
 		<!-- Layouts Page -->
