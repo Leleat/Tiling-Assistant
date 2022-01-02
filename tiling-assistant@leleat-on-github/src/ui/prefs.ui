@@ -553,6 +553,14 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Toggle 'Always on Top'</property>
+                            <property name="suffix">
+                              <object class="ShortcutListener" id="toggle_always_on_top"/>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

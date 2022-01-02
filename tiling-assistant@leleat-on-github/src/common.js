@@ -159,6 +159,7 @@ var Shortcuts = class Shortcuts {
     static AUTO_FILL = 'auto-tile';
     static MAXIMIZE = 'tile-maximize';
     static RESTORE_WINDOW = 'restore-window';
+    static ALWAYS_ON_TOP = 'toggle-always-on-top';
     static TOP = 'tile-top-half';
     static BOTTOM = 'tile-bottom-half';
     static LEFT = 'tile-left-half';
@@ -181,6 +182,7 @@ var Shortcuts = class Shortcuts {
             this.AUTO_FILL,
             this.MAXIMIZE,
             this.RESTORE_WINDOW,
+            this.ALWAYS_ON_TOP,
             this.TOP,
             this.BOTTOM,
             this.LEFT,

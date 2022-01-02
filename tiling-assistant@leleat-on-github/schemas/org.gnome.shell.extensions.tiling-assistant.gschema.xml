@@ -63,6 +63,9 @@
 		<key name="restore-window" type="as">
 			<default><![CDATA[['<Super>Down']]]></default>
 		</key>
+		<key name="toggle-always-on-top" type="as">
+			<default>[]</default>
+		</key>
 		<key name="tile-top-half" type="as">
 			<default>[]</default>
 		</key>

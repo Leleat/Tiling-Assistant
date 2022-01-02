@@ -96,6 +96,10 @@ var Handler = class TilingKeybindingHandler {
             else if (window.get_maximized())
                 window.unmaximize(window.get_maximized());
 
+        // Toggle always-on-top
+        } else if (shortcutName === Shortcuts.ALWAYS_ON_TOP) {
+            window.is_above() ? window.unmake_above() : window.make_above();
+
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
