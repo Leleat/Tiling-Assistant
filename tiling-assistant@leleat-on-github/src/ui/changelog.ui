@@ -5,7 +5,7 @@
     <property name="visible">1</property>
     <property name="modal">True</property>
     <property name="decorated">False</property>
-    <property name="default-width">550</property>
+    <property name="default-width">530</property>
     <property name="default-height">500</property>
     <property name="destroy-with-parent">True</property>
     <property name="hide-on-close">False</property>
