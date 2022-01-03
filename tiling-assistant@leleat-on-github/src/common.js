@@ -157,11 +157,11 @@ var Shortcuts = class Shortcuts {
     static TOGGLE_POPUP = 'toggle-tiling-popup';
     static EDIT_MODE = 'tile-edit-mode';
     static AUTO_FILL = 'auto-tile';
+    static ALWAYS_ON_TOP = 'toggle-always-on-top';
     static MAXIMIZE = 'tile-maximize';
     static MAXIMIZE_V = 'tile-maximize-vertically';
     static MAXIMIZE_H = 'tile-maximize-horizontally';
     static RESTORE_WINDOW = 'restore-window';
-    static ALWAYS_ON_TOP = 'toggle-always-on-top';
     static TOP = 'tile-top-half';
     static BOTTOM = 'tile-bottom-half';
     static LEFT = 'tile-left-half';
@@ -182,11 +182,11 @@ var Shortcuts = class Shortcuts {
             this.TOGGLE_POPUP,
             this.EDIT_MODE,
             this.AUTO_FILL,
+            this.ALWAYS_ON_TOP,
             this.MAXIMIZE,
             this.MAXIMIZE_V,
             this.MAXIMIZE_H,
             this.RESTORE_WINDOW,
-            this.ALWAYS_ON_TOP,
             this.TOP,
             this.BOTTOM,
             this.LEFT,

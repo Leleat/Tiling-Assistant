@@ -89,13 +89,6 @@ var Handler = class TilingKeybindingHandler {
             const tileEditor = new TileEditingMode.TileEditor();
             tileEditor.open();
 
-        // Restore window size
-        } else if (shortcutName === Shortcuts.RESTORE_WINDOW) {
-            if (window.isTiled)
-                Twm.untile(window, { clampToWorkspace: true });
-            else if (window.get_maximized())
-                window.unmaximize(window.get_maximized());
-
         // Toggle always-on-top
         } else if (shortcutName === Shortcuts.ALWAYS_ON_TOP) {
             window.is_above() ? window.unmake_above() : window.make_above();
@@ -145,6 +138,13 @@ var Handler = class TilingKeybindingHandler {
                 const tileRect = new Rect(workArea.x, currRect.y, workArea.width, currRect.height);
                 Twm.tile(window, tileRect);
             }
+
+        // Restore window size
+        } else if (shortcutName === Shortcuts.RESTORE_WINDOW) {
+            if (window.isTiled)
+                Twm.untile(window, { clampToWorkspace: true });
+            else if (window.get_maximized())
+                window.unmaximize(window.get_maximized());
 
         // Tile a window
         } else {
