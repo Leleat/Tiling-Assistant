@@ -115,6 +115,7 @@ var ShortcutListener = GObject.registerClass({
 
     _onClearButtonClicked() {
         this.keybinding = '';
+        ShortcutListener.stopListening();
     }
 
     _onKeyPressed(eventControllerKey, keyval, keycode, state) {
