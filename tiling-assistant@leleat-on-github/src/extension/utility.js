@@ -666,8 +666,8 @@ var Rect = class Rect {
 
     get center() {
         return {
-            x: this.x + this.width / 2,
-            y: this.y + this.height / 2
+            x: this.x + Math.floor(this.width / 2),
+            y: this.y + Math.floor(this.height / 2)
         };
     }
 
