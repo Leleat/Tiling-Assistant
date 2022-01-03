@@ -1,66 +1,50 @@
 {
     "added": [
         {
-            "title": "Added a Panel Indicator for the layouts",
-            "subtitle": "Activate a layout with your pointer or change your 'Favorite Layout' (per monitor). The indicator is disabled by default."
+            "title": "Added new keyboard shortcuts",
+            "subtitle": "Toggle Always-on-Top, Move Window to Center, Restore Window Size, Toggle Vertical/Horizontal Maximization."
         },
         {
-            "title": "Added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup",
-            "subtitle": ""
+            "title": "Move tile groups to a new workspace/monitor with the Tile Editing Mode",
+            "subtitle": "Shift+Directions moves the tile group to a new monitor; Shift+Alt+Directions to a new workspace."
         },
         {
-            "title": "When dnd-ing a window, hold Super to make the tile preview span multiple rectangles",
-            "subtitle": "This only works in the 'Favorite Layout' or 'Split Tiles' preview modes."
-        },
-        {
-            "title": "Added a (hidden) setting to not adapt the Edge-Tiling to the favorite layouts",
-            "subtitle": ""
+            "title": "Tiled windows will untile automatically if they change workspaces"
         }
     ],
     "removed": [
-        {
-            "title": "Removed the 'Change favorite layouts' keyboard shortcut",
-            "subtitle": "This is replaced by the Panel Indicator."
-        },
-        {
-            "title": "Removed the favorite button from the 'Layouts' in the preferences",
-            "subtitle": "This is replaced by the Panel Indicator."
-        }
+
     ],
     "changed": [
         {
-            "title": "Show the entire Layout when moving a window with the 'Favorite Layout' preview mode",
-            "subtitle": ""
+            "title": "Adapt edge-tiling only if it doesn't cover existing tiles and their tile groups",
+            "subtitle": "Use Ctrl-drag (mouse) or the Tile Editing Mode (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups."
         },
         {
-            "title": "Updated the jp translation (by k-fog #112)",
-            "subtitle": ""
+            "title": "Changed the default shortcuts from Super+Numpad to follow GNOME's native behaviour (Super+Up/Down/Left/Right)"
         },
         {
-            "title": "Untile tiled windows, if they are moved to a new monitor or workspace (#114)",
-            "subtitle": ""
+            "title": "Reworked tile group detection"
         },
         {
-            "title": "Tile Editing Mode: 'Space' will always open the Tiling Popup",
-            "subtitle": ""
+            "title": "Renamed 'Split Tiles' mode to 'Adaptive Tiling'",
+            "subtitle": "This is the mode when moving a window around while holding Ctrl."
         },
         {
-            "title": "Visual tweaks to the preference window",
-            "subtitle": ""
+            "title": "Disabled grouping tiled windows in the app switcher by default and mark that setting as experimental"
+        },
+        {
+            "title": "Deprecated the 'Toggle Tiling Popup' and 'Auto-Tile' keyboard shortcuts",
+            "subtitle": "Deprecated settings won't be visible in the prefs window anymore unless they have a non-default value set."
         }
+
     ],
     "fixed": [
         {
-            "title": "The Tiling Popup will appear on the correct monitor during the 'Grace Period'",
-            "subtitle": "When dragging a window to a new monitor there is a short 'Grace Period' (150 ms), in which, if the grab is released on the window, the window will tile to the old monitor."
+            "title": "Fixed a compatibility issue introduced in v31 with other alt-Tab extensions"
         },
         {
-            "title": "Fixed artifacts due to the rounded corners of the Changelog window",
-            "subtitle": "This only works on Wayland."
-        },
-        {
-            "title": "Fixed animations being skipped, if an animation was already running (#58)",
-            "subtitle": ""
+            "title": "Shortcuts may no longer change unintentionally after using the clear-shortcut-button"
         }
     ]
 }

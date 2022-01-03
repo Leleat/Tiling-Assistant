@@ -1,5 +1,31 @@
 # Changelog
 
+## v32
+**Added**
+- added new keyboard shortcuts:
+    - Restore window size (#134)
+    - Toggle Vertical Maximization
+    - Toggle Horizontal Maximization
+    - Move Window to Center (#132)
+    - Toggle `Always on Top`
+- added ability to move tile groups to a new workspace/monitor using the Tile Editing Mode:
+    - `Shift`+`Directions` moves the tile group to a new monitor
+    - `Shift`+`Alt`+`Directions` moves the tile group to a new workspace
+- tiled windows will untile themselves if they change workspaces
+
+**Changed**
+- adapt edge-tiling only if it doesn't cover existing tiles. Use `Ctrl`-drag (mouse) or the `Tile Editing Mode` (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups
+- changed the default shortcuts from numpad to follow GNOME's native behaviour (`Super`+`UP`/`DOWN`/`LEFT`/`RIGHT`)
+- reworked tile group detection when a window is tiled
+- renamed `Split Tiles` mode to `Adaptive Tiling`. This is the mode when moving a window around while holding `Ctrl`
+- disabled grouping tiled windows in the app switcher by default and mark that setting as experimental
+- introduce concept of deprecated settings and deprecate the `Toggle Tiling Popup` and `Auto-Tile` keyboard shortcuts
+    - Deprecated settings won't be visible in the prefs window anymore unless they have a non-default value set
+
+**Fixed**
+- fixed a compatibility issue introduced in v31 with other alt-Tab extensions (#126)
+- shortcuts may no longer change unintentionally after using the clear-shortcut-button
+
 ## v31
 **Fixed**
 - fixed crash introduced in v28 (#125)
