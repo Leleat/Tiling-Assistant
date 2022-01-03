@@ -50,8 +50,10 @@ const PrefsWidget = GObject.registerClass({
         'dynamic_keybinding_tiling_state_windows_row',
         'dynamic_keybinding_favorite_layout_row',
         'toggle_tiling_popup',
+        'toggle_tiling_popup_row',
         'tile_edit_mode',
         'auto_tile',
+        'auto_tile_row',
         'toggle_always_on_top',
         'tile_maximize',
         'tile_maximize_vertically',
@@ -142,6 +144,9 @@ const PrefsWidget = GObject.registerClass({
             const hiddenSettingsAction = new Gio.SimpleAction({ name: 'open-hidden-settings' });
             hiddenSettingsAction.connect('activate', this._openHiddenSettings.bind(this));
             actionGroup.add_action(hiddenSettingsAction);
+
+            // Set visibility for deprecated settings
+            this._setDeprecatedSettings();
 
             // Show Changelog after an update.
             const lastVersion = this._settings.get_int(Settings.CHANGELOG_VERSION);
@@ -329,6 +334,20 @@ const PrefsWidget = GObject.registerClass({
         shortcuts.forEach(key => {
             const shortcut = this[`_${key.replaceAll('-', '_')}`];
             shortcut.initialize(key, this._settings);
+        });
+    }
+
+    /**
+     * Sets the visibility of deprecated settings. Those setting aren't visible
+     * in the GUI unless they have a user set value. That means they aren't
+     * discoverable through the GUI and need to first be set with the gsetting.
+     * The listRows should have the id of: GSETTING_WITH_UNDERSCORES_row.
+     */
+    _setDeprecatedSettings() {
+        // Keybindings
+        ['toggle-tiling-popup', 'auto-tile'].forEach(s => {
+            const isNonDefault = this._settings.get_strv(s)[0] !== this._settings.get_default_value(s).get_strv()[0];
+            this[`_${s.replaceAll('-', '_')}_row`].set_visible(isNonDefault);
         });
     }
 });

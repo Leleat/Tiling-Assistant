@@ -98,3 +98,7 @@ You can mark one layout (per monitor) as a favorite. See [Favorite Layout](#Favo
 ### Hidden Settings
 
 This is a hidden settings page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking the `Advanced...` menu item, which appears when clicking the titlebar button.
+
+### Deprecated Settings
+
+Some settings are deprecated and won't be shown in the preference window any more unless they have a non-default value set before they were deprecated or via the gsetting.

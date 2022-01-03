@@ -504,15 +504,11 @@
                           <class name="frame"/>
                         </style>
                         <child>
-                          <object class="TilingAssistantListRow">
+                          <object class="TilingAssistantListRow" id="toggle_tiling_popup_row">
                             <property name="title" translatable="yes">Toggle 'Tiling Popup'</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="toggle_tiling_popup"/>
                             </property>
-                            <property name="visible"
-                                      bind-source="enable_advanced_experimental_features"
-                                      bind-property="active"
-                                      bind-flags="sync-create"/>
                           </object>
                         </child>
                         <child>
@@ -525,16 +521,12 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingAssistantListRow">
+                          <object class="TilingAssistantListRow" id="auto_tile_row">
                             <property name="title" translatable="yes">Auto-Tile</property>
                             <property name="subtitle" translatable="yes">Un/tile the current window based on the visible tiles</property>
                             <property name="suffix">
                               <object class="ShortcutListener" id="auto_tile"/>
                             </property>
-                            <property name="visible"
-                                      bind-source="enable_advanced_experimental_features"
-                                      bind-property="active"
-                                      bind-flags="sync-create"/>
                           </object>
                         </child>
                         <child>
