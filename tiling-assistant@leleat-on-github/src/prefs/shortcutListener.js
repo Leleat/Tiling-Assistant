@@ -61,7 +61,7 @@ var ShortcutListener = GObject.registerClass({
 
         ShortcutListener.isListening = false;
         ShortcutListener.listener.isActive = false;
-        ShortcutListener.listener.setLabel(ShortcutListener.listener.getKeybindingLabel() || 'Disabled');
+        ShortcutListener.listener.setLabel(ShortcutListener.listener.getKeybindingLabel());
         ShortcutListener.listener = null;
     }
 
@@ -72,7 +72,7 @@ var ShortcutListener = GObject.registerClass({
 
         this.connect('realize', () => this.get_root().add_controller(this._eventKeyController));
 
-        this.keybinding = this._setting.get_strv(key)[0] ?? '';
+        this.keybinding = this._setting.get_strv(key) ?? [];
     }
 
     /**
@@ -84,13 +84,22 @@ var ShortcutListener = GObject.registerClass({
 
     /**
      * Gets the keybinding in a more pleasant to read format.
-     * For example: <Control><Super>e -> Ctrl+Super+E
+     * For example: [<Control><Super>e,<Super>a] will become
+     * 'Ctrl+Super+E / Super+A' or 'Disabled'
      *
      * @returns {string}
      */
     getKeybindingLabel() {
-        const [, keyval, mask] = Gtk.accelerator_parse(this.keybinding);
-        return Gtk.accelerator_get_label(keyval, mask);
+        const kbLabel = this.keybinding.reduce((label, kb) => {
+            const [, keyval, mask] = Gtk.accelerator_parse(kb);
+            const l = Gtk.accelerator_get_label(keyval, mask);
+            if (!label)
+                return l;
+
+            return l ? `${label} / ${l}` : label;
+        }, '');
+
+        return kbLabel || 'Disabled';
     }
 
     setLabel(label) {
@@ -102,19 +111,13 @@ var ShortcutListener = GObject.registerClass({
     }
 
     _onKeybindingChanged() {
-        if (this.keybinding === '') {
-            this._setting.set_strv(this._key, []);
-            this._clearButton.set_sensitive(false);
-            this._button.set_label('Disabled');
-        } else {
-            this._setting.set_strv(this._key, [this.keybinding]);
-            this._clearButton.set_sensitive(true);
-            this._button.set_label(this.getKeybindingLabel());
-        }
+        this._setting.set_strv(this._key, this.keybinding);
+        this._clearButton.set_sensitive(this.keybinding.length);
+        this._button.set_label(this.getKeybindingLabel());
     }
 
     _onClearButtonClicked() {
-        this.keybinding = '';
+        this.keybinding = [];
         ShortcutListener.stopListening();
     }
 
@@ -128,7 +131,7 @@ var ShortcutListener = GObject.registerClass({
         if (mask === 0) {
             switch (keyval) {
                 case Gdk.KEY_BackSpace:
-                    this.keybinding = '';
+                    this.keybinding = [];
                     // falls through
                 case Gdk.KEY_Escape:
                     ShortcutListener.stopListening();
@@ -141,7 +144,7 @@ var ShortcutListener = GObject.registerClass({
             return Gdk.EVENT_STOP;
 
         this.keybinding =
-            Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask);
+            [Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask)];
 
         ShortcutListener.stopListening();
         return Gdk.EVENT_STOP;
