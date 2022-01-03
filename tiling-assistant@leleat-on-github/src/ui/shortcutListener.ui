@@ -17,7 +17,8 @@
         <property name="valign">center</property>
         <property name="label">Disabled</property>
         <property name="has-frame">0</property>
-        <signal name="clicked" handler="_onButtonClicked" swapped="no"/>
+        <property name="tooltip-text" translatable="yes">Replace the keyboard shortcuts. Press '+' when listening for a shortcut to append a new one to the existing shortcuts instead.</property>
+        <signal name="clicked" handler="_onShortcutButtonClicked" swapped="no"/>
         <style>
           <class name="round-button-no-frame"/>
         </style>
@@ -28,9 +29,9 @@
         <property name="has-frame">0</property>
         <property name="sensitive">0</property>
         <property name="focus-on-click">0</property>
-        <property name="receives-default">1</property>
         <property name="valign">center</property>
         <property name="icon-name">edit-undo-symbolic</property>
+        <property name="tooltip-text" translatable="yes">Clear the keyboard shortcuts</property>
         <signal name="clicked" handler="_onClearButtonClicked" swapped="no"/>
         <style>
           <class name="round-button-no-frame"/>

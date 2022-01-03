@@ -33,7 +33,10 @@ var ShortcutListener = GObject.registerClass({
      * Only allow 1 active ShortcutListener at a time
      */
     static isListening = false;
+    static isAppendingShortcut = false;
     static listener = null;
+    static listeningText = 'Press a shortcut...';
+    static appendingText = 'Append a new shortcut...';
 
     /**
      * Starts listening for a keyboard shortcut.
@@ -47,7 +50,7 @@ var ShortcutListener = GObject.registerClass({
         ShortcutListener.stopListening();
 
         shortcutListener.isActive = true;
-        shortcutListener.setLabel('Press a shortcut...');
+        shortcutListener.setLabel(ShortcutListener.listeningText);
         ShortcutListener.listener = shortcutListener;
         ShortcutListener.isListening = true;
     }
@@ -60,6 +63,7 @@ var ShortcutListener = GObject.registerClass({
             return;
 
         ShortcutListener.isListening = false;
+        ShortcutListener.isAppendingShortcut = false;
         ShortcutListener.listener.isActive = false;
         ShortcutListener.listener.setLabel(ShortcutListener.listener.getKeybindingLabel());
         ShortcutListener.listener = null;
@@ -106,7 +110,7 @@ var ShortcutListener = GObject.registerClass({
         this._button.set_label(label);
     }
 
-    _onButtonClicked() {
+    _onShortcutButtonClicked() {
         this.activate();
     }
 
@@ -136,6 +140,13 @@ var ShortcutListener = GObject.registerClass({
                 case Gdk.KEY_Escape:
                     ShortcutListener.stopListening();
                     return Gdk.EVENT_STOP;
+                case Gdk.KEY_plus:
+                    ShortcutListener.isAppendingShortcut = !ShortcutListener.isAppendingShortcut;
+                    this.setLabel(ShortcutListener.isAppendingShortcut
+                        ? ShortcutListener.appendingText
+                        : ShortcutListener.listeningText
+                    );
+                    return;
             }
         }
 
@@ -143,8 +154,8 @@ var ShortcutListener = GObject.registerClass({
                 !Gtk.accelerator_valid(keyval, mask))
             return Gdk.EVENT_STOP;
 
-        this.keybinding =
-            [Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask)];
+        const sc = Gtk.accelerator_name_with_keycode(null, keyval, keycode, mask);
+        this.keybinding = ShortcutListener.isAppendingShortcut ? [...this.keybinding, sc] : [sc];
 
         ShortcutListener.stopListening();
         return Gdk.EVENT_STOP;
