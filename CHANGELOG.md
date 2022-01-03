@@ -12,10 +12,11 @@
     - `Shift`+`Directions` moves the tile group to a new monitor
     - `Shift`+`Alt`+`Directions` moves the tile group to a new workspace
 - tiled windows will untile themselves if they change workspaces
+- allow one action to have multiple keyboard shortcuts (press '+' when listening for a new keyboard shortcut to append shortcuts to existing ones)
+- added GNOME's native tiling behaviour (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
 
 **Changed**
 - adapt edge-tiling only if it doesn't cover existing tiles. Use `Ctrl`-drag (mouse) or the `Tile Editing Mode` (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups
-- changed the default shortcuts from numpad to follow GNOME's native behaviour (`Super`+`UP`/`DOWN`/`LEFT`/`RIGHT`)
 - reworked tile group detection when a window is tiled
 - renamed `Split Tiles` mode to `Adaptive Tiling`. This is the mode when moving a window around while holding `Ctrl`
 - disabled grouping tiled windows in the app switcher by default and mark that setting as experimental

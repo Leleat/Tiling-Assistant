@@ -9,7 +9,12 @@
             "subtitle": "Shift+Directions moves the tile group to a new monitor; Shift+Alt+Directions to a new workspace."
         },
         {
-            "title": "Tiled windows will untile automatically if they change workspaces"
+            "title": "Tiled windows will untile if they change workspaces or monitors",
+            "subtitle": "Use the Tile Editing Mode to move tile groups to a different workspace/monitor"
+        },
+        {
+            "title": "Allow one action to have multiple keyboard shortcuts",
+            "subtitle": "Press '+' when listening for a new keyboard shortcut to append to existing ones."
         }
     ],
     "removed": [
@@ -19,9 +24,6 @@
         {
             "title": "Adapt edge-tiling only if it doesn't cover existing tiles and their tile groups",
             "subtitle": "Use Ctrl-drag (mouse) or the Tile Editing Mode (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups."
-        },
-        {
-            "title": "Changed the default shortcuts from Super+Numpad to follow GNOME's native behaviour (Super+Up/Down/Left/Right)"
         },
         {
             "title": "Reworked tile group detection"
