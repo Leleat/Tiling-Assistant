@@ -100,6 +100,52 @@ var Handler = class TilingKeybindingHandler {
         } else if (shortcutName === Shortcuts.ALWAYS_ON_TOP) {
             window.is_above() ? window.unmake_above() : window.make_above();
 
+        // Toggle maximization vertically
+        } else if (shortcutName === Shortcuts.MAXIMIZE_V) {
+            const workArea = new Rect(window.get_work_area_current_monitor());
+            const currRect = window.tiledRect ?? window.get_frame_rect();
+
+            // Is tiled or maximized with this extension
+            if (window.untiledRect && currRect.height === workArea.height) {
+                // Is maximized
+                if (currRect.width === workArea.width) {
+                    const tileRect = new Rect(workArea.x, window.untiledRect.y, workArea.width, window.untiledRect.height);
+                    Twm.tile(window, tileRect);
+                // Is tiled
+                } else {
+                    Twm.untile(window);
+                }
+
+            // Maximize vertically even if the height may already be equal to the workArea
+            // e. g. via double-click titlebar, maximize-window-button or whatever
+            } else {
+                const tileRect = new Rect(currRect.x, workArea.y, currRect.width, workArea.height);
+                Twm.tile(window, tileRect);
+            }
+
+        // Toggle maximization horizontally
+        } else if (shortcutName === Shortcuts.MAXIMIZE_H) {
+            const workArea = new Rect(window.get_work_area_current_monitor());
+            const currRect = window.tiledRect ?? window.get_frame_rect();
+
+            // Is tiled or maximized with this extension
+            if (window.untiledRect && currRect.width === workArea.width) {
+                // Is maximized
+                if (currRect.height === workArea.height) {
+                    const tileRect = new Rect(window.untiledRect.x, workArea.y, window.untiledRect.width, workArea.height);
+                    Twm.tile(window, tileRect);
+                // Is tiled
+                } else {
+                    Twm.untile(window);
+                }
+
+            // Maximize horizontally even if the width may already be equal to the workArea
+            // e. g. via double-click titlebar, maximize-window-button or whatever
+            } else {
+                const tileRect = new Rect(workArea.x, currRect.y, workArea.width, currRect.height);
+                Twm.tile(window, tileRect);
+            }
+
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;

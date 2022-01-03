@@ -53,6 +53,8 @@ const PrefsWidget = GObject.registerClass({
         'tile_edit_mode',
         'auto_tile',
         'tile_maximize',
+        'tile_maximize_vertically',
+        'tile_maximize_horizontally',
         'restore_window',
         'toggle_always_on_top',
         'tile_top_half',

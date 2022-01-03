@@ -60,6 +60,12 @@
 		<key name="tile-maximize" type="as">
 			<default><![CDATA[['<Super>Up']]]></default>
 		</key>
+		<key name="tile-maximize-vertically" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-maximize-horizontally" type="as">
+			<default>[]</default>
+		</key>
 		<key name="restore-window" type="as">
 			<default><![CDATA[['<Super>Down']]]></default>
 		</key>
