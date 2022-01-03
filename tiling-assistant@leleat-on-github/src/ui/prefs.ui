@@ -585,6 +585,14 @@
                             </property>
                           </object>
                         </child>
+                        <child>
+                          <object class="TilingAssistantListRow">
+                            <property name="title" translatable="yes">Move Window to Center</property>
+                            <property name="suffix">
+                              <object class="ShortcutListener" id="center_window"/>
+                            </property>
+                          </object>
+                        </child>
                       </object>
                     </child>
                     <child>

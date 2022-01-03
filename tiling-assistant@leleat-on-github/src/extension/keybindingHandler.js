@@ -146,6 +146,43 @@ var Handler = class TilingKeybindingHandler {
             else if (window.get_maximized())
                 window.unmaximize(window.get_maximized());
 
+        // Center window
+        } else if (shortcutName === Shortcuts.CENTER_WINDOW) {
+            const workArea = new Rect(window.get_work_area_current_monitor());
+            if (window.isTiled) {
+                const currRect = window.tiledRect;
+                const tileRect = new Rect(
+                    workArea.center.x - Math.floor(currRect.width / 2),
+                    workArea.center.y - Math.floor(currRect.height / 2),
+                    currRect.width,
+                    currRect.height
+                );
+
+                if (tileRect.equal(currRect))
+                    return;
+
+                Twm.tile(window, tileRect, { openTilingPopup: false });
+            } else if (!Twm.isMaximized(window)) {
+                if (!window.allows_move())
+                    return;
+
+                const currRect = window.get_frame_rect();
+                const x = workArea.center.x - Math.floor(currRect.width / 2);
+                const y = workArea.center.y - Math.floor(currRect.height / 2);
+
+                if (x === currRect.x && y === currRect.y)
+                    return;
+
+                const wActor = window.get_compositor_private();
+                wActor && Main.wm._prepareAnimationInfo(
+                    global.window_manager,
+                    wActor,
+                    currRect,
+                    Meta.SizeChange.UNMAXIMIZE
+                );
+                window.move_frame(false, x, y);
+            }
+
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
