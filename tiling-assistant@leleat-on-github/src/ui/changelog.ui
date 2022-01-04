@@ -63,7 +63,7 @@
                             <property name="halign">center</property>
                             <property name="can-focus">False</property>
                             <property name="use-underline">True</property>
-                            <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/master/CHANGELOG.md</property>
+                            <property name="uri">https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md</property>
                             <style>
                               <class name="caption"/>
                             </style>
