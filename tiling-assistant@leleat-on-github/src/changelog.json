@@ -46,6 +46,9 @@
             "title": "Fixed a compatibility issue introduced in v31 with other alt-Tab extensions"
         },
         {
+            "title": "Fixed the Tiling Popup ignoring the Tile Group setting 'App Switcher and Tiling Popup'"
+        },
+        {
             "title": "Shortcuts may no longer change unintentionally after using the clear-shortcut-button"
         }
     ]
