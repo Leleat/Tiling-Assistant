@@ -141,7 +141,7 @@ var Handler = class TilingKeybindingHandler {
 
         // Restore window size
         } else if (shortcutName === Shortcuts.RESTORE_WINDOW) {
-            if (window.isTiled)
+            if (window.untiledRect) // Tiled & maximized with gaps
                 Twm.untile(window, { clampToWorkspace: true });
             else if (window.get_maximized())
                 window.unmaximize(window.get_maximized());
