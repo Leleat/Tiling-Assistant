@@ -140,13 +140,15 @@ var ShortcutListener = GObject.registerClass({
                 case Gdk.KEY_Escape:
                     ShortcutListener.stopListening();
                     return Gdk.EVENT_STOP;
-                case Gdk.KEY_plus:
+                case Gdk.KEY_KP_Enter:
+                case Gdk.KEY_Return:
+                case Gdk.KEY_space:
                     ShortcutListener.isAppendingShortcut = !ShortcutListener.isAppendingShortcut;
                     this.setLabel(ShortcutListener.isAppendingShortcut
                         ? ShortcutListener.appendingText
                         : ShortcutListener.listeningText
                     );
-                    return;
+                    return Gdk.EVENT_STOP;
             }
         }
 
