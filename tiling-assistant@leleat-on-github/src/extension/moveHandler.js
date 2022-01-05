@@ -154,7 +154,7 @@ var Handler = class TilingMoveHandler {
             const monitor = global.display.get_current_monitor();
             const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
 
-            const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: true });
+            const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
             this._posChangedId = window.connect('position-changed',
@@ -180,7 +180,7 @@ var Handler = class TilingMoveHandler {
             // with at least 1 window being part of multiple tile groups.
             let isCtrlReplacement = false;
             const ctrlReplacedTileGroup = [];
-            const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: true });
+            const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
             const pointerPos = { x: global.get_pointer()[0], y: global.get_pointer()[1] };
             const twHovered = topTileGroup.some(w => w.tiledRect.containsPoint(pointerPos));
             if (this._currPreviewMode === MoveModes.ADAPTIVE_TILING && !this._splitRects.size && twHovered) {

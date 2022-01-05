@@ -483,19 +483,22 @@ var TilingWindowManager = class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [ignoreTopWindow=true] wether we ignore the top window
-     *      for the consideration of overlaps.
+     * @param {boolean} [skipTopWindow=true] wether we ignore the top window
+     *      in the active search for the top tile group. The top window may
+     *      still be part of the returned array if it is part of another high-
+     *      stacked window's tile group. This is mainly only useful, if the
+     *      top window isn't tiled (for example when dnd-ing a window).
      * @param {number} [monitor=null] get the group for the monitor number.
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
-    static getTopTileGroup({ ignoreTopWindow = false, monitor = null } = {}) {
+    static getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
         // 'Raise Tile Group' setting is enabled
         if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
             const openWindows = this.getWindows();
             const ignoredWindows = [];
             const mon = monitor ?? openWindows[0]?.get_monitor();
 
-            for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
+            for (let i = skipTopWindow ? 1 : 0; i < openWindows.length; i++) {
                 const window = openWindows[i];
                 if (window.get_monitor() !== mon)
                     continue;
@@ -525,7 +528,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         // 'Raise Tile Group' setting is disabled
         } else {
-            return this._getTopTiledWindows({ ignoreTopWindow, monitor });
+            return this._getTopTiledWindows({ skipTopWindow, monitor });
         }
     }
 
@@ -738,7 +741,18 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         const favLayout = Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
-        const twRects = favLayout ? Util.getFavoriteLayout() : this.getTopTileGroup(true, monitor).map(w => w.tiledRect);
+        const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
+        // getTileFor is used to get the adaptive tiles for dnd & tiling keyboard
+        // shortcuts. Thats why the top most window needs to be ignored when
+        // calculating the new tile rect. The top most window is already ignored
+        // for dnd in the getTopTileGroup() call. While the top most window will
+        // be ignored for the active search in getTopTileGroup, it may still be
+        // part of the returned array if it's part of another high-stackeing
+        // window's tile group.
+        const openWindows = this.getWindows();
+        const idx = topTileGroup.indexOf(openWindows[0]);
+        idx !== -1 && topTileGroup.splice(idx, 1);
+        const twRects = favLayout ? Util.getFavoriteLayout() : topTileGroup.map(w => w.tiledRect);
         if (!twRects.length)
             return this.getDefaultTileFor(shortcut, workArea);
 
@@ -990,13 +1004,13 @@ var TilingWindowManager = class TilingWindowManager {
      *
      * @param {{boolean, number}} param1
      */
-    static _getTopTiledWindows({ ignoreTopWindow = false, monitor = null } = {}) {
+    static _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
         const openWindows = this.getWindows();
         const topTiledWindows = [];
         const ignoredWindows = [];
         const mon = monitor ?? openWindows[0]?.get_monitor();
 
-        for (let i = ignoreTopWindow ? 1 : 0; i < openWindows.length; i++) {
+        for (let i = skipTopWindow ? 1 : 0; i < openWindows.length; i++) {
             const window = openWindows[i];
             if (window.get_monitor() !== mon)
                 continue;

@@ -77,7 +77,7 @@ var Handler = class TilingKeybindingHandler {
             if (Twm.isMaximized(window)) {
                 Twm.untile(window);
             } else {
-                const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: !window.isTiled });
+                const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: !window.isTiled });
                 const tRects = topTileGroup.map(w => w.tiledRect);
                 const tileRect = Twm.getBestFreeRect(tRects, window.tiledRect);
                 Twm.toggleTiling(window, tileRect);
@@ -217,7 +217,7 @@ var Handler = class TilingKeybindingHandler {
      *      the focus to.
      */
     _dynamicFocus(window, shortcutName) {
-        const topTileGroup = Twm.getTopTileGroup({ ignoreTopWindow: true });
+        const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
         const workArea = new Rect(window.get_work_area_current_monitor());
 
         // Toggle tile state of the window, if it isn't tiled
