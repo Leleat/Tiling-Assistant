@@ -34,15 +34,7 @@ const Modes = {
 var TileEditor = GObject.registerClass(
 class TileEditingMode extends St.Widget {
     _init() {
-        const monitor = global.display.get_current_monitor();
-        const display = global.display.get_monitor_geometry(monitor);
-        super._init({
-            x: display.x,
-            y: display.y,
-            width: display.width,
-            height: display.height,
-            reactive: true
-        });
+        super._init({ reactive: true });
 
         this._haveModal = false;
         // The windows managed by the Tile Editor, that means the tiled windows
@@ -78,6 +70,11 @@ class TileEditingMode extends St.Widget {
             return;
         }
 
+        this.monitor = this._windows[0].get_monitor();
+        const display = global.display.get_monitor_geometry(this.monitor);
+        this.set_position(display.x, display.y);
+        this.set_size(display.width, display.height);
+
         // Enter initial state.
         this._mode = Modes.DEFAULT;
         this._keyHandler = new DefaultKeyHandler(this);
@@ -89,7 +86,7 @@ class TileEditingMode extends St.Widget {
         // Create the active selection indicator.
         const window = this._windows[0];
         const params = { style_class: 'tile-preview' };
-        this._selectIndicator = new Indicator(params, window.tiledRect);
+        this._selectIndicator = new Indicator(params, window.tiledRect, this.monitor);
         this._selectIndicator.focus(window.tiledRect, window);
         this.add_child(this._selectIndicator);
     }
@@ -190,8 +187,9 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
     /**
      * @param {string} widgetParams
      * @param {Rect} rect the final rect / pos of the indicator
+     * @param {number} monitor
      */
-    _init(widgetParams = {}, rect) {
+    _init(widgetParams = {}, rect, monitor) {
         // Start from a scaled down position.
         super._init({
             ...widgetParams,
@@ -204,6 +202,7 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
 
         this.rect = null;
         this.window = null;
+        this._monitor = monitor;
     }
 
     /**
@@ -213,10 +212,9 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
      * @param {Meta.Window|null} window the window at `rect`'s position.
      */
     focus(rect, window = null) {
-        const monitor = global.display.get_current_monitor();
-        const display = global.display.get_monitor_geometry(monitor);
+        const display = global.display.get_monitor_geometry(this._monitor);
         const activeWs = global.workspace_manager.get_active_workspace();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = new Rect(activeWs.get_work_area_for_monitor(this._monitor));
 
         // Adjusted for window / screen gaps
         const { x, y, width, height } = rect.addGaps(workArea);
@@ -273,7 +271,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.DEFAULT;
 
             const tiledRect = this._windows.map(w => w.tiledRect);
-            const tileRect = Twm.getBestFreeRect(tiledRect, window.tiledRect);
+            const tileRect = Twm.getBestFreeRect(tiledRect, { currRect: window.tiledRect });
             if (window.tiledRect.equal(tileRect))
                 return Modes.DEFAULT;
 
@@ -296,7 +294,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.DEFAULT;
 
             const tiledRects = this._windows.map(w => w.tiledRect);
-            const fullRect = Twm.getBestFreeRect(tiledRects, window.tiledRect);
+            const fullRect = Twm.getBestFreeRect(tiledRects, { currRect: window.tiledRect });
             const topHalf = fullRect.getUnitAt(0, fullRect.height / 2, Orientation.H);
             const rightHalf = fullRect.getUnitAt(1, fullRect.width / 2, Orientation.V);
             const bottomHalf = fullRect.getUnitAt(1, fullRect.height / 2, Orientation.H);
@@ -394,8 +392,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
      */
     _focusInDir(dir) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = new Rect(activeWs.get_work_area_for_monitor(this._tileEditor.monitor));
         const tiledRects = this._windows.map(w => w.tiledRect);
         const screenRects = tiledRects.concat(workArea.minus(tiledRects));
         const nearestRect = this._selectIndicator.rect.getNeighbor(dir, screenRects);
@@ -430,7 +427,7 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
         const { red, green, blue, alpha } = color;
         this._anchorIndicator = new Indicator({
             style: `background-color: rgba(${red}, ${green}, ${blue}, ${alpha / 255})`
-        }, this._selectIndicator.rect);
+        }, this._selectIndicator.rect, tileEditor.monitor);
         this._anchorIndicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
         this._tileEditor.add_child(this._anchorIndicator);
     }
@@ -525,7 +522,7 @@ const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
                     metaDir = Meta.DisplayDirection.RIGHT;
 
                 // get_current_monitor isn't accurate for our case
-                const currMonitor = this._tileEditor._windows[0].get_monitor();
+                const currMonitor = this._tileEditor.monitor;
                 const newMonitor = global.display.get_monitor_neighbor_index(currMonitor, metaDir);
                 if (newMonitor === -1)
                     return Modes.MOVE;

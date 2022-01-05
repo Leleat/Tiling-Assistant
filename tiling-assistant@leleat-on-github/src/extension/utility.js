@@ -124,7 +124,9 @@ var Util = class Utility {
     }
 
     /**
-     * @param {number|null} monitorNr
+     * @param {number|null} monitorNr determines which monitor the layout scales
+     *      to. Sometimes we want the monitor of the pointer (when using dnd) and
+     *      sometimes not (when using layouts with the keyboard shortcuts).
      * @returns {Rect[]}
      */
     static getFavoriteLayout(monitorNr = null) {

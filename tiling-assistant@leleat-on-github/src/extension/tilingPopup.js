@@ -36,6 +36,7 @@ var TilingSwitcherPopup = GObject.registerClass({
     _init(openWindows, freeScreenRect, allowConsecutivePopup = true) {
         this._freeScreenRect = freeScreenRect;
         this._shadeBG = null;
+        this._monitor = -1;
 
         SwitcherPopup.SwitcherPopup.prototype._init.call(this);
 
@@ -67,6 +68,8 @@ var TilingSwitcherPopup = GObject.registerClass({
      * @returns if the popup was successfully shown.
      */
     show(tileGroup) {
+        this._monitor = tileGroup[0]?.get_monitor() ?? global.display.get_current_monitor();
+
         if (!this._items.length)
             return false;
 
@@ -107,10 +110,7 @@ var TilingSwitcherPopup = GObject.registerClass({
     _shadeBackground(tileGroup) {
         const tiledWindow = tileGroup[0];
         const activeWs = global.workspace_manager.get_active_workspace();
-        const mon = tiledWindow?.get_monitor();
-        const currMon = global.display.get_current_monitor();
-        const workArea = tiledWindow?.get_work_area_for_monitor(mon) ??
-                activeWs.get_work_area_for_monitor(currMon);
+        const workArea = activeWs.get_work_area_for_monitor(this._monitor);
 
         this._shadeBG = new St.Widget({
             style: 'background-color : black',
@@ -175,10 +175,7 @@ var TilingSwitcherPopup = GObject.registerClass({
 
         if (this._thumbnails) {
             const cbox = this._switcherList.get_allocation_box();
-            const focusedWindow = global.display.focus_window;
-            const monitor = global.display.get_monitor_geometry(
-                focusedWindow?.get_monitor() ?? global.display.get_current_monitor()
-            );
+            const monitor = global.display.get_monitor_geometry(this._monitor);
 
             const leftPadd = this.get_theme_node().get_padding(St.Side.LEFT);
             const rightPadd = this.get_theme_node().get_padding(St.Side.RIGHT);
@@ -292,7 +289,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         this.tiledWindow = window;
 
         window.change_workspace(global.workspace_manager.get_active_workspace());
-        window.move_to_monitor(global.display.get_current_monitor());
+        window.move_to_monitor(this._monitor);
 
         // We want to activate/focus the window after it was tiled with the
         // Tiling Popup. Calling activate/focus() after tile() doesn't seem to

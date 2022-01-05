@@ -79,7 +79,7 @@ var Handler = class TilingKeybindingHandler {
             } else {
                 const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: !window.isTiled });
                 const tRects = topTileGroup.map(w => w.tiledRect);
-                const tileRect = Twm.getBestFreeRect(tRects, window.tiledRect);
+                const tileRect = Twm.getBestFreeRect(tRects, { currRect: window.tiledRect });
                 Twm.toggleTiling(window, tileRect);
             }
 
@@ -190,7 +190,7 @@ var Handler = class TilingKeybindingHandler {
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;
             const workArea = new Rect(window.get_work_area_current_monitor());
-            const rect = Twm.getTileFor(shortcutName, workArea);
+            const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
 
             switch (dynamicSetting) {
                 case DynamicKeybindings.FOCUS:
@@ -223,7 +223,7 @@ var Handler = class TilingKeybindingHandler {
         // Toggle tile state of the window, if it isn't tiled
         // or if it is the only window which is.
         if (!window.isTiled || topTileGroup.length === 1) {
-            const rect = Twm.getTileFor(shortcutName, workArea);
+            const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
             Twm.toggleTiling(window, rect);
             return;
         }
@@ -252,7 +252,7 @@ var Handler = class TilingKeybindingHandler {
         );
 
         if (!nearestWindow) {
-            const rect = Twm.getTileFor(shortcutName, workArea);
+            const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
             Twm.toggleTiling(window, rect);
             return;
         }
@@ -310,14 +310,14 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.MAXIMIZE:
                 case Shortcuts.TOP: {
-                    const rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    const rect = Twm.getTileFor(Shortcuts.TOP, workArea, window.get_monitor());
                     Twm.tile(window, rect, { skipAnim: true });
                     break;
                 } case Shortcuts.BOTTOM: {
                     Twm.untile(window);
                     break;
                 } default: {
-                    const rect = Twm.getTileFor(shortcutName, workArea);
+                    const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                 }
             }
@@ -332,7 +332,7 @@ var Handler = class TilingKeybindingHandler {
                     }
                 // falls through
                 } default: {
-                    const rect = Twm.getTileFor(shortcutName, workArea);
+                    const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                 }
             }
@@ -387,11 +387,11 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
@@ -402,11 +402,11 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
@@ -416,15 +416,15 @@ var Handler = class TilingKeybindingHandler {
         } else if (isTopHalf) {
             switch (shortcutName) {
                 case Shortcuts.TOP:
-                    rect = Twm.getTileFor(Shortcuts.MAXIMIZE, workArea);
+                    rect = Twm.getTileFor(Shortcuts.MAXIMIZE, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
-                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
@@ -434,11 +434,11 @@ var Handler = class TilingKeybindingHandler {
         } else if (isBottomHalf) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.TOP:
@@ -446,29 +446,29 @@ var Handler = class TilingKeybindingHandler {
                     Twm.untile(window);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, window.get_monitor());
                     isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isTopLeftQuarter) {
             switch (shortcutName) {
                 case Shortcuts.RIGHT:
-                    rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
             }
         } else if (isTopRightQuarter) {
             switch (shortcutName) {
                 case Shortcuts.LEFT:
-                    rect = Twm.getTileFor(Shortcuts.TOP, workArea);
+                    rect = Twm.getTileFor(Shortcuts.TOP, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
             }
@@ -476,15 +476,15 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.LEFT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.RIGHT:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, window.get_monitor());
                     isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
@@ -492,27 +492,27 @@ var Handler = class TilingKeybindingHandler {
             switch (shortcutName) {
                 case Shortcuts.TOP:
                 case Shortcuts.MAXIMIZE:
-                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea);
+                    rect = Twm.getTileFor(Shortcuts.RIGHT, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.LEFT:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, window.get_monitor());
                     Twm.toggleTiling(window, rect);
                     return;
                 case Shortcuts.BOTTOM:
-                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea);
+                    rect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, window.get_monitor());
                     isWindowsStyle ? window.minimize() : Twm.toggleTiling(window, rect);
                     return;
             }
         }
 
-        Twm.toggleTiling(window, Twm.getTileFor(shortcutName, workArea));
+        Twm.toggleTiling(window, Twm.getTileFor(shortcutName, workArea, window.get_monitor()));
     }
 
     _dynamicFavoriteLayout(window, shortcutName) {
         const workArea = new Rect(window.get_work_area_current_monitor());
         const toggleTiling = () => {
-            const rect = Twm.getTileFor(shortcutName, workArea);
+            const rect = Twm.getTileFor(shortcutName, workArea, window.get_monitor());
             Twm.toggleTiling(window, rect);
         };
 
@@ -521,7 +521,7 @@ var Handler = class TilingKeybindingHandler {
             return;
         }
 
-        const favoriteLayout = Util.getFavoriteLayout();
+        const favoriteLayout = Util.getFavoriteLayout(window.get_monitor());
         if (favoriteLayout.length <= 1) {
             toggleTiling();
             return;

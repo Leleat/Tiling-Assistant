@@ -538,12 +538,13 @@ var TilingWindowManager = class TilingWindowManager {
      * (for ex.: 2 diagonally opposing quarters). In that case we return null.
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
-     * @param {number} [monitorNr=-1] used for the grace period during dnd
+     * @param {number|null} [monitorNr] useful for the grace period during dnd.
+     *      Defaults to pointer monitor.
      * @returns {Rect|null} a Rect, which represent the free screen space.
      */
-    static getFreeScreen(rectList, monitorNr = -1) {
+    static getFreeScreen(rectList, monitorNr = null) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = monitorNr === -1 ? global.display.get_current_monitor() : monitorNr;
+        const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeScreenRects = workArea.minus(rectList);
         if (!freeScreenRects.length)
@@ -579,11 +580,12 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Rect} [currRect=null] a Rect, which may be expanded.
      * @param {Orientation} [orientation=null] The orientation we want to expand
      *      `currRect` into. If `null`, expand in both orientations.
+     * @param {Rect} [monitor=null] defaults to pointer monitor.
      * @returns {Rect} a new Rect.
      */
-    static getBestFreeRect(rectList, currRect = null, orientation = null) {
+    static getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitor = global.display.get_current_monitor();
+        const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeRects = workArea.minus(rectList);
         if (!freeRects.length)
@@ -677,7 +679,11 @@ var TilingWindowManager = class TilingWindowManager {
                 rectList.splice(currRectIdx, 1);
                 rectList.push(newRect);
                 return newRect.union(
-                    this.getBestFreeRect(rectList, newRect, Orientation.H));
+                    this.getBestFreeRect(rectList, {
+                        currRect: newRect,
+                        orientation: Orientation.H,
+                        monitorNr: monitor
+                    }));
             } else {
                 return newRect;
             }
@@ -692,7 +698,7 @@ var TilingWindowManager = class TilingWindowManager {
             });
             rectList.push(biggestSingle);
 
-            return this.getBestFreeRect(rectList, biggestSingle);
+            return this.getBestFreeRect(rectList, { currRect: biggestSingle });
         }
     }
 
@@ -752,7 +758,7 @@ var TilingWindowManager = class TilingWindowManager {
         const openWindows = this.getWindows();
         const idx = topTileGroup.indexOf(openWindows[0]);
         idx !== -1 && topTileGroup.splice(idx, 1);
-        const twRects = favLayout ? Util.getFavoriteLayout() : topTileGroup.map(w => w.tiledRect);
+        const twRects = favLayout ? Util.getFavoriteLayout(monitor) : topTileGroup.map(w => w.tiledRect);
         if (!twRects.length)
             return this.getDefaultTileFor(shortcut, workArea);
 
@@ -865,7 +871,7 @@ var TilingWindowManager = class TilingWindowManager {
             return;
 
         const tRects = topTileGroup.map(w => w.tiledRect);
-        const monitor = topTileGroup[0]?.get_monitor() ?? -1; // for the grace period
+        const monitor = topTileGroup[0]?.get_monitor(); // for the grace period
         const freeSpace = this.getFreeScreen(tRects, monitor);
         if (!freeSpace)
             return;
