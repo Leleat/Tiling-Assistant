@@ -293,8 +293,16 @@ var TilingSwitcherPopup = GObject.registerClass({
 
         window.change_workspace(global.workspace_manager.get_active_workspace());
         window.move_to_monitor(global.display.get_current_monitor());
-        Twm.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
+
+        // We want to activate/focus the window after it was tiled with the
+        // Tiling Popup. Calling activate/focus() after tile() doesn't seem to
+        // work for GNOME Terminal if it is maximized before trying to tile it.
+        // It won't be tiled properly in that case for some reason... Instead
+        // activate first but clear the tiling signals before so that the old
+        // tile group won't be accidently raised.
+        Twm.clearTilingProps(window.get_id());
         window.activate(global.get_current_time());
+        Twm.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
     }
 
     // Dont _finish(), if no mods are pressed
