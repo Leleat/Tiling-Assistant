@@ -1134,6 +1134,7 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static _onWorkspaceAdded() {
         this._ignoreWsChange = true;
+        this._wsAddedTimer && GLib.Source.remove(this._wsAddedTimer);
         this._wsAddedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
             this._ignoreWsChange = false;
             this._wsAddedTimer = null;
@@ -1151,6 +1152,7 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static _onWorkspaceRemoved() {
         this._ignoreWsChange = true;
+        this._wsRemovedTimer && GLib.Source.remove(this._wsRemovedTimer);
         this._wsRemovedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
             this._ignoreWsChange = false;
             this._wsRemovedTimer = null;
