@@ -31,7 +31,7 @@ There are three ways to tile windows with your mouse: `Edge Tiling`, `Adaptive T
 
 You use this by dragging a window around while holding `Ctrl`. In this mode you split or replace tiles (that means either tiled windows or the free screen space created by tiled windows), if you hover over them. If you hover at the center of the tile, the full tile will be covered. If you hover off-center, the grabbed window will only tile to one half of the full tile. If the hovered tile is a tiled window, the tiled window will take the remaining half. If you hover at the edges of a tile (i. e. within 50 px of an edge), multiple tiled windows will be affected by that. If you _additionally_ hold `Super`, the grabbed window will span multiple tiles.
 
-https://user-images.githubusercontent.com/53054301/144303811-97f532c1-9a02-47c7-ae57-4e1d7e960276.mp4
+https://user-images.githubusercontent.com/53054301/148323753-5f3fc7e9-613f-4055-866a-1105f11b4c15.mp4
 
 #### Favorite Layout
 
