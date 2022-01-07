@@ -20,7 +20,7 @@ assignees: ''
  - XOrg/Wayland:
 
 **Journalctl logs**
-<!-- Run `journalctl -fo cat /usr/bin/gnome-shell` in a Terminal. Then reproduce the bug. Ideally, disable all other extensions before that and restart GNOME shell, so you can be sure that this extension isn't conflicting with others. -->
+<!-- Run `journalctl -fo cat /usr/bin/gnome-shell`, then reproduce the bug. If new entries appear and they look relevant, please post them here. Ideally, disable all other extensions before that and restart GNOME shell, so you can be sure that this extension isn't conflicting with others. -->
 
 **List of other extensions**
 <!-- It's possible Tiling Assistant is conflicting with other extensions. So please provide a list of your installed extensions. Run `gnome-extensions list --enabled` and post the output here. -->
