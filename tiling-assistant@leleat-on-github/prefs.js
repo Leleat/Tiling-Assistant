@@ -189,17 +189,11 @@ const PrefsWidget = GObject.registerClass({
     }
 
     _openBugReport(prefsDialog) {
-        Gio.AppInfo.launch_default_for_uri(
-            'https://github.com/Leleat/Tiling-Assistant/issues',
-            prefsDialog.get_display().get_app_launch_context()
-        );
+        Gtk.show_uri(prefsDialog, 'https://github.com/Leleat/Tiling-Assistant/issues', Gdk.CURRENT_TIME);
     }
 
     _openUserGuide(prefsDialog) {
-        Gio.AppInfo.launch_default_for_uri(
-            'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md',
-            prefsDialog.get_display().get_app_launch_context()
-        );
+        Gtk.show_uri(prefsDialog, 'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md', Gdk.CURRENT_TIME);
     }
 
     _openChangelog(prefsDialog) {
@@ -219,10 +213,7 @@ const PrefsWidget = GObject.registerClass({
     }
 
     _openLicense(prefsDialog) {
-        Gio.AppInfo.launch_default_for_uri(
-            'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE',
-            prefsDialog.get_display().get_app_launch_context()
-        );
+        Gtk.show_uri(prefsDialog, 'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE', Gdk.CURRENT_TIME);
     }
 
     _openHiddenSettings() {
