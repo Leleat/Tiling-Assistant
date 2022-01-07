@@ -260,6 +260,11 @@ var TilingSwitcherPopup = GObject.registerClass({
     }
 
     fadeAndDestroy() {
+        if (this._alreadyDestroyed)
+            return;
+
+        this._alreadyDestroyed = true;
+
         const canceled = !this.tiledWindow;
         this.emit('closed', canceled);
 
