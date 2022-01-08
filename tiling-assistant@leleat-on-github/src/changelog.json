@@ -52,7 +52,7 @@
             "title": "Shortcuts may no longer change unintentionally after using the clear-shortcut-button"
         },
         {
-            "title": "Fixed the URLs in the prefs' popup menu freezing the prefs"
+            "title": "Fixed the URLs in the prefs' popup menu freezing the prefs (Wayland only)"
         }
     ]
 }
