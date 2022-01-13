@@ -132,6 +132,29 @@ var TilingWindowManager = class TilingWindowManager {
         if (!window.allows_resize() || !window.allows_move())
             return;
 
+        log('tile() ------------ /');
+        log(`Current monitor: ${global.display.get_current_monitor()}`);
+        log(`Window's monitor: ${window.get_monitor()}`);
+        log('Monitor dimensions:');
+        Main.layoutManager.monitors.forEach((x, idx) => {
+            const m = global.display.get_monitor_geometry(idx);
+            log(`    Monitor ${idx} x: ${m.x}`);
+            log(`    Monitor ${idx} y: ${m.y}`);
+            log(`    Monitor ${idx} width: ${m.width}`);
+            log(`    Monitor ${idx} height: ${m.height}\n`);
+        });
+        const wA = new Rect(window.get_work_area_current_monitor());
+        log(`Trying to tile: ${window.get_wm_class()}`);
+        log(`Window.get_work_area_current_monitor.x : ${wA.x}`);
+        log(`Window.get_work_area_current_monitor.y : ${wA.y}`);
+        log(`Window.get_work_area_current_monitor.width : ${wA.width}`);
+        log(`Window.get_work_area_current_monitor.height : ${wA.height}`);
+        log(`Window's new x: ${newRect.x}`);
+        log(`Window's new y: ${newRect.y}`);
+        log(`Window's new width: ${newRect.width}`);
+        log(`Window's new height: ${newRect.height}`);
+        log('/ ------------ tile()');
+
         // Remove window from the other windows' tileGroups so it
         // doesn't falsely get raised with them.
         this.clearTilingProps(window.get_id());
@@ -182,9 +205,9 @@ var TilingWindowManager = class TilingWindowManager {
 
         // Wayland workaround because some apps dont work properly
         // e. g. tiling Nautilus and then choosing firefox from the popup
-        Meta.is_wayland_compositor() && window.move_frame(false, x, y);
+        Meta.is_wayland_compositor() && window.move_frame(true, x, y);
         // user_op as false needed for some apps
-        window.move_resize_frame(false, x, y, width, height);
+        window.move_resize_frame(true, x, y, width, height);
 
         // Maximized with gaps
         if (maximize) {
