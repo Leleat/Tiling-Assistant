@@ -127,6 +127,8 @@ var TilingWindowManager = class TilingWindowManager {
         if (wasMaximized)
             window.unmaximize(wasMaximized);
 
+        window.unmake_fullscreen();
+
         if (!window.allows_resize() || !window.allows_move())
             return;
 
@@ -134,6 +136,7 @@ var TilingWindowManager = class TilingWindowManager {
         // doesn't falsely get raised with them.
         this.clearTilingProps(window.get_id());
 
+        window.unmake_above();
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
