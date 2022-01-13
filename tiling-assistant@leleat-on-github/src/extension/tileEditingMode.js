@@ -86,7 +86,7 @@ class TileEditingMode extends St.Widget {
         // Create the active selection indicator.
         const window = this._windows[0];
         const params = { style_class: 'tile-preview' };
-        this._selectIndicator = new Indicator(params, window.tiledRect, this.monitor);
+        this._selectIndicator = new Indicator(window.tiledRect, this.monitor, params);
         this._selectIndicator.focus(window.tiledRect, window);
         this.add_child(this._selectIndicator);
     }
@@ -189,7 +189,7 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
      * @param {Rect} rect the final rect / pos of the indicator
      * @param {number} monitor
      */
-    _init(widgetParams = {}, rect, monitor) {
+    _init(rect, monitor, widgetParams = {}) {
         // Start from a scaled down position.
         super._init({
             ...widgetParams,
@@ -425,9 +425,9 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
         // Create an 'anchor indicator' to indicate the window that will be swapped
         const color = this._selectIndicator.get_theme_node().get_background_color();
         const { red, green, blue, alpha } = color;
-        this._anchorIndicator = new Indicator({
+        this._anchorIndicator = new Indicator(this._selectIndicator.rect, tileEditor.monitor, {
             style: `background-color: rgba(${red}, ${green}, ${blue}, ${alpha / 255})`
-        }, this._selectIndicator.rect, tileEditor.monitor);
+        });
         this._anchorIndicator.focus(this._selectIndicator.rect, this._selectIndicator.window);
         this._tileEditor.add_child(this._anchorIndicator);
     }
