@@ -12,7 +12,7 @@
     - `Shift`+`Directions` moves the tile group to a new monitor
     - `Shift`+`Alt`+`Directions` moves the tile group to a new workspace
 - tiled windows will untile themselves if they change workspaces
-- allow one action to have multiple keyboard shortcuts (press '+' when listening for a new keyboard shortcut to append shortcuts to existing ones)
+- allow one action to have multiple keyboard shortcuts (press `Enter` or `Space` when listening for a new keyboard shortcut to append shortcuts to existing ones)
 - added GNOME's native tiling behaviour (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
 
 **Changed**

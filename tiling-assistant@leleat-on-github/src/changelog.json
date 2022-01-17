@@ -14,7 +14,7 @@
         },
         {
             "title": "Allow one action to have multiple keyboard shortcuts",
-            "subtitle": "Press '+' when listening for a new keyboard shortcut to append to existing ones."
+            "subtitle": "Press 'Enter' or 'Space' when listening for a new keyboard shortcut to append to existing ones."
         }
     ],
     "removed": [
