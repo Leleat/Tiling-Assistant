@@ -7,7 +7,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const LayoutRow = Me.imports.src.prefs.layoutRow.LayoutRow;
-const Util = Me.imports.src.prefs.utility.Util;
 
 /**
  * This class takes care of everything related to layouts (at least on the
@@ -84,7 +83,7 @@ var Prefs = class TilingLayoutsPrefs {
     _loadLayouts() {
         this._applySaveButtonStyle('');
 
-        Util.forEachChild(this, this._layoutsListBox, row => row.destroy());
+        this._forEachLayoutRow(row => row.destroy());
         LayoutRow.resetInstanceCount();
 
         // Try to load layouts file.
@@ -123,7 +122,7 @@ var Prefs = class TilingLayoutsPrefs {
         this._applySaveButtonStyle('');
 
         const layouts = [];
-        Util.forEachChild(this, this._layoutsListBox, layoutRow => {
+        this._forEachLayoutRow(layoutRow => {
             const lay = layoutRow.getLayout();
             if (lay) {
                 layouts.push(lay);
@@ -214,5 +213,15 @@ var Prefs = class TilingLayoutsPrefs {
         });
         this._layoutsListBox.append(layoutRow);
         return layoutRow;
+    }
+
+    _forEachLayoutRow(callback) {
+        for (let i = 0, child = this._layoutsListBox.get_first_child(); !!child; i++) {
+            // Get a ref to the next widget in case the curr widget
+            // gets destroyed during the function call.
+            const nxtSibling = child.get_next_sibling();
+            callback.call(this, child, i);
+            child = nxtSibling;
+        }
     }
 };
