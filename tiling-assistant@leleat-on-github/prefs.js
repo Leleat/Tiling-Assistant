@@ -39,6 +39,7 @@ const PrefsWidget = GObject.registerClass({
         'tiling_popup_all_workspace',
         'enable_raise_tile_group',
         'tilegroups_in_app_switcher',
+        'tilegroups_in_app_switcher_row',
         'use_window_switcher',
         'window_switcher_group_by_apps',
         'window_gap',
@@ -338,6 +339,12 @@ const PrefsWidget = GObject.registerClass({
         // Keybindings
         ['toggle-tiling-popup', 'auto-tile'].forEach(s => {
             const isNonDefault = this._settings.get_strv(s)[0] !== this._settings.get_default_value(s).get_strv()[0];
+            this[`_${s.replaceAll('-', '_')}_row`].set_visible(isNonDefault);
+        });
+
+        // Switches
+        ['tilegroups-in-app-switcher'].forEach(s => {
+            const isNonDefault = this._settings.get_boolean(s) !== this._settings.get_default_value(s).get_boolean();
             this[`_${s.replaceAll('-', '_')}_row`].set_visible(isNonDefault);
         });
     }

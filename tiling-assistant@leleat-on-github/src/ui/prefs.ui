@@ -200,7 +200,7 @@
                           </object>
                         </child>
                         <child>
-                          <object class="TilingAssistantListRow">
+                          <object class="TilingAssistantListRow" id="tilegroups_in_app_switcher_row">
                             <property name="title" translatable="yes">App Switcher and Tiling Popup</property>
                             <property name="subtitle" translatable="yes">This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You may need to re-enable this or the other extension after toggling this setting</property>
                             <property name="suffix">
@@ -211,10 +211,6 @@
                                 <property name="hexpand">True</property>
                               </object>
                             </property>
-                            <property name="visible"
-                                      bind-source="enable_advanced_experimental_features"
-                                      bind-property="active"
-                                      bind-flags="sync-create"/>
                             <property name="sensitive"
                                       bind-source="enable_raise_tile_group"
                                       bind-property="active"

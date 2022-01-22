@@ -59,9 +59,7 @@ Holding `Shift` or `Alt` while activating an app icon, will tile the window to t
 
 ### Tile Groups
 
-When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is raised. Resizing one of the windows will also affect the other windows in the group. Tile groups can be show as one item in the App Switcher.
-
-![](media/Guide_AppSwitcher.png)
+When a window is tiled, the top-most tiled windows, which don't overlap each other, are considered in a group. That means they will be raised to the foreground together, if one of them is raised. Resizing one of the windows will also affect the other windows in the group.
 
 ### Tile Editing Mode
 
@@ -98,7 +96,3 @@ You can mark one layout (per monitor) as a favorite. See [Favorite Layout](#Favo
 ### Hidden Settings
 
 This is a hidden settings page. It contains minor, debugging, advanced and experimental settings. You can access it by clicking the `Advanced...` menu item, which appears when clicking the titlebar button.
-
-### Deprecated Settings
-
-Some settings are deprecated and won't be shown in the preference window any more unless they have a non-default value set before they were deprecated or via the gsetting.
