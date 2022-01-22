@@ -87,7 +87,7 @@ var Handler = class TilingMoveHandler {
         // because it may have been tiled with this extension before being
         // maximized so we need to restore its size to pre-tiling.
         this._wasMaximizedOnStart = window.get_maximized();
-        const [eventX, eventY] = global.get_pointer();
+        const [x, y] = global.get_pointer();
 
         // Try to restore the window size
         const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
@@ -126,17 +126,17 @@ var Handler = class TilingMoveHandler {
 
                 counter += 10;
                 if (counter >= 400) {
-                    this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
+                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
 
                 const [currX, currY] = global.get_pointer();
                 const currPoint = { x: currX, y: currY };
-                const oldPoint = { x: eventX, y: eventY };
+                const oldPoint = { x, y };
                 const moveDist = Util.getDistance(currPoint, oldPoint);
                 if (moveDist > 10) {
-                    this._restoreSizeAndRestartGrab(window, eventX, eventY, grabOp);
+                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
@@ -223,16 +223,8 @@ var Handler = class TilingMoveHandler {
     }
 
     _onMoving(grabOp, window, topTileGroup, freeScreenRects) {
-        // Use the current event's coords instead of global.get_pointer
-        // to support touch...?
-        const event = Clutter.get_current_event();
-        if (!event)
-            return;
-
-        const [eventX, eventY] = grabOp === Meta.GrabOp.KEYBOARD_MOVING
-            ? global.get_pointer()
-            : event.get_coords();
-        this._lastPointerPos = { x: eventX, y: eventY };
+        const [x, y] = global.get_pointer();
+        this._lastPointerPos = { x, y };
 
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
@@ -311,16 +303,16 @@ var Handler = class TilingMoveHandler {
         }
     }
 
-    _restoreSizeAndRestartGrab(window, eventX, eventY, grabOp) {
+    _restoreSizeAndRestartGrab(window, px, py, grabOp) {
         global.display.end_grab_op(global.get_current_time());
 
         const rect = window.get_frame_rect();
-        const x = eventX - rect.x;
+        const x = px - rect.x;
         const relativeX = x / rect.width;
         let untiledRect = window.untiledRect;
         Twm.untile(window, {
             restoreFullPos: false,
-            xAnchor: eventX,
+            xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
         // untiledRect is null, if the window was maximized via non-extension
@@ -344,7 +336,7 @@ var Handler = class TilingMoveHandler {
             global.get_current_time(),
             postUntileRect.x + untiledWidth * relativeX,
             // So the pointer isn't above the window in some cases.
-            Math.max(eventY, postUntileRect.y)
+            Math.max(py, postUntileRect.y)
         );
     }
 

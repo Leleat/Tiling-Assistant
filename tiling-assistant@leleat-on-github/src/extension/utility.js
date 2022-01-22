@@ -100,9 +100,7 @@ var Util = class Utility {
      * @returns wether the current event the modifier at `modMask`.
      */
     static isModPressed(modMask) {
-        const event = Clutter.get_current_event();
-        const modifiers = event?.get_state() ?? 0;
-        return modifiers & modMask;
+        return global.get_pointer()[2] & modMask;
     }
 
     /**
