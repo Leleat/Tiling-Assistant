@@ -106,20 +106,6 @@ function enable() {
 
     // Restore tiled window properties after session was unlocked.
     _loadAfterSessionLock();
-
-    // TODO: remove compatibility code: override (default) shortcut for 'restore window'
-    // if an older shortcut already exists with Super+Down
-    const sc = Me.imports.src.common.Shortcuts;
-    const scKeys = sc.getAllKeys();
-    scKeys.splice(scKeys.indexOf(sc.RESTORE_WINDOW), 1);
-    if (scKeys.some(key => this._settings.getStrv(key).includes('<Super>Down')))
-        this._settings.setStrv(sc.RESTORE_WINDOW, []);
-
-    // TODO: remove compatibility code for single favorite layout
-    if (!this._settings.getStrv(this._settings.FAVORITE_LAYOUTS).length) {
-        const currFav = `${this._settings.getInt('favorite-layout')}`;
-        this._settings.setStrv(this._settings.FAVORITE_LAYOUTS, [currFav]);
-    }
 }
 
 function disable() {
