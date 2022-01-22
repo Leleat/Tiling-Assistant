@@ -139,7 +139,7 @@ var LayoutManager = class TilingLayoutsManager {
         // the current item / rect and open a new Tiling Popup for that rect.
         if (!loopType) {
             // We're at the last item and not looping, so there are no more items.
-            if (this._currItem === this._items[this._items.length - 1]) {
+            if (this._currItem === this._items.at(-1)) {
                 this._finishLayouting();
                 return;
             }
@@ -216,7 +216,7 @@ var LayoutManager = class TilingLayoutsManager {
             // If this._currItem is the last item and we don't loop over it,
             // allow the Tiling Popup itself to spawn another instance of
             // a Tiling Popup, if there is free screen space.
-            this._currItem === this._items[this._items.length - 1] && !this._currItem.loopType
+            this._currItem === this._items.at(-1) && !this._currItem.loopType
         );
         const stacked = global.display.sort_windows_by_stacking(this._tiledWithLayout);
         const tileGroup = stacked.reverse();
