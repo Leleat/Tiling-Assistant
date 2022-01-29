@@ -178,12 +178,15 @@ var LayoutManager = class TilingLayoutsManager {
             return;
         }
 
-        if (app.can_open_new_window()) {
+        const winTracker = Shell.WindowTracker.get_default();
+        const idx = this._remainingWindows.findIndex(w => winTracker.get_window_app(w) === app);
+        const window = this._remainingWindows[idx];
+        idx !== -1 && this._remainingWindows.splice(idx, 1);
+
+        if (window)
+            Twm.tile(window, this._currRect, { openTilingPopup: false });
+        else if (app.can_open_new_window())
             Twm.openAppTiled(app, this._currRect);
-        } else {
-            // Should we search for an open instance of the app and tile that?
-            // Would we move it across workspaces and monitors?
-        }
 
         this._step();
     }
