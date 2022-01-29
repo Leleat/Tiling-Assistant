@@ -50,7 +50,7 @@ var ShortcutListener = GObject.registerClass({
         ShortcutListener.stopListening();
 
         shortcutListener.isActive = true;
-        shortcutListener.setLabel(ShortcutListener.listeningText);
+        shortcutListener._setLabel(ShortcutListener.listeningText);
         ShortcutListener.listener = shortcutListener;
         ShortcutListener.isListening = true;
     }
@@ -65,7 +65,7 @@ var ShortcutListener = GObject.registerClass({
         ShortcutListener.isListening = false;
         ShortcutListener.isAppendingShortcut = false;
         ShortcutListener.listener.isActive = false;
-        ShortcutListener.listener.setLabel(ShortcutListener.listener.getKeybindingLabel());
+        ShortcutListener.listener._setLabel(ShortcutListener.listener.getKeybindingLabel());
         ShortcutListener.listener = null;
     }
 
@@ -106,7 +106,7 @@ var ShortcutListener = GObject.registerClass({
         return kbLabel || 'Disabled';
     }
 
-    setLabel(label) {
+    _setLabel(label) {
         this._button.set_label(label);
     }
 
@@ -144,7 +144,7 @@ var ShortcutListener = GObject.registerClass({
                 case Gdk.KEY_Return:
                 case Gdk.KEY_space:
                     ShortcutListener.isAppendingShortcut = !ShortcutListener.isAppendingShortcut;
-                    this.setLabel(ShortcutListener.isAppendingShortcut
+                    this._setLabel(ShortcutListener.isAppendingShortcut
                         ? ShortcutListener.appendingText
                         : ShortcutListener.listeningText
                     );
