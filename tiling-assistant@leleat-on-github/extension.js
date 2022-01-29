@@ -69,19 +69,25 @@ function enable() {
     this._gnomeMutterKeybindings = ExtensionUtils.getSettings('org.gnome.mutter.keybindings');
     this._gnomeDesktopKeybindings = ExtensionUtils.getSettings('org.gnome.desktop.wm.keybindings');
     this._nativeKeybindings = [];
-    if (this._gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up')) {
+    const sc = Me.imports.src.common.Shortcuts;
+
+    if (this._gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
+            this._settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
         this._gnomeDesktopKeybindings.set_strv('maximize', []);
         this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'maximize']);
     }
-    if (this._gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down')) {
+    if (this._gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
+            this._settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
         this._gnomeDesktopKeybindings.set_strv('unmaximize', []);
         this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'unmaximize']);
     }
-    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left')) {
+    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
+            this._settings.getStrv(sc.LEFT).includes('<Super>Left')) {
         this._gnomeMutterKeybindings.set_strv('toggle-tiled-left', []);
         this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-left']);
     }
-    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right')) {
+    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
+            this._settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
         this._gnomeMutterKeybindings.set_strv('toggle-tiled-right', []);
         this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-right']);
     }
