@@ -17,16 +17,6 @@ function init() {
 }
 
 function buildPrefsWidget() {
-    // Load css file
-    const provider = new Gtk.CssProvider();
-    const path = GLib.build_filenamev([Me.path, 'src/stylesheet/prefs.css']);
-    provider.load_from_path(path);
-    Gtk.StyleContext.add_provider_for_display(
-        Gdk.Display.get_default(),
-        provider,
-        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
-    );
-
     return new PrefsWidget();
 }
 
@@ -119,7 +109,6 @@ const PrefsWidget = GObject.registerClass({
         this.connect('realize', () => {
             const prefsDialog = this.get_root();
             prefsDialog.set_titlebar(this._title_bar);
-            prefsDialog.add_css_class('tiling-assistant');
             prefsDialog.set_default_size(550, 750);
 
             // Info-popup-menu actions
