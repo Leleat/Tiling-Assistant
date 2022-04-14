@@ -9,7 +9,7 @@ msgstr ""
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-01-22 10:01+0100\n"
 "PO-Revision-Date: 2022-04-11 16:53-0300\n"
-"Last-Translator: João Henrique L. Corrêa <jhenriquelc@gmail.com>\n"
+"Last-Translator: Fernando Omori <feh.omori@gmail.com>\n"
 "Language-Team: \n"
 "Language: pt_BR\n"
 "MIME-Version: 1.0\n"
@@ -185,11 +185,11 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:437
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1013
 msgid "Favorite Layout"
-msgstr "Leiaute favorito"
+msgstr "Layout favorito"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:438
 msgid "Move the window along your favorite Layout"
-msgstr "Mover a janela junto ao seu leiaute favorito"
+msgstr "Mover a janela junto ao seu Layout favorito"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:469
 msgid "Keybindings"
@@ -217,7 +217,7 @@ msgstr "Ladrilhar/Desladrilhar a janela atual conforme os ladrilhos visíveis"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
 msgid "Toggle 'Always on Top'"
-msgstr "Alternar 'Sempre à Frente'"
+msgstr "Alternar 'Sempre no Topo'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:542
 msgid "Toggle Maximization"
@@ -283,7 +283,7 @@ msgstr "Ladrilhar abaixo e direita"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:710
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:775
 msgid "Layouts"
-msgstr "Leiautes"
+msgstr "Layouts"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:750
 msgid "Panel Indicator"
@@ -291,24 +291,24 @@ msgstr "Indicador de Painel"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:762
 msgid "Search for a Layout"
-msgstr "Procurar por um Leiaute"
+msgstr "Procurar por um Layout"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:763
 msgid "Open a popup listing all the available layouts"
-msgstr "Abrir um popup listando todos os leiautes disponíveis"
+msgstr "Abrir um popup listando todos os Layouts disponíveis"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:813
 msgid "Add a new Layout."
-msgstr "Adicionar um novo leiaute."
+msgstr "Adicionar um novo Layout."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:821
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
-msgstr "Salve os leiautes no disco. As alterações inválidas serão perdidas!"
+msgstr "Salve os Layouts no disco. As alterações inválidas serão perdidas!"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:829
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr ""
-"Recarregue os leiautes do disco - descartando todas as alterações não salvas."
+"Recarregue os Layouts do disco - descartando todas as alterações não salvas."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:845
 msgid "Hidden Settings"
@@ -355,15 +355,15 @@ msgid ""
 "Releasing the grab on a window while hovering over a tile will push the "
 "overlapped window(s) aside"
 msgstr ""
-"Soltar uma janela estando encima de um ladrilho empurrará a janela "
-"sobreposta ao lado"
+"Soltar uma janela estando encima de um ladrilho empurrará a(s) janela(s) "
+"sobreposta(s) ao lado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1014
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
-"A prévia do ladrilho se continuará usando seu leiaute favorito da página "
-"'Leiautes'"
+"A prévia do ladrilho se continuará usando seu Layout favorito da página "
+"'Layouts'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1036
 msgid "Other Window Movement Settings"
@@ -371,7 +371,7 @@ msgstr "Outras Configurações de Movimento de Janela"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1054
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
-msgstr "Adaptar 'Ladrilhamento às Bordas' ao seu Leiaute Favorito"
+msgstr "Adaptar 'Ladrilhamento às Bordas' ao seu Layout Favorito"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1066
 msgid "'Adaptive Tiling' Move Mode Activator"
@@ -394,7 +394,7 @@ msgstr "Clique Secundário"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1084
 msgid "'Favorite Layout' Move Mode Activator"
-msgstr "Ativator de Modo de Movimentação de 'Leiaute Favorito'"
+msgstr "Ativator de Modo de Movimentação de 'Layout Favorito'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1102
 msgid "Vertical Edge Preview Trigger Area"
@@ -471,11 +471,11 @@ msgstr "Janela instantânea de ladrilhamento foi desativada"
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:85
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
 msgid "No valid layouts defined."
-msgstr "Nenhum leiaute válido definido."
+msgstr "Nenhum Layout válido definido."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:176
 msgid "Popup Layouts: App not found."
-msgstr "Leiautes de Janela Instantânea: App não encontrado."
+msgstr "Layouts de Janela Instantânea: App não encontrado."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
 msgid "Type to search..."
@@ -483,7 +483,7 @@ msgstr "Digite para procurar..."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
 msgid "Nameless layout..."
-msgstr "Leiaute sem nome..."
+msgstr "Layout sem nome..."
 
 #: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
@@ -496,7 +496,7 @@ msgid "'User Guide' for help..."
 msgstr "'Guia do Usuário' para ajuda..."
 
 #~ msgid "No valid popup layouts defined."
-#~ msgstr "Nenhum leiaute de janela instantânea válido definido."
+#~ msgstr "Nenhum Layout de janela instantânea válido definido."
 
 #~ msgid "Raise Tile Groups together"
 #~ msgstr "Elevar Grupos de Ladrilhos juntos"
@@ -592,10 +592,10 @@ msgstr "'Guia do Usuário' para ajuda..."
 #~ msgstr "<b>    Ladrilhamento de Canto    </b>"
 
 #~ msgid "Search Popup Layout"
-#~ msgstr "Leiaute de Janela de Pesquisa"
+#~ msgstr "Layout de Janela de Pesquisa"
 
 #~ msgid "Popup Layouts"
-#~ msgstr "Leiautes de Janelas Instantâneas"
+#~ msgstr "Layouts de Janelas Instantâneas"
 
 #~ msgid "Tiling Assistant"
 #~ msgstr "Tiling Assistant"
@@ -605,9 +605,9 @@ msgstr "'Guia do Usuário' para ajuda..."
 #~ "\n"
 #~ "please open an issue on Github."
 #~ msgstr ""
-#~ "Se você quer reportar um bug ou precisa de\n"
+#~ "Se você quer reportar um bug ou precisa de ajuda,\n"
 #~ "\n"
-#~ "ajuda por favor abra uma \"issue\" no Github."
+#~ "por favor abra uma \"issue\" no Github."
 
 #~ msgid ""
 #~ "List of known <big><b>INCOMPATIBLE</b></big> apps/extensions/limitations."
@@ -676,10 +676,10 @@ msgstr "'Guia do Usuário' para ajuda..."
 #~ msgstr "Depurando: Mostrar Retângulos de Tela Livre"
 
 #~ msgid "Nameless Layout..."
-#~ msgstr "Leiaute sem nome..."
+#~ msgstr "Layout sem nome..."
 
 #~ msgid "Layout"
-#~ msgstr "Leiaute"
+#~ msgstr "Layout"
 
 #~ msgid "Check out the 'Guide' in the repository (see the 'Help' Tab)."
 #~ msgstr "Verifique o 'Guia' no repositório (veja a aba 'Ajuda')."
