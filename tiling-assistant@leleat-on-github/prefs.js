@@ -117,7 +117,6 @@ const PrefsWidget = GObject.registerClass({
         // Setup titlebar and size
         this.connect('realize', () => {
             const prefsDialog = this.get_root();
-            prefsDialog.set_titlebar(this._title_bar);
             prefsDialog.add_css_class('tiling-assistant');
             prefsDialog.set_default_size(550, 750);
 

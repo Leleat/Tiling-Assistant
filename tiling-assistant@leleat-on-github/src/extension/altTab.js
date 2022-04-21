@@ -204,7 +204,8 @@ var AppSwitcherItem = GObject.registerClass({
                 Main.activateWindow(this.cachedWindows[0], timestamp);
             },
             // Listening to the app-stop now happens in the custom _init func
-            connect: () => {}
+            connect: () => {},
+            connectObject: () => {}
         };
 
         this.updateAppIcons();
