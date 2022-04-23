@@ -1,14 +1,14 @@
 'use strict';
 
-const { Gdk, Gio, GObject, Gtk } = imports.gi;
+const { Adw, Gdk, Gio, GObject, Gtk } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 /**
- * A Widget to implement the shortcuts in the preference window. It's a GtkBox,
- * which contains a button to activate listening for a shortcut and a shortcut-
- * clear-button.
+ * A Widget to implement the shortcuts in the preference window.
+ * It's an AdwActionRow, which contains a label showing the keybinding(s)
+ * and a shortcut-clear-button.
  *
  * Some parts are from https://extensions.gnome.org/extension/2236/night-theme-switcher/.
  * _isBindingValid & _isKeyvalForbidden are straight up copied from its util.js
@@ -18,7 +18,7 @@ const Me = ExtensionUtils.getCurrentExtension();
 var ShortcutListener = GObject.registerClass({
     GTypeName: 'ShortcutListener',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/shortcutListener.ui`).get_uri(),
-    InternalChildren: ['button', 'clearButton', 'eventKeyController'],
+    InternalChildren: ['keybindingLabel', 'clearButton', 'eventKeyController'],
     Properties: {
         keybinding: GObject.ParamSpec.string(
             'keybinding',
@@ -28,7 +28,7 @@ var ShortcutListener = GObject.registerClass({
             null
         )
     }
-}, class ShortcutListener extends Gtk.Box {
+}, class ShortcutListener extends Adw.ActionRow {
     /**
      * Only allow 1 active ShortcutListener at a time
      */
@@ -50,7 +50,7 @@ var ShortcutListener = GObject.registerClass({
         ShortcutListener.stopListening();
 
         shortcutListener.isActive = true;
-        shortcutListener._setLabel(ShortcutListener.listeningText);
+        shortcutListener.setKeybindingLabel(ShortcutListener.listeningText);
         ShortcutListener.listener = shortcutListener;
         ShortcutListener.isListening = true;
     }
@@ -65,7 +65,7 @@ var ShortcutListener = GObject.registerClass({
         ShortcutListener.isListening = false;
         ShortcutListener.isAppendingShortcut = false;
         ShortcutListener.listener.isActive = false;
-        ShortcutListener.listener._setLabel(ShortcutListener.listener.getKeybindingLabel());
+        ShortcutListener.listener.setKeybindingLabel(ShortcutListener.listener.getKeybindingLabel());
         ShortcutListener.listener = null;
     }
 
@@ -79,11 +79,11 @@ var ShortcutListener = GObject.registerClass({
         this.keybinding = this._setting.get_strv(key) ?? [];
     }
 
-    /**
-     * Toggles this to listen for a keyboard shortcut.
+    /*
+     * Sets the label of the keybinding.
      */
-    activate() {
-        this.isActive ? ShortcutListener.stopListening() : ShortcutListener.listen(this);
+    setKeybindingLabel(label) {
+        this._keybindingLabel.set_label(label);
     }
 
     /**
@@ -106,18 +106,14 @@ var ShortcutListener = GObject.registerClass({
         return kbLabel || 'Disabled';
     }
 
-    _setLabel(label) {
-        this._button.set_label(label);
-    }
-
-    _onShortcutButtonClicked() {
-        this.activate();
+    _onActivated() {
+        this.isActive ? ShortcutListener.stopListening() : ShortcutListener.listen(this);
     }
 
     _onKeybindingChanged() {
         this._setting.set_strv(this._key, this.keybinding);
         this._clearButton.set_sensitive(this.keybinding.length);
-        this._button.set_label(this.getKeybindingLabel());
+        this.setKeybindingLabel(this.getKeybindingLabel());
     }
 
     _onClearButtonClicked() {
@@ -144,7 +140,7 @@ var ShortcutListener = GObject.registerClass({
                 case Gdk.KEY_Return:
                 case Gdk.KEY_space:
                     ShortcutListener.isAppendingShortcut = !ShortcutListener.isAppendingShortcut;
-                    this._setLabel(ShortcutListener.isAppendingShortcut
+                    this.setKeybindingLabel(ShortcutListener.isAppendingShortcut
                         ? ShortcutListener.appendingText
                         : ShortcutListener.listeningText
                     );

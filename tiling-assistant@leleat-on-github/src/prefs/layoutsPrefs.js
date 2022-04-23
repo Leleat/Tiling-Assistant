@@ -38,19 +38,16 @@ const LayoutRow = Me.imports.src.prefs.layoutRow.LayoutRow;
  */
 
 var Prefs = class TilingLayoutsPrefs {
-    /**
-     * @param {TilingAssistantPrefs} mainPrefs
-     */
-    constructor(mainPrefs) {
+    constructor(settings, builder) {
         // Keep a reference to the settings for the shortcuts
-        this._settings = mainPrefs._settings;
+        this._settings = settings;
 
         // The Gtk.ListBox, which LayoutRows are added to
-        this._layoutsListBox = mainPrefs._layouts_listbox;
+        this._layoutsListBox = builder.get_object('layouts_listbox');
 
         // Unique button to save changes made to all layouts to the disk. For
         // simplicity, reload from file after saving to get rid of invalid input.
-        this._saveLayoutsButton = mainPrefs._save_layouts_button;
+        this._saveLayoutsButton = builder.get_object('save_layouts_button');
         this._saveLayoutsButton.connect('clicked', () => {
             this._saveLayouts();
             this._loadLayouts();
@@ -58,13 +55,13 @@ var Prefs = class TilingLayoutsPrefs {
 
         // Unique button to load layouts from the disk
         // (discarding all tmp changes) without any user prompt
-        this._reloadLayoutsButton = mainPrefs._reload_layouts_button;
+        this._reloadLayoutsButton = builder.get_object('reload_layouts_button');
         this._reloadLayoutsButton.connect('clicked', () => {
             this._loadLayouts();
         });
 
         // Unique button to add a new *tmp* LayoutRow
-        this._addLayoutButton = mainPrefs._add_layout_button;
+        this._addLayoutButton = builder.get_object('add_layout_button');
         this._addLayoutButton.connect('clicked', () => {
             const row = this._createLayoutRow(LayoutRow.getInstanceCount());
             row.toggleReveal();
@@ -72,7 +69,7 @@ var Prefs = class TilingLayoutsPrefs {
 
         // Bind the general layouts keyboard shortcuts.
         ['search-popup-layout'].forEach(key => {
-            const shortcut = mainPrefs[`_${key.replaceAll('-', '_')}`];
+            const shortcut = builder.get_object(key.replaceAll('-', '_'));
             shortcut.initialize(key, this._settings);
         });
 
@@ -97,7 +94,11 @@ var Prefs = class TilingLayoutsPrefs {
         // Custom layouts are already defined in the file.
         if (contents.length) {
             layouts = JSON.parse(ByteArray.toString(contents));
-            layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
+            // Ensure at least 1 empty row otherwhise the listbox won't have
+            // a height but a weird looking shadow only.
+            layouts.length
+                ? layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout))
+                : this._createLayoutRow(0);
 
         // Otherwise import the examples... but only do it once!
         // Use a setting as a flag.

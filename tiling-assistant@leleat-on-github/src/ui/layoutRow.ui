@@ -17,31 +17,16 @@
                 <property name="valign">center</property>
                 <property name="has-frame">0</property>
                 <property name="focus-on-click">0</property>
-                <property name="receives-default">1</property>
                 <property name="icon-name">edit-delete-symbolic</property>
                 <signal name="clicked" handler="_onDeleteButtonClicked" swapped="no"/>
               </object>
             </child>
             <child>
-              <object class="GtkBox">
-                <property name="orientation">vertical</property>
-                <property name="spacing">3</property>
-                <child>
-                  <object class="GtkEntry" id="nameEntry">
-                    <signal name="changed" handler="_onNameEntryChanged" swapped="no"/>
-                  </object>
-                </child>
-                <child>
-                  <object class="GtkLabel">
-                    <property name="halign">start</property>
-                    <property name="margin-start">8</property>
-                    <property name="use-markup">True</property>
-                    <property name="label">&lt;span size="x-small"&gt;Name&lt;/span&gt;</property>
-                    <style>
-                      <class name="dim-label"/>
-                    </style>
-                  </object>
-                </child>
+              <object class="GtkEntry" id="nameEntry">
+                <property name="valign">center</property>
+                <property name="hexpand">True</property>
+                <property name="margin-end">36</property>
+                <signal name="changed" handler="_onNameEntryChanged" swapped="no"/>
               </object>
             </child>
             <child>
@@ -53,10 +38,10 @@
               </object>
             </child>
             <child>
-              <object class="ShortcutListener" id="shortcut"/>
-            </child>
-            <child>
-              <object class="GtkSeparator">
+              <object class="AdwPreferencesGroup">
+                <child>
+                  <object class="ShortcutListener" id="shortcut"/>
+                </child>
               </object>
             </child>
             <child>

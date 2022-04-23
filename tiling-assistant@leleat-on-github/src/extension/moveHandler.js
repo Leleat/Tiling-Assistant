@@ -90,7 +90,7 @@ var Handler = class TilingMoveHandler {
         const [x, y] = global.get_pointer();
 
         // Try to restore the window size
-        const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
+        const restoreSetting = Settings.getInt(Settings.RESTORE_SIZE_ON);
         if ((window.tiledRect || this._wasMaximizedOnStart) &&
                 restoreSetting === RestoreOn.ON_GRAB_START) {
             // HACK:
@@ -202,7 +202,7 @@ var Handler = class TilingMoveHandler {
             // be maximized by ctrl-super-drag.
             isCtrlReplacement && window.isTiled && Twm.updateTileGroup(ctrlReplacedTileGroup);
         } else {
-            const restoreSetting = Settings.getString(Settings.RESTORE_SIZE_ON);
+            const restoreSetting = Settings.getInt(Settings.RESTORE_SIZE_ON);
             const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;
             restoreOnEnd && Twm.untile(
                 window, {
@@ -230,22 +230,22 @@ var Handler = class TilingMoveHandler {
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
         const rmb = Clutter.ModifierType.BUTTON3_MASK;
-        const pressed = {
-            Ctrl: Util.isModPressed(ctrl),
-            Alt: Util.isModPressed(altL) || Util.isModPressed(altGr),
-            RMB: Util.isModPressed(rmb)
-        };
+        const pressed = [ // order comes from the settings schema
+            Util.isModPressed(ctrl),
+            Util.isModPressed(altL) || Util.isModPressed(altGr),
+            Util.isModPressed(rmb)
+        ];
 
         const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
-        const splitActivator = Settings.getString(Settings.ADAPTIVE_TILING_MOD);
-        const favActivator = Settings.getString(Settings.FAVORITE_LAYOUT_MOD);
+        const adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
+        const favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
         let newMode = '';
 
-        if (pressed[splitActivator]) {
+        if (pressed[adaptiveMod]) {
             newMode = defaultMode === MoveModes.ADAPTIVE_TILING
                 ? MoveModes.EDGE_TILING
                 : MoveModes.ADAPTIVE_TILING;
-        } else if (pressed[favActivator]) {
+        } else if (pressed[favMod]) {
             newMode = defaultMode === MoveModes.FAVORITE_LAYOUT
                 ? MoveModes.EDGE_TILING
                 : MoveModes.FAVORITE_LAYOUT;

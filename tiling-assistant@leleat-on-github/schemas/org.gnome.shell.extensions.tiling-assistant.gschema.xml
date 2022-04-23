@@ -1,16 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <schemalist>
-	<enum id="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
-		<value value="0" nick="Grab Start"/>
-		<value value="1" nick="Grab End"/>
-	</enum>
-
-	<enum id="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
-		<value value="0" nick="Ctrl"/>
-		<value value="1" nick="Alt"/>
-		<value value="2" nick="RMB"/>
-	</enum>
-
 	<schema id="org.gnome.shell.extensions.tiling-assistant" path="/org/gnome/shell/extensions/tiling-assistant/">
 
 		<!-- General Page -->
@@ -26,12 +15,6 @@
 		</key>
 		<key name="tilegroups-in-app-switcher" type="b">
 			<default>false</default>
-		</key>
-		<key name="use-window-switcher" type="b">
-			<default>false</default>
-		</key>
-		<key name="window-switcher-group-by-apps" type="b">
-			<default>true</default>
 		</key>
 		<key name="dynamic-keybinding-behaviour" type="s">
 			<default>"Disabled"</default>
@@ -203,11 +186,13 @@
 		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
 			<default>true</default>
 		</key>
-		<key name="move-adaptive-tiling-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
-			<default>"Ctrl"</default>
+		<key name="move-adaptive-tiling-mod" type="i">
+			<!-- 0: Ctrl, 1: Alt, 2: RMB -->
+			<default>0</default>
 		</key>
-		<key name="move-favorite-layout-mod" enum="org.gnome.shell.extensions.tiling-assistant.move-modes-mods">
-			<default>"Alt"</default>
+		<key name="move-favorite-layout-mod" type="i">
+			<!-- 0: Ctrl, 1: Alt, 2: RMB -->
+			<default>1</default>
 		</key>
 		<key name="vertical-preview-area" type="i">
 			<default>15</default>
@@ -224,8 +209,9 @@
 		<key name="enable-hold-maximize-inverse-portrait" type="b">
 			<default>false</default>
 		</key>
-		<key name="restore-window-size-on" enum="org.gnome.shell.extensions.tiling-assistant.restore-window-size">
-			<default>"Grab Start"</default>
+		<key name="restore-window-size-on" type="i">
+			<!-- 0: Grab Start, 1: Grab End -->
+			<default>0</default>
 		</key>
 		<key name="debugging-show-tiled-rects" type="as">
 			<default>[]</default>

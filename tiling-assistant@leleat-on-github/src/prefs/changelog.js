@@ -1,16 +1,15 @@
 'use strict';
 
-const { Gio, Gtk, GObject, Pango } = imports.gi;
+const { Adw, Gio, Gtk, GObject } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
-
-const { ListRow } = Me.imports.src.prefs.listRow;
 
 var Changelog = GObject.registerClass({
     GTypeName: 'ChangelogDialog',
     Template: Gio.File.new_for_path(`${Me.path}/src/ui/changelog.ui`).get_uri(),
     InternalChildren: [
+        'changelogReturnButton',
         'addedBox',
         'addedListBox',
         'removedBox',
@@ -20,9 +19,9 @@ var Changelog = GObject.registerClass({
         'fixedBox',
         'fixedListBox'
     ]
-}, class ChangelogDialog extends Gtk.Dialog {
-    _init(params = {}, changes, allowAdvExpSettings) {
-        super._init(params);
+}, class ChangelogDialog extends Gtk.WindowHandle {
+    _init(changes, allowAdvExpSettings) {
+        super._init();
 
         Object.entries(changes).forEach(([type, changeItems]) => {
             if (!changeItems.length)
@@ -49,20 +48,16 @@ var Changelog = GObject.registerClass({
             }
 
             changeItems.forEach(change => {
-                const row = new ListRow({
+                const row = new Adw.ActionRow({
                     can_focus: false,
                     activatable: false
                 });
-                row.getContentBox().set_margin_start(18);
-                row.getContentBox().set_margin_end(18);
-                row.getContentBox().set_margin_top(18);
-                row.getContentBox().set_margin_bottom(18);
 
                 if (change.isExperimental && !allowAdvExpSettings)
                     return;
 
-                row.title = change.title;
-                row.subtitle = change.subtitle;
+                row.set_title(change.title);
+                change.subtitle && row.set_subtitle(change.subtitle);
 
                 listBox.append(row);
             });

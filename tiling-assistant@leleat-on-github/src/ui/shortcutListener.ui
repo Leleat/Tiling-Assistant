@@ -1,35 +1,30 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <interface domain="tiling-assistant@leleat-on-github">
-  <requires lib="gtk" version="4.0"/>
-
   <object class="GtkEventControllerKey" id="eventKeyController">
     <signal name="key-pressed" handler="_onKeyPressed" swapped="no"/>
   </object>
 
-  <template class="ShortcutListener" parent="GtkBox">
-    <property name="hexpand">1</property>
-    <property name="spacing">3</property>
+  <template class="ShortcutListener" parent="AdwActionRow">
     <signal name="notify::keybinding" handler="_onKeybindingChanged" swapped="no"/>
+    <signal name="activated" handler="_onActivated" swapped="no"/>
+    <property name="activatable">True</property>
+    <property name="tooltip-text" translatable="yes">Replace the keyboard shortcuts. Press 'space' or 'return' when listening for a shortcut to append a new one to the existing shortcuts instead.</property>
     <child>
-      <object class="GtkButton" id="button">
-        <property name="halign">end</property>
-        <property name="hexpand">1</property>
-        <property name="valign">center</property>
+      <object class="GtkLabel" id="keybindingLabel">
         <property name="label">Disabled</property>
-        <property name="has-frame">0</property>
-        <property name="tooltip-text" translatable="yes">Replace the keyboard shortcuts. Press 'space' or 'return' when listening for a shortcut to append a new one to the existing shortcuts instead.</property>
-        <signal name="clicked" handler="_onShortcutButtonClicked" swapped="no"/>
       </object>
     </child>
     <child>
       <object class="GtkButton" id="clearButton">
-        <property name="has-frame">0</property>
         <property name="sensitive">0</property>
         <property name="focus-on-click">0</property>
         <property name="valign">center</property>
         <property name="icon-name">edit-undo-symbolic</property>
         <property name="tooltip-text" translatable="yes">Clear the keyboard shortcuts</property>
         <signal name="clicked" handler="_onClearButtonClicked" swapped="no"/>
+        <style>
+          <class name="flat"/>
+        </style>
       </object>
     </child>
   </template>
