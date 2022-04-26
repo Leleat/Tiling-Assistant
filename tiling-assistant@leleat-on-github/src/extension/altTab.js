@@ -89,18 +89,17 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
 
         this.icons = [];
         this._arrows = [];
-        this._curApp = -1;
         this._apps = [];
         this._altTabPopup = altTabPopup;
+        this._delayedHighlighted = -1;
         this._mouseTimeOutId = 0;
 
         const winTracker = Shell.WindowTracker.get_default();
-        const groupTileGroups = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER);
         let groupedWindows;
 
         // Group windows based on their tileGroup, if tileGroup.length > 1.
         // Otherwise group them based on their respective apps.
-        if (groupTileGroups) {
+        if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)) {
             groupedWindows = windows.reduce((allGroups, w) => {
                 for (const group of allGroups) {
                     if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {
@@ -204,7 +203,9 @@ var AppSwitcherItem = GObject.registerClass({
                 Main.activateWindow(this.cachedWindows[0], timestamp);
             },
             // Listening to the app-stop now happens in the custom _init func
-            connect: () => {}
+            // So prevent signal connection. here.. careful in case signal
+            // connection in the future is used for more...
+            connectObject: () => {}
         };
 
         this.updateAppIcons();
