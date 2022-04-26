@@ -307,15 +307,14 @@ const LayoutSearch = GObject.registerClass({
         });
         Main.uiGroup.add_child(this);
 
-        if (!Main.pushModal(this)) {
-            // Probably someone else has a pointer grab, try again with keyboard
-            const alreadyGrabbed = Meta.ModalOptions.POINTER_ALREADY_GRABBED;
-            if (!Main.pushModal(this, { options: alreadyGrabbed })) {
-                this.destroy();
-                return;
-            }
+        const grab = Main.pushModal(this);
+        // We expect at least a keyboard grab here
+        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+            Main.popModal(grab);
+            return false;
         }
 
+        this._grab = grab;
         this._haveModal = true;
         this._focused = -1;
         this._items = [];
@@ -364,7 +363,7 @@ const LayoutSearch = GObject.registerClass({
 
     destroy() {
         if (this._haveModal) {
-            Main.popModal(this);
+            Main.popModal(this._grab);
             this._haveModal = false;
         }
 
