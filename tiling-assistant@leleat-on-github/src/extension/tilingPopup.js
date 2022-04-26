@@ -73,13 +73,14 @@ var TilingSwitcherPopup = GObject.registerClass({
         if (!this._items.length)
             return false;
 
-        if (!Main.pushModal(this)) {
-            // Probably someone else has a pointer grab, try again with keyboard
-            const alreadyGrabbed = Meta.ModalOptions.POINTER_ALREADY_GRABBED;
-            if (!Main.pushModal(this, { options: alreadyGrabbed }))
-                return false;
+        const grab = Main.pushModal(this);
+        // We expect at least a keyboard grab here
+        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+            Main.popModal(grab);
+            return false;
         }
 
+        this._grab = grab;
         this._haveModal = true;
 
         this._switcherList.connect('item-activated', this._itemActivated.bind(this));
