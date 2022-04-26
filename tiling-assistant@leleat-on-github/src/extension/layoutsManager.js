@@ -322,16 +322,17 @@ const LayoutSearch = GObject.registerClass({
         this.connect('button-press-event', () => this.destroy());
 
         const popup = new St.BoxLayout({
-            style_class: 'osd-window',
+            style_class: 'switcher-list',
             vertical: true,
             width: 500
         });
         this.add_child(popup);
 
-        const fontSize = 18;
+        const fontSize = 16;
         const entry = new St.Entry({
             style: `font-size: ${fontSize}px;\
-                    border-radius: 16px;`,
+                    border-radius: 16px;
+                    margin-bottom: 12px;`,
             // The cursor overlaps the text, so add some spaces at the beginning
             hint_text: ` ${_('Type to search...')}`
         });
