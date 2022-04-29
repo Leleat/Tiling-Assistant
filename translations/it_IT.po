@@ -1,0 +1,502 @@
+# Tiling-Assistant GNOME extension.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Andrea Brandi <git@andreabrandi.com>, 2022.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Tiling-Assistant\n"
+"Report-Msgid-Bugs-To: git@andreabrandi.com\n"
+"POT-Creation-Date: 2022-01-22 10:01+0100\n"
+"PO-Revision-Date: 2022-04-29 00:20+0200\n"
+"Last-Translator: Andrea Brandi <git@andreabrandi.com>\n"
+"Language-Team: Italian <git@andreabrandi.com>\n"
+"Language: it\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"X-Generator: Gtranslator 40.0\n"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
+msgid "Report a Bug"
+msgstr "Segnala un bug"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
+msgid "User Guide"
+msgstr "Guida utente"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:22
+msgid "License"
+msgstr "Licenza"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:26
+msgid "Changelog"
+msgstr "Registro modifiche"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:30
+msgid "Advanced..."
+msgstr "Avanzate..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:98
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:490
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:733
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:866
+msgid "General"
+msgstr "Generale"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:119
+msgid "Tiling Popup"
+msgstr "Popup finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:137
+msgid "Open after tiling a window"
+msgstr "Apri quando una finestra viene affiancata"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:150
+msgid "Include apps from all workspaces"
+msgstr "Includi app da tutte le aree di lavoro"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:171
+msgid "Tile Groups"
+msgstr "Gruppi finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:189
+msgid "Raise together"
+msgstr "Primo piano di gruppo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:190
+msgid ""
+"A tile group is created when a window gets tiled. If a tiled window is "
+"raised, raise the other windows of its tile group as well"
+msgstr ""
+"Quando una finestra è affiancata viene creato un gruppo di finestre. Se una "
+"finestra del gruppo viene messa in primo piano, anche le altre finestre del "
+"gruppo andranno in primo piano"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:204
+msgid "App Switcher and Tiling Popup"
+msgstr "Selettore app e finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:205
+msgid ""
+"This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
+"may need to re-enable this or the other extension after toggling this setting"
+msgstr ""
+"Questa opzione potrebbe entrare in conflitto con altre estensioni di "
+"selezione delle app (aka alt+Tab). Potrebbe essere necessario riattivare "
+"questa o le altre estensioni dopo averla abilitata."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:232
+msgid "Tiling Window Switcher"
+msgstr "Selettore finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:251
+msgid "Replace App Switcher"
+msgstr "Sostituisci selettore app"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:252
+msgid ""
+"Replace the App Switcher (a. k. a. Alt+Tab) with a window switcher, which "
+"previews the windows and tile groups"
+msgstr ""
+"Sostituisci selettore app (aka Alt+Tab) con un selettore che mostra le "
+"anteprime delle finestre e dei gruppi di finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:265
+msgid "Group Windows by App"
+msgstr "Raggruppa le finestre per app"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+msgid ""
+"Windows of the same app are displayed as one item and can be cycled through "
+"with the key above Tab"
+msgstr ""
+"Le finestre della stessa app vengono visualizzate come un singolo elemento e "
+"possono essere selezionate con il tasto sopra Tab"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:288
+msgid "Gaps"
+msgstr "Spaziatura"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:306
+msgid "Windows"
+msgstr "Finestre"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:319
+msgid "Screen Edges"
+msgstr "Bordi dello schermo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
+msgid "Maximized Windows"
+msgstr "Finestre massimizzate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:349
+msgid "Dynamic Keybinding Behaviour"
+msgstr "Scorciatoie dinamiche"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
+msgid "Disabled"
+msgstr "Disabilita"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
+msgid ""
+"The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
+"right won't change their behaviour based on the window's tiling state"
+msgstr ""
+"Le scorciatoie per ingrandire e affiancare in alto, in basso, a sinistra e a "
+"destra non cambieranno il loro comportamento in base allo stato di "
+"affiancamento della finestra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:383
+msgid "Window Focus"
+msgstr "Stato attivo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:384
+msgid ""
+"Switch focus to the tiled window in the direction of the pressed shortcut, "
+"if there is one"
+msgstr ""
+"Sposta lo stato attivo sulla finestra affiancata nella direzione indicata, "
+"se presente"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:401
+msgid "Tiling State"
+msgstr "Stato affiancato"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:402
+msgid ""
+"Adapt the current window's tiling state to the pressed shortcut. For "
+"instance, a window tiled to the right half will tile to the bottom-right "
+"quarter, if 'tile to bottom' is activated"
+msgstr ""
+"Adatta lo stato di affiancamento della finestra corrente alla scorciatoia. "
+"Ad esempio, una finestra affiancata a destra verrà affiancata in basso a "
+"destra quando l'opzione \"affianca in basso\" è attiva"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:419
+msgid "Tiling State (Windows)"
+msgstr "Stato affiancato (finestre)"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:420
+msgid ""
+"Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
+"bottom and the 'tile to bottom' shortcut is activated, minimize the window"
+msgstr ""
+"Agisce come \"Stato affiancato\" ma se la finestra non è affiancata o è già "
+"affiancata in basso e la scorciatoia \"affianca in basso\" è attiva, riduce "
+"a icona la finestra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:437
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1013
+msgid "Favorite Layout"
+msgstr "Layout preferito"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:438
+msgid "Move the window along your favorite Layout"
+msgstr "Sposta la finestra seguendo il layout preferito delle finestre"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:469
+msgid "Keybindings"
+msgstr "Scorciatoie"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:508
+msgid "Toggle 'Tiling Popup'"
+msgstr "Attiva/disattiva \"Popup finestre affiancate\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
+msgid "Tile Editing Mode"
+msgstr "Editor delle finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+msgid "A keyboard-driven mode to manage your tiled windows"
+msgstr "Modalità guidata da tastiera per gestire le finestre affiancate"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:525
+msgid "Auto-Tile"
+msgstr "Auto-affiancamento"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:526
+msgid "Un/tile the current window based on the visible tiles"
+msgstr "Affianca/rimuove la finestra corrente in base ai riquadri visibili"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
+msgid "Toggle 'Always on Top'"
+msgstr "Attiva/disattiva \"Sempre in primo piano\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:542
+msgid "Toggle Maximization"
+msgstr "Attiva/disattiva massimizza"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:550
+msgid "Toggle Vertical Maximization"
+msgstr "Attiva/disattiva massimizza in verticale"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:562
+msgid "Toggle Horizontal Maximization"
+msgstr "Attiva/disattiva massimizza in orizzontale"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:574
+msgid "Restore Window Size"
+msgstr "Ripristina le dimensioni della finestra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:582
+msgid "Move Window to Center"
+msgstr "Sposta la finestra al centro"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:595
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:978
+msgid "Edge Tiling"
+msgstr "Affiancamento ai bordi"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:613
+msgid "Tile to top"
+msgstr "Affianca in alto"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
+msgid "Tile to bottom"
+msgstr "Affianca in basso"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:629
+msgid "Tile to left"
+msgstr "Affianca a sinistra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:637
+msgid "Tile to right"
+msgstr "Affianca a destra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:650
+msgid "Corner Tiling"
+msgstr "Affianca ad angolo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:667
+msgid "Tile to top-left"
+msgstr "Affianca in alto a sinistra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:675
+msgid "Tile to top-right"
+msgstr "Affianca in alto a destra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:683
+msgid "Tile to bottom-left"
+msgstr "Affianca in basso a sinistra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:691
+msgid "Tile to bottom-right"
+msgstr "Affianca in basso a destra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:710
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:775
+msgid "Layouts"
+msgstr "Layout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:750
+msgid "Panel Indicator"
+msgstr "Indicatore del pannello"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:762
+msgid "Search for a Layout"
+msgstr "Seleziona layout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:763
+msgid "Open a popup listing all the available layouts"
+msgstr "Apre un popup che elenca tutti i layout disponibili"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:813
+msgid "Add a new Layout."
+msgstr "Aggiungi nuovo layout."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:821
+msgid "Save the layouts to the disk. Invalid changes will be lost!"
+msgstr "Salva i layout sul disco. Le modifiche non valide andranno perdute!"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:829
+msgid "Reload the layouts from the disk - discarding all non-saved changes."
+msgstr "Ricarica i layout dal disco - elimina tutte le modifiche non salvate."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:845
+msgid "Hidden Settings"
+msgstr "Impostazioni nascoste"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:884
+msgid "Advanced / Experimental Settings"
+msgstr "Impostazioni avanzate/sperimentali"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:896
+msgid "Show Changelog in Preferences after an Update"
+msgstr "Mostra Registro modifiche nelle Preferenze dopo un aggiornamento"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:913
+msgid "Animations"
+msgstr "Animazioni"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:931
+msgid "Tiling"
+msgstr "Affianca finestra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:943
+msgid "Untiling"
+msgstr "Rimuovi affiancamento"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:960
+msgid "Default Window Movement Mode"
+msgstr "Modalità di movimento della finestra predefinita"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:979
+msgid ""
+"Moving the window to the screen edges or corners will open the default tile "
+"preview"
+msgstr ""
+"Spostando la finestra sui bordi o sugli angoli dello schermo si aprirà "
+"l'anteprima di affiancamento predefinita"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:995
+msgid "Adaptive Tiling"
+msgstr "Affiancamento adattivo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:996
+msgid ""
+"Releasing the grab on a window while hovering over a tile will push the "
+"overlapped window(s) aside"
+msgstr ""
+"Mentre viene trascinata, rilasciare una finestra su una finestra già "
+"affiancata, spingerà da parte la finestra sovrapposta."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1014
+msgid ""
+"The tile preview will stick to your favorite layout from the 'Layouts' page"
+msgstr ""
+"L'anteprima di affiancamento seguirà il layout preferito nella pagina "
+"\"Layout\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1036
+msgid "Other Window Movement Settings"
+msgstr "Altre impostazioni di movimento della finestra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1054
+msgid "Adapt 'Edge Tiling' to your Favorite Layout"
+msgstr "Adatta \"Affiancamento ai bordi\" al layout preferito"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1066
+msgid "'Adaptive Tiling' Move Mode Activator"
+msgstr "Per attivare la modalità \"Affiancamento adattivo\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1074
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1092
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1075
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1093
+msgid "Alt"
+msgstr "Alt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1076
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1094
+msgid "RMB"
+msgstr "Tasto destro"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1084
+msgid "'Favorite Layout' Move Mode Activator"
+msgstr "Per attivare la modalità \"Layout preferito\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1102
+msgid "Vertical Edge Preview Trigger Area"
+msgstr "Area di attivazione del bordo verticale"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1116
+msgid "Horizontal Edge Preview Trigger Area"
+msgstr "Area di attivazione del bordo orizzontale"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1130
+msgid "Inverse Top Screen Edge Action Timer"
+msgstr "Timer dell'azione inversa nella parte superiore dello schermo"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1146
+msgid "Inverse Top Screen Edge Action for Landscape Displays"
+msgstr "Azione inversa nella parte superiore degli schermi orizzontali"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1158
+msgid "Inverse Top Screen Edge Action for Portrait Displays"
+msgstr "Azione inversa nella parte superiore degli schermi verticali"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1170
+msgid "Restore Window Size on"
+msgstr "Ripristina dimensione finestra a"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1171
+msgid ""
+"Tiled windows may not properly restore their size on Wayland. If that's the "
+"case, use 'Restore Window Size on Grab End'"
+msgstr ""
+"Le finestre affiancate potrebbero non ripristinarsi correttamente su "
+"Wayland. Se ciò accade, selezionare \"Ripristina dimensione finestra a Fine "
+"trascinamento\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1180
+msgid "Grab Start"
+msgstr "Inizio trascinamento"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1181
+msgid "Grab End"
+msgstr "Fine trascinamento"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1194
+msgid "Debugging"
+msgstr "Debug"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1211
+msgid "Show Tiled Rects"
+msgstr "Mostra guide dei riquadri"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1219
+msgid "Show Free Screen Rects"
+msgstr "Mostra guide dello spazio libero"
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:20
+msgid ""
+"Replace the keyboard shortcuts. Press 'space' or 'return' when listening for "
+"a shortcut to append a new one to the existing shortcuts instead."
+msgstr ""
+"Sostituisci le scorciatoie. Premere \"spazio\" o \"invio\" mentre si "
+"registra una combinazione di tasti per aggiungerne una nuova a quelle "
+"esistenti."
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:34
+msgid "Clear the keyboard shortcuts"
+msgstr "Cancella scorciatoie"
+
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
+msgid "Tiling popup enabled"
+msgstr "Popup finestre affiancate abilitato"
+
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
+msgid "Tiling popup was disabled"
+msgstr "Popup finestre affiancate disabilitato"
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:85
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
+msgid "No valid layouts defined."
+msgstr "Nessun layout valido definito."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:176
+msgid "Popup Layouts: App not found."
+msgstr "Layout popup: app non trovata."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
+msgid "Type to search..."
+msgstr "Digita per cercare..."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
+msgid "Nameless layout..."
+msgstr "Layout senza nome..."
+
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
+msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
+msgstr ""
+"Impossibile avviare \"Editor delle finestre affiancate\", quando non è "
+"visibile alcuna finestra affiancata."
+
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
+msgid "'User Guide' for help..."
+msgstr "\"Guida utente\" per assistenza..."
