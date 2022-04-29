@@ -12,8 +12,7 @@ An extension which adds a Windows-like snap assist to GNOME. It also changes GNO
 
 ## Supported GNOME Versions
 
-- 40
-- 41
+- 42
 
 ## Usage and Features
 
@@ -33,7 +32,7 @@ Please see the ![User Guide](GUIDE.md) for a list and an explanation of every fe
 
 ## Installation
 
-You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download / clone the repository and run the `scripts/build.sh` script with the `-i` flag. It's also on the AUR (but that one isn't maintained me).
+You can install it via https://extensions.gnome.org. Alternatively (or if you want an up-to-date version), download / clone the repository and run the `scripts/build.sh` script with the `-i` flag (make sure to install `gettext` first). It's also on the AUR (but that one isn't maintained me).
 
 ## Translations
 
