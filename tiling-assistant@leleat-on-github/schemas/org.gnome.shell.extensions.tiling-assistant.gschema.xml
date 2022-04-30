@@ -184,7 +184,7 @@
 			<default>"Edge Tiling"</default>
 		</key>
 		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
-			<default>true</default>
+			<default>false</default>
 		</key>
 		<key name="move-adaptive-tiling-mod" type="i">
 			<!-- 0: Ctrl, 1: Alt, 2: RMB -->

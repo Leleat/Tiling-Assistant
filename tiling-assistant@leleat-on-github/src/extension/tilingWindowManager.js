@@ -749,7 +749,6 @@ var TilingWindowManager = class TilingWindowManager {
      * @returns a Rect.
      */
     static getTileFor(shortcut, workArea, monitor = null) {
-        const favLayout = Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
         const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
         // getTileFor is used to get the adaptive tiles for dnd & tiling keyboard
         // shortcuts. Thats why the top most window needs to be ignored when
@@ -761,13 +760,18 @@ var TilingWindowManager = class TilingWindowManager {
         const openWindows = this.getWindows();
         const idx = topTileGroup.indexOf(openWindows[0]);
         idx !== -1 && topTileGroup.splice(idx, 1);
-        const twRects = favLayout ? Util.getFavoriteLayout(monitor) : topTileGroup.map(w => w.tiledRect);
+        const favLayout = Util.getFavoriteLayout(monitor);
+        const useFavLayout = favLayout.length && Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
+        const twRects = useFavLayout && favLayout || topTileGroup.map(w => w.tiledRect);
+
         if (!twRects.length)
             return this.getDefaultTileFor(shortcut, workArea);
 
-        // Return the adapted rect only if it doesn't overlap an existing tile
+        // Return the adapted rect only if it doesn't overlap an existing tile.
+        // Ignore an overlap, if a fav layout is used since we always prefer the
+        // user set layout in that case.
         const getTile = rect => {
-            if (favLayout)
+            if (useFavLayout)
                 return rect;
 
             const overlapsTiles = twRects.some(r => r.overlap(rect));
