@@ -177,7 +177,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:419
 msgid "Tiling State (Windows)"
-msgstr "Kachelzustand (Fenster)"
+msgstr "Kachelzustand (Windows)"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:420
 msgid ""
