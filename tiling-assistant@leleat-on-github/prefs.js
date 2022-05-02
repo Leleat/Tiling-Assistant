@@ -140,8 +140,7 @@ function _bindComboRows(settings, builder) {
 function _bindRadioButtons(settings, builder) {
     // These 'radioButtons' are basically just used as a 'fake ComboBox' with
     // explanations for the different options. So there is just *one* gsetting
-    // (a string) which saves the current 'selection'. The listRows' titles
-    // will be used as the options for this 'fake combobox'.
+    // (an int) which saves the current 'selection'.
     const radioButtons = [
         {
             key: Settings.DYNAMIC_KEYBINDINGS,

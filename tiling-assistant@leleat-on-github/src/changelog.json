@@ -1,58 +1,47 @@
 {
     "added": [
         {
-            "title": "Added new keyboard shortcuts",
-            "subtitle": "Toggle Always-on-Top, Move Window to Center, Restore Window Size, Toggle Vertical/Horizontal Maximization."
+            "title": "german (Switzerland) tl",
+            "subtitle": "by MrReSc #152"
         },
         {
-            "title": "Move tile groups to a new workspace/monitor with the Tile Editing Mode",
-            "subtitle": "Shift+Directions moves the tile group to a new monitor; Shift+Alt+Directions to a new workspace."
+            "title": "german (Germany) tl",
+            "subtitle": "by pjanze #161"
         },
         {
-            "title": "Tiled windows will untile if they change workspaces or monitors",
-            "subtitle": "Use the Tile Editing Mode to move tile groups to a different workspace/monitor"
+            "title": "italian tl",
+            "subtitle": "by starise #164"
         },
         {
-            "title": "Allow one action to have multiple keyboard shortcuts",
-            "subtitle": "Press 'Enter' or 'Space' when listening for a new keyboard shortcut to append to existing ones."
+            "title": "spanish tl",
+            "subtitle": "by fjsevilla-dev #168"
         }
     ],
     "removed": [
-
+        {
+            "title": "hacky partial touch 'support'"
+        },
+        {
+            "title": "'App Switcher and Tiling Popup' setting"
+        }
     ],
     "changed": [
         {
-            "title": "Adapt edge-tiling only if it doesn't cover existing tiles and their tile groups",
-            "subtitle": "Use Ctrl-drag (mouse) or the Tile Editing Mode (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups."
+            "title": "Port to GNOME 42 and drop support for older versions"
         },
         {
-            "title": "Reworked tile group detection"
+            "title": "Update Brazillian Portuguese tl",
+            "subtitle": "by ItzJaum #157"
         },
         {
-            "title": "Renamed 'Split Tiles' mode to 'Adaptive Tiling'",
-            "subtitle": "This is the mode when moving a window around while holding Ctrl."
-        },
-        {
-            "title": "Disabled grouping tiled windows in the app switcher by default and mark that setting as experimental"
-        },
-        {
-            "title": "Deprecated the 'Toggle Tiling Popup' and 'Auto-Tile' keyboard shortcuts",
-            "subtitle": "Deprecated settings won't be visible in the prefs window anymore unless they have a non-default value set."
+            "title": "Layouts with app attachments",
+            "subtitle": "if an app is attached to a layout rect, try to tile an existing window instance first before opening a new one"
         }
 
     ],
     "fixed": [
         {
-            "title": "Fixed a compatibility issue introduced in v31 with other alt-Tab extensions"
-        },
-        {
-            "title": "Fixed the Tiling Popup ignoring the Tile Group setting 'App Switcher and Tiling Popup'"
-        },
-        {
-            "title": "Shortcuts may no longer change unintentionally after using the clear-shortcut-button"
-        },
-        {
-            "title": "Fixed the URLs in the prefs' popup menu freezing the prefs (Wayland only)"
+            "title": "Override GNOME's default shortcuts only if they are set in Tiling Assistant"
         }
     ]
 }

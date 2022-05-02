@@ -1,5 +1,24 @@
 # Changelog
 
+## v33
+**Added**
+- german (Switzerland) tl by MrReSc #152
+- german (Germany) tl by pjanze #161
+- italian translation by starise #164
+- spanish translation by fjsevilla-dev #168
+
+**Changed**
+- port to GNOME 42 and drop support for older versions
+- Brazillian Portuguese tl by ItzJaum #157
+- if an app is attached to a layout rect, try to tile an existing window instance first before opening a new one
+
+**Removed**
+- deprecate 'App Switcher and Tiling Popup' setting
+- hacky partial touch 'support'
+
+**Fixed**
+- override GNOME's default shortcuts only if they are set in Tiling Assistant
+
 ## v32
 **Added**
 - added new keyboard shortcuts:
