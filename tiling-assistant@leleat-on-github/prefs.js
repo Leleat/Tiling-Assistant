@@ -164,18 +164,15 @@ function _bindRadioButtons(settings, builder) {
     ];
 
     radioButtons.forEach(({ key, rowNames }) => {
-        const currActive = settings.get_string(key);
+        const currActive = settings.get_int(key);
 
-        rowNames.forEach(name => {
+        rowNames.forEach((name, idx) => {
             const row = builder.get_object(name.replaceAll('-', '_'));
             const checkButton = row.activatable_widget;
-            const title = row.title;
-            checkButton.connect('toggled', () => {
-                settings.set_string(key, title);
-            });
+            checkButton.connect('toggled', () => settings.set_int(key, idx));
 
             // Set initial state
-            if (title === currActive)
+            if (idx === currActive)
                 checkButton.activate();
         });
     });

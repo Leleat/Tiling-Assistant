@@ -16,8 +16,9 @@
 		<key name="tilegroups-in-app-switcher" type="b">
 			<default>false</default>
 		</key>
-		<key name="dynamic-keybinding-behaviour" type="s">
-			<default>"Disabled"</default>
+		<key name="dynamic-keybinding-behaviour" type="i">
+			<!-- 0: Disabled, 1: Focus, 2: Tiling State, 3: Tiling State (Windows), 4: Favorite Layout -->
+			<default>0</default>
 		</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
@@ -180,8 +181,9 @@
 		<key name="show-changelog-on-update" type="b">
 			<default>true</default>
 		</key>
-		<key name="default-move-mode" type="s">
-			<default>"Edge Tiling"</default>
+		<key name="default-move-mode" type="i">
+			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout -->
+			<default>0</default>
 		</key>
 		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
 			<default>false</default>

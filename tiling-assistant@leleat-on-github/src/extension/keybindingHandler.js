@@ -186,7 +186,7 @@ var Handler = class TilingKeybindingHandler {
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
-            const dynamicSetting = Settings.getString(dynamicBehaviour);
+            const dynamicSetting = Settings.getInt(dynamicBehaviour);
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;
             const workArea = new Rect(window.get_work_area_current_monitor());

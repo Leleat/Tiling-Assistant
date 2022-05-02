@@ -206,17 +206,19 @@ var RestoreOn = class RestoreWindowSizeBehaviour {
 };
 
 var DynamicKeybindings = class DynamicKeybindingBehaviour {
-    static DISABLED = 'Disabled';
-    static FOCUS = 'Window Focus';
-    static TILING_STATE = 'Tiling State';
-    static TILING_STATE_WINDOWS = 'Tiling State (Windows)';
-    static FAVORITE_LAYOUT = 'Favorite Layout';
+    // Order comes from prefs
+    static DISABLED = 0;
+    static FOCUS = 1;
+    static TILING_STATE = 2;
+    static TILING_STATE_WINDOWS = 3;
+    static FAVORITE_LAYOUT = 4;
 };
 
-var MoveModes = class MovePreviewActivator {
-    static EDGE_TILING = 'Edge Tiling';
-    static ADAPTIVE_TILING = 'Adaptive Tiling';
-    static FAVORITE_LAYOUT = 'Favorite Layout';
+var MoveModes = class MoveModes {
+    // Order comes from prefs
+    static EDGE_TILING = 0;
+    static ADAPTIVE_TILING = 1;
+    static FAVORITE_LAYOUT = 2;
 };
 
 var Orientation = class Orientation {

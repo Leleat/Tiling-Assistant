@@ -218,7 +218,7 @@ var Handler = class TilingMoveHandler {
         this._favoritePreviews = [];
         this._anchorRect = null;
         this._tilePreview.close();
-        this._currPreviewMode = '';
+        this._currPreviewMode = MoveModes.ADAPTIVE_TILING;
         this._isGrabOp = false;
     }
 
@@ -236,7 +236,7 @@ var Handler = class TilingMoveHandler {
             Util.isModPressed(rmb)
         ];
 
-        const defaultMode = Settings.getString(Settings.DEFAULT_MOVE_MODE);
+        const defaultMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);
         const adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
         const favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
         let newMode = '';
