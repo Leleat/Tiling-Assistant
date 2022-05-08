@@ -300,14 +300,14 @@ var Rect = class Rect {
          ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, gap1, gap2]) => {
             if (this[pos] === workArea[pos]) {
                 r[pos] = this[pos] + gap1;
-                r[dim] -= gap2;
+                r[dim] -= gap1 + gap2 / 2;
             } else {
                 r[pos] = this[pos] + windowGap / 2;
                 r[dim] -= windowGap / 2;
             }
 
             if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
-                r[dim] -= gap2;
+                r[dim] -= gap2 / 2;
             else
                 r[dim] -= windowGap / 2;
         });
