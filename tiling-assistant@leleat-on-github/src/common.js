@@ -15,7 +15,10 @@ var Settings = class Settings {
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
     static TILEGROUPS_IN_APP_SWITCHER = 'tilegroups-in-app-switcher';
     static WINDOW_GAP = 'window-gap';
-    static SCREEN_GAP = 'screen-gap';
+    static SCREEN_TOP_GAP = 'screen-top-gap';
+    static SCREEN_LEFT_GAP = 'screen-left-gap';
+    static SCREEN_RIGHT_GAP = 'screen-right-gap';
+    static SCREEN_BOTTOM_GAP = 'screen-bottom-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
     static SHOW_LAYOUT_INDICATOR = 'show-layout-panel-indicator';
@@ -73,7 +76,10 @@ var Settings = class Settings {
             this.RAISE_TILE_GROUPS,
             this.TILEGROUPS_IN_APP_SWITCHER,
             this.WINDOW_GAP,
-            this.SCREEN_GAP,
+            this.SCREEN_TOP_GAP,
+            this.SCREEN_LEFT_GAP,
+            this.SCREEN_RIGHT_GAP,
+            this.SCREEN_BOTTOM_GAP,
             this.MAXIMIZE_WITH_GAPS,
             this.DYNAMIC_KEYBINDINGS,
             this.SHOW_LAYOUT_INDICATOR,

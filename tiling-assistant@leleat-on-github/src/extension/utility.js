@@ -289,21 +289,24 @@ var Rect = class Rect {
      * @returns {Rect} the rectangle after the gaps were taken into account
      */
     addGaps(workArea) {
-        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
+        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
+        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
+        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
         const windowGap = Settings.getInt(Settings.WINDOW_GAP);
         const r = this.copy();
-
-        [['x', 'width'], ['y', 'height']].forEach(([pos, dim]) => {
+        
+        [['x', 'width', screenLeftGap, screenRightGap], ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, gap1, gap2]) => {
             if (this[pos] === workArea[pos]) {
-                r[pos] = this[pos] + screenGap;
-                r[dim] -= screenGap;
+                r[pos] = this[pos] + gap1;
+                r[dim] -= gap2;
             } else {
                 r[pos] = this[pos] + windowGap / 2;
                 r[dim] -= windowGap / 2;
             }
 
             if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
-                r[dim] -= screenGap;
+                r[dim] -= gap2;
             else
                 r[dim] -= windowGap / 2;
         });
