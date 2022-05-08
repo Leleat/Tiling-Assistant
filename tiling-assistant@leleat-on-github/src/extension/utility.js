@@ -296,7 +296,8 @@ var Rect = class Rect {
         const windowGap = Settings.getInt(Settings.WINDOW_GAP);
         const r = this.copy();
         
-        [['x', 'width', screenLeftGap, screenRightGap], ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, gap1, gap2]) => {
+        [['x', 'width', screenLeftGap, screenRightGap],
+         ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, gap1, gap2]) => {
             if (this[pos] === workArea[pos]) {
                 r[pos] = this[pos] + gap1;
                 r[dim] -= gap2;
