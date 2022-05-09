@@ -297,17 +297,17 @@ var Rect = class Rect {
         const r = this.copy();
         
         [['x', 'width', screenLeftGap, screenRightGap],
-         ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, gap1, gap2]) => {
+         ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, posGap, dimGap]) => {
             if (this[pos] === workArea[pos]) {
-                r[pos] = this[pos] + gap1;
-                r[dim] -= gap1 + gap2 / 2;
+                r[pos] = this[pos] + posGap;
+                r[dim] -= dimGap;
             } else {
                 r[pos] = this[pos] + windowGap / 2;
                 r[dim] -= windowGap / 2;
             }
 
             if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
-                r[dim] -= gap2 / 2;
+                r[dim] -= dimGap;
             else
                 r[dim] -= windowGap / 2;
         });
