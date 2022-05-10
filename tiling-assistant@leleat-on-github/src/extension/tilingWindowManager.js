@@ -26,8 +26,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         this._wsAddedId = global.workspace_manager.connect('workspace-added', this._onWorkspaceAdded.bind(this));
         this._wsRemovedId = global.workspace_manager.connect('workspace-removed', this._onWorkspaceRemoved.bind(this));
-
-        this._windowSizeChange = global.window_manager.connect('size-change', this._onWindowSizeChange.bind(this))
+        this._windowSizeChange = global.window_manager.connect('size-change', this._onWindowSizeChange.bind(this));
     }
 
     static destroy() {
@@ -1222,11 +1221,10 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static _onWindowSizeChange(_, actor, change, __) {
         const window = actor.meta_window;
-        if (window.window_type === Meta.WindowType.NORMAL && change === Meta.SizeChange.MAXIMIZE 
-            && window.get_maximized() === Meta.MaximizeFlags.BOTH) {
-            const wA = window.get_work_area_for_monitor(window.get_monitor());
-            const workArea = new Rect(wA);
-            this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
+        const workArea = window.get_work_area_for_monitor(window.get_monitor());
+        if (window.window_type === Meta.WindowType.NORMAL && this.isMaximized(window, workArea)) {
+            const workAreaRect = new Rect(workArea);
+            this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
         }
 
     }
