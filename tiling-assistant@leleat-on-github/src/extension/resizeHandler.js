@@ -296,13 +296,13 @@ var Handler = class TilingResizeHandler {
         // special cases like gnome-terminal)
         const isResizingE = (grabOp & Meta.GrabOp.RESIZING_E) > 1;
         const newGrabbedTiledRectWidth = isResizingE
-            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenRightGap : windowGap / 2)
+            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenLeftGap : windowGap / 2)
             : window.tiledRect.x2 - newGrabbedTiledRectX;
 
         // Same principal applies to the height and resizing on the S side
         const isResizingS = (grabOp & Meta.GrabOp.RESIZING_S) > 1;
         const newGrabbedTiledRectHeight = isResizingS
-            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenBottomGap : windowGap / 2)
+            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenTopGap : windowGap / 2)
             : window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
