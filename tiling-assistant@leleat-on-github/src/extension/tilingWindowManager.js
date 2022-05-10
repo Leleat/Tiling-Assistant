@@ -26,7 +26,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         this._wsAddedId = global.workspace_manager.connect('workspace-added', this._onWorkspaceAdded.bind(this));
         this._wsRemovedId = global.workspace_manager.connect('workspace-removed', this._onWorkspaceRemoved.bind(this));
-        this._windowSizeChange = global.window_manager.connect('size-change', this._onWindowSizeChange.bind(this));
+        this._windowSizeChangeId = global.window_manager.connect('size-change', this._onWindowSizeChange.bind(this));
     }
 
     static destroy() {
@@ -35,7 +35,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         global.workspace_manager.disconnect(this._wsAddedId);
         global.workspace_manager.disconnect(this._wsRemovedId);
-        global.window_manager.disconnect(this._windowSizeChange);
+        global.window_manager.disconnect(this._windowSizeChangeId);
 
         this._tileGroups.clear();
         this._unmanagingWindows = [];
@@ -1214,12 +1214,9 @@ var TilingWindowManager = class TilingWindowManager {
      * This handles the cases where the titlebar is double-clicked, maximizing
      * the window.
      * 
-     * @param {*} _ 
      * @param {Meta.Actor} actor 
-     * @param {Meta.SizeChange} change 
-     * @param {*} __ 
      */
-    static _onWindowSizeChange(_, actor, change, __) {
+    static _onWindowSizeChange(_, actor, __, ___) {
         const window = actor.meta_window;
         const workArea = window.get_work_area_for_monitor(window.get_monitor());
         if (window.window_type === Meta.WindowType.NORMAL && this.isMaximized(window, workArea)) {
