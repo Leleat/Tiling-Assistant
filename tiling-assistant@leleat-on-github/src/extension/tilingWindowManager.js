@@ -26,6 +26,8 @@ var TilingWindowManager = class TilingWindowManager {
 
         this._wsAddedId = global.workspace_manager.connect('workspace-added', this._onWorkspaceAdded.bind(this));
         this._wsRemovedId = global.workspace_manager.connect('workspace-removed', this._onWorkspaceRemoved.bind(this));
+
+        this._windowSizeChange = global.window_manager.connect('size-change', this._onWindowSizeChange.bind(this))
     }
 
     static destroy() {
@@ -34,6 +36,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         global.workspace_manager.disconnect(this._wsAddedId);
         global.workspace_manager.disconnect(this._wsRemovedId);
+        global.window_manager.disconnect(this._windowSizeChange);
 
         this._tileGroups.clear();
         this._unmanagingWindows = [];
@@ -1205,6 +1208,27 @@ var TilingWindowManager = class TilingWindowManager {
         } else if (window.isTiled) {
             this.untile(window, { restoreFullPos: false, clampToWorkspace: true, skipAnim: Main.overview.visible });
         }
+    }
+
+    /**
+     * This is only used to properly tile windows that need to be maximized.
+     * This handles the cases where the titlebar is double-clicked, maximizing
+     * the window.
+     * 
+     * @param {*} _ 
+     * @param {Meta.Actor} actor 
+     * @param {Meta.SizeChange} change 
+     * @param {*} __ 
+     */
+    static _onWindowSizeChange(_, actor, change, __) {
+        const window = actor.meta_window;
+        if (window.window_type === Meta.WindowType.NORMAL && change === Meta.SizeChange.MAXIMIZE 
+            && window.get_maximized() === Meta.MaximizeFlags.BOTH) {
+            const wA = window.get_work_area_for_monitor(window.get_monitor());
+            const workArea = new Rect(wA);
+            this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
+        }
+
     }
 };
 
