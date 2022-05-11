@@ -1220,8 +1220,6 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Actor} actor 
      */
     static _onWindowSizeChange(_, actor, __, ___) {
-        if (window.window_type !== Meta.WindowType.NORMAL) return;
-
         const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
         const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
         const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
