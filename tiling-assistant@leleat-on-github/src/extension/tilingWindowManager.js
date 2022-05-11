@@ -1220,13 +1220,19 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Actor} actor 
      */
     static _onWindowSizeChange(_, actor, __, ___) {
-        const window = actor.meta_window;
-        const workArea = window.get_work_area_for_monitor(window.get_monitor());
-        if (window.window_type === Meta.WindowType.NORMAL && this.isMaximized(window, workArea)) {
-            const workAreaRect = new Rect(workArea);
-            this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
+        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
+        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
+        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
+        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
+        const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
+        if (maxUsesGap) {
+            const window = actor.meta_window;
+            const workArea = window.get_work_area_for_monitor(window.get_monitor());
+            if (window.window_type === Meta.WindowType.NORMAL && this.isMaximized(window, workArea)) {
+                const workAreaRect = new Rect(workArea);
+                this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
+            }
         }
-
     }
 };
 
