@@ -153,8 +153,11 @@ var TilingWindowManager = class TilingWindowManager {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
-        const maxUsesGap = screenGap && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
+        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
+        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
+        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
+        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
+        const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
         if (maximize && !maxUsesGap) {
             window.tiledRect = null;
             window.maximize(Meta.MaximizeFlags.BOTH);

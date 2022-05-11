@@ -229,7 +229,9 @@ var Handler = class TilingMoveHandler {
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
-        const rmb = Clutter.ModifierType.BUTTON3_MASK;
+        const rmb = Meta.is_wayland_compositor()
+            ? Clutter.ModifierType.BUTTON2_MASK
+            : Clutter.ModifierType.BUTTON3_MASK;
         const pressed = [ // order comes from the settings schema
             Util.isModPressed(ctrl),
             Util.isModPressed(altL) || Util.isModPressed(altGr),

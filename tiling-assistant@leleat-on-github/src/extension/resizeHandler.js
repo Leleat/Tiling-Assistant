@@ -264,7 +264,10 @@ var Handler = class TilingResizeHandler {
         if (!window.isTiled)
             return;
 
-        const screenGap = Settings.getInt(Settings.SCREEN_GAP);
+        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
+        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
+        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
+        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
         const windowGap = Settings.getInt(Settings.WINDOW_GAP);
         const workArea = window.get_work_area_for_monitor(window.get_monitor());
 
@@ -280,26 +283,26 @@ var Handler = class TilingResizeHandler {
         let newGrabbedTiledRectX = window.tiledRect.x + (grabbedsNewRect.x - grabbedsOldRect.x);
         // Switch the screenGap for a windowGap
         if (isResizingW && window.tiledRect.x === workArea.x)
-            newGrabbedTiledRectX = newGrabbedTiledRectX + screenGap - windowGap / 2;
+            newGrabbedTiledRectX = newGrabbedTiledRectX + screenLeftGap - windowGap / 2;
 
         // Same as W but different orientation
         const isResizingN = (grabOp & Meta.GrabOp.RESIZING_N) > 1;
         let newGrabbedTiledRectY = window.tiledRect.y + (grabbedsNewRect.y - grabbedsOldRect.y);
         if (isResizingN && window.tiledRect.y === workArea.y)
-            newGrabbedTiledRectY = newGrabbedTiledRectY + screenGap - windowGap / 2;
+            newGrabbedTiledRectY = newGrabbedTiledRectY + screenTopGap - windowGap / 2;
 
         // If resizing on the E side, you can simply rely on get_frame_rect's
         // new width else x2 should stick to where it was (manual calc due
         // special cases like gnome-terminal)
         const isResizingE = (grabOp & Meta.GrabOp.RESIZING_E) > 1;
         const newGrabbedTiledRectWidth = isResizingE
-            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenGap : windowGap / 2)
+            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenLeftGap : windowGap / 2)
             : window.tiledRect.x2 - newGrabbedTiledRectX;
 
         // Same principal applies to the height and resizing on the S side
         const isResizingS = (grabOp & Meta.GrabOp.RESIZING_S) > 1;
         const newGrabbedTiledRectHeight = isResizingS
-            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenGap : windowGap / 2)
+            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenTopGap : windowGap / 2)
             : window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
