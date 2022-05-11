@@ -1225,15 +1225,14 @@ var TilingWindowManager = class TilingWindowManager {
         const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
         const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
         const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
-
         if (maxUsesGap) {
             const window = actor.meta_window;
             const workArea = window.get_work_area_for_monitor(window.get_monitor());
             const workAreaRect = new Rect(workArea);
-            if (window.get_maximized() === Meta.MaximizeFlags.BOTH) {
+            if (window.tiledRect && window.tiledRect.equal(workAreaRect)) {
+                this.untile(window);
+            } else if (window.get_maximized() === Meta.MaximizeFlags.BOTH) {
                 this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
-            } else if (window.tiledRect && window.tiledRect.equal(workAreaRect)) {
-                global.log('minimize here!');
             }
         }
     }
