@@ -1227,7 +1227,7 @@ var TilingWindowManager = class TilingWindowManager {
         
         // If the window is maximized, untile it. Otherwise, tile the window to the monitor's work area
         const workAreaRect = new Rect(window.get_work_area_for_monitor(window.get_monitor()));
-        if (window.tiledRect && window.tiledRect.equal(workAreaRect)) {
+        if (window.tiledRect?.equal(workAreaRect)) {
             this.untile(window);
         } else {
             this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
