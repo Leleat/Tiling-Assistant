@@ -162,6 +162,19 @@ var Util = class Utility {
     }
 
     /**
+     * Get if maximized gaps are enabled.
+     * 
+     * @returns {boolean}
+     */
+    static isMaximizedGapsEnabled() {
+        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
+        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
+        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
+        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
+        return (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
+    }
+
+    /**
      * Shows the tiled rects of the top tile group.
      *
      * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.

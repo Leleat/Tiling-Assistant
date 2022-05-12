@@ -153,12 +153,7 @@ var TilingWindowManager = class TilingWindowManager {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
-        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
-        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
-        const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
-        if (maximize && !maxUsesGap) {
+        if (maximize && !Util.isMaximizedGapsEnabled()) {
             window.tiledRect = null;
             window.maximize(Meta.MaximizeFlags.BOTH);
             return;
@@ -1220,20 +1215,22 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Actor} actor 
      */
     static _onWindowSizeChange(_, actor, __, ___) {
-        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
-        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
-        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
-        const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
-        if (maxUsesGap) {
-            const window = actor.meta_window;
-            const workArea = window.get_work_area_for_monitor(window.get_monitor());
-            const workAreaRect = new Rect(workArea);
-            if (window.tiledRect && window.tiledRect.equal(workAreaRect)) {
-                this.untile(window);
-            } else if (window.get_maximized() === Meta.MaximizeFlags.BOTH) {
-                this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
-            }
+        // Only override maximization if maximized window gaps are enabled and if any gap is non-zero
+        if (!Util.isMaximizedGapsEnabled())
+            return;
+
+        const window = actor.meta_window;
+        
+        // Only override maximization if the window was maximized
+        if (window.get_maximized() !== Meta.MaximizeFlags.BOTH)
+            return;
+        
+        // If the window is maximized, untile it. Otherwise, tile the window to the monitor's work area
+        const workAreaRect = new Rect(window.get_work_area_for_monitor(window.get_monitor()));
+        if (window.tiledRect && window.tiledRect.equal(workAreaRect)) {
+            this.untile(window);
+        } else {
+            this.tile(window, workAreaRect, { openTilingPopup: false, skipAnim: true });
         }
     }
 };
