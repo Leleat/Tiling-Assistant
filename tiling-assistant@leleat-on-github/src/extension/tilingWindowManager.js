@@ -1213,19 +1213,15 @@ var TilingWindowManager = class TilingWindowManager {
      * the window.
      * 
      * @param {Meta.Actor} actor 
+     * @param {Meta.SizeChange} change
      */
-    static _onWindowSizeChange(_, actor, __, ___) {
-        // Only override maximization if maximized window gaps are enabled
-        if (!Util.isMaximizedGapsEnabled())
+    static _onWindowSizeChange(_, actor, change, ___) {
+        // Only override maximization if the window is being maximized or if maximized window gaps are enabled
+        if (change !== Meta.SizeChange.MAXIMIZE || !Util.isMaximizedGapsEnabled())
             return;
 
-        const window = actor.meta_window;
-        
-        // Only override maximization if the window was maximized
-        if (window.get_maximized() !== Meta.MaximizeFlags.BOTH)
-            return;
-        
         // If the window is maximized, untile it. Otherwise, tile the window to the monitor's work area
+        const window = actor.meta_window;
         const workAreaRect = new Rect(window.get_work_area_for_monitor(window.get_monitor()));
         if (window.tiledRect?.equal(workAreaRect)) {
             this.untile(window);
