@@ -69,8 +69,11 @@ var Handler = class TilingResizeHandler {
     }
 
     _onResizeStarted(window, grabOp) {
-        if (!window.isTiled)
+        if (!window.isTiled) {
+            if (window.tiledRect)
+                this._preGrabRects.set(window, new Rect(window.get_frame_rect()));
             return;
+        }
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
@@ -261,7 +264,7 @@ var Handler = class TilingResizeHandler {
             this._sizeChangedId = 0;
         }
 
-        if (!window.isTiled)
+        if (!window.isTiled && !window.tiledRect)
             return;
 
         const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
