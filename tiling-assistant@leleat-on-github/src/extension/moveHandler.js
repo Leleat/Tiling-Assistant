@@ -48,6 +48,19 @@ var Handler = class TilingMoveHandler {
 
         this._favoritePreviews = [];
         this._tilePreview = new TilePreview();
+
+        // The mouse button mod to move/resize a window may be changed to Alt.
+        // So switch Alt and Super in our own prefs, if the user switched from
+        // Super to Alt.
+        const wmPrefs = ExtensionUtils.getSettings('org.gnome.desktop.wm.preferences');
+        const altAsMod = wmPrefs.get_string('mouse-button-modifier') === '<Alt>';
+        if (altAsMod) {
+            for (const s of [Settings.ADAPTIVE_TILING_MOD, Settings.FAVORITE_LAYOUT_MOD]) {
+                const mod = Settings.getInt(s);
+                if (mod === 1) // 1 -> Alt; see settings ui
+                    Settings.setInt(s, 3); // 3 -> Super; see settings ui
+            }
+        }
     }
 
     destroy() {
@@ -229,13 +242,15 @@ var Handler = class TilingMoveHandler {
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
+        const meta = Clutter.ModifierType.MOD4_MASK;
         const rmb = Meta.is_wayland_compositor()
             ? Clutter.ModifierType.BUTTON2_MASK
             : Clutter.ModifierType.BUTTON3_MASK;
-        const pressed = [ // order comes from the settings schema
+        const pressed = [ // order comes from the ui file
             Util.isModPressed(ctrl),
             Util.isModPressed(altL) || Util.isModPressed(altGr),
-            Util.isModPressed(rmb)
+            Util.isModPressed(rmb),
+            Util.isModPressed(meta)
         ];
 
         const defaultMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);

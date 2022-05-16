@@ -198,11 +198,11 @@
 			<default>false</default>
 		</key>
 		<key name="move-adaptive-tiling-mod" type="i">
-			<!-- 0: Ctrl, 1: Alt, 2: RMB -->
+			<!-- 0: Ctrl, 1: Alt, 2: RMB, 3: Meta -->
 			<default>0</default>
 		</key>
 		<key name="move-favorite-layout-mod" type="i">
-			<!-- 0: Ctrl, 1: Alt, 2: RMB -->
+			<!-- 0: Ctrl, 1: Alt, 2: RMB, 3: Meta -->
 			<default>1</default>
 		</key>
 		<key name="vertical-preview-area" type="i">

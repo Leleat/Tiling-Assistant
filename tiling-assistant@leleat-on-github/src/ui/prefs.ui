@@ -692,6 +692,7 @@
                           <item translatable="yes">Ctrl</item>
                           <item translatable="yes">Alt</item>
                           <item translatable="yes">RMB</item>
+                          <item translatable="yes">Super</item>
                         </items>
                       </object>
                     </property>
@@ -706,6 +707,7 @@
                           <item translatable="yes">Ctrl</item>
                           <item translatable="yes">Alt</item>
                           <item translatable="yes">RMB</item>
+                          <item translatable="yes">Super</item>
                         </items>
                       </object>
                     </property>
