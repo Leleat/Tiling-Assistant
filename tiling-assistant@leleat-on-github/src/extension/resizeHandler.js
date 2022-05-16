@@ -266,8 +266,6 @@ var Handler = class TilingResizeHandler {
 
         const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
         const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
-        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
         const windowGap = Settings.getInt(Settings.WINDOW_GAP);
         const workArea = window.get_work_area_for_monitor(window.get_monitor());
 
