@@ -183,11 +183,22 @@ var TilingWindowManager = class TilingWindowManager {
             );
         }
 
-        // Wayland workaround because some apps dont work properly
-        // e. g. tiling Nautilus and then choosing firefox from the popup
-        Meta.is_wayland_compositor() && window.move_frame(false, x, y);
-        // user_op as false needed for some apps
-        window.move_resize_frame(false, x, y, width, height);
+        // See issue #137.
+        // Under some circumstances it's possible that windows will tile to the wrong
+        // monitor. I can't reproduce it but I suspect that it's because of passing
+        // false as the user_op to move_resize_frame. user_op is meant to determine if
+        // the window should be clamped to the monitor. A user operation (user_op = true)
+        // won't be clamped. So I think there is something unexpected happening.
+        // Someone in the issue mentioned that passing true as the user_op fixes the
+        // multi-monitor bug.
+        //
+        // The reason why I set user_op as false originally is that GNOME Terminal (and
+        // some other Terminals) will only resize but not move with user_op as true. Try
+        // to workaround that by first only moving the window and then resizing it. That
+        // workaround was already necessary under Wayland because of some apps. E. g.
+        // first tiling Nautilus and then Firefox using the Tiling Popup.
+        window.move_frame(true, x, y);
+        window.move_resize_frame(true, x, y, width, height);
 
         // Maximized with gaps
         if (maximize) {
