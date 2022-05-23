@@ -24,16 +24,16 @@
 			<default>0</default>
 		</key>
 		<key name="screen-top-gap" type="i">
-			<default>-1</default>
+			<default>0</default>
 		</key>
 		<key name="screen-left-gap" type="i">
-			<default>-1</default>
+			<default>0</default>
 		</key>
 		<key name="screen-right-gap" type="i">
-			<default>-1</default>
+			<default>0</default>
 		</key>
 		<key name="screen-bottom-gap" type="i">
-			<default>-1</default>
+			<default>0</default>
 		</key>
 		<key name="maximize-with-gap" type="b">
 			<default>false</default>
