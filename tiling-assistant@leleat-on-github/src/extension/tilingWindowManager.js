@@ -114,12 +114,18 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {boolean} [openTilingPopup=true] decides, if we open a Tiling
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
+     * @param {number} [number=null] is used to get the workArea in which the
+     *      window tiles on. It's used for gap calcuation. We can't always rely on
+     *      window.get_monitor with its monitor or global.display.get_current_monitor
+     *      (the pointer monitor) because of the 'grace period' during a quick dnd
+     *      towards a screen border since the pointer and the window will be on the
+     *      'wrong' monitor.
      * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
      * @param {boolean} [tileGroup=null] forces the creation of this tile group.
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, { openTilingPopup = true, skipAnim = false, fakeTile = false } = {}) {
+    static tile(window, newRect, { openTilingPopup = true, monitorNr = null, skipAnim = false, fakeTile = false } = {}) {
         if (!window || window.is_skip_taskbar())
             return;
 
@@ -143,7 +149,7 @@ var TilingWindowManager = class TilingWindowManager {
         window.raise();
 
         const oldRect = new Rect(window.get_frame_rect());
-        const monitor = window.get_monitor();
+        const monitor = monitorNr ?? window.get_monitor();
         const workArea = new Rect(window.get_work_area_for_monitor(monitor));
         const maximize = newRect.equal(workArea);
 
