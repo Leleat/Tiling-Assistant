@@ -188,7 +188,7 @@
 			<default>-1</default>
 		</key>
 		<key name="show-changelog-on-update" type="b">
-			<default>true</default>
+			<default>false</default>
 		</key>
 		<key name="default-move-mode" type="i">
 			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout -->
