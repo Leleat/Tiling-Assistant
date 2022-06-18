@@ -25,6 +25,7 @@ var Settings = class Settings {
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
     static SHOW_CHANGE_ON_UPDATE = 'show-changelog-on-update';
     static CHANGELOG_VERSION = 'changelog-version';
+    static DISABLE_TILE_GROUPS = 'disable-tile-groups';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
     static FAVORITE_LAYOUTS = 'favorite-layouts';
@@ -86,6 +87,7 @@ var Settings = class Settings {
             this.ENABLE_ADV_EXP_SETTINGS,
             this.SHOW_CHANGE_ON_UPDATE,
             this.CHANGELOG_VERSION,
+            this.DISABLE_TILE_GROUPS,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
             this.FAVORITE_LAYOUTS,

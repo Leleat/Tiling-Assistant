@@ -86,6 +86,7 @@ function _bindSwitches(settings, builder) {
         Settings.SHOW_LAYOUT_INDICATOR,
         Settings.ENABLE_ADV_EXP_SETTINGS,
         Settings.SHOW_CHANGE_ON_UPDATE,
+        Settings.DISABLE_TILE_GROUPS,
         Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
         Settings.ENABLE_TILE_ANIMATIONS,
         Settings.ENABLE_UNTILE_ANIMATIONS,

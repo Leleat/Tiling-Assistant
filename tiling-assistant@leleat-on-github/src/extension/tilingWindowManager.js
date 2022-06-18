@@ -212,13 +212,20 @@ var TilingWindowManager = class TilingWindowManager {
 
         // Tiled window
         } else if (!fakeTile) {
+            // Make the tile group only consist of the window itself to stop
+            // resizing or raising together
+            if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS)) {
+                this.updateTileGroup([window]);
             // Setup the (new) tileGroup to raise tiled windows as a group
-            const topTileGroup = this._getWindowsForBuildingTileGroup(window.get_monitor());
-            this.updateTileGroup(topTileGroup);
+            } else {
+                const topTileGroup = this._getWindowsForBuildingTileGroup(window.get_monitor());
+                this.updateTileGroup(topTileGroup);
+            }
 
             this.emit('window-tiled', window);
 
-            openTilingPopup && this.tryOpeningTilingPopup();
+            if (openTilingPopup && !Settings.getBoolean(Settings.DISABLE_TILE_GROUPS))
+                this.tryOpeningTilingPopup();
         }
     }
 
@@ -769,6 +776,10 @@ var TilingWindowManager = class TilingWindowManager {
      * @returns a Rect.
      */
     static getTileFor(shortcut, workArea, monitor = null) {
+        // Don't try to adapt a tile rect
+        if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS))
+            return this.getDefaultTileFor(shortcut, workArea);
+
         const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
         // getTileFor is used to get the adaptive tiles for dnd & tiling keyboard
         // shortcuts. Thats why the top most window needs to be ignored when
