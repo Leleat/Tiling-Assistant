@@ -1,10 +1,11 @@
 'use strict';
 
-const Meta = imports.gi.Meta;
+const { Clutter, Meta } = imports.gi;
 
 const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
+const { Orientation } = Me.imports.src.common;
 const Settings = Me.imports.src.common.Settings;
 const { Rect, Util } = Me.imports.src.extension.utility;
 const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
@@ -74,7 +75,7 @@ var Handler = class TilingResizeHandler {
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
-        const topTileGroup = Twm.getTopTileGroup();
+        let topTileGroup = Twm.getTopTileGroup();
         topTileGroup.forEach(w => {
             this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
 
@@ -121,6 +122,18 @@ var Handler = class TilingResizeHandler {
         // be passively resized.
         topTileGroup.splice(topTileGroup.indexOf(window), 1);
         const grabbedRect = window.tiledRect;
+
+        // Holding Ctrl allows resizing windows which only directly (or transitively)
+        // border the window being actively resized (instead of the entire tileGroup)
+        const isCtrlPressed = Util.isModPressed(Clutter.ModifierType.CONTROL_MASK);
+        const singleEdgeResizeOp = [
+            Meta.GrabOp.RESIZING_N,
+            Meta.GrabOp.RESIZING_S,
+            Meta.GrabOp.RESIZING_W,
+            Meta.GrabOp.RESIZING_E
+        ];
+        if (isCtrlPressed && singleEdgeResizeOp.includes(grabOp))
+            topTileGroup = this._getWindowsForIndividualResize(window, topTileGroup, grabOp);
 
         switch (grabOp) {
         // Resizing cardinal directions
@@ -398,6 +411,78 @@ var Handler = class TilingResizeHandler {
                     ? [wRect.x, wRect.y, resizedRect.x2 - preGrabRect.x, wRect.height]
                     : [resizedRect.x2 + windowGap, wRect.y, preGrabRect.x2 - resizedRect.x2 - windowGap, wRect.height];
         }
+    }
+
+    /**
+     * Gets the windows which should be resized for the 'individual' resize mode.
+     * That means all windows that directly (or transitively) border the window
+     * being resized at the resized edge.
+     *
+     * @param {Meta.Window} window the window that is actively resized.
+     * @param {Meta.Window[]} tileGroup the top tile group.
+     * @param {Meta.GrabOp} grabOp
+     * @returns {Meta.Window[]} all windows that will resize using the individual resize mode
+     */
+    _getWindowsForIndividualResize(window, tileGroup, grabOp) {
+        // Resizes on the same side as the one being resized by the user.
+        // Starts with the window that is actively being resized by the user.
+        const sameSide = [window];
+        // Resizes on the opposite side as the one being resized by the user
+        const oppositeSide = [];
+        const resizeIsNOrW = [Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_W].includes(grabOp);
+        const orientation = [Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_S].includes(grabOp)
+            ? Orientation.V : Orientation.H;
+
+        // Checks if the w1 and w2 border each other at a certain edge.
+        const borders = (w1, w2, w1IsAfterW2) => {
+            const [start, end] = orientation === Orientation.H ? ['x', 'x2'] : ['y', 'y2'];
+            const overlap = orientation === Orientation.H ? 'vertOverlap' : 'horizOverlap';
+            if (w1IsAfterW2) {
+                return w1.tiledRect[start] === w2.tiledRect[end] &&
+                        w1.tiledRect[overlap](w2.tiledRect);
+            } else {
+                return w1.tiledRect[end] === w2.tiledRect[start] &&
+                        w1.tiledRect[overlap](w2.tiledRect);
+            }
+        };
+
+        /**
+         * @param {Meta.Window[]} uncheckedWindows windows yet to be checked.
+         * @param {Meta.Window[]} checkingWindows windows, which the bordering windows
+         *      are searched for. It initially only starts with the window that is
+         *      actively resized by the user.
+         * @param {Meta.Window[]} borderingWindows the windows that border the
+         *      checkingWindows on the resized edge.
+         * @param {boolean} sideDeterminant determines which edge the
+         *      bordering is checked on. It's the relation of the checkingWindows
+         *      to the actively resized windows.
+         */
+        const findBorderingWindows = (uncheckedWindows, checkingWindows,
+                borderingWindows, sideDeterminant) => {
+            const oldCount = borderingWindows.length;
+
+            checkingWindows.forEach(w => {
+                uncheckedWindows.forEach(unchecked => {
+                    if (borders(w, unchecked, sideDeterminant))
+                        borderingWindows.push(unchecked);
+                });
+            });
+
+            if (oldCount !== borderingWindows.length) {
+                // Find the bordering windows for the newly added windows by
+                // flipping the checkingWindows and borderingWindows arrays as well as
+                // the side that is checked with the borders function.
+                findBorderingWindows(
+                    uncheckedWindows.filter(w => !borderingWindows.includes(w)),
+                    borderingWindows,
+                    checkingWindows,
+                    !sideDeterminant
+                );
+            }
+        };
+
+        findBorderingWindows(tileGroup, sameSide, oppositeSide, resizeIsNOrW);
+        return [...sameSide, ...oppositeSide];
     }
 };
 
