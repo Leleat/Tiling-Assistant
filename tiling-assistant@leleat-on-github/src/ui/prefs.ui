@@ -539,9 +539,8 @@
                     <property name="margin-bottom">32</property>
                     <property name="orientation">vertical</property>
                     <child>
-                      <object class="GtkImage">
+                      <object class="GtkImage" id="hidden_settings_icon">
                         <property name="margin-bottom">6</property>
-                        <property name="icon-name">eye-not-looking-symbolic</property>
                         <property name="pixel-size">48</property>
                         <style>
                           <class name="lowres-icon"/>

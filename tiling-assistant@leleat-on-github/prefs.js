@@ -57,6 +57,11 @@ function fillPreferencesWindow(window) {
     // Add a button into the headerbar with info
     _addHeaderBarInfoButton(window, settings, builder);
 
+    // Set icon for hidden settings page. That icon doesn't seem to be included
+    // in GNOME anymore. So directly ship that icon with the extension.
+    const hiddenSettingsIcon = builder.get_object('hidden_settings_icon');
+    hiddenSettingsIcon.set_from_file(`${Me.path}/media/eye-not-looking-symbolic.png`);
+
     // Open Changelog after an update
     const lastVersion = settings.get_int(Settings.CHANGELOG_VERSION);
     const firstInstall = lastVersion === -1;
