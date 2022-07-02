@@ -522,8 +522,13 @@ var TilingWindowManager = class TilingWindowManager {
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
     static getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
-        // 'Raise Tile Group' setting is enabled
-        if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
+        // 'Raise Tile Group' setting is enabled so we just return the tracked
+        // tile group. Same thing for the setting 'Disable Tile Groups' because
+        // it's implemented by just making the tile groups consist of single
+        // windows (the tiled window itself).
+        if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS) ||
+            Settings.getBoolean(Settings.DISABLE_TILE_GROUPS)
+        ) {
             const openWindows = this.getWindows();
             const ignoredWindows = [];
             const mon = monitor ?? openWindows[0]?.get_monitor();
@@ -556,7 +561,8 @@ var TilingWindowManager = class TilingWindowManager {
 
             return [];
 
-        // 'Raise Tile Group' setting is disabled
+        // 'Raise Tile Group' setting is disabled so we get thetop most
+        // non-overlapped/ing tiled windows ignoring the tile groups.
         } else {
             return this._getTopTiledWindows({ skipTopWindow, monitor });
         }
