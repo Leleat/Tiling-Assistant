@@ -117,7 +117,8 @@ var Handler = class TilingMoveHandler {
         // Try to restore the window size
         const restoreSetting = Settings.getInt(Settings.RESTORE_SIZE_ON);
         if ((window.tiledRect || this._wasMaximizedOnStart) &&
-                restoreSetting === RestoreOn.ON_GRAB_START) {
+            restoreSetting === RestoreOn.ON_GRAB_START
+        ) {
             // HACK:
             // The grab begin signal (and thus this function call) gets fired
             // at the moment of the first click. However I don't want to restore
