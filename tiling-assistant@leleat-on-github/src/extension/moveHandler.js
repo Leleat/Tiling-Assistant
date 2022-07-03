@@ -292,19 +292,25 @@ var Handler = class TilingMoveHandler {
     }
 
     _preparePreviewModeChange(newMode, window) {
-        // Cleanups / resets
         this._tileRect = null;
-        this._splitRects.clear();
-        this._favoritePreviews.forEach(p => {
-            p.ease({
-                opacity: 0,
-                duration: 100,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => p.destroy()
-            });
-        });
-        this._favoritePreviews = [];
-        this._anchorRect = null;
+
+        switch (this._currPreviewMode) {
+            case MoveModes.ADAPTIVE_TILING:
+                this._splitRects.clear();
+                this._anchorRect = null;
+                break;
+            case MoveModes.FAVORITE_LAYOUT:
+                this._favoritePreviews.forEach(p => {
+                    p.ease({
+                        opacity: 0,
+                        duration: 100,
+                        mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                        onComplete: () => p.destroy()
+                    });
+                });
+                this._favoritePreviews = [];
+                this._anchorRect = null;
+        }
 
         switch (newMode) {
             case MoveModes.FAVORITE_LAYOUT:
