@@ -88,6 +88,7 @@ var Settings = class Settings {
             this.SHOW_CHANGE_ON_UPDATE,
             this.CHANGELOG_VERSION,
             this.DISABLE_TILE_GROUPS,
+            'test-setting',
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,
             this.FAVORITE_LAYOUTS,

@@ -603,6 +603,17 @@
                     </child>
                   </object>
                 </child>
+                <child>
+                  <object class="AdwActionRow">
+                    <property name="title" translatable="yes">Hybrid Movement</property>
+                    <property name="activatable-widget">test_setting</property>
+                    <child>
+                      <object class="GtkSwitch" id="test_setting">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
               </object>
             </child>
             <!-- ======================================================================================== -->

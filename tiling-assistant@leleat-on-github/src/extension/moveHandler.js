@@ -176,12 +176,17 @@ var Handler = class TilingMoveHandler {
             this._isWayland = Meta.is_wayland_compositor();
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
+            this._lastPointerPos = { x, y };
+            this._notMoved = false;
+            this._testSetting = Settings.getBoolean('test-setting');
             this._vDetectionSize = Settings.getInt(Settings.VERTICAL_PREVIEW_AREA);
             this._hDetectionSize = Settings.getInt(Settings.HORIZONTAL_PREVIEW_AREA);
             this._inverse_top_maximize_timer = Settings.getInt(Settings.INVERSE_TOP_MAXIMIZE_TIMER);
             this._defaultMoveMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);
             this._adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
             this._favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
+            this._timeoutCounter = 0;
+            this._callCounter = 0;
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -190,15 +195,22 @@ var Handler = class TilingMoveHandler {
             const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
-            this._posChangedId = window.connect('position-changed',
-                this._onMoving.bind(
+
+            this._testSetting
+                ? GLib.timeout_add(GLib.PRIORITY_IDLE, 20, this._onMoving.bind(
                     this,
                     grabOp,
                     window,
                     topTileGroup,
                     freeScreenRects
-                )
-            );
+                ))
+                : GLib.timeout_add(GLib.PRIORITY_IDLE, 500, this._onMoving.bind(
+                    this,
+                    grabOp,
+                    window,
+                    topTileGroup,
+                    freeScreenRects
+                ));
         }
     }
 
@@ -256,9 +268,33 @@ var Handler = class TilingMoveHandler {
     }
 
     _onMoving(grabOp, window, topTileGroup, freeScreenRects) {
-        const [x, y, mod] = global.get_pointer();
-        this._lastPointerPos = { x, y };
+        if (!this._isGrabOp)
+            return GLib.SOURCE_REMOVE;
 
+        const [x, y, mod] = global.get_pointer();
+        const currPointerPos = { x, y };
+        let earlyUpdate = false;
+        const moveDist = Util.getDistance(this._lastPointerPos, currPointerPos);
+        if (this._testSetting) {
+            if (this._notMoved) {
+                if (moveDist > 10) {
+                    this._notMoved = false;
+                    earlyUpdate = true;
+                } else {
+                    return GLib.SOURCE_CONTINUE;
+                }
+            } else if (moveDist < 10) {
+                earlyUpdate = true;
+                this._notMoved = true;
+            }
+        }
+        this._timeoutCounter = earlyUpdate ? 0 : this._timeoutCounter + 1;
+        this._lastPointerPos = currPointerPos;
+
+        if (this._testSetting && this._timeoutCounter % 25 !== 0)
+            return GLib.SOURCE_CONTINUE;
+
+        log(`------Tiling Assistant: calc count during move: ${this._callCounter++}`);
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
@@ -306,6 +342,8 @@ var Handler = class TilingMoveHandler {
         }
 
         this._currPreviewMode = newMode;
+
+        return GLib.SOURCE_CONTINUE;
     }
 
     _preparePreviewModeChange(newMode, window) {

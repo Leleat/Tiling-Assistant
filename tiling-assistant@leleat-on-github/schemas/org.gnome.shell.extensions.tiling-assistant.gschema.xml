@@ -193,6 +193,9 @@
 		<key name="disable-tile-groups" type="b">
 			<default>false</default>
 		</key>
+		<key name="test-setting" type="b">
+			<default>false</default>
+		</key>
 		<key name="default-move-mode" type="i">
 			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout -->
 			<default>0</default>
