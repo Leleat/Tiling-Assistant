@@ -99,8 +99,8 @@ var Util = class Utility {
      * @param {number} modMask a Clutter.ModifierType.
      * @returns wether the current event the modifier at `modMask`.
      */
-    static isModPressed(modMask, mod = null) {
-        return (mod ?? global.get_pointer()[2]) & modMask;
+    static isModPressed(modMask) {
+        return global.get_pointer()[2] & modMask;
     }
 
     /**

@@ -10,18 +10,6 @@ const { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } = Me.imports.sr
 const { Rect, Util } = Me.imports.src.extension.utility;
 const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
-const edgeTilingPos = {
-    NONE: '',
-    TOP: 'TOP',
-    LEFT: 'LEFT',
-    RIGHT: 'RIGHT',
-    BOTTOM: 'BOTTOM',
-    TOP_LEFT: 'TOP_LEFT',
-    TOP_RIGHT: 'TOP_RIGHT',
-    BOTTOM_LEFT: 'BOTTOM_LEFT',
-    BOTTOM_RIGHT: 'BOTTOM_RIGHT'
-};
-
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
  * If the moved window is tiled at the start of the grab, untile it. This is
@@ -173,15 +161,8 @@ var Handler = class TilingMoveHandler {
         // Tile preview
         } else {
             this._isGrabOp = true;
-            this._isWayland = Meta.is_wayland_compositor();
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
-            this._vDetectionSize = Settings.getInt(Settings.VERTICAL_PREVIEW_AREA);
-            this._hDetectionSize = Settings.getInt(Settings.HORIZONTAL_PREVIEW_AREA);
-            this._inverse_top_maximize_timer = Settings.getInt(Settings.INVERSE_TOP_MAXIMIZE_TIMER);
-            this._defaultMoveMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);
-            this._adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
-            this._favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -256,36 +237,39 @@ var Handler = class TilingMoveHandler {
     }
 
     _onMoving(grabOp, window, topTileGroup, freeScreenRects) {
-        const [x, y, mod] = global.get_pointer();
+        const [x, y] = global.get_pointer();
         this._lastPointerPos = { x, y };
 
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
         const meta = Clutter.ModifierType.MOD4_MASK;
-        const rmb = this._isWayland
+        const rmb = Meta.is_wayland_compositor()
             ? Clutter.ModifierType.BUTTON2_MASK
             : Clutter.ModifierType.BUTTON3_MASK;
         const pressed = [ // order comes from the ui file
-            Util.isModPressed(ctrl, mod),
-            Util.isModPressed(altL, mod) || Util.isModPressed(altGr, mod),
-            Util.isModPressed(rmb, mod),
-            Util.isModPressed(meta, mod)
+            Util.isModPressed(ctrl),
+            Util.isModPressed(altL) || Util.isModPressed(altGr),
+            Util.isModPressed(rmb),
+            Util.isModPressed(meta)
         ];
 
+        const defaultMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);
+        const adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
+        const favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
         let newMode = '';
 
-        if (pressed[this._adaptiveMod]) {
-            newMode = this._defaultMoveMode === MoveModes.ADAPTIVE_TILING
+        if (pressed[adaptiveMod]) {
+            newMode = defaultMode === MoveModes.ADAPTIVE_TILING
                 ? MoveModes.EDGE_TILING
                 : MoveModes.ADAPTIVE_TILING;
-        } else if (pressed[this._favMod]) {
-            newMode = this._defaultMoveMode === MoveModes.FAVORITE_LAYOUT
+        } else if (pressed[favMod]) {
+            newMode = defaultMode === MoveModes.FAVORITE_LAYOUT
                 ? MoveModes.EDGE_TILING
                 : MoveModes.FAVORITE_LAYOUT;
-        } else if (this._defaultMoveMode === MoveModes.ADAPTIVE_TILING) {
+        } else if (defaultMode === MoveModes.ADAPTIVE_TILING) {
             newMode = MoveModes.ADAPTIVE_TILING;
-        } else if (this._defaultMoveMode === MoveModes.FAVORITE_LAYOUT) {
+        } else if (defaultMode === MoveModes.FAVORITE_LAYOUT) {
             newMode = MoveModes.FAVORITE_LAYOUT;
         } else {
             newMode = MoveModes.EDGE_TILING;
@@ -312,9 +296,6 @@ var Handler = class TilingMoveHandler {
         this._tileRect = null;
 
         switch (this._currPreviewMode) {
-            case MoveModes.EDGE_TILING:
-                this._lastEdgeTilingPos = edgeTilingPos.NONE;
-                break;
             case MoveModes.ADAPTIVE_TILING:
                 this._splitRects.clear();
                 this._anchorRect = null;
@@ -418,10 +399,12 @@ var Handler = class TilingMoveHandler {
         const wRect = window.get_frame_rect();
         const workArea = new Rect(window.get_work_area_for_monitor(this._monitorNr));
 
-        const pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + this._vDetectionSize;
-        const pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - this._vDetectionSize;
-        const pointerAtLeftEdge = this._lastPointerPos.x <= workArea.x + this._hDetectionSize;
-        const pointerAtRightEdge = this._lastPointerPos.x >= workArea.x2 - this._hDetectionSize;
+        const vDetectionSize = Settings.getInt(Settings.VERTICAL_PREVIEW_AREA);
+        const pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize;
+        const pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - vDetectionSize;
+        const hDetectionSize = Settings.getInt(Settings.HORIZONTAL_PREVIEW_AREA);
+        const pointerAtLeftEdge = this._lastPointerPos.x <= workArea.x + hDetectionSize;
+        const pointerAtRightEdge = this._lastPointerPos.x >= workArea.x2 - hDetectionSize;
         // Also use window's pos for top and bottom area detection for quarters
         // because global.get_pointer's y isn't accurate (no idea why...) when
         // grabbing the titlebar & slowly going from the left/right sides to
@@ -435,39 +418,18 @@ var Handler = class TilingMoveHandler {
         const tileBottomRightQuarter = pointerAtRightEdge && (pointerAtBottomEdge || windowAtBottomEdge);
 
         if (tileTopLeftQuarter) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.TOP_LEFT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.TOP_LEFT;
             this._tileRect = Twm.getTileFor(Shortcuts.TOP_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileTopRightQuarter) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.TOP_RIGHT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.TOP_RIGHT;
             this._tileRect = Twm.getTileFor(Shortcuts.TOP_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileBottomLeftQuarter) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.BOTTOM_LEFT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.BOTTOM_LEFT;
             this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM_LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (tileBottomRightQuarter) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.BOTTOM_RIGHT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.BOTTOM_RIGHT;
             this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM_RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtTopEdge) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.TOP)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.TOP;
-
             // Switch between maximize & top tiling when keeping the mouse at the top edge.
             const monitorRect = global.display.get_monitor_geometry(this._monitorNr);
             const isLandscape = monitorRect.width >= monitorRect.height;
@@ -492,13 +454,12 @@ var Handler = class TilingMoveHandler {
             let timerId = 0;
             this._latestPreviewTimerId && GLib.Source.remove(this._latestPreviewTimerId);
             this._latestPreviewTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
-                this._inverse_top_maximize_timer, () => {
-                    // Only open the alternative preview, if the timeout-ed timer
-                    // is the same as the one which started last
+                Settings.getInt(Settings.INVERSE_TOP_MAXIMIZE_TIMER), () => {
+                // Only open the alternative preview, if the timeout-ed timer
+                // is the same as the one which started last
                     if (timerId === this._latestPreviewTimerId &&
                         this._tilePreview._showing &&
-                        this._tilePreview._rect.equal(tileRect.meta)
-                    ) {
+                        this._tilePreview._rect.equal(tileRect.meta)) {
                         this._tileRect = holdTileRect;
                         this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
                     }
@@ -508,31 +469,15 @@ var Handler = class TilingMoveHandler {
                 });
             timerId = this._latestPreviewTimerId;
         } else if (pointerAtBottomEdge) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.BOTTOM)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.BOTTOM;
             this._tileRect = Twm.getTileFor(Shortcuts.BOTTOM, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtLeftEdge) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.LEFT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.LEFT;
             this._tileRect = Twm.getTileFor(Shortcuts.LEFT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else if (pointerAtRightEdge) {
-            if (this._lastEdgeTilingPos === edgeTilingPos.RIGHT)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.RIGHT;
             this._tileRect = Twm.getTileFor(Shortcuts.RIGHT, workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
         } else {
-            if (this._lastEdgeTilingPos === edgeTilingPos.NONE)
-                return;
-
-            this._lastEdgeTilingPos = edgeTilingPos.NONE;
             this._tileRect = null;
             this._tilePreview.close();
         }
