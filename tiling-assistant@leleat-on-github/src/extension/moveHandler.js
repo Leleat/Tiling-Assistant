@@ -29,12 +29,6 @@ var Handler = class TilingMoveHandler {
         });
         this._displaySignals.push(g1Id);
 
-        const g2Id = global.display.connect('grab-op-end', (src, window, grabOp) => {
-            if (window && moveOps.includes(grabOp))
-                this._onMoveFinished(window);
-        });
-        this._displaySignals.push(g2Id);
-
         const wId = global.display.connect('window-entered-monitor', this._onMonitorEntered.bind(this));
         this._displaySignals.push(wId);
 
@@ -85,6 +79,11 @@ var Handler = class TilingMoveHandler {
         if (this._restoreSizeTimerId) {
             GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = null;
+        }
+
+        if (this._movingTimerId) {
+            GLib.Source.remove(this._movingTimerId);
+            this._movingTimerId = null;
         }
     }
 
@@ -163,6 +162,11 @@ var Handler = class TilingMoveHandler {
             this._isGrabOp = true;
             this._monitorNr = global.display.get_current_monitor();
             this._lastMonitorNr = this._monitorNr;
+            this._lastPointerPos = { x, y };
+            this._pointerDidntMove = false;
+            this._movingTimerDuration = 20;
+            this._movingTimeoutsSinceUpdate = 0;
+            this._forceMoveUpdate = false;
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -171,7 +175,10 @@ var Handler = class TilingMoveHandler {
             const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
-            this._posChangedId = window.connect('position-changed',
+
+            this._movingTimerId = GLib.timeout_add(
+                GLib.PRIORITY_IDLE,
+                this._movingTimerDuration,
                 this._onMoving.bind(
                     this,
                     grabOp,
@@ -180,15 +187,20 @@ var Handler = class TilingMoveHandler {
                     freeScreenRects
                 )
             );
+
+            const id = global.display.connect('grab-op-end', () => {
+                // 'Quick throws' of windows won't create a tile preview since
+                // the timeout for onMoving may not have happened yet. So force
+                // 1 call of the tile preview updates for those quick actions.
+                this._forceMoveUpdate = true;
+                this._onMoving(grabOp, window, topTileGroup, freeScreenRects);
+                this._onMoveFinished(window);
+                global.display.disconnect(id);
+            });
         }
     }
 
     _onMoveFinished(window) {
-        if (this._posChangedId) {
-            window.disconnect(this._posChangedId);
-            this._posChangedId = 0;
-        }
-
         if (this._tileRect) {
             // Ctrl-drag to replace some windows in a tile group / create a new tile group
             // with at least 1 window being part of multiple tile groups.
@@ -236,9 +248,46 @@ var Handler = class TilingMoveHandler {
         this._isGrabOp = false;
     }
 
+    // Called periodically (~ every 20 ms) with a timer after a window was grabbed.
+    // However this function will only update the tile previews fully after about
+    // 500 ms. Force an earlier update, if the pointer movement state changed
+    // (e.g. pointer came to a stop after a movement). This Detection is done
+    // naively by comparing the pointer position of the previous timeout with
+    // the current position.
     _onMoving(grabOp, window, topTileGroup, freeScreenRects) {
+        if (!this._isGrabOp) {
+            this._movingTimerId = null;
+            return GLib.SOURCE_REMOVE;
+        }
+
         const [x, y] = global.get_pointer();
-        this._lastPointerPos = { x, y };
+        const currPointerPos = { x, y };
+        const movementDist = Util.getDistance(this._lastPointerPos, currPointerPos);
+        const movementDetectionThreshold = 10;
+        this._lastPointerPos = currPointerPos;
+        this._movingTimeoutsSinceUpdate++;
+
+        // Force an early update if the movement state changed
+        // i. e. moving -> stand still or stand still -> moving
+        if (this._pointerDidntMove) {
+            if (movementDist > movementDetectionThreshold) {
+                this._pointerDidntMove = false;
+                this._forceMoveUpdate = true;
+            }
+        } else if (movementDist < movementDetectionThreshold) {
+            this._pointerDidntMove = true;
+            this._forceMoveUpdate = true;
+        }
+
+        // Only update the tile preview every 500 ms for better performance.
+        // Force an early update, if the pointer movement state changed.
+        const updateInterval = 500;
+        const timeSinceLastUpdate = this._movingTimerDuration * this._movingTimeoutsSinceUpdate;
+        if (timeSinceLastUpdate < updateInterval && !this._forceMoveUpdate)
+            return GLib.SOURCE_CONTINUE;
+
+        this._movingTimeoutsSinceUpdate = 0;
+        this._forceMoveUpdate = false;
 
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
@@ -290,6 +339,8 @@ var Handler = class TilingMoveHandler {
         }
 
         this._currPreviewMode = newMode;
+
+        return GLib.SOURCE_CONTINUE;
     }
 
     _preparePreviewModeChange(newMode, window) {
