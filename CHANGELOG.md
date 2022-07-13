@@ -1,7 +1,22 @@
 # Changelog
 
-## v33
+## v34
 **Added**
+- added setting to completely disable tile groups. That means no resizing, raising or suggestions anymore (#180)
+- added the ability to only resize the absolutely necessary windows in a tile group when holding `Ctrl` before resizing started (#155)
+
+**Changed**
+- improved perfromance when dragging a window around for lower performance machines (#181)
+- split the screen gap setting into top, bottom, left and right parts by CharlieQLe (#146)
+- don't open the changelog window after an extension update in the prefs by default anymore
+
+**Fixed**
+- added a workaround for a multi-monitor bug where windows may untile incorrectly under Wayland (#137)
+- fixed issue with RMB as a `Move Mode Activator` under Wayland (#170)
+- added Meta as a `Move Mode Activator` and set it as default, if `Alt` is the default window action key (#172)
+
+## v33
+**Added*
 - german (Switzerland) tl by MrReSc #152
 - german (Germany) tl by pjanze #161
 - italian translation by starise #164
