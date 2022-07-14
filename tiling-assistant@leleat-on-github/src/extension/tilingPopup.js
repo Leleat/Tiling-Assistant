@@ -295,7 +295,6 @@ var TilingSwitcherPopup = GObject.registerClass({
         this.tiledWindow = window;
 
         window.change_workspace(global.workspace_manager.get_active_workspace());
-        window.move_to_monitor(this._monitor);
 
         // We want to activate/focus the window after it was tiled with the
         // Tiling Popup. Calling activate/focus() after tile() doesn't seem to
@@ -305,7 +304,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         // tile group won't be accidently raised.
         Twm.clearTilingProps(window.get_id());
         window.activate(global.get_current_time());
-        Twm.tile(window, rect, { openTilingPopup: this._allowConsecutivePopup });
+        Twm.tile(window, rect, { monitorNr: this._monitor, openTilingPopup: this._allowConsecutivePopup });
     }
 
     // Dont _finish(), if no mods are pressed
