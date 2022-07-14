@@ -164,6 +164,10 @@ var TilingWindowManager = class TilingWindowManager {
         const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
         if (maximize && !maxUsesGap) {
             window.tiledRect = null;
+            // It's possible for a window to maximize() to the wrong monitor.
+            // This is very easy to reproduce when dragging a window on the
+            // lower half with Super + LMB.
+            window.move_to_monitor(monitor);
             window.maximize(Meta.MaximizeFlags.BOTH);
             return;
         }
@@ -218,7 +222,7 @@ var TilingWindowManager = class TilingWindowManager {
                 this.updateTileGroup([window]);
             // Setup the (new) tileGroup to raise tiled windows as a group
             } else {
-                const topTileGroup = this._getWindowsForBuildingTileGroup(window.get_monitor());
+                const topTileGroup = this._getWindowsForBuildingTileGroup(monitor);
                 this.updateTileGroup(topTileGroup);
             }
 
