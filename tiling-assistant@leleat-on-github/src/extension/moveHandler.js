@@ -428,7 +428,8 @@ var Handler = class TilingMoveHandler {
         // the user doesn't have to slowly inch the mouse to the monitor edge
         // just because there is another monitor at that edge.
         const currMonitorNr = global.display.get_current_monitor();
-        if (this._lastMonitorNr !== currMonitorNr) {
+        const useGracePeriod = Settings.getBoolean(Settings.MONITOR_SWITCH_GRACE_PERIOD);
+        if (useGracePeriod && this._lastMonitorNr !== currMonitorNr) {
             this._monitorNr = this._lastMonitorNr;
             let timerId = 0;
             this._latestMonitorLockTimerId && GLib.Source.remove(this._latestMonitorLockTimerId);
@@ -444,7 +445,10 @@ var Handler = class TilingMoveHandler {
                 return GLib.SOURCE_REMOVE;
             });
             timerId = this._latestMonitorLockTimerId;
+        } else {
+            this._monitorNr = global.display.get_current_monitor();
         }
+
         this._lastMonitorNr = currMonitorNr;
 
         const wRect = window.get_frame_rect();

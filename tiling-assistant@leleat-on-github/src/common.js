@@ -30,6 +30,7 @@ var Settings = class Settings {
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
     static FAVORITE_LAYOUTS = 'favorite-layouts';
     static DEFAULT_MOVE_MODE = 'default-move-mode';
+    static MONITOR_SWITCH_GRACE_PERIOD = 'monitor-switch-grace-period';
     static ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT = 'adapt-edge-tiling-to-favorite-layout';
     static ADAPTIVE_TILING_MOD = 'move-adaptive-tiling-mod';
     static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
@@ -92,6 +93,7 @@ var Settings = class Settings {
             this.ENABLE_UNTILE_ANIMATIONS,
             this.FAVORITE_LAYOUTS,
             this.DEFAULT_MOVE_MODE,
+            this.MONITOR_SWITCH_GRACE_PERIOD,
             this.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
             this.ADAPTIVE_TILING_MOD,
             this.FAVORITE_LAYOUT_MOD,

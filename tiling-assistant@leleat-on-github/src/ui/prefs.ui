@@ -685,6 +685,18 @@
                 <property name="title" translatable="yes">Other Window Movement Settings</property>
                 <child>
                   <object class="AdwActionRow">
+                    <property name="title" translatable="yes">Monitor Switch Grace Period</property>
+                    <property name="subtitle" translatable="yes">When a window is dragged to a new monitor the tile preview will stick to the old monitor for a very short time. This way you can tile windows by 'throwing' it towards any screen edge even if a monitor is bordering that edge.</property>
+                    <property name="activatable-widget">monitor_switch_grace_period</property>
+                    <child>
+                      <object class="GtkSwitch" id="monitor_switch_grace_period">
+                        <property name="valign">center</property>
+                      </object>
+                    </child>
+                  </object>
+                </child>
+                <child>
+                  <object class="AdwActionRow">
                     <property name="title" translatable="yes">Adapt 'Edge Tiling' to your Favorite Layout</property>
                     <property name="activatable-widget">adapt_edge_tiling_to_favorite_layout</property>
                     <child>
