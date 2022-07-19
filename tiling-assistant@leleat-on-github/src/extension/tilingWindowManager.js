@@ -157,12 +157,7 @@ var TilingWindowManager = class TilingWindowManager {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
-        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
-        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
-        const maxUsesGap = (screenTopGap || screenLeftGap || screenRightGap || screenBottomGap) && Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS);
-        if (maximize && !maxUsesGap) {
+        if (maximize && !Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS)) {
             window.tiledRect = null;
             // It's possible for a window to maximize() to the wrong monitor.
             // This is very easy to reproduce when dragging a window on the
