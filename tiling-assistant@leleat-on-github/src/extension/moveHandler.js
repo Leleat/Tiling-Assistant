@@ -320,7 +320,6 @@ var Handler = class TilingMoveHandler {
                 return GLib.SOURCE_CONTINUE;
 
             this._movingTimeoutsSinceUpdate = 0;
-            forceMoveUpdate = false;
         }
 
         this._lastPointerPos = currPointerPos;
