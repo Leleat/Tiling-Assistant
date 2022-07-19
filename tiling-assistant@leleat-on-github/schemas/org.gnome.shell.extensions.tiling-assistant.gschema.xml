@@ -197,6 +197,9 @@
 			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout -->
 			<default>0</default>
 		</key>
+		<key name="low-performance-move-mode" type="b">
+			<default>false</default>
+		</key>
 		<key name="monitor-switch-grace-period" type="b">
 			<default>true</default>
 		</key>

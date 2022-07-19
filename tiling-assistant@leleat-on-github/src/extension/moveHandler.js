@@ -166,7 +166,6 @@ var Handler = class TilingMoveHandler {
             this._pointerDidntMove = false;
             this._movingTimerDuration = 20;
             this._movingTimeoutsSinceUpdate = 0;
-            this._forceMoveUpdate = false;
 
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
@@ -176,31 +175,60 @@ var Handler = class TilingMoveHandler {
             const tRects = topTileGroup.map(w => w.tiledRect);
             const freeScreenRects = workArea.minus(tRects);
 
-            this._movingTimerId = GLib.timeout_add(
-                GLib.PRIORITY_IDLE,
-                this._movingTimerDuration,
-                this._onMoving.bind(
-                    this,
-                    grabOp,
-                    window,
-                    topTileGroup,
-                    freeScreenRects
-                )
-            );
+            // When low performance mode is enabled we use a timer to periodically
+            // update the tile previews so that we don't update the tile preview
+            // as often when compared to the position-changed signal.
+            if (Settings.getBoolean(Settings.LOW_PERFORMANCE_MOVE_MODE)) {
+                this._movingTimerId = GLib.timeout_add(
+                    GLib.PRIORITY_IDLE,
+                    this._movingTimerDuration,
+                    this._onMoving.bind(
+                        this,
+                        grabOp,
+                        window,
+                        topTileGroup,
+                        freeScreenRects,
+                        true
+                    )
+                );
 
-            const id = global.display.connect('grab-op-end', () => {
-                // 'Quick throws' of windows won't create a tile preview since
-                // the timeout for onMoving may not have happened yet. So force
-                // 1 call of the tile preview updates for those quick actions.
-                this._forceMoveUpdate = true;
-                this._onMoving(grabOp, window, topTileGroup, freeScreenRects);
-                this._onMoveFinished(window);
-                global.display.disconnect(id);
-            });
+                const id = global.display.connect('grab-op-end', () => {
+                    global.display.disconnect(id);
+                    // 'Quick throws' of windows won't create a tile preview since
+                    // the timeout for onMoving may not have happened yet. So force
+                    // 1 call of the tile preview updates for those quick actions.
+                    this._onMoving(grabOp, window, topTileGroup, freeScreenRects);
+                    this._onMoveFinished(window);
+                });
+
+            // Otherwise we will update the tile preview whenever the window is
+            // moved as often as necessary.
+            } else {
+                this._posChangedId = window.connect('position-changed',
+                    this._onMoving.bind(
+                        this,
+                        grabOp,
+                        window,
+                        topTileGroup,
+                        freeScreenRects,
+                        false
+                    )
+                );
+
+                const id = global.display.connect('grab-op-end', () => {
+                    global.display.disconnect(id);
+                    this._onMoveFinished(window);
+                });
+            }
         }
     }
 
     _onMoveFinished(window) {
+        if (this._posChangedId) {
+            window.disconnect(this._posChangedId);
+            this._posChangedId = 0;
+        }
+
         if (this._tileRect) {
             // Ctrl-drag to replace some windows in a tile group / create a new tile group
             // with at least 1 window being part of multiple tile groups.
@@ -248,46 +276,54 @@ var Handler = class TilingMoveHandler {
         this._isGrabOp = false;
     }
 
+    // If lowPerfMode is enabled in the settings:
     // Called periodically (~ every 20 ms) with a timer after a window was grabbed.
     // However this function will only update the tile previews fully after about
     // 500 ms. Force an earlier update, if the pointer movement state changed
     // (e.g. pointer came to a stop after a movement). This Detection is done
     // naively by comparing the pointer position of the previous timeout with
     // the current position.
-    _onMoving(grabOp, window, topTileGroup, freeScreenRects) {
-        if (!this._isGrabOp) {
-            this._movingTimerId = null;
-            return GLib.SOURCE_REMOVE;
-        }
-
+    // Without the lowPerfMode enabled this will be called whenever the window is
+    // moved (by listening to the position-changed signal)
+    _onMoving(grabOp, window, topTileGroup, freeScreenRects, lowPerfMode = false) {
         const [x, y] = global.get_pointer();
         const currPointerPos = { x, y };
-        const movementDist = Util.getDistance(this._lastPointerPos, currPointerPos);
-        const movementDetectionThreshold = 10;
-        this._lastPointerPos = currPointerPos;
-        this._movingTimeoutsSinceUpdate++;
 
-        // Force an early update if the movement state changed
-        // i. e. moving -> stand still or stand still -> moving
-        if (this._pointerDidntMove) {
-            if (movementDist > movementDetectionThreshold) {
-                this._pointerDidntMove = false;
-                this._forceMoveUpdate = true;
+        if (lowPerfMode) {
+            if (!this._isGrabOp) {
+                this._movingTimerId = null;
+                return GLib.SOURCE_REMOVE;
             }
-        } else if (movementDist < movementDetectionThreshold) {
-            this._pointerDidntMove = true;
-            this._forceMoveUpdate = true;
+
+            const movementDist = Util.getDistance(this._lastPointerPos, currPointerPos);
+            const movementDetectionThreshold = 10;
+            let forceMoveUpdate = false;
+            this._movingTimeoutsSinceUpdate++;
+
+            // Force an early update if the movement state changed
+            // i. e. moving -> stand still or stand still -> moving
+            if (this._pointerDidntMove) {
+                if (movementDist > movementDetectionThreshold) {
+                    this._pointerDidntMove = false;
+                    forceMoveUpdate = true;
+                }
+            } else if (movementDist < movementDetectionThreshold) {
+                this._pointerDidntMove = true;
+                forceMoveUpdate = true;
+            }
+
+            // Only update the tile preview every 500 ms for better performance.
+            // Force an early update, if the pointer movement state changed.
+            const updateInterval = 500;
+            const timeSinceLastUpdate = this._movingTimerDuration * this._movingTimeoutsSinceUpdate;
+            if (timeSinceLastUpdate < updateInterval && !forceMoveUpdate)
+                return GLib.SOURCE_CONTINUE;
+
+            this._movingTimeoutsSinceUpdate = 0;
+            forceMoveUpdate = false;
         }
 
-        // Only update the tile preview every 500 ms for better performance.
-        // Force an early update, if the pointer movement state changed.
-        const updateInterval = 500;
-        const timeSinceLastUpdate = this._movingTimerDuration * this._movingTimeoutsSinceUpdate;
-        if (timeSinceLastUpdate < updateInterval && !this._forceMoveUpdate)
-            return GLib.SOURCE_CONTINUE;
-
-        this._movingTimeoutsSinceUpdate = 0;
-        this._forceMoveUpdate = false;
+        this._lastPointerPos = currPointerPos;
 
         const ctrl = Clutter.ModifierType.CONTROL_MASK;
         const altL = Clutter.ModifierType.MOD1_MASK;
@@ -429,22 +465,24 @@ var Handler = class TilingMoveHandler {
         // just because there is another monitor at that edge.
         const currMonitorNr = global.display.get_current_monitor();
         const useGracePeriod = Settings.getBoolean(Settings.MONITOR_SWITCH_GRACE_PERIOD);
-        if (useGracePeriod && this._lastMonitorNr !== currMonitorNr) {
-            this._monitorNr = this._lastMonitorNr;
-            let timerId = 0;
-            this._latestMonitorLockTimerId && GLib.Source.remove(this._latestMonitorLockTimerId);
-            this._latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
-                // Only update the monitorNr, if the latest timer timed out.
-                if (timerId === this._latestMonitorLockTimerId) {
-                    this._monitorNr = global.display.get_current_monitor();
-                    if (global.display.get_grab_op() === grabOp) // !
-                        this._edgeTilingPreview(window, grabOp);
-                }
+        if (useGracePeriod) {
+            if (this._lastMonitorNr !== currMonitorNr) {
+                this._monitorNr = this._lastMonitorNr;
+                let timerId = 0;
+                this._latestMonitorLockTimerId && GLib.Source.remove(this._latestMonitorLockTimerId);
+                this._latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
+                    // Only update the monitorNr, if the latest timer timed out.
+                    if (timerId === this._latestMonitorLockTimerId) {
+                        this._monitorNr = global.display.get_current_monitor();
+                        if (global.display.get_grab_op() === grabOp) // !
+                            this._edgeTilingPreview(window, grabOp);
+                    }
 
-                this._latestMonitorLockTimerId = null;
-                return GLib.SOURCE_REMOVE;
-            });
-            timerId = this._latestMonitorLockTimerId;
+                    this._latestMonitorLockTimerId = null;
+                    return GLib.SOURCE_REMOVE;
+                });
+                timerId = this._latestMonitorLockTimerId;
+            }
         } else {
             this._monitorNr = global.display.get_current_monitor();
         }
