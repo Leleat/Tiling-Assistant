@@ -38,6 +38,9 @@
 		<key name="maximize-with-gap" type="b">
 			<default>false</default>
 		</key>
+		<key name="monitor-switch-grace-period" type="b">
+			<default>true</default>
+		</key>
 
 		<!-- Keybindings Page -->
 
@@ -199,9 +202,6 @@
 		</key>
 		<key name="low-performance-move-mode" type="b">
 			<default>false</default>
-		</key>
-		<key name="monitor-switch-grace-period" type="b">
-			<default>true</default>
 		</key>
 		<key name="adapt-edge-tiling-to-favorite-layout" type="b">
 			<default>false</default>

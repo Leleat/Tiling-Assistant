@@ -290,6 +290,23 @@
           </child>
         </object>
       </child>
+      <child>
+        <object class="AdwPreferencesGroup">
+          <property name="title" translatable="yes">Other</property>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Monitor Switch Grace Period</property>
+              <property name="subtitle" translatable="yes">When a window is dragged to a new monitor the tile preview will stick to the old monitor for a very short time. This way you can tile windows by 'throwing' it towards any screen edge even if a monitor is bordering that edge.</property>
+              <property name="activatable-widget">monitor_switch_grace_period</property>
+              <child>
+                <object class="GtkSwitch" id="monitor_switch_grace_period">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </child>
   </object>
 
   <!-- ======================================================================================== -->
@@ -690,18 +707,6 @@
                     <property name="activatable-widget">low_performance_move_mode</property>
                     <child>
                       <object class="GtkSwitch" id="low_performance_move_mode">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Monitor Switch Grace Period</property>
-                    <property name="subtitle" translatable="yes">When a window is dragged to a new monitor the tile preview will stick to the old monitor for a very short time. This way you can tile windows by 'throwing' it towards any screen edge even if a monitor is bordering that edge.</property>
-                    <property name="activatable-widget">monitor_switch_grace_period</property>
-                    <child>
-                      <object class="GtkSwitch" id="monitor_switch_grace_period">
                         <property name="valign">center</property>
                       </object>
                     </child>
