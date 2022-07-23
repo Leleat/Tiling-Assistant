@@ -1,6 +1,6 @@
 # Maintainer: Leleat
 pkgname='gnome-shell-extension-tiling-assistant'
-pkgver=34
+pkgver=35
 pkgrel=1
 pkgdesc="A GNOME Shell extension to expand GNOME's native 2 column design."
 arch=('x86_64')

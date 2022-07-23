@@ -7,5 +7,5 @@
   "url": "https://github.com/Leleat/Tiling-Assistant",
   "uuid": "tiling-assistant@leleat-on-github",
   "settings-schema": "org.gnome.shell.extensions.tiling-assistant",
-  "version": 34
+  "version": 35
 }
