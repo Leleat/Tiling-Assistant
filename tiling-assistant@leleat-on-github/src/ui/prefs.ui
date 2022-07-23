@@ -599,17 +599,6 @@
                 </child>
                 <child>
                   <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Show Changelog in Preferences after an Update</property>
-                    <property name="activatable-widget">show_changelog_on_update</property>
-                    <child>
-                      <object class="GtkSwitch" id="show_changelog_on_update">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
                     <property name="title" translatable="yes">Disable Tile Groups</property>
                     <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' and the Tiling Popup will also no longer work.</property>
                     <property name="activatable-widget">disable_tile_groups</property>

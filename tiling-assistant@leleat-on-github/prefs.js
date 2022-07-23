@@ -7,7 +7,6 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const LayoutPrefs = Me.imports.src.prefs.layoutsPrefs.Prefs;
-const { Changelog } = Me.imports.src.prefs.changelog;
 const { ShortcutListener } = Me.imports.src.prefs.shortcutListener;
 const { Settings, Shortcuts } = Me.imports.src.common;
 
@@ -61,21 +60,6 @@ function fillPreferencesWindow(window) {
     // in GNOME anymore. So directly ship that icon with the extension.
     const hiddenSettingsIcon = builder.get_object('hidden_settings_icon');
     hiddenSettingsIcon.set_from_file(`${Me.path}/media/eye-not-looking-symbolic.png`);
-
-    // Open Changelog after an update
-    const lastVersion = settings.get_int(Settings.CHANGELOG_VERSION);
-    const firstInstall = lastVersion === -1;
-    const noUpdate = lastVersion >= Me.metadata.version;
-
-    settings.set_int(Settings.CHANGELOG_VERSION, Me.metadata.version);
-
-    if (firstInstall || noUpdate)
-        return;
-
-    if (!settings.get_boolean(Settings.SHOW_CHANGE_ON_UPDATE))
-        return;
-
-    _openChangelog(window, settings);
 }
 
 /*
@@ -90,7 +74,6 @@ function _bindSwitches(settings, builder) {
         Settings.MAXIMIZE_WITH_GAPS,
         Settings.SHOW_LAYOUT_INDICATOR,
         Settings.ENABLE_ADV_EXP_SETTINGS,
-        Settings.SHOW_CHANGE_ON_UPDATE,
         Settings.DISABLE_TILE_GROUPS,
         Settings.LOW_PERFORMANCE_MOVE_MODE,
         Settings.MONITOR_SWITCH_GRACE_PERIOD,
@@ -239,11 +222,11 @@ function _addHeaderBarInfoButton(window, settings, builder) {
     actionGroup.add_action(bugReportAction);
 
     const userGuideAction = new Gio.SimpleAction({ name: 'open-user-guide' });
-    userGuideAction.connect('activate', this._openUserGuide.bind(this, window, settings));
+    userGuideAction.connect('activate', this._openUserGuide.bind(this, window));
     actionGroup.add_action(userGuideAction);
 
     const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
-    changelogAction.connect('activate', this._openChangelog.bind(this, window, settings));
+    changelogAction.connect('activate', this._openChangelog.bind(this, window));
     actionGroup.add_action(changelogAction);
 
     const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
@@ -267,21 +250,8 @@ function _openUserGuide(window) {
     Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md', Gdk.CURRENT_TIME);
 }
 
-function _openChangelog(window, settings) {
-    const path = GLib.build_filenamev([Me.path, 'src/changelog.json']);
-    const file = Gio.File.new_for_path(path);
-    if (!file.query_exists(null))
-        return;
-
-    const [success, contents] = file.load_contents(null);
-    if (!success || !contents.length)
-        return;
-
-    const changes = JSON.parse(ByteArray.toString(contents));
-    const allowAdvExpSettings = settings.get_boolean(Settings.ENABLE_ADV_EXP_SETTINGS);
-    const changelogDialog = new Changelog(changes, allowAdvExpSettings);
-    changelogDialog._changelogReturnButton.connect('clicked', () => window.close_subpage());
-    window.present_subpage(changelogDialog);
+function _openChangelog(window) {
+    Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md', Gdk.CURRENT_TIME);
 }
 
 function _openLicense(window) {

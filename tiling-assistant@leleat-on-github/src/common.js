@@ -23,8 +23,6 @@ var Settings = class Settings {
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
     static SHOW_LAYOUT_INDICATOR = 'show-layout-panel-indicator';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
-    static SHOW_CHANGE_ON_UPDATE = 'show-changelog-on-update';
-    static CHANGELOG_VERSION = 'changelog-version';
     static DISABLE_TILE_GROUPS = 'disable-tile-groups';
     static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
     static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
@@ -87,8 +85,6 @@ var Settings = class Settings {
             this.DYNAMIC_KEYBINDINGS,
             this.SHOW_LAYOUT_INDICATOR,
             this.ENABLE_ADV_EXP_SETTINGS,
-            this.SHOW_CHANGE_ON_UPDATE,
-            this.CHANGELOG_VERSION,
             this.DISABLE_TILE_GROUPS,
             this.ENABLE_TILE_ANIMATIONS,
             this.ENABLE_UNTILE_ANIMATIONS,

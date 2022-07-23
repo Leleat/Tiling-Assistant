@@ -187,12 +187,6 @@
 		<key name="enable-untile-animations" type="b">
 			<default>true</default>
 		</key>
-		<key name="changelog-version" type="i">
-			<default>-1</default>
-		</key>
-		<key name="show-changelog-on-update" type="b">
-			<default>false</default>
-		</key>
 		<key name="disable-tile-groups" type="b">
 			<default>false</default>
 		</key>
