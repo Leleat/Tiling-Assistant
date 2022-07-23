@@ -1,5 +1,18 @@
 # Changelog
 
+## v35
+**Added**
+- added setting to disable multi-monitor grace period (#189)
+
+**Changed**
+- make the 'improved performance behaviour' opt-in (in the advanced settings) since it impacts the precision of the tile preview (#190)
+
+**Fixed**
+- fixed issue about windows maximizing to wrong monitor under some circumstances setups (#188)
+
+**Removed**
+- removed in-app changelog
+
 ## v34
 **Added**
 - added setting to completely disable tile groups. That means no resizing, raising or suggestions anymore (#180)
