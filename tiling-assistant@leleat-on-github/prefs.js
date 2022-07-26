@@ -15,6 +15,16 @@ function init() {
 }
 
 function fillPreferencesWindow(window) {
+    // Load css file
+    const provider = new Gtk.CssProvider();
+    const path = GLib.build_filenamev([Me.path, 'stylesheet.css']);
+    provider.load_from_path(path);
+    Gtk.StyleContext.add_provider_for_display(
+        Gdk.Display.get_default(),
+        provider,
+        Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+    );
+
     window.set_can_navigate_back(true);
 
     const settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);

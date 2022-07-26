@@ -42,6 +42,9 @@
                 <child>
                   <object class="ShortcutListener" id="shortcut"/>
                 </child>
+                <style>
+                  <class name="layout-shortcut"/>
+                </style>
               </object>
             </child>
             <child>
