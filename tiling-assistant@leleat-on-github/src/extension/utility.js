@@ -96,6 +96,20 @@ var Util = class Utility {
     }
 
     /**
+     * Get the window or screen gaps scaled to the monitor scale.
+     *
+     * @param {String} settingsKey the key for the gap
+     * @param {number} monitor the number of the monitor to scale the gap to
+     * @returns {number} the scaled gap as a even number since the window gap
+     *      will be divided by 2.
+     */
+    static getScaledGap(settingsKey, monitor) {
+        const gap = Settings.getInt(settingsKey);
+        const scaledGap = gap * global.display.get_monitor_scale(monitor);
+        return scaledGap % 2 === 0 ? scaledGap : scaledGap + 1;
+    }
+
+    /**
      * @param {number} modMask a Clutter.ModifierType.
      * @returns wether the current event the modifier at `modMask`.
      */
@@ -283,21 +297,24 @@ var Rect = class Rect {
 
     /**
      * Gets a new rectangle where the screen and window gaps were
-     * added/subbed to/from `this`
+     * added/subbed to/from `this`.
      *
      * @param {Rect} rect a tiled Rect
+     * @param {number} monitor the number of the monitor to scale the gap to
      * @returns {Rect} the rectangle after the gaps were taken into account
      */
-    addGaps(workArea) {
-        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
-        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const screenRightGap = Settings.getInt(Settings.SCREEN_RIGHT_GAP);
-        const screenBottomGap = Settings.getInt(Settings.SCREEN_BOTTOM_GAP);
-        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
+    addGaps(workArea, monitor) {
+        const screenTopGap = Util.getScaledGap(Settings.SCREEN_TOP_GAP, monitor);
+        const screenLeftGap = Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
+        const screenRightGap = Util.getScaledGap(Settings.SCREEN_RIGHT_GAP, monitor);
+        const screenBottomGap = Util.getScaledGap(Settings.SCREEN_BOTTOM_GAP, monitor);
+        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);
         const r = this.copy();
 
-        [['x', 'width', screenLeftGap, screenRightGap],
-            ['y', 'height', screenTopGap, screenBottomGap]].forEach(([pos, dim, posGap, dimGap]) => {
+        [
+            ['x', 'width', screenLeftGap, screenRightGap],
+            ['y', 'height', screenTopGap, screenBottomGap]
+        ].forEach(([pos, dim, posGap, dimGap]) => {
             if (this[pos] === workArea[pos]) {
                 r[pos] = this[pos] + posGap;
                 r[dim] -= posGap;

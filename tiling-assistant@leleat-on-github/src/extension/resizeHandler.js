@@ -277,10 +277,11 @@ var Handler = class TilingResizeHandler {
         if (!window.isTiled)
             return;
 
-        const screenTopGap = Settings.getInt(Settings.SCREEN_TOP_GAP);
-        const screenLeftGap = Settings.getInt(Settings.SCREEN_LEFT_GAP);
-        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
-        const workArea = window.get_work_area_for_monitor(window.get_monitor());
+        const monitor = window.get_monitor();
+        const screenTopGap = Util.getScaledGap(Settings.SCREEN_TOP_GAP, monitor);
+        const screenLeftGap = Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
+        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);
+        const workArea = window.get_work_area_for_monitor(monitor);
 
         // First calculate the new tiledRect for window:
         // The new x / y coord for the window's tiledRect can be calculated by
@@ -388,7 +389,7 @@ var Handler = class TilingResizeHandler {
         const resizedRect = new Rect(resizedWindow.get_frame_rect());
         const wRect = new Rect(window.get_frame_rect());
         const preGrabRect = this._preGrabRects.get(window);
-        const windowGap = Settings.getInt(Settings.WINDOW_GAP);
+        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, window.get_monitor());
 
         switch (grabOp) {
             case Meta.GrabOp.RESIZING_N:

@@ -172,7 +172,7 @@ var TilingWindowManager = class TilingWindowManager {
         // For ex. which only resize in full rows/columns like gnome-terminal
         window.tiledRect = newRect.copy();
 
-        const { x, y, width, height } = newRect.addGaps(workArea);
+        const { x, y, width, height } = newRect.addGaps(workArea, monitor);
 
         // Animations
         const wActor = window.get_compositor_private();
