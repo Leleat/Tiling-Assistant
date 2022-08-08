@@ -333,6 +333,26 @@ var Rect = class Rect {
     }
 
     /**
+     * Checks wether `this` borders another rectangle on this' east edge.
+     *
+     * @param {Rect} rect
+     * @returns {boolean}
+     */
+    bordersOnE(rect) {
+        return this.vertOverlap && this.x2 === rect.x;
+    }
+
+    /**
+     * Checks wether `this` borders another rectangle on this' south edge.
+     *
+     * @param {Rect} rect
+     * @returns {boolean}
+     */
+    bordersOnS(rect) {
+        return this.horizOverlap && this.y2 === rect.y;
+    }
+
+    /**
      * @param {{x: number, y: number}} point
      * @returns {boolean}
      */
