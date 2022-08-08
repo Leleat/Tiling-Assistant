@@ -56,7 +56,26 @@ var LayoutManager = class TilingLayoutsManager {
 
         // Bind the keyboard shortcuts for each layout and the layout searchers
         this._keyBindings = [];
-        this._bindKeybindings();
+
+        for (let i = 0; i < 20; i++) {
+            this._keyBindings.push(`activate-layout${i}`);
+            Main.wm.addKeybinding(
+                `activate-layout${i}`,
+                Settings.getGioObject(),
+                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+                Shell.ActionMode.NORMAL,
+                this.startLayouting.bind(this, i)
+            );
+        }
+
+        this._keyBindings.push('search-popup-layout');
+        Main.wm.addKeybinding(
+            'search-popup-layout',
+            Settings.getGioObject(),
+            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+            Shell.ActionMode.NORMAL,
+            this.openPopupSearch.bind(this)
+        );
 
         // Add panel indicator
         this._panelIndicator = new PanelIndicator();
@@ -264,28 +283,6 @@ var LayoutManager = class TilingLayoutsManager {
 
             this._step(this._currItem.loopType);
         }
-    }
-
-    _bindKeybindings() {
-        for (let i = 0; i < 20; i++) {
-            this._keyBindings.push(`activate-layout${i}`);
-            Main.wm.addKeybinding(
-                `activate-layout${i}`,
-                Settings.getGioObject(),
-                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                Shell.ActionMode.NORMAL,
-                this.startLayouting.bind(this, i)
-            );
-        }
-
-        this._keyBindings.push('search-popup-layout');
-        Main.wm.addKeybinding(
-            'search-popup-layout',
-            Settings.getGioObject(),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL,
-            this.openPopupSearch.bind(this)
-        );
     }
 };
 
