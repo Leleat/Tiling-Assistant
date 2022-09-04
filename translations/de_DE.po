@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-07-23 11:46+0200\n"
+"POT-Creation-Date: 2022-09-04 12:01+0200\n"
 "PO-Revision-Date: 2022-04-24 12:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -497,20 +497,20 @@ msgstr "Kachel Popup aktiviert"
 msgid "Tiling popup was disabled"
 msgstr "Kachel Popup wurde deaktiviert"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:85
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:490
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
 msgid "No valid layouts defined."
 msgstr "Keine gültigen Layouts definiert."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:176
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
 msgid "Popup Layouts: App not found."
 msgstr "Popup Layouts: App nicht gefunden."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:337
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
 msgid "Type to search..."
 msgstr "Schreiben um zu suchen..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:443
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
 msgid "Nameless layout..."
 msgstr "Unbenanntes Layout..."
 
