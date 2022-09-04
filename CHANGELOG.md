@@ -1,5 +1,15 @@
 # Changelog
 
+## v36
+**Added**
+- support GNOME 43
+
+**Changed**
+- removed the 'row'-look of shortcuts in the layouts
+
+**Fixed**
+- consider monitor scale when calculating window gaps (#196)
+
 ## v35
 **Added**
 - added setting to disable multi-monitor grace period (#189)
