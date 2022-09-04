@@ -126,7 +126,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                      <property name="upper">100</property>
+                      <property name="upper">500</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">8</property>
                     </object>
@@ -144,7 +144,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                      <property name="upper">50</property>
+                      <property name="upper">500</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">8</property>
                     </object>
@@ -162,7 +162,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                      <property name="upper">50</property>
+                      <property name="upper">500</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">8</property>
                     </object>
@@ -180,7 +180,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                      <property name="upper">50</property>
+                      <property name="upper">500</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">8</property>
                     </object>
@@ -198,7 +198,7 @@
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">
-                      <property name="upper">50</property>
+                      <property name="upper">500</property>
                       <property name="step-increment">2</property>
                       <property name="page-increment">8</property>
                     </object>
@@ -752,7 +752,7 @@
                         <property name="adjustment">
                           <object class="GtkAdjustment">
                             <property name="lower">5</property>
-                            <property name="upper">100</property>
+                            <property name="upper">500</property>
                             <property name="step-increment">5</property>
                             <property name="page-increment">10</property>
                           </object>
@@ -771,7 +771,7 @@
                         <property name="adjustment">
                           <object class="GtkAdjustment">
                             <property name="lower">10</property>
-                            <property name="upper">100</property>
+                            <property name="upper">500</property>
                             <property name="step-increment">5</property>
                             <property name="page-increment">10</property>
                           </object>
