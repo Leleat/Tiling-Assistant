@@ -226,10 +226,11 @@
       <child>
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Dynamic Keybinding Behaviour</property>
+          <property name="description" translatable="yes">The keybindings to maximize and tile to the top/bottom/left/right may change their behaviour based on the window's tiling state</property>
           <child>
             <object class="AdwActionRow" id="dynamic_keybinding_disabled_row">
               <property name="title" translatable="yes">Disabled</property>
-              <property name="subtitle" translatable="yes">The keyboard shortcuts to maximize and tile to the top, bottom, left, and right won't change their behaviour based on the window's tiling state</property>
+              <property name="subtitle" translatable="yes">Don't change the keybindings' behaviour</property>
               <property name="activatable-widget">dynamic_keybinding_disabled_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="dynamic_keybinding_disabled_button"/>
@@ -239,7 +240,7 @@
           <child>
             <object class="AdwActionRow" id="dynamic_keybinding_window_focus_row">
               <property name="title" translatable="yes">Window Focus</property>
-              <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut, if there is one</property>
+              <property name="subtitle" translatable="yes">Switch focus to the tiled window in the direction of the pressed shortcut</property>
               <property name="activatable-widget">dynamic_keybinding_window_focus_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="dynamic_keybinding_window_focus_button">
@@ -251,7 +252,7 @@
           <child>
             <object class="AdwActionRow" id="dynamic_keybinding_tiling_state_row">
               <property name="title" translatable="yes">Tiling State</property>
-              <property name="subtitle" translatable="yes">Adapt the current window's tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated</property>
+              <property name="subtitle" translatable="yes">Adapt the tiling state to the pressed shortcut. For instance, a window tiled to the right half will tile to the bottom-right quarter, if 'tile to bottom' is activated</property>
               <property name="activatable-widget">dynamic_keybinding_tiling_state_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="dynamic_keybinding_tiling_state_button">
