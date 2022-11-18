@@ -290,6 +290,9 @@
           </child>
         </object>
       </child>
+      <!-- ======================================================================================== -->
+      <!-- = Group: Other ========================================================================= -->
+      <!-- ======================================================================================== -->
       <child>
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Other</property>
@@ -341,6 +344,10 @@
         <child>
           <object class="ShortcutListener" id="toggle_always_on_top">
             <property name="title" translatable="yes">Toggle 'Always on Top'</property>
+            <property name="visible"
+                      bind-source="enable_advanced_experimental_features"
+                      bind-property="active"
+                      bind-flags="sync-create"/>
           </object>
         </child>
         <child>
