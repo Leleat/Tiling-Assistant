@@ -292,6 +292,87 @@
         </object>
       </child>
       <!-- ======================================================================================== -->
+      <!-- = Group: Active Window Hint ============================================================ -->
+      <!-- ======================================================================================== -->
+      <child>
+        <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Active Window Hint</property>
+          <child>
+            <object class="AdwActionRow" id="active_hint_disabled_row">
+              <property name="title" translatable="yes">Disabled</property>
+              <property name="subtitle" translatable="yes">Don't indicate the focused window</property>
+              <property name="activatable-widget">active_hint_disabled_button</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="active_hint_disabled_button"/>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow" id="active_hint_minimal_row">
+              <property name="title" translatable="yes">Minimal</property>
+              <property name="subtitle" translatable="yes">Indicate the focused window if it's ambiguous. For instance, when switching to a workspace with multiple non-overlapping windows</property>
+              <property name="activatable-widget">active_hint_minimal_button</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="active_hint_minimal_button">
+                  <property name="group">active_hint_disabled_button</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow" id="active_hint_always_row">
+              <property name="title" translatable="yes">Always</property>
+              <property name="subtitle" translatable="yes">Always indicate the focused window unless it's maximized or in fullscreen</property>
+              <property name="activatable-widget">active_hint_always_button</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="active_hint_always_button">
+                  <property name="group">active_hint_disabled_button</property>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </child>
+      <child>
+        <object class="AdwPreferencesGroup">
+          <property name="visible"
+                    bind-source="enable_advanced_experimental_features"
+                    bind-property="active"
+                    bind-flags="sync-create"/>
+          <child>
+            <object class="AdwActionRow" id="active_hint_color_row">
+              <property name="title" translatable="yes">Hint Color</property>
+              <property name="subtitle" translatable="yes">The color of the frame indicating the focused window</property>
+              <property name="activatable-widget">active_hint_color_button</property>
+              <child>
+                <object class="GtkColorButton" id="active_hint_color_button">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Border Size</property>
+              <property name="subtitle" translatable="yes">The border size of the frame indicating the focused window</property>
+              <property name="activatable-widget">active_hint_size</property>
+              <child>
+                <object class="GtkSpinButton" id="active_hint_size">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="upper">50</property>
+                      <property name="step-increment">2</property>
+                      <property name="page-increment">8</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </child>
+      <!-- ======================================================================================== -->
       <!-- = Group: Other ========================================================================= -->
       <!-- ======================================================================================== -->
       <child>
