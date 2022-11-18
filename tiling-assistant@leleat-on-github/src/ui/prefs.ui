@@ -83,6 +83,22 @@
           <property name="title" translatable="yes">Tile Groups</property>
           <child>
             <object class="AdwActionRow">
+              <property name="title" translatable="yes">Disable Tile Groups</property>
+              <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' and the Tiling Popup will also no longer work.</property>
+              <property name="activatable-widget">disable_tile_groups</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSwitch" id="disable_tile_groups">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
               <property name="title" translatable="yes">Raise together</property>
               <property name="subtitle" translatable="yes">A tile group is created when a window gets tiled. If a tiled window is raised, raise the other windows of its tile group as well</property>
               <property name="activatable-widget">enable_raise_tile_group</property>
@@ -373,6 +389,86 @@
         </object>
       </child>
       <!-- ======================================================================================== -->
+      <!-- = Group: Animations ==================================================================== -->
+      <!-- ======================================================================================== -->
+      <child>
+        <object class="AdwPreferencesGroup">
+          <property name="title" translatable="yes">Animations</property>
+          <property name="visible"
+                    bind-source="enable_advanced_experimental_features"
+                    bind-property="active"
+                    bind-flags="sync-create"/>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Tiling</property>
+              <property name="activatable-widget">enable_tile_animations</property>
+              <child>
+                <object class="GtkSwitch" id="enable_tile_animations">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Untiling</property>
+              <property name="activatable-widget">enable_untile_animations</property>
+              <child>
+                <object class="GtkSwitch" id="enable_untile_animations">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </child>
+      <!-- ======================================================================================== -->
+      <!-- = Group: Default Window Movement Mode ================================================== -->
+      <!-- ======================================================================================== -->
+      <child>
+        <object class="AdwPreferencesGroup">
+          <property name="title" translatable="yes">Default Window Movement Mode</property>
+          <property name="visible"
+                    bind-source="enable_advanced_experimental_features"
+                    bind-property="active"
+                    bind-flags="sync-create"/>
+          <child>
+            <object class="AdwActionRow" id="edge_tiling_row">
+              <property name="title" translatable="yes">Edge Tiling</property>
+              <property name="subtitle" translatable="yes">Moving the window to the screen edges or corners will open the default tile preview</property>
+              <property name="activatable-widget">edge_tiling_checkbutton</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="edge_tiling_checkbutton"/>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow" id="adaptive_tiling_row">
+              <property name="title" translatable="yes">Adaptive Tiling</property>
+              <property name="subtitle" translatable="yes">Releasing the grab on a window while hovering over a tile will push the overlapped window(s) aside</property>
+              <property name="activatable-widget">adaptive_tiling_checkbutton</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="adaptive_tiling_checkbutton">
+                  <property name="group">edge_tiling_checkbutton</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow" id="favorite_layout_row">
+              <property name="title" translatable="yes">Favorite Layout</property>
+              <property name="subtitle" translatable="yes">The tile preview will stick to your favorite layout from the 'Layouts' page</property>
+              <property name="activatable-widget">favorite_layout_checkbutton</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="favorite_layout_checkbutton">
+                  <property name="group">edge_tiling_checkbutton</property>
+                </object>
+              </child>
+            </object>
+          </child>
+        </object>
+      </child>
+      <!-- ======================================================================================== -->
       <!-- = Group: Other ========================================================================= -->
       <!-- ======================================================================================== -->
       <child>
@@ -388,6 +484,192 @@
                   <property name="valign">center</property>
                 </object>
               </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Low Performance Movement Mode</property>
+              <property name="subtitle" translatable="yes">Use this if there is a lag when moving windows around. This will however decrease the precision of the tile preview updates.</property>
+              <property name="activatable-widget">low_performance_move_mode</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSwitch" id="low_performance_move_mode">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Adapt 'Edge Tiling' to your Favorite Layout</property>
+              <property name="activatable-widget">adapt_edge_tiling_to_favorite_layout</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSwitch" id="adapt_edge_tiling_to_favorite_layout">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="move_adaptive_tiling_mod">
+              <property name="title" translatable="yes">'Adaptive Tiling' Move Mode Activator</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item translatable="yes">Ctrl</item>
+                    <item translatable="yes">Alt</item>
+                    <item translatable="yes">RMB</item>
+                    <item translatable="yes">Super</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="move_favorite_layout_mod">
+              <property name="title" translatable="yes">'Favorite Layout' Move Mode Activator</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item translatable="yes">Ctrl</item>
+                    <item translatable="yes">Alt</item>
+                    <item translatable="yes">RMB</item>
+                    <item translatable="yes">Super</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Vertical Edge Preview Trigger Area</property>
+              <property name="activatable-widget">vertical_preview_area</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSpinButton" id="vertical_preview_area">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="lower">5</property>
+                      <property name="upper">500</property>
+                      <property name="step-increment">5</property>
+                      <property name="page-increment">10</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Horizontal Edge Preview Trigger Area</property>
+              <property name="activatable-widget">horizontal_preview_area</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSpinButton" id="horizontal_preview_area">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="lower">10</property>
+                      <property name="upper">500</property>
+                      <property name="step-increment">5</property>
+                      <property name="page-increment">10</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Inverse Top Screen Edge Action Timer</property>
+              <property name="activatable-widget">toggle_maximize_tophalf_timer</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSpinButton" id="toggle_maximize_tophalf_timer">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="lower">300</property>
+                      <property name="upper">1500</property>
+                      <property name="step-increment">50</property>
+                      <property name="page-increment">10</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
+              <property name="activatable-widget">enable_hold_maximize_inverse_landscape</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSwitch" id="enable_hold_maximize_inverse_landscape">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
+              <property name="activatable-widget">enable_hold_maximize_inverse_portrait</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <child>
+                <object class="GtkSwitch" id="enable_hold_maximize_inverse_portrait">
+                  <property name="valign">center</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="restore_window_size_on">
+              <property name="title" translatable="yes">Restore Window Size on</property>
+              <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item translatable="yes">Grab Start</item>
+                    <item translatable="yes">Grab End</item>
+                  </items>
+                </object>
+              </property>
             </object>
           </child>
         </object>
@@ -500,7 +782,7 @@
     <!-- ======================================================================================== -->
     <child>
       <object class="AdwPreferencesGroup">
-        <property name="title" translatable="yes">Edge Tiling</property>
+        <property name="title" translatable="yes">Corner Tiling</property>
         <child>
           <object class="ShortcutListener" id="tile_topleft_quarter">
             <property name="title" translatable="yes">Tile to top-left</property>
@@ -519,6 +801,28 @@
         <child>
           <object class="ShortcutListener" id="tile_bottomright_quarter">
             <property name="title" translatable="yes">Tile to bottom-right</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <!-- ======================================================================================== -->
+    <!-- = Group: Debugging ===================================================================== -->
+    <!-- ======================================================================================== -->
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Debugging</property>
+        <property name="visible"
+                  bind-source="enable_advanced_experimental_features"
+                  bind-property="active"
+                  bind-flags="sync-create"/>
+        <child>
+          <object class="ShortcutListener" id="debugging_show_tiled_rects">
+            <property name="title" translatable="yes">Show Tiled Rects</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="debugging_free_rects">
+            <property name="title" translatable="yes">Show Free Screen Rects</property>
           </object>
         </child>
       </object>
@@ -673,7 +977,6 @@
             <!-- ======================================================================================== -->
             <child>
               <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">General</property>
                 <child>
                   <object class="AdwActionRow">
                     <property name="title" translatable="yes">Advanced / Experimental Settings</property>
@@ -684,262 +987,6 @@
                         <property name="valign">center</property>
                       </object>
                     </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Disable Tile Groups</property>
-                    <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' and the Tiling Popup will also no longer work.</property>
-                    <property name="activatable-widget">disable_tile_groups</property>
-                    <child>
-                      <object class="GtkSwitch" id="disable_tile_groups">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- ======================================================================================== -->
-            <!-- = Group: Animations ==================================================================== -->
-            <!-- ======================================================================================== -->
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Animations</property>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Tiling</property>
-                    <property name="activatable-widget">enable_tile_animations</property>
-                    <child>
-                      <object class="GtkSwitch" id="enable_tile_animations">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Untiling</property>
-                    <property name="activatable-widget">enable_untile_animations</property>
-                    <child>
-                      <object class="GtkSwitch" id="enable_untile_animations">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- ======================================================================================== -->
-            <!-- = Group: Default Window Movement Mode ================================================== -->
-            <!-- ======================================================================================== -->
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Default Window Movement Mode</property>
-                <child>
-                  <object class="AdwActionRow" id="edge_tiling_row">
-                    <property name="title" translatable="yes">Edge Tiling</property>
-                    <property name="subtitle" translatable="yes">Moving the window to the screen edges or corners will open the default tile preview</property>
-                    <property name="activatable-widget">edge_tiling_checkbutton</property>
-                    <child type="prefix">
-                      <object class="GtkCheckButton" id="edge_tiling_checkbutton"/>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow" id="adaptive_tiling_row">
-                    <property name="title" translatable="yes">Adaptive Tiling</property>
-                    <property name="subtitle" translatable="yes">Releasing the grab on a window while hovering over a tile will push the overlapped window(s) aside</property>
-                    <property name="activatable-widget">adaptive_tiling_checkbutton</property>
-                    <child type="prefix">
-                      <object class="GtkCheckButton" id="adaptive_tiling_checkbutton">
-                        <property name="group">edge_tiling_checkbutton</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow" id="favorite_layout_row">
-                    <property name="title" translatable="yes">Favorite Layout</property>
-                    <property name="subtitle" translatable="yes">The tile preview will stick to your favorite layout from the 'Layouts' page</property>
-                    <property name="activatable-widget">favorite_layout_checkbutton</property>
-                    <child type="prefix">
-                      <object class="GtkCheckButton" id="favorite_layout_checkbutton">
-                        <property name="group">edge_tiling_checkbutton</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- ======================================================================================== -->
-            <!-- = Group: Other Window Movement Settings ================================================ -->
-            <!-- ======================================================================================== -->
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Other Window Movement Settings</property>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Low Performance Movement Mode</property>
-                    <property name="subtitle" translatable="yes">Use this if there is a lag when moving windows around. This will however decrease the precision of the tile preview updates.</property>
-                    <property name="activatable-widget">low_performance_move_mode</property>
-                    <child>
-                      <object class="GtkSwitch" id="low_performance_move_mode">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Adapt 'Edge Tiling' to your Favorite Layout</property>
-                    <property name="activatable-widget">adapt_edge_tiling_to_favorite_layout</property>
-                    <child>
-                      <object class="GtkSwitch" id="adapt_edge_tiling_to_favorite_layout">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwComboRow" id="move_adaptive_tiling_mod">
-                    <property name="title" translatable="yes">'Adaptive Tiling' Move Mode Activator</property>
-                    <property name="model">
-                      <object class="GtkStringList">
-                        <items>
-                          <item translatable="yes">Ctrl</item>
-                          <item translatable="yes">Alt</item>
-                          <item translatable="yes">RMB</item>
-                          <item translatable="yes">Super</item>
-                        </items>
-                      </object>
-                    </property>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwComboRow" id="move_favorite_layout_mod">
-                    <property name="title" translatable="yes">'Favorite Layout' Move Mode Activator</property>
-                    <property name="model">
-                      <object class="GtkStringList">
-                        <items>
-                          <item translatable="yes">Ctrl</item>
-                          <item translatable="yes">Alt</item>
-                          <item translatable="yes">RMB</item>
-                          <item translatable="yes">Super</item>
-                        </items>
-                      </object>
-                    </property>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Vertical Edge Preview Trigger Area</property>
-                    <property name="activatable-widget">vertical_preview_area</property>
-                    <child>
-                      <object class="GtkSpinButton" id="vertical_preview_area">
-                        <property name="valign">center</property>
-                        <property name="adjustment">
-                          <object class="GtkAdjustment">
-                            <property name="lower">5</property>
-                            <property name="upper">500</property>
-                            <property name="step-increment">5</property>
-                            <property name="page-increment">10</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Horizontal Edge Preview Trigger Area</property>
-                    <property name="activatable-widget">horizontal_preview_area</property>
-                    <child>
-                      <object class="GtkSpinButton" id="horizontal_preview_area">
-                        <property name="valign">center</property>
-                        <property name="adjustment">
-                          <object class="GtkAdjustment">
-                            <property name="lower">10</property>
-                            <property name="upper">500</property>
-                            <property name="step-increment">5</property>
-                            <property name="page-increment">10</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Inverse Top Screen Edge Action Timer</property>
-                    <property name="activatable-widget">toggle_maximize_tophalf_timer</property>
-                    <child>
-                      <object class="GtkSpinButton" id="toggle_maximize_tophalf_timer">
-                        <property name="valign">center</property>
-                        <property name="adjustment">
-                          <object class="GtkAdjustment">
-                            <property name="lower">300</property>
-                            <property name="upper">1500</property>
-                            <property name="step-increment">50</property>
-                            <property name="page-increment">10</property>
-                          </object>
-                        </property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
-                    <property name="activatable-widget">enable_hold_maximize_inverse_landscape</property>
-                    <child>
-                      <object class="GtkSwitch" id="enable_hold_maximize_inverse_landscape">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwActionRow">
-                    <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
-                    <property name="activatable-widget">enable_hold_maximize_inverse_portrait</property>
-                    <child>
-                      <object class="GtkSwitch" id="enable_hold_maximize_inverse_portrait">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
-                  </object>
-                </child>
-                <child>
-                  <object class="AdwComboRow" id="restore_window_size_on">
-                    <property name="title" translatable="yes">Restore Window Size on</property>
-                    <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;</property>
-                    <property name="model">
-                      <object class="GtkStringList">
-                        <items>
-                          <item translatable="yes">Grab Start</item>
-                          <item translatable="yes">Grab End</item>
-                        </items>
-                      </object>
-                    </property>
-                  </object>
-                </child>
-              </object>
-            </child>
-            <!-- ======================================================================================== -->
-            <!-- = Group: Debugging ===================================================================== -->
-            <!-- ======================================================================================== -->
-            <child>
-              <object class="AdwPreferencesGroup">
-                <property name="title" translatable="yes">Debugging</property>
-                <child>
-                  <object class="ShortcutListener" id="debugging_show_tiled_rects">
-                    <property name="title" translatable="yes">Show Tiled Rects</property>
-                  </object>
-                </child>
-                <child>
-                  <object class="ShortcutListener" id="debugging_free_rects">
-                    <property name="title" translatable="yes">Show Free Screen Rects</property>
                   </object>
                 </child>
               </object>
