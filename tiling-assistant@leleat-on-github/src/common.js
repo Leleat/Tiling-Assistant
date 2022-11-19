@@ -21,6 +21,9 @@ var Settings = class Settings {
     static SCREEN_BOTTOM_GAP = 'screen-bottom-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
     static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
+    static ACTIVE_WINDOW_HINT = 'active-window-hint';
+    static ACTIVE_WINDOW_HINT_COLOR = 'active-window-hint-color';
+    static ACTIVE_WINDOW_HINT_BORDER_SIZE = 'active-window-hint-border-size';
     static SHOW_LAYOUT_INDICATOR = 'show-layout-panel-indicator';
     static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
     static DISABLE_TILE_GROUPS = 'disable-tile-groups';
@@ -83,6 +86,9 @@ var Settings = class Settings {
             this.SCREEN_BOTTOM_GAP,
             this.MAXIMIZE_WITH_GAPS,
             this.DYNAMIC_KEYBINDINGS,
+            this.ACTIVE_WINDOW_HINT,
+            this.ACTIVE_WINDOW_HINT_COLOR,
+            this.ACTIVE_WINDOW_HINT_BORDER_SIZE,
             this.SHOW_LAYOUT_INDICATOR,
             this.ENABLE_ADV_EXP_SETTINGS,
             this.DISABLE_TILE_GROUPS,

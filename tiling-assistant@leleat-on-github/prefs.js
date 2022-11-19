@@ -55,6 +55,7 @@ function fillPreferencesWindow(window) {
     _bindComboRows(settings, builder);
     _bindRadioButtons(settings, builder);
     _bindKeybindings(settings, builder);
+    _bindColorButtons(settings, builder);
 
     // LayoutPrefs manages everything related to layouts on the
     // prefs side (including the keyboard shortcuts)
@@ -105,6 +106,7 @@ function _bindSpinbuttons(settings, builder) {
         Settings.SCREEN_LEFT_GAP,
         Settings.SCREEN_RIGHT_GAP,
         Settings.SCREEN_BOTTOM_GAP,
+        Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE,
         Settings.INVERSE_TOP_MAXIMIZE_TIMER,
         Settings.VERTICAL_PREVIEW_AREA,
         Settings.HORIZONTAL_PREVIEW_AREA
@@ -134,6 +136,27 @@ function _bindComboRows(settings, builder) {
 }
 
 /*
+ * Bind GUI color buttons to settings.
+ */
+function _bindColorButtons(settings, builder) {
+    const switches = [
+        Settings.ACTIVE_WINDOW_HINT_COLOR
+    ];
+
+    switches.forEach(key => {
+        const widget = builder.get_object(`${key.replaceAll('-', '_')}_button`);
+        widget.connect('color-set', () => {
+            settings.set_string(key, widget.get_rgba().to_string());
+        });
+
+        // initilaize color
+        const rgba = new Gdk.RGBA();
+        rgba.parse(settings.get_string(key));
+        widget.set_rgba(rgba);
+    });
+}
+
+/*
  * Bind radioButtons to settings.
  */
 function _bindRadioButtons(settings, builder) {
@@ -149,6 +172,14 @@ function _bindRadioButtons(settings, builder) {
                 'dynamic_keybinding_tiling_state_row',
                 'dynamic_keybinding_tiling_state_windows_row',
                 'dynamic_keybinding_favorite_layout_row'
+            ]
+        },
+        {
+            key: Settings.ACTIVE_WINDOW_HINT,
+            rowNames: [
+                'active_window_hint_disabled_row',
+                'active_window_hint_minimal_row',
+                'active_window_hint_always_row'
             ]
         },
         {

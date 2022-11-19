@@ -55,6 +55,8 @@ function enable() {
     this._keybindingHandler = new KeybindingHandler.Handler();
     const LayoutsManager = Me.imports.src.extension.layoutsManager;
     this._layoutsManager = new LayoutsManager.LayoutManager();
+    const activeWindowHint = Me.imports.src.extension.activeWindowHint;
+    this._activeWindowHintHandler = new activeWindowHint.Handler();
 
     const AltTabOverride = Me.imports.src.extension.altTab.Override;
     this._altTabOverride = new AltTabOverride();
@@ -127,6 +129,8 @@ function disable() {
     this._keybindingHandler = null;
     this._layoutsManager.destroy();
     this._layoutsManager = null;
+    this._activeWindowHintHandler.destroy();
+    this._activeWindowHintHandler = null;
 
     this._altTabOverride.destroy();
     this._altTabOverride = null;

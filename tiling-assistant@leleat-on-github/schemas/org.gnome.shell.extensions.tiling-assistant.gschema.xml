@@ -20,6 +20,16 @@
 			<!-- 0: Disabled, 1: Focus, 2: Tiling State, 3: Tiling State (Windows), 4: Favorite Layout -->
 			<default>0</default>
 		</key>
+		<key name="active-window-hint" type="i">
+			<!-- 0: Disabled, 1: Minimal, 2: Always -->
+			<default>1</default>
+		</key>
+		<key name="active-window-hint-color" type="s">
+			<default>''</default>
+		</key>
+		<key name="active-window-hint-border-size" type="i">
+			<default>5</default>
+		</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
