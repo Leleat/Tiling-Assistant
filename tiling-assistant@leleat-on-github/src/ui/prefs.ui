@@ -939,33 +939,18 @@
         </child>
         <child>
           <object class="AdwPreferencesPage">
+            <property name="valign">center</property>
+            <property name="vexpand">1</property>
             <child>
               <object class="AdwPreferencesGroup">
+                <property name="margin-bottom">12</property>
                 <child>
                   <object class="GtkBox">
-                    <property name="margin-start">32</property>
-                    <property name="margin-end">32</property>
-                    <property name="margin-top">32</property>
-                    <property name="margin-bottom">32</property>
                     <property name="orientation">vertical</property>
                     <child>
                       <object class="GtkImage" id="hidden_settings_icon">
-                        <property name="margin-bottom">6</property>
-                        <property name="pixel-size">48</property>
-                        <style>
-                          <class name="lowres-icon"/>
-                        </style>
-                      </object>
-                    </child>
-                    <child>
-                      <object class="GtkLabel">
-                        <property name="label">Hidden Settings</property>
-                        <style>
-                          <class name="large-title"/>
-                        </style>
-                        <attributes>
-                          <attribute name="weight" value="bold"></attribute>
-                        </attributes>
+                        <property name="pixel-size">96</property>
+                        <property name="icon-name">dialog-warning-symbolic</property>
                       </object>
                     </child>
                   </object>
