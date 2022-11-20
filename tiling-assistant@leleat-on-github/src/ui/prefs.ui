@@ -153,8 +153,34 @@
           </child>
           <child>
             <object class="AdwActionRow">
+              <property name="title" translatable="yes">Screen Edges</property>
+              <property name="activatable-widget">single_screen_gap</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="invert-boolean"/>
+              <child>
+                <object class="GtkSpinButton" id="single_screen_gap">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="upper">500</property>
+                      <property name="step-increment">2</property>
+                      <property name="page-increment">8</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
               <property name="title" translatable="yes">Screen Edge Top</property>
               <property name="activatable-widget">screen_top_gap</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
               <child>
                 <object class="GtkSpinButton" id="screen_top_gap">
                   <property name="valign">center</property>
@@ -173,6 +199,10 @@
             <object class="AdwActionRow">
               <property name="title" translatable="yes">Screen Edge Left</property>
               <property name="activatable-widget">screen_left_gap</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
               <child>
                 <object class="GtkSpinButton" id="screen_left_gap">
                   <property name="valign">center</property>
@@ -191,6 +221,10 @@
             <object class="AdwActionRow">
               <property name="title" translatable="yes">Screen Edge Right</property>
               <property name="activatable-widget">screen_right_gap</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
               <child>
                 <object class="GtkSpinButton" id="screen_right_gap">
                   <property name="valign">center</property>
@@ -209,6 +243,10 @@
             <object class="AdwActionRow">
               <property name="title" translatable="yes">Screen Edge Bottom</property>
               <property name="activatable-widget">screen_bottom_gap</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
               <child>
                 <object class="GtkSpinButton" id="screen_bottom_gap">
                   <property name="valign">center</property>

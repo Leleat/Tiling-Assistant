@@ -15,6 +15,7 @@ var Settings = class Settings {
     static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
     static TILEGROUPS_IN_APP_SWITCHER = 'tilegroups-in-app-switcher';
     static WINDOW_GAP = 'window-gap';
+    static SINGLE_SCREEN_GAP = 'single-screen-gap';
     static SCREEN_TOP_GAP = 'screen-top-gap';
     static SCREEN_LEFT_GAP = 'screen-left-gap';
     static SCREEN_RIGHT_GAP = 'screen-right-gap';
@@ -80,6 +81,7 @@ var Settings = class Settings {
             this.RAISE_TILE_GROUPS,
             this.TILEGROUPS_IN_APP_SWITCHER,
             this.WINDOW_GAP,
+            this.SINGLE_SCREEN_GAP,
             this.SCREEN_TOP_GAP,
             this.SCREEN_LEFT_GAP,
             this.SCREEN_RIGHT_GAP,

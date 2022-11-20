@@ -102,6 +102,7 @@ function _bindSwitches(settings, builder) {
 function _bindSpinbuttons(settings, builder) {
     const spinButtons = [
         Settings.WINDOW_GAP,
+        Settings.SINGLE_SCREEN_GAP,
         Settings.SCREEN_TOP_GAP,
         Settings.SCREEN_LEFT_GAP,
         Settings.SCREEN_RIGHT_GAP,

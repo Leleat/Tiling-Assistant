@@ -109,6 +109,12 @@ var Util = class Utility {
         return scaledGap % 2 === 0 ? scaledGap : scaledGap + 1;
     }
 
+    static useIndividualGaps() {
+        // the prefs' visibility of individual gaps is tied to the advanced setting
+        // so also tie the usage of it to the advanced setting
+        return Settings.getBoolean(Settings.ENABLE_ADV_EXP_SETTINGS);
+    }
+
     /**
      * @param {number} modMask a Clutter.ModifierType.
      * @returns wether the current event the modifier at `modMask`.
@@ -308,26 +314,45 @@ var Rect = class Rect {
         const screenLeftGap = Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
         const screenRightGap = Util.getScaledGap(Settings.SCREEN_RIGHT_GAP, monitor);
         const screenBottomGap = Util.getScaledGap(Settings.SCREEN_BOTTOM_GAP, monitor);
+        const singleScreenGap = Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
         const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);
         const r = this.copy();
 
-        [
-            ['x', 'width', screenLeftGap, screenRightGap],
-            ['y', 'height', screenTopGap, screenBottomGap]
-        ].forEach(([pos, dim, posGap, dimGap]) => {
-            if (this[pos] === workArea[pos]) {
-                r[pos] = this[pos] + posGap;
-                r[dim] -= posGap;
-            } else {
-                r[pos] = this[pos] + windowGap / 2;
-                r[dim] -= windowGap / 2;
-            }
+        // Prefer individual gaps
+        if (Util.useIndividualGaps()) {
+            [['x', 'width', screenLeftGap, screenRightGap],
+                ['y', 'height', screenTopGap, screenBottomGap]]
+            .forEach(([pos, dim, posGap, dimGap]) => {
+                if (this[pos] === workArea[pos]) {
+                    r[pos] = this[pos] + posGap;
+                    r[dim] -= posGap;
+                } else {
+                    r[pos] = this[pos] + windowGap / 2;
+                    r[dim] -= windowGap / 2;
+                }
 
-            if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
-                r[dim] -= dimGap;
-            else
-                r[dim] -= windowGap / 2;
-        });
+                if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
+                    r[dim] -= dimGap;
+                else
+                    r[dim] -= windowGap / 2;
+            });
+        // Use the single screen gap
+        } else {
+            [['x', 'width'], ['y', 'height']].forEach(([pos, dim]) => {
+                if (this[pos] === workArea[pos]) {
+                    r[pos] = this[pos] + singleScreenGap;
+                    r[dim] -= singleScreenGap;
+                } else {
+                    r[pos] = this[pos] + windowGap / 2;
+                    r[dim] -= windowGap / 2;
+                }
+
+                if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
+                    r[dim] -= singleScreenGap;
+                else
+                    r[dim] -= windowGap / 2;
+            });
+        }
 
         return r;
     }
