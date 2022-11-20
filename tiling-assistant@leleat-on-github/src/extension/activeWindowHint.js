@@ -251,20 +251,23 @@ class AlwaysActiveWindowHint extends Hint {
 
     _updateGeometry() {
         this._disconnectWindowSignals();
-        this.hide();
 
         const window = global.display.focus_window;
         const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG]
-        if (!window || !allowTypes.includes(window.get_window_type()))
+        if (!window || !allowTypes.includes(window.get_window_type())) {
+            this.hide();
             return;
+        }
 
         this._window = window;
         this._signalIds.push(window.connect('position-changed', () => this._updateGeometry()));
         this._signalIds.push(window.connect('size-changed', () => this._updateGeometry()));
 
         // Don't show hint on maximzed/fullscreen windows
-        if (window.is_fullscreen() || Twm.isMaximized(window))
+        if (window.is_fullscreen() || Twm.isMaximized(window)) {
+            this.hide();
             return;
+        }
 
         const wRect = window.get_frame_rect();
         this.set({

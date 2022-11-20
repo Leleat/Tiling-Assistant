@@ -326,7 +326,7 @@
           <child>
             <object class="AdwActionRow" id="active_window_hint_minimal_row">
               <property name="title" translatable="yes">Minimal</property>
-              <property name="subtitle" translatable="yes">Indicate the focused window if it's ambiguous. For instance, when switching to a workspace with multiple non-overlapping windows</property>
+              <property name="subtitle" translatable="yes">Temporarily indicate the focused window when switching to a workspace with multiple non-overlapping windows</property>
               <property name="activatable-widget">active_window_hint_minimal_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="active_window_hint_minimal_button">
