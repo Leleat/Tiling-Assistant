@@ -108,7 +108,30 @@
 		<key name="tile-bottomright-quarter" type="as">
 			<default><![CDATA[['<Super>KP_3']]]></default>
 		</key>
-
+		<key name="tile-top-half-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-bottom-half-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-left-half-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-right-half-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-topleft-quarter-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-topright-quarter-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-bottomleft-quarter-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
+		<key name="tile-bottomright-quarter-ignore-ta" type="as">
+			<default>[]</default>
+		</key>
 		<!-- Layouts Page -->
 		<!-- Hidden by default unless the advanced / experimental settings are enabled.
 		The number of layouts / shortcuts are hardcoded / limited to 20 -->
@@ -204,7 +227,7 @@
 			<default>false</default>
 		</key>
 		<key name="default-move-mode" type="i">
-			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout -->
+			<!-- 0: Edge Tiling, 1: Adaptive Tiling, 2: Favorite Layout, 3: Ignore TA -->
 			<default>0</default>
 		</key>
 		<key name="low-performance-move-mode" type="b">
@@ -214,12 +237,16 @@
 			<default>false</default>
 		</key>
 		<key name="move-adaptive-tiling-mod" type="i">
-			<!-- 0: Ctrl, 1: Alt, 2: RMB, 3: Meta -->
-			<default>0</default>
+			<!-- 0: Disabled, 1: Ctrl, 2: Alt, 3: RMB, 4: Meta -->
+			<default>1</default>
 		</key>
 		<key name="move-favorite-layout-mod" type="i">
-			<!-- 0: Ctrl, 1: Alt, 2: RMB, 3: Meta -->
-			<default>1</default>
+			<!-- 0: Disabled, 1: Ctrl, 2: Alt, 3: RMB, 4: Meta -->
+			<default>2</default>
+		</key>
+		<key name="ignore-ta-mod" type="i">
+			<!-- 0: Disabled, 1: Ctrl, 2: Alt, 3: RMB, 4: Meta -->
+			<default>0</default>
 		</key>
 		<key name="vertical-preview-area" type="i">
 			<default>15</default>

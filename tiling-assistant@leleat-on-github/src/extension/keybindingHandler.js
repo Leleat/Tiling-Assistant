@@ -182,7 +182,16 @@ var Handler = class TilingKeybindingHandler {
                 );
                 window.move_frame(false, x, y);
             }
-
+        // Tile a window but ignore T-A features
+        } else if ([Shortcuts.TOP_IGNORE_TA, Shortcuts.BOTTOM_IGNORE_TA,
+            Shortcuts.LEFT_IGNORE_TA, Shortcuts.RIGHT_IGNORE_TA,
+            Shortcuts.TOP_LEFT_IGNORE_TA, Shortcuts.TOP_RIGHT_IGNORE_TA,
+            Shortcuts.BOTTOM_LEFT_IGNORE_TA,
+            Shortcuts.BOTTOM_RIGHT_IGNORE_TA].includes(shortcutName)
+        ) {
+            const workArea = new Rect(window.get_work_area_current_monitor());
+            const rect = Twm.getDefaultTileFor(shortcutName, workArea);
+            Twm.toggleTiling(window, rect, { ignoreTA: true });
         // Tile a window
         } else {
             const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;

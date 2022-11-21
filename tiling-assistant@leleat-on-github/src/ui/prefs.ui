@@ -504,6 +504,18 @@
               </child>
             </object>
           </child>
+          <child>
+            <object class="AdwActionRow" id="ignore_ta_row">
+              <property name="title" translatable="yes">Ignore Tiling Assistant</property>
+              <property name="subtitle" translatable="yes">Use Edge Tiling without Tiling Assistant's features</property>
+              <property name="activatable-widget">ignore_ta_checkbutton</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="ignore_ta_checkbutton">
+                  <property name="group">edge_tiling_checkbutton</property>
+                </object>
+              </child>
+            </object>
+          </child>
         </object>
       </child>
       <!-- ======================================================================================== -->
@@ -565,6 +577,7 @@
               <property name="model">
                 <object class="GtkStringList">
                   <items>
+                    <item translatable="yes">Disabled</item>
                     <item translatable="yes">Ctrl</item>
                     <item translatable="yes">Alt</item>
                     <item translatable="yes">RMB</item>
@@ -584,6 +597,27 @@
               <property name="model">
                 <object class="GtkStringList">
                   <items>
+                    <item translatable="yes">Disabled</item>
+                    <item translatable="yes">Ctrl</item>
+                    <item translatable="yes">Alt</item>
+                    <item translatable="yes">RMB</item>
+                    <item translatable="yes">Super</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
+          <child>
+            <object class="AdwComboRow" id="ignore_ta_mod">
+              <property name="title" translatable="yes">'Ignore Tiling Assistant' Mode Activator</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item translatable="yes">Disabled</item>
                     <item translatable="yes">Ctrl</item>
                     <item translatable="yes">Alt</item>
                     <item translatable="yes">RMB</item>
@@ -838,6 +872,70 @@
         </child>
         <child>
           <object class="ShortcutListener" id="tile_bottomright_quarter">
+            <property name="title" translatable="yes">Tile to bottom-right</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <!-- ======================================================================================== -->
+    <!-- = Group: Edge Tiling - Ignore TA ======================================================= -->
+    <!-- ======================================================================================== -->
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Edge Tiling without Tiling Assistant</property>
+        <property name="visible"
+                  bind-source="enable_advanced_experimental_features"
+                  bind-property="active"
+                  bind-flags="sync-create"/>
+        <child>
+          <object class="ShortcutListener" id="tile_top_half_ignore_ta">
+            <property name="title" translatable="yes">Tile to top</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_bottom_half_ignore_ta">
+            <property name="title" translatable="yes">Tile to bottom</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_left_half_ignore_ta">
+            <property name="title" translatable="yes">Tile to left</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_right_half_ignore_ta">
+            <property name="title" translatable="yes">Tile to right</property>
+          </object>
+        </child>
+      </object>
+    </child>
+    <!-- ======================================================================================== -->
+    <!-- = Group: Corner Tiling - Ignore TA ===================================================== -->
+    <!-- ======================================================================================== -->
+    <child>
+      <object class="AdwPreferencesGroup">
+        <property name="title" translatable="yes">Corner Tiling without Tiling Assistant</property>
+        <property name="visible"
+                  bind-source="enable_advanced_experimental_features"
+                  bind-property="active"
+                  bind-flags="sync-create"/>
+        <child>
+          <object class="ShortcutListener" id="tile_topleft_quarter_ignore_ta">
+            <property name="title" translatable="yes">Tile to top-left</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_topright_quarter_ignore_ta">
+            <property name="title" translatable="yes">Tile to top-right</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_bottomleft_quarter_ignore_ta">
+            <property name="title" translatable="yes">Tile to bottom-left</property>
+          </object>
+        </child>
+        <child>
+          <object class="ShortcutListener" id="tile_bottomright_quarter_ignore_ta">
             <property name="title" translatable="yes">Tile to bottom-right</property>
           </object>
         </child>

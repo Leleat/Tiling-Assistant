@@ -37,6 +37,7 @@ var Settings = class Settings {
     static ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT = 'adapt-edge-tiling-to-favorite-layout';
     static ADAPTIVE_TILING_MOD = 'move-adaptive-tiling-mod';
     static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
+    static IGNORE_TA_MOD = 'ignore-ta-mod';
     static VERTICAL_PREVIEW_AREA = 'vertical-preview-area';
     static HORIZONTAL_PREVIEW_AREA = 'horizontal-preview-area';
     static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
@@ -103,6 +104,7 @@ var Settings = class Settings {
             this.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
             this.ADAPTIVE_TILING_MOD,
             this.FAVORITE_LAYOUT_MOD,
+            this.IGNORE_TA_MOD,
             this.VERTICAL_PREVIEW_AREA,
             this.HORIZONTAL_PREVIEW_AREA,
             this.INVERSE_TOP_MAXIMIZE_TIMER,
@@ -183,6 +185,14 @@ var Shortcuts = class Shortcuts {
     static TOP_RIGHT = 'tile-topright-quarter';
     static BOTTOM_LEFT = 'tile-bottomleft-quarter';
     static BOTTOM_RIGHT = 'tile-bottomright-quarter';
+    static TOP_IGNORE_TA = 'tile-top-half-ignore-ta';
+    static BOTTOM_IGNORE_TA = 'tile-bottom-half-ignore-ta';
+    static LEFT_IGNORE_TA = 'tile-left-half-ignore-ta';
+    static RIGHT_IGNORE_TA = 'tile-right-half-ignore-ta';
+    static TOP_LEFT_IGNORE_TA = 'tile-topleft-quarter-ignore-ta';
+    static TOP_RIGHT_IGNORE_TA = 'tile-topright-quarter-ignore-ta';
+    static BOTTOM_LEFT_IGNORE_TA = 'tile-bottomleft-quarter-ignore-ta';
+    static BOTTOM_RIGHT_IGNORE_TA = 'tile-bottomright-quarter-ignore-ta';
     static DEBUGGING = 'debugging-show-tiled-rects';
     static DEBUGGING_FREE_RECTS = 'debugging-free-rects';
 
@@ -209,6 +219,14 @@ var Shortcuts = class Shortcuts {
             this.TOP_RIGHT,
             this.BOTTOM_LEFT,
             this.BOTTOM_RIGHT,
+            this.TOP_IGNORE_TA,
+            this.BOTTOM_IGNORE_TA,
+            this.LEFT_IGNORE_TA,
+            this.RIGHT_IGNORE_TA,
+            this.TOP_LEFT_IGNORE_TA,
+            this.TOP_RIGHT_IGNORE_TA,
+            this.BOTTOM_LEFT_IGNORE_TA,
+            this.BOTTOM_RIGHT_IGNORE_TA,
             this.DEBUGGING,
             this.DEBUGGING_FREE_RECTS
         ];
@@ -235,6 +253,7 @@ var MoveModes = class MoveModes {
     static EDGE_TILING = 0;
     static ADAPTIVE_TILING = 1;
     static FAVORITE_LAYOUT = 2;
+    static IGNORE_TA = 3;
 };
 
 var Orientation = class Orientation {

@@ -117,7 +117,7 @@ function enable() {
 
     // Setting used for detection of a fresh install and do compatibility
     // changes if necessary...
-    this._settings.set_int('last-version-installed', Me.metadata.version);
+    this._settings.setInt('last-version-installed', Me.metadata.version);
 }
 
 function disable() {

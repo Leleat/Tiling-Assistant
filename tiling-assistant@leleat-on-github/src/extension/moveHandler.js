@@ -248,7 +248,11 @@ var Handler = class TilingMoveHandler {
 
             this._splitRects.forEach((rect, w) => Twm.tile(w, rect, { openTilingPopup: false }));
             this._splitRects.clear();
-            Twm.tile(window, this._tileRect, { monitorNr: this._monitorNr, openTilingPopup: this._currPreviewMode !== MoveModes.ADAPTIVE_TILING });
+            Twm.tile(window, this._tileRect, {
+                monitorNr: this._monitorNr,
+                openTilingPopup: this._currPreviewMode !== MoveModes.ADAPTIVE_TILING,
+                ignoreTA: this._ignoreTA
+            });
             this._tileRect = null;
 
             // Create a new tile group, in which some windows are already part
@@ -331,7 +335,8 @@ var Handler = class TilingMoveHandler {
         const rmb = Meta.is_wayland_compositor()
             ? Clutter.ModifierType.BUTTON2_MASK
             : Clutter.ModifierType.BUTTON3_MASK;
-        const pressed = [ // order comes from the ui file
+        const pressed = [ // idxs come from settings
+            false, // Dummy for disabled state so that we can use the correct idxs
             Util.isModPressed(ctrl),
             Util.isModPressed(altL) || Util.isModPressed(altGr),
             Util.isModPressed(rmb),
@@ -341,28 +346,32 @@ var Handler = class TilingMoveHandler {
         const defaultMode = Settings.getInt(Settings.DEFAULT_MOVE_MODE);
         const adaptiveMod = Settings.getInt(Settings.ADAPTIVE_TILING_MOD);
         const favMod = Settings.getInt(Settings.FAVORITE_LAYOUT_MOD);
+        const ignoreTAMod = Settings.getInt(Settings.IGNORE_TA_MOD);
+        const noMod = pressed.every(modPressed => !modPressed);
+
+        const useAdaptiveTiling = defaultMode !== MoveModes.ADAPTIVE_TILING && adaptiveMod && pressed[adaptiveMod] ||
+            noMod && defaultMode === MoveModes.ADAPTIVE_TILING;
+        const usefavLayout = defaultMode !== MoveModes.FAVORITE_LAYOUT && favMod && pressed[favMod] ||
+            noMod && defaultMode === MoveModes.FAVORITE_LAYOUT;
+        const useIgnoreTa = defaultMode !== MoveModes.IGNORE_TA && ignoreTAMod && pressed[ignoreTAMod] ||
+            noMod && defaultMode === MoveModes.IGNORE_TA;
+
         let newMode = '';
 
-        if (pressed[adaptiveMod]) {
-            newMode = defaultMode === MoveModes.ADAPTIVE_TILING
-                ? MoveModes.EDGE_TILING
-                : MoveModes.ADAPTIVE_TILING;
-        } else if (pressed[favMod]) {
-            newMode = defaultMode === MoveModes.FAVORITE_LAYOUT
-                ? MoveModes.EDGE_TILING
-                : MoveModes.FAVORITE_LAYOUT;
-        } else if (defaultMode === MoveModes.ADAPTIVE_TILING) {
+        if (useAdaptiveTiling)
             newMode = MoveModes.ADAPTIVE_TILING;
-        } else if (defaultMode === MoveModes.FAVORITE_LAYOUT) {
+        else if (usefavLayout)
             newMode = MoveModes.FAVORITE_LAYOUT;
-        } else {
+        else if (useIgnoreTa)
+            newMode = MoveModes.IGNORE_TA;
+        else
             newMode = MoveModes.EDGE_TILING;
-        }
 
         if (this._currPreviewMode !== newMode)
             this._preparePreviewModeChange(newMode, window);
 
         switch (newMode) {
+            case MoveModes.IGNORE_TA:
             case MoveModes.EDGE_TILING:
                 this._edgeTilingPreview(window, grabOp);
                 break;
@@ -380,6 +389,7 @@ var Handler = class TilingMoveHandler {
 
     _preparePreviewModeChange(newMode, window) {
         this._tileRect = null;
+        this._ignoreTA = false;
 
         switch (this._currPreviewMode) {
             case MoveModes.ADAPTIVE_TILING:
@@ -400,6 +410,9 @@ var Handler = class TilingMoveHandler {
         }
 
         switch (newMode) {
+            case MoveModes.IGNORE_TA:
+                this._ignoreTA = true;
+                break;
             case MoveModes.FAVORITE_LAYOUT:
                 this._favoriteLayout = Util.getFavoriteLayout();
                 this._favoriteLayout.forEach(rect => {

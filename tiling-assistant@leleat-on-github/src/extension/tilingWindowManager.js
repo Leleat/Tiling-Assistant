@@ -125,7 +125,13 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, { openTilingPopup = true, monitorNr = null, skipAnim = false, fakeTile = false } = {}) {
+    static tile(window, newRect, {
+        openTilingPopup = true,
+        ignoreTA = false,
+        monitorNr = null,
+        skipAnim = false,
+        fakeTile = false
+    } = {}) {
         if (!window || window.is_skip_taskbar())
             return;
 
@@ -212,18 +218,19 @@ var TilingWindowManager = class TilingWindowManager {
         // Tiled window
         } else if (!fakeTile) {
             // Make the tile group only consist of the window itself to stop
-            // resizing or raising together
-            if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS)) {
+            // resizing or raising together. Also don't call the Tiling Popup.
+            if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS) || ignoreTA) {
                 this.updateTileGroup([window]);
-            // Setup the (new) tileGroup to raise tiled windows as a group
-            } else {
-                const topTileGroup = this._getWindowsForBuildingTileGroup(monitor);
-                this.updateTileGroup(topTileGroup);
+                return;
             }
+
+            // Setup the (new) tileGroup to raise tiled windows as a group
+            const topTileGroup = this._getWindowsForBuildingTileGroup(monitor);
+            this.updateTileGroup(topTileGroup);
 
             this.emit('window-tiled', window);
 
-            if (openTilingPopup && !Settings.getBoolean(Settings.DISABLE_TILE_GROUPS))
+            if (openTilingPopup)
                 this.tryOpeningTilingPopup();
         }
     }
@@ -880,20 +887,28 @@ var TilingWindowManager = class TilingWindowManager {
             case Shortcuts.MAXIMIZE:
                 return workArea.copy();
             case Shortcuts.LEFT:
+            case Shortcuts.LEFT_IGNORE_TA:
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
             case Shortcuts.RIGHT:
+            case Shortcuts.RIGHT_IGNORE_TA:
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
             case Shortcuts.TOP:
+            case Shortcuts.TOP_IGNORE_TA:
                 return workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
             case Shortcuts.BOTTOM:
+            case Shortcuts.BOTTOM_IGNORE_TA:
                 return workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
             case Shortcuts.TOP_LEFT:
+            case Shortcuts.TOP_LEFT_IGNORE_TA:
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
             case Shortcuts.TOP_RIGHT:
+            case Shortcuts.TOP_RIGHT_IGNORE_TA:
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
             case Shortcuts.BOTTOM_LEFT:
+            case Shortcuts.BOTTOM_LEFT_IGNORE_TA:
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
             case Shortcuts.BOTTOM_RIGHT:
+            case Shortcuts.BOTTOM_RIGHT_IGNORE_TA:
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
         }
     }
@@ -931,14 +946,14 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {Meta.Window} window a Meta.Window.
      * @param {Rect} rect the Rect the `window` tiles to or untiles from.
      */
-    static toggleTiling(window, rect) {
+    static toggleTiling(window, rect, params = {}) {
         const workArea = window.get_work_area_current_monitor();
         const equalsWA = rect.equal(workArea);
         const equalsTile = window.tiledRect && rect.equal(window.tiledRect);
         if (window.isTiled && equalsTile || this.isMaximized(window) && equalsWA)
-            this.untile(window);
+            this.untile(window, params);
         else
-            this.tile(window, rect);
+            this.tile(window, rect, params);
     }
 
     /**

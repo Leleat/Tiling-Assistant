@@ -126,6 +126,7 @@ function _bindComboRows(settings, builder) {
     const comboRows = [
         Settings.ADAPTIVE_TILING_MOD,
         Settings.FAVORITE_LAYOUT_MOD,
+        Settings.IGNORE_TA_MOD,
         Settings.RESTORE_SIZE_ON
     ];
 
@@ -188,7 +189,8 @@ function _bindRadioButtons(settings, builder) {
             rowNames: [
                 'edge_tiling_row',
                 'adaptive_tiling_row',
-                'favorite_layout_row'
+                'favorite_layout_row',
+                'ignore_ta_row'
             ]
         }
     ];
