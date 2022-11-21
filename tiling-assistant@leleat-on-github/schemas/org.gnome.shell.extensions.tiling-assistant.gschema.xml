@@ -246,5 +246,8 @@
 		<key name="debugging-free-rects" type="as">
 			<default>[]</default>
 		</key>
+		<key name="last-version-installed" type="i">
+			<default>-1</default>
+		</key>
 	</schema>
 </schemalist>
