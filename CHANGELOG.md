@@ -1,5 +1,15 @@
 # Changelog
 
+## v37
+**Added**
+- added active window hint. By default the `Minimal` option will be chosen (#210) 
+- added an option to not use T-A features (Tiling Popup and grouping) when DNDing a window via a modifier and via additional keyboard shortcuts. Features are hidden behind the advanced settings (#212)
+- added setting for a single/uniform screen gap instead of splitting it into edges (each edge is still available, if the advanced settings are enabled)
+
+**Changed**
+- increased possible maximum of gaps to 500 (#205)
+- changed/shuffled some of the preferences around
+
 ## v36
 **Added**
 - support GNOME 43
