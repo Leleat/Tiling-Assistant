@@ -376,7 +376,7 @@
           <child>
             <object class="AdwActionRow" id="active_window_hint_always_row">
               <property name="title" translatable="yes">Always</property>
-              <property name="subtitle" translatable="yes">Always indicate the focused window unless it's maximized or in fullscreen</property>
+              <property name="subtitle" translatable="yes">Always indicate the focused window unless it's maximized or in fullscreen. There are issues on Wayland with GTK4 popups</property>
               <property name="activatable-widget">active_window_hint_always_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="active_window_hint_always_button">
@@ -412,6 +412,25 @@
               <property name="activatable-widget">active_window_hint_border_size</property>
               <child>
                 <object class="GtkSpinButton" id="active_window_hint_border_size">
+                  <property name="valign">center</property>
+                  <property name="adjustment">
+                    <object class="GtkAdjustment">
+                      <property name="upper">50</property>
+                      <property name="step-increment">1</property>
+                      <property name="page-increment">8</property>
+                    </object>
+                  </property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes">Inner Border Size</property>
+              <property name="subtitle" translatable="yes">The border for the always active hint reaching inside the window frame. This is meant to cover rounded corners. However, GTK4 popups on Wayland will put the window behind the hint for whatever reason...</property>
+              <property name="activatable-widget">active_window_hint_inner_border_size</property>
+              <child>
+                <object class="GtkSpinButton" id="active_window_hint_inner_border_size">
                   <property name="valign">center</property>
                   <property name="adjustment">
                     <object class="GtkAdjustment">

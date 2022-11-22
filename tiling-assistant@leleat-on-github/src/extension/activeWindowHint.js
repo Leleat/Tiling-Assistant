@@ -61,12 +61,16 @@ class ActiveWindowHint extends St.Widget {
 
         this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
         this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
+        this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE); // 'Inner border' to cover rounded corners
 
         Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
             this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
         });
         Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
             this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
+        });
+        Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
+            this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE);
         });
 
         global.window_group.add_child(this);
@@ -220,7 +224,7 @@ class AlwaysActiveWindowHint extends Hint {
 
         this._window = null;
         this._signalIds = [];
-        this._innerBorderSize = 10; // 'Inner border' to cover rounded corners
+        this._hideQueued = false;
 
         this._updateGeometry();
         this._updateStyle();
@@ -236,25 +240,31 @@ class AlwaysActiveWindowHint extends Hint {
             this._updateStyle();
             this._updateGeometry();
         });
+        Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
+            this._updateStyle();
+            this._updateGeometry();
+        });
     }
 
     destroy() {
-        this._disconnectWindowSignals();
+        this._reset();
         super.destroy();
     }
 
-    _disconnectWindowSignals() {
+    _reset() {
         this._signalIds.forEach(id => this._window.disconnect(id));
         this._signalIds = [];
         this._window = null;
+        this._hideQueued = false;
     }
 
     _updateGeometry() {
-        this._disconnectWindowSignals();
+        this._reset();
 
         const window = global.display.focus_window;
         const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
         if (!window || !allowTypes.includes(window.get_window_type())) {
+            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -265,6 +275,7 @@ class AlwaysActiveWindowHint extends Hint {
 
         // Don't show hint on maximzed/fullscreen windows
         if (window.is_fullscreen() || Twm.isMaximized(window)) {
+            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -278,7 +289,12 @@ class AlwaysActiveWindowHint extends Hint {
         });
 
         const actor = window.get_compositor_private();
-        actor && Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
+        actor && Meta.later_add(Meta.LaterType.IDLE, () => {
+            if (this._hideQueued) {
+                this._hideQueued = false;
+                return false;
+            }
+
             global.window_group.set_child_below_sibling(this, actor);
             this.show();
             return false;

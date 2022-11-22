@@ -108,6 +108,7 @@ function _bindSpinbuttons(settings, builder) {
         Settings.SCREEN_RIGHT_GAP,
         Settings.SCREEN_BOTTOM_GAP,
         Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE,
+        Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE,
         Settings.INVERSE_TOP_MAXIMIZE_TIMER,
         Settings.VERTICAL_PREVIEW_AREA,
         Settings.HORIZONTAL_PREVIEW_AREA
