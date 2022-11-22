@@ -278,10 +278,10 @@ var Handler = class TilingResizeHandler {
             return;
 
         const monitor = window.get_monitor();
-        const screenTopGap = Util.useIndividualGaps()
+        const screenTopGap = Util.useIndividualGaps(monitor)
             ? Util.getScaledGap(Settings.SCREEN_TOP_GAP, monitor)
             : Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
-        const screenLeftGap = Util.useIndividualGaps()
+        const screenLeftGap = Util.useIndividualGaps(monitor)
             ? Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor)
             : Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
         const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);

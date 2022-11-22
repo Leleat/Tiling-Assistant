@@ -109,10 +109,13 @@ var Util = class Utility {
         return scaledGap % 2 === 0 ? scaledGap : scaledGap + 1;
     }
 
-    static useIndividualGaps() {
-        // the prefs' visibility of individual gaps is tied to the advanced setting
-        // so also tie the usage of it to the advanced setting
-        return Settings.getBoolean(Settings.ENABLE_ADV_EXP_SETTINGS);
+    static useIndividualGaps(monitor) {
+        // Prefer individual gaps over the single one
+        const screenTopGap = this.getScaledGap(Settings.SCREEN_TOP_GAP, monitor);
+        const screenLeftGap = this.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
+        const screenRightGap = this.getScaledGap(Settings.SCREEN_RIGHT_GAP, monitor);
+        const screenBottomGap = this.getScaledGap(Settings.SCREEN_BOTTOM_GAP, monitor);
+        return screenTopGap || screenLeftGap || screenRightGap || screenBottomGap;
     }
 
     /**
@@ -319,7 +322,7 @@ var Rect = class Rect {
         const r = this.copy();
 
         // Prefer individual gaps
-        if (Util.useIndividualGaps()) {
+        if (Util.useIndividualGaps(monitor)) {
             [['x', 'width', screenLeftGap, screenRightGap],
                 ['y', 'height', screenTopGap, screenBottomGap]]
             .forEach(([pos, dim, posGap, dimGap]) => {
