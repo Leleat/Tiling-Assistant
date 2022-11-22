@@ -2,7 +2,6 @@
   "description": "Expand GNOME's 2 column tiling and add a Windows-snap-assist-inspired popup...",
   "name": "Tiling Assistant",
   "shell-version": [
-    "42",
     "43"
   ],
   "url": "https://github.com/Leleat/Tiling-Assistant",
