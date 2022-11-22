@@ -159,7 +159,7 @@ class MinimalActiveWindowHint extends Hint {
             x: x - scaleAmount,
             y: y - scaleAmount,
             width: width + 2 * scaleAmount,
-            height: height + 2 * scaleAmount,
+            height: height + 2 * scaleAmount
         });
         global.window_group.insert_child_above(this._windowClone, actor);
 
@@ -253,7 +253,7 @@ class AlwaysActiveWindowHint extends Hint {
         this._disconnectWindowSignals();
 
         const window = global.display.focus_window;
-        const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG]
+        const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
         if (!window || !allowTypes.includes(window.get_window_type())) {
             this.hide();
             return;
@@ -274,7 +274,7 @@ class AlwaysActiveWindowHint extends Hint {
             x: wRect.x,
             y: wRect.y,
             width: wRect.width,
-            height: wRect.height,
+            height: wRect.height
         });
 
         const actor = window.get_compositor_private();
