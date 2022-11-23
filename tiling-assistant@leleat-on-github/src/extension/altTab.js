@@ -19,7 +19,7 @@ var Override = class AltTabOverride {
         if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
             AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
 
-        Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
+        this._settingsId = Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
             AltTab.AppSwitcherPopup = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)
                 ? TilingAppSwitcherPopup
                 : this._originalAltTab;
@@ -27,6 +27,7 @@ var Override = class AltTabOverride {
     }
 
     destroy() {
+        Settings.disconnect(this._settingsId);
         AltTab.AppSwitcherPopup = this._originalAltTab;
     }
 };

@@ -70,7 +70,11 @@ var Settings = class Settings {
      * @param {*} func function to call when the setting changed.
      */
     static changed(key, func) {
-        this._settings.connect(`changed::${key}`, func);
+        return this._settings.connect(`changed::${key}`, func);
+    }
+
+    static disconnect(id) {
+        this._settings.disconnect(id);
     }
 
     /**

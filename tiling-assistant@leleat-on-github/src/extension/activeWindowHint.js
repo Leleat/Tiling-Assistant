@@ -26,13 +26,16 @@ var Handler = class ActiveWindowHintHandler {
         }
 
         this._hint = null;
+        this._settingsId = 0;
 
         this._setupHint();
 
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT, () => this._setupHint());
+        this._settingsId = Settings.changed(Settings.ACTIVE_WINDOW_HINT,
+            () => this._setupHint());
     }
 
     destroy() {
+        Settings.disconnect(this._settingsId);
         this._hint?.destroy();
         this._hint = null;
     }
@@ -62,18 +65,24 @@ class ActiveWindowHint extends St.Widget {
         this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
         this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
         this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE); // 'Inner border' to cover rounded corners
+        this._settingsIds = [];
 
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
             this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
-        });
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
+        }));
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
             this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
-        });
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
+        }));
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
             this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE);
-        });
+        }));
 
         global.window_group.add_child(this);
+    }
+
+    destroy() {
+        this._settingsIds.forEach(id => Settings.disconnect(id));
+        super.destroy();
     }
 });
 
@@ -86,9 +95,9 @@ class MinimalActiveWindowHint extends Hint {
 
         this._updateStyle();
 
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
             this._updateStyle();
-        });
+        }));
 
         global.workspace_manager.connectObject('workspace-switched',
             () => this._onWsSwitched(), this);
@@ -232,18 +241,18 @@ class AlwaysActiveWindowHint extends Hint {
         global.display.connectObject('notify::focus-window',
             () => this._updateGeometry(), this);
 
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
             this._updateStyle();
             this._updateGeometry();
-        });
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
+        }));
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
             this._updateStyle();
             this._updateGeometry();
-        });
-        Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
+        }));
+        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
             this._updateStyle();
             this._updateGeometry();
-        });
+        }));
     }
 
     destroy() {
