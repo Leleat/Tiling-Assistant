@@ -1,5 +1,9 @@
 # Changelog
 
+## v38
+**Fixed**
+- issue with always active window hint (there is still a problem with GTK4 popups on Wayland)
+
 ## v37
 **Added**
 - added active window hint. By default the `Minimal` option will be chosen (#210) 
