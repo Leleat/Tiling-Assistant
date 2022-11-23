@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 02:07+0100\n"
+"POT-Creation-Date: 2022-11-23 02:29+0100\n"
 "PO-Revision-Date: 2022-05-05 16:17+0200\n"
 "Last-Translator: Francisco Jesús Sevilla García <fjsevilla.dev@gmail.com>\n"
 "Language-Team: \n"
@@ -593,20 +593,20 @@ msgstr "Ventana emergente de disposición en mosaico habilitada"
 msgid "Tiling popup was disabled"
 msgstr "La ventana emergente de disposición en mosaico fue deshabilitada"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:488
 msgid "No valid layouts defined."
 msgstr "No hay distribuciones válidas definidas."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
 msgid "Popup Layouts: App not found."
 msgstr "Ventana emergente de distribuciones: aplicación no encontrada."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:335
 msgid "Type to search..."
 msgstr "Escriba para buscar..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:441
 msgid "Nameless layout..."
 msgstr "Distribución sin nombre..."
 
