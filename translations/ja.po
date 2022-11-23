@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-22 22:10+0100\n"
+"POT-Creation-Date: 2022-11-23 02:07+0100\n"
 "PO-Revision-Date: 2021-11-03 17:47+0900\n"
 "Last-Translator: k-fog <kiridasuku@gmail.com>\n"
 "Language-Team: Japanese <>\n"
@@ -38,8 +38,8 @@ msgid "Advanced..."
 msgstr "高度な設定"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:762
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:983
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:781
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1002
 msgid "General"
 msgstr "一般"
 
@@ -134,9 +134,9 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:580
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:599
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:619
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:639
 msgid "Disabled"
 msgstr "無効"
 
@@ -178,7 +178,7 @@ msgstr ""
 "す。"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:497
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
 msgid "Favorite Layout"
 msgstr "お気に入りのレイアウト"
 
@@ -210,7 +210,8 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
-"Always indicate the focused window unless it's maximized or in fullscreen"
+"Always indicate the focused window unless it's maximized or in fullscreen. "
+"There are issues on Wayland with GTK4 popups"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
@@ -231,28 +232,39 @@ msgid ""
 "active hint"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:434
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
+msgid "Inner Border Size"
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
+msgid ""
+"The border for the always active hint reaching inside the window frame. This "
+"is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
+"the window behind the hint for whatever reason..."
+msgstr ""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
 msgstr "アニメーション"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:441
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:460
 msgid "Tiling"
 msgstr "整列時"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:452
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:471
 msgid "Untiling"
 msgstr "整列解除時"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:468
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
 msgid "Default Window Movement Mode"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:475
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:829
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:848
 msgid "Edge Tiling"
 msgstr "端に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:476
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
 msgid ""
 "Moving the window to the screen edges or corners will open the default tile "
 "preview"
@@ -260,38 +272,38 @@ msgstr ""
 "ウィンドウを画面端または角に移動すると、デフォルトのタイルプレビューを表示す"
 "る"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:485
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:504
 msgid "Adaptive Tiling"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:486
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:505
 msgid ""
 "Releasing the grab on a window while hovering over a tile will push the "
 "overlapped window(s) aside"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:498
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:509
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:510
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:526
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:530
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
 msgid ""
 "When a window is dragged to a new monitor the tile preview will stick to the "
 "old monitor for a very short time. This way you can tile windows by "
@@ -299,81 +311,81 @@ msgid ""
 "edge."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:541
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:542
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:557
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:572
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:591
 msgid "'Adaptive Tiling' Move Mode Activator"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:581
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
 msgid "Ctrl"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:582
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
 msgid "Alt"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:583
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:642
 msgid "RMB"
 msgstr "マウス右ボタン"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:584
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:604
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
 msgid "Super"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:592
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:611
 msgid "'Favorite Layout' Move Mode Activator"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:612
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
 msgid "'Ignore Tiling Assistant' Mode Activator"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:632
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Vertical Edge Preview Trigger Area"
 msgstr "上下の整列プレビュー反応範囲"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:655
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:674
 msgid "Horizontal Edge Preview Trigger Area"
 msgstr "左右の整列プレビュー反応範囲"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:678
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:697
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "画面上端での動作切り替え時間"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:701
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:720
 msgid "Inverse Top Screen Edge Action for Landscape Displays"
 msgstr "横長の画面で画面上端での動作を逆にする"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:716
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:735
 msgid "Inverse Top Screen Edge Action for Portrait Displays"
 msgstr "縦長の画面で画面上端での動作を逆にする"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:731
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:750
 msgid "Restore Window Size on"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:732
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:751
 msgid ""
 "Tiled windows may not properly restore their size on Wayland. If that's the "
 "case, use 'Restore Window Size on Grab End'"
@@ -381,160 +393,160 @@ msgstr ""
 "Waylandでは、整列されたウィンドウが適切にサイズを復元できない場合があります。"
 "その場合、'Restore Window Size on Grab End'を使用してください。"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:740
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:759
 msgid "Grab Start"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:741
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:760
 msgid "Grab End"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:755
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:774
 msgid "Keybindings"
 msgstr "キーバインド"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:765
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:784
 msgid "Toggle 'Tiling Popup'"
 msgstr "[タイリングポップアップ]の切り替え"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:770
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:789
 msgid "Tile Editing Mode"
 msgstr "タイル編集モード"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:771
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:790
 msgid "A keyboard-driven mode to manage your tiled windows"
 msgstr "整列したウィンドウをキーボードで操作するモード"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:776
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:795
 msgid "Auto-Tile"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:777
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
 msgid "Un/tile the current window based on the visible tiles"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:782
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:801
 msgid "Toggle 'Always on Top'"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:791
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:810
 msgid "Toggle Maximization"
 msgstr "最大化切り替え"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:815
 msgid "Toggle Vertical Maximization"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:805
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:824
 msgid "Toggle Horizontal Maximization"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:814
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:833
 msgid "Restore Window Size"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:819
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:838
 msgid "Move Window to Center"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:832
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:892
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:851
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:911
 msgid "Tile to top"
 msgstr "上に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:837
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:897
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:856
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:916
 msgid "Tile to bottom"
 msgstr "下に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:842
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:902
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:861
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:921
 msgid "Tile to left"
 msgstr "左に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:847
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:907
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:866
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:926
 msgid "Tile to right"
 msgstr "右に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:857
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:876
 msgid "Corner Tiling"
 msgstr "角に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:860
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:924
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:879
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:943
 msgid "Tile to top-left"
 msgstr "左上に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:865
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:929
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:884
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:948
 msgid "Tile to top-right"
 msgstr "右上に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:870
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:934
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:889
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:953
 msgid "Tile to bottom-left"
 msgstr "左下に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:875
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:939
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:894
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:958
 msgid "Tile to bottom-right"
 msgstr "右下に配置"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:885
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:904
 msgid "Edge Tiling without Tiling Assistant"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:917
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:936
 msgid "Corner Tiling without Tiling Assistant"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:949
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
 msgid "Debugging"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:956
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:975
 msgid "Show Tiled Rects"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:961
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:980
 msgid "Show Free Screen Rects"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:972
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1008
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:991
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1027
 msgid "Layouts"
 msgstr "レイアウト"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:986
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1005
 msgid "Panel Indicator"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:997
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1016
 msgid "Search for a Layout"
 msgstr "レイアウトを探す"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:998
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1017
 msgid "Open a popup listing all the available layouts"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1032
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1051
 msgid "Add a new Layout."
 msgstr "新しいレイアウトを追加"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1039
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1058
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
 msgstr "レイアウトを保存する（無効な設定は失われます！）"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1046
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1065
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr "保存されていない変更を破棄し、レイアウトを再読込する。"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1103
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1122
 msgid "Advanced / Experimental Settings"
 msgstr "高度な／実験な機能の設定"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1104
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
 msgid "Show more settings in the main preference window"
 msgstr ""
 
