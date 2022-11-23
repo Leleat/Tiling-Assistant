@@ -1,5 +1,9 @@
 # Changelog
 
+## v39
+**Fixed**
+- Clean up settings signals properly (technically only relevant for the active hint since it may be destroyed before the settings singleton)
+
 ## v38
 **Fixed**
 - issue with always active window hint (there is still a problem with GTK4 popups on Wayland)
