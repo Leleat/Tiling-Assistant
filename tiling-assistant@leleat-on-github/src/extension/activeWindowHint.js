@@ -289,13 +289,8 @@ class AlwaysActiveWindowHint extends Hint {
             return;
         }
 
-        const wRect = window.get_frame_rect();
-        this.set({
-            x: wRect.x,
-            y: wRect.y,
-            width: wRect.width,
-            height: wRect.height
-        });
+        const { x, y, width, height } = window.get_frame_rect();
+        this.set({ x, y, width, height });
 
         const actor = window.get_compositor_private();
         actor && Meta.later_add(Meta.LaterType.IDLE, () => {
