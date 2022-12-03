@@ -8,35 +8,35 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-23 02:29+0100\n"
-"PO-Revision-Date: 2021-09-14 14:19+0200\n"
-"Last-Translator: Heimen Stoffels <vistausss@fastmail.com>\n"
+"PO-Revision-Date: 2022-12-03 18:48+0100\n"
+"Last-Translator: Philip Goto <philip.goto@gmail.com>\n"
 "Language-Team: \n"
 "Language: nl\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.0\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.1.1\n"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:10
 msgid "Report a Bug"
-msgstr ""
+msgstr "Probleem rapporteren"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
 msgid "User Guide"
-msgstr ""
+msgstr "Gebruikershandleiding"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
 msgid "License"
-msgstr ""
+msgstr "Licentie"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:22
 msgid "Changelog"
-msgstr ""
+msgstr "Wijzigingslogboek"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:26
 msgid "Advanced..."
-msgstr ""
+msgstr "Geavanceerd…"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:781
@@ -50,19 +50,19 @@ msgstr "Tegelpop-upvenster"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
 msgid "Open after tiling a window"
-msgstr ""
+msgstr "Openen na tegelen venster"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:62
 msgid "Include apps from all workspaces"
-msgstr ""
+msgstr "Apps van alle werkbladen tonen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:83
 msgid "Tile Groups"
-msgstr ""
+msgstr "Tegelgroepen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Tegelgroepen uitschakelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
@@ -73,7 +73,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
-msgstr ""
+msgstr "Samen naar voren brengen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
 msgid ""
@@ -83,7 +83,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:114
 msgid "App Switcher and Tiling Popup"
-msgstr ""
+msgstr "App-wisselaar en tegelingspop-up"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:115
 msgid ""
@@ -93,35 +93,35 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
 msgid "Gaps"
-msgstr ""
+msgstr "Ruimtes"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
 msgid "Windows"
-msgstr ""
+msgstr "Vensters"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:156
 msgid "Screen Edges"
-msgstr ""
+msgstr "Schermranden"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
 msgid "Screen Edge Top"
-msgstr ""
+msgstr "Schermrand boven"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
 msgid "Screen Edge Left"
-msgstr ""
+msgstr "Schermrand links"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
 msgid "Screen Edge Right"
-msgstr ""
+msgstr "Schermrand rechts"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
 msgid "Screen Edge Bottom"
-msgstr ""
+msgstr "Schermrand onder"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 msgid "Maximized Windows"
-msgstr ""
+msgstr "Gemaximaliseerde vensters"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
 msgid "Dynamic Keybinding Behaviour"
@@ -147,7 +147,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
 msgid "Window Focus"
-msgstr ""
+msgstr "Vensterfocus"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:297
 msgid ""
@@ -178,7 +178,7 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
 msgid "Favorite Layout"
-msgstr ""
+msgstr "Favoriete indeling"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
 msgid "Move the window along your favorite Layout"
@@ -186,7 +186,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
 msgid "Active Window Hint"
-msgstr ""
+msgstr "Hint van actieve venster"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
@@ -194,7 +194,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
-msgstr ""
+msgstr "Minimaal"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
 msgid ""
@@ -204,7 +204,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
-msgstr ""
+msgstr "Altijd"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
@@ -214,7 +214,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
-msgstr ""
+msgstr "Hintkleur"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "The color of the frame indicating the focused window"
@@ -222,7 +222,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
 msgid "Border Size"
-msgstr ""
+msgstr "Randbreedte"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
 msgid ""
@@ -232,7 +232,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
-msgstr ""
+msgstr "Binnenste randbreedte"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
@@ -243,24 +243,24 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
-msgstr ""
+msgstr "Animaties"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:460
 msgid "Tiling"
-msgstr ""
+msgstr "Tegelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:471
 msgid "Untiling"
-msgstr ""
+msgstr "Onttegelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
 msgid "Default Window Movement Mode"
-msgstr ""
+msgstr "Standaardvensterbeweginsmodus"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:848
 msgid "Edge Tiling"
-msgstr ""
+msgstr "Randtegeling"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
 msgid ""
@@ -270,7 +270,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:504
 msgid "Adaptive Tiling"
-msgstr ""
+msgstr "Adaptieve tegeling"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:505
 msgid ""
@@ -285,7 +285,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
-msgstr ""
+msgstr "Tegelingsassistent negeren"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
@@ -293,11 +293,11 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
-msgstr ""
+msgstr "Overig"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
-msgstr ""
+msgstr "Wachttijd bij schermwissel"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
 msgid ""
@@ -309,7 +309,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
-msgstr ""
+msgstr "Bewegingsmodus met lage prestaties"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
 msgid ""
@@ -329,25 +329,25 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
 msgid "Ctrl"
-msgstr ""
+msgstr "Ctrl"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
 msgid "Alt"
-msgstr ""
+msgstr "Alt"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:642
 msgid "RMB"
-msgstr ""
+msgstr "RMK"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
 msgid "Super"
-msgstr ""
+msgstr "Super"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:611
 msgid "'Favorite Layout' Move Mode Activator"
@@ -417,31 +417,31 @@ msgstr "Automatisch tegelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
 msgid "Un/tile the current window based on the visible tiles"
-msgstr ""
+msgstr "Het huidige venster (ont)tegelen gebaseerd op zichtbare tegels"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:801
 msgid "Toggle 'Always on Top'"
-msgstr ""
+msgstr "‘Altijd voorop’ omschakelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:810
 msgid "Toggle Maximization"
-msgstr "Maximaliseren aan/uit"
+msgstr "Maximaliseren omschakelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:815
 msgid "Toggle Vertical Maximization"
-msgstr ""
+msgstr "Verticale maximalisatie omschakelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:824
 msgid "Toggle Horizontal Maximization"
-msgstr ""
+msgstr "Horizontale maximalisatie omschakelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:833
 msgid "Restore Window Size"
-msgstr ""
+msgstr "Venstergrootte herstellen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:838
 msgid "Move Window to Center"
-msgstr ""
+msgstr "Venster naar midden verplaatsen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:851
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:911
@@ -465,7 +465,7 @@ msgstr "Naar rechts tegelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:876
 msgid "Corner Tiling"
-msgstr ""
+msgstr "Hoektegeling"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:879
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:943
@@ -489,15 +489,15 @@ msgstr "Naar rechtsonder tegelen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:904
 msgid "Edge Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Randtegeling zonder tegelingsassistent"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:936
 msgid "Corner Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Hoektegeling zonder tegelingsassistent"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
 msgid "Debugging"
-msgstr ""
+msgstr "Foutopsporing"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:975
 msgid "Show Tiled Rects"
@@ -510,15 +510,15 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:991
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1027
 msgid "Layouts"
-msgstr ""
+msgstr "Indelingen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1005
 msgid "Panel Indicator"
-msgstr ""
+msgstr "Paneelindicator"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1016
 msgid "Search for a Layout"
-msgstr ""
+msgstr "Naar indeling zoeken"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1017
 msgid "Open a popup listing all the available layouts"
@@ -526,7 +526,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1051
 msgid "Add a new Layout."
-msgstr ""
+msgstr "Voeg een nieuwe indeling toe."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1058
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
@@ -538,7 +538,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1122
 msgid "Advanced / Experimental Settings"
-msgstr ""
+msgstr "Geavanceerde/experimentele instellingen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
 msgid "Show more settings in the main preference window"
@@ -556,16 +556,16 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
 msgid "Tiling popup enabled"
-msgstr ""
+msgstr "Tegelingspop-up ingeschakeld"
 
 #: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
 msgid "Tiling popup was disabled"
-msgstr ""
+msgstr "Tegelingspop-up is uitgeschakeld"
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:488
 msgid "No valid layouts defined."
-msgstr ""
+msgstr "Geen geldige indelingen gedefinieerd."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
 msgid "Popup Layouts: App not found."
@@ -573,11 +573,11 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:335
 msgid "Type to search..."
-msgstr ""
+msgstr "Typ om te zoeken…"
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:441
 msgid "Nameless layout..."
-msgstr ""
+msgstr "Naamloze indeling…"
 
 #: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:66
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
@@ -585,7 +585,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
 msgid "'User Guide' for help..."
-msgstr ""
+msgstr "‘Gebruikershandleiding’ voor hulp…"
 
 #~ msgid "Raise Tile Groups together"
 #~ msgstr "Tegelgroepen tegelijk focussen"
