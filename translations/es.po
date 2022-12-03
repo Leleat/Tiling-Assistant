@@ -62,7 +62,7 @@ msgstr "Grupos de ventanas en mosaico"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Desactivar los grupos de mosaicos"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
@@ -111,19 +111,19 @@ msgstr "Bordes de pantalla"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
 msgid "Screen Edge Top"
-msgstr ""
+msgstr "Borde de pantalla superior"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
 msgid "Screen Edge Left"
-msgstr ""
+msgstr "Borde de la pantalla izquierda"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
 msgid "Screen Edge Right"
-msgstr ""
+msgstr "Borde de la pantalla derecha"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
 msgid "Screen Edge Bottom"
-msgstr ""
+msgstr "Borde inferior de la pantalla"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 msgid "Maximized Windows"
@@ -149,7 +149,7 @@ msgstr "Desactivado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Don't change the keybindings' behaviour"
-msgstr ""
+msgstr "No cambie el comportamiento de los enlaces de las teclas"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
 msgid "Window Focus"
@@ -196,15 +196,15 @@ msgstr "Mueve la ventana de acuerdo a tu distribución favorita"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
 msgid "Active Window Hint"
-msgstr ""
+msgstr "Sugerencia de ventana activa"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
-msgstr ""
+msgstr "No indicar la ventana enfocada"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
-msgstr ""
+msgstr "Mínimo"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
 msgid ""
@@ -214,7 +214,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
-msgstr ""
+msgstr "Siempre"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
@@ -224,15 +224,15 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
-msgstr ""
+msgstr "Color del indicio"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "The color of the frame indicating the focused window"
-msgstr ""
+msgstr "El color del marco que indica la ventana enfocada"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
 msgid "Border Size"
-msgstr ""
+msgstr "Tamaño de los bordes"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
 msgid ""
@@ -242,7 +242,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
-msgstr ""
+msgstr "Tamaño del borde interior"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
@@ -309,7 +309,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
-msgstr ""
+msgstr "Otro"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
