@@ -2,13 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Andrea Brandi <git@andreabrandi.com>, 2022.
+# Albano Battistella <albano_battistella@hotmail.com>, 2023.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling-Assistant\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2022-11-23 02:29+0100\n"
-"PO-Revision-Date: 2022-04-29 00:20+0200\n"
+"PO-Revision-Date: 2023-01-03 18:52+0100\n"
 "Last-Translator: Andrea Brandi <git@andreabrandi.com>\n"
 "Language-Team: Italian <git@andreabrandi.com>\n"
 "Language: it\n"
@@ -62,7 +63,7 @@ msgstr "Gruppi finestre affiancate"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Disabilita i gruppi di finestre"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
@@ -111,19 +112,19 @@ msgstr "Bordi dello schermo"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
 msgid "Screen Edge Top"
-msgstr ""
+msgstr "Bordo dello schermo in alto"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
 msgid "Screen Edge Left"
-msgstr ""
+msgstr "Bordo dello schermo a sinistra"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
 msgid "Screen Edge Right"
-msgstr ""
+msgstr "Bordo dello schermo a destra"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
 msgid "Screen Edge Bottom"
-msgstr ""
+msgstr "Bordo dello schermo in basso"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 msgid "Maximized Windows"
@@ -149,7 +150,7 @@ msgstr "Disabilita"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Don't change the keybindings' behaviour"
-msgstr ""
+msgstr "Non modificare il comportamento delle associazioni dei tasti"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
 msgid "Window Focus"
@@ -195,15 +196,15 @@ msgstr "Sposta la finestra seguendo il layout preferito delle finestre"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
 msgid "Active Window Hint"
-msgstr ""
+msgstr "Suggerimento finestra attiva"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
-msgstr ""
+msgstr ""Non indicare la finestra focalizzata"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
-msgstr ""
+msgstr "Minimale"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
 msgid ""
@@ -213,7 +214,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
-msgstr ""
+msgstr "Sempre"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
@@ -223,15 +224,15 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
-msgstr ""
+msgstr "Suggerimento colore"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "The color of the frame indicating the focused window"
-msgstr ""
+msgstr "Il colore del riquadro che indica la finestra attiva"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
 msgid "Border Size"
-msgstr ""
+msgstr "Dimensione del bordo"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
 msgid ""
@@ -241,7 +242,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
-msgstr ""
+msgstr "Dimensione del bordo interno"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
@@ -300,7 +301,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
-msgstr ""
+msgstr "Ignora l'Assistente di affiancamento"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
@@ -308,7 +309,7 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
-msgstr ""
+msgstr "Altro"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
@@ -560,7 +561,7 @@ msgstr "Impostazioni avanzate/sperimentali"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
 msgid "Show more settings in the main preference window"
-msgstr ""
+msgstr "Mostra più impostazioni nella finestra principale delle preferenze"
 
 #: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:11
 msgid ""
