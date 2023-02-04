@@ -62,7 +62,7 @@ msgstr "Kachelgruppen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Kachelgruppen deaktivieren"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
@@ -70,10 +70,14 @@ msgid ""
 "raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
+"Gekachelte Fenster passen ihre Größe nicht mehr an andere gekachelte "
+"Fenster an und werden nicht mehr gemeinsam vergrößert oder verändert."
+"Die dynamische Tastenbindung 'Fensterfokus' und das Kachel-Popup "
+"funktionieren dann ebenfalls nicht mehr."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
-msgstr "Gemeinsam öffnen"
+msgstr "Gemeinsam anheben"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
 msgid ""
@@ -95,7 +99,7 @@ msgid ""
 msgstr ""
 "Dies könnte zu Konflikten mit anderen App-Switcher-Erweiterungen (Alt+Tab) "
 "führen. Diese müssen möglicherweise erneut aktiviert werden, wenn diese "
-"Einstellung umgeschaltet wurde."
+"Einstellung angeschaltet wurde."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
 msgid "Gaps"
@@ -111,19 +115,19 @@ msgstr "Bildschirmränder"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
 msgid "Screen Edge Top"
-msgstr ""
+msgstr "Bildschirmrand oben"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
 msgid "Screen Edge Left"
-msgstr ""
+msgstr "Bildschirmrand links"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
 msgid "Screen Edge Right"
-msgstr ""
+msgstr "Bildschirmrand rechts"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
 msgid "Screen Edge Bottom"
-msgstr ""
+msgstr "Bildschirmrand unten"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 msgid "Maximized Windows"
@@ -138,6 +142,9 @@ msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behaviour based on the window's tiling state"
 msgstr ""
+"Die Tastenkombinationen zum Maximieren und Kacheln nach "
+"oben/unten/links/rechts können ihr Verhalten je nach "
+"Kachelzustand des Fensters ändern"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
@@ -149,7 +156,7 @@ msgstr "Deaktiviert"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Don't change the keybindings' behaviour"
-msgstr ""
+msgstr "Das Verhalten der Tastenkombinationen nicht ändern"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
 msgid "Window Focus"
@@ -159,6 +166,8 @@ msgstr "Fenster-Fokus"
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
+"Fokus auf das gekachelte Fenster in Richtung des angeklickten Shortcuts "
+"umschalten"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
 msgid "Tiling State"
@@ -170,6 +179,9 @@ msgid ""
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
 "is activated"
 msgstr ""
+"Passt den Kachelzustand an das gedrückte Tastenkürzel an. Beispielsweise "
+"wird ein zur rechten Hälfte gekacheltes Fenster zum rechten unteren Viertel "
+"gekachelt, wenn die Option 'Nach unten zuordnen' aktiviert ist. "
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
 msgid "Tiling State (Windows)"
@@ -195,53 +207,59 @@ msgstr "Verschiebt das Fenster entlang des favorisierten Layouts"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
 msgid "Active Window Hint"
-msgstr ""
+msgstr "Aktiver Fensterhinweis"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
-msgstr ""
+msgstr "Das fokussierte Fenster nicht anzeigen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
-msgstr ""
+msgstr "Minimal"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
 msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
 msgstr ""
+"Vorübergehendes Anzeigen des fokussierten Fensters beim Wechsel zu einem "
+"Arbeitsbereich mit mehreren sich nicht überlappenden Fenstern"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
-msgstr ""
+msgstr "Immer"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
 msgstr ""
+"Zeigt immer das fokussierte Fenster an, es sei denn, es ist maximiert oder "
+"im Vollbildmodus. Es gibt Probleme unter Wayland mit GTK4 Popups" 
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
-msgstr ""
+msgstr "Hinweisfarbe"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "The color of the frame indicating the focused window"
-msgstr ""
+msgstr "Die Farbe des Rahmens, der das fokussierte Fenster anzeigt"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
 msgid "Border Size"
-msgstr ""
+msgstr "Rahmengröße"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
 msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
 msgstr ""
+"Die Größe des Rahmens, der das fokussierte Fenster für den immer aktiven "
+"Hinweis anzeigt"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
-msgstr ""
+msgstr "Innere Rahmengröße"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
@@ -249,6 +267,9 @@ msgid ""
 "is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
 "the window behind the hint for whatever reason..."
 msgstr ""
+"Die Umrandung des immer aktiven Hinweises reicht bis in den Fensterrahmen. "
+"Dies ist dazu gedacht, abgerundete Ecken abzudecken. Allerdings werden "
+"GTK4-Popups unter Wayland das Fenster aus irgendeinem Grund dahinter setzen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
@@ -300,19 +321,19 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
-msgstr ""
+msgstr "Kachelassistent ignorieren"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
-msgstr ""
+msgstr "Verwendung von Kantenkachelung ohne die Funktionen vom Kachelassistent"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
-msgstr ""
+msgstr "Andere"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
-msgstr ""
+msgstr "Monitorwechsel Wartezeit"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
 msgid ""
