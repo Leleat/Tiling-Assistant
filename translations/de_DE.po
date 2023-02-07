@@ -342,16 +342,23 @@ msgid ""
 "'throwing' it towards any screen edge even if a monitor is bordering that "
 "edge."
 msgstr ""
+"Wenn ein Fenster auf einen neuen Monitor gezogen wird, bleibt die "
+"Kachelvorschau für eine sehr kurze Zeit auf dem alten Monitor aktiv. "
+"Auf diese Weise können Sie Fenster kacheln, indem Sie sie auf eine beliebige "
+"Bildschirmkanten 'werfen', selbst wenn ein Monitor an diese Kante angrenzt." 
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
-msgstr ""
+msgstr "Bewegungsmodus mit geringer Leistung"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
 msgstr ""
+"Verwenden Sie diese Funktion, wenn es beim Verschieben von Fenstern zu "
+"Verzögerungen kommt. Allerdings wird dadurch die Genauigkeit der "
+"Kachelvorschauaktualisierungen verringert."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
@@ -383,7 +390,7 @@ msgstr "RMB"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
 msgid "Super"
-msgstr ""
+msgstr "Super"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:611
 msgid "'Favorite Layout' Move Mode Activator"
@@ -391,7 +398,7 @@ msgstr "Aktivator für den Verschiebemodus 'Favorisiertes Layout'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
 msgid "'Ignore Tiling Assistant' Mode Activator"
-msgstr ""
+msgstr "'Ignoriere Kachel-Assistent' Modus Schalter "
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Vertical Edge Preview Trigger Area"
@@ -529,11 +536,11 @@ msgstr "Nach unten rechts zuordnen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:904
 msgid "Edge Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Kantenkachelung ohne Assistent"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:936
 msgid "Corner Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Eckenkachelung ohne Assistenz"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
 msgid "Debugging"
@@ -585,7 +592,7 @@ msgstr "Erweiterte / Experimentelle Einstellungen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
 msgid "Show more settings in the main preference window"
-msgstr ""
+msgstr "Weitere Einstellungen in den Hauptmenü anzeigen"
 
 #: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:11
 msgid ""
