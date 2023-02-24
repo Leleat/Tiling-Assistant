@@ -200,7 +200,7 @@ msgstr "Suggerimento finestra attiva"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
-msgstr ""Non indicare la finestra focalizzata"
+msgstr "Non indicare la finestra focalizzata"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
