@@ -63,8 +63,11 @@ function enable() {
 
     // Disable native tiling.
     this._gnomeMutterSettings = ExtensionUtils.getSettings('org.gnome.mutter');
+    this._gnomeMutterEdgeTilingUserValue = this._gnomeMutterSettings.get_user_value('edge-tiling');
     this._gnomeMutterSettings.set_boolean('edge-tiling', false);
+
     this._gnomeShellSettings = ExtensionUtils.getSettings('org.gnome.shell.overrides');
+    this._gnomeShellEdgeTilingUserValue = this._gnomeShellSettings.get_user_value('edge-tiling');
     this._gnomeShellSettings.set_boolean('edge-tiling', false);
 
     // Disable native keybindings for Super+Up/Down/Left/Right
@@ -75,23 +78,27 @@ function enable() {
 
     if (this._gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
             this._settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
+        const userValue = this._gnomeDesktopKeybindings.get_value('maximize');
         this._gnomeDesktopKeybindings.set_strv('maximize', []);
-        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'maximize']);
+        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'maximize', userValue]);
     }
     if (this._gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
             this._settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
+        const userValue = this._gnomeDesktopKeybindings.get_value('unmaximize');
         this._gnomeDesktopKeybindings.set_strv('unmaximize', []);
-        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'unmaximize']);
+        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'unmaximize', userValue]);
     }
     if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
             this._settings.getStrv(sc.LEFT).includes('<Super>Left')) {
+        const userValue = this._gnomeMutterKeybindings.get_value('toggle-tiled-left');
         this._gnomeMutterKeybindings.set_strv('toggle-tiled-left', []);
-        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-left']);
+        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-left', userValue]);
     }
     if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
             this._settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
+        const userValue = this._gnomeMutterKeybindings.get_value('toggle-tiled-right');
         this._gnomeMutterKeybindings.set_strv('toggle-tiled-right', []);
-        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-right']);
+        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-right', userValue]);
     }
 
     // Include tiled windows when dragging from the top panel.
@@ -145,14 +152,29 @@ function disable() {
     this._settings.destroy();
     this._settings = null;
 
+    const restoreSetting = (gsettings, key, oldValue) => {
+        if (gsettings) {
+            if (oldValue)
+                gsettings.set_value(key, oldValue);
+            else
+                gsettings.reset(key);
+        }
+    };
+
     // Re-enable native tiling.
-    this._gnomeMutterSettings.reset('edge-tiling');
+    restoreSetting(this._gnomeMutterSettings,
+        'edge-tiling', this._gnomeMutterEdgeTilingUserValue);
+    this._gnomeMutterEdgeTilingUserValue = null;
     this._gnomeMutterSettings = null;
-    this._gnomeShellSettings.reset('edge-tiling');
+
+    restoreSetting(this._gnomeShellSettings,
+        'edge-tiling', this._gnomeShellEdgeTilingUserValue);
+    this._gnomeShellEdgeTilingUserValue = null;
     this._gnomeShellSettings = null;
 
     // Restore native keybindings for Super+Up/Down/Left/Right
-    this._nativeKeybindings.forEach(([kbSetting, kbName]) => kbSetting.reset(kbName));
+    this._nativeKeybindings.forEach(([kbSetting, kbName, kbOldValue]) =>
+        restoreSetting(kbSetting, kbName, kbOldValue));
     this._nativeKeybindings = [];
     this._gnomeMutterKeybindings = null;
     this._gnomeDesktopKeybindings = null;
