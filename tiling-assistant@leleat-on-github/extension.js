@@ -66,9 +66,11 @@ function enable() {
     this._gnomeMutterEdgeTilingUserValue = this._gnomeMutterSettings.get_user_value('edge-tiling');
     this._gnomeMutterSettings.set_boolean('edge-tiling', false);
 
-    this._gnomeShellSettings = ExtensionUtils.getSettings('org.gnome.shell.overrides');
-    this._gnomeShellEdgeTilingUserValue = this._gnomeShellSettings.get_user_value('edge-tiling');
-    this._gnomeShellSettings.set_boolean('edge-tiling', false);
+    if (Gio.SettingsSchemaSource.get_default().lookup('org.gnome.shell.overrides', true)) {
+        this._gnomeShellSettings = ExtensionUtils.getSettings('org.gnome.shell.overrides');
+        this._gnomeShellEdgeTilingUserValue = this._gnomeShellSettings.get_user_value('edge-tiling');
+        this._gnomeShellSettings.set_boolean('edge-tiling', false);
+    }
 
     // Disable native keybindings for Super+Up/Down/Left/Right
     this._gnomeMutterKeybindings = ExtensionUtils.getSettings('org.gnome.mutter.keybindings');
