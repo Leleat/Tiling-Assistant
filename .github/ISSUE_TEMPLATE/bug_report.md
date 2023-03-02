@@ -7,8 +7,6 @@ assignees: ''
 
 ---
 
-<!-- If you just want to ask a question, please open a discussion instead. -->
-
 **Describe the bug**
 
 **Steps To Reproduce**
