@@ -1,0 +1,636 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2022-11-23 02:29+0100\n"
+"PO-Revision-Date: 2023-02-28 20:11+0100\n"
+"Last-Translator: infeeeee <gyetpet@mailbox.org>\n"
+"Language-Team: \n"
+"Language: hu\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 3.2.2\n"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:10
+msgid "Report a Bug"
+msgstr "Hiba jelentése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
+msgid "User Guide"
+msgstr "Felhasználói dokumentáció"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
+msgid "License"
+msgstr "Licensz"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:22
+msgid "Changelog"
+msgstr "Változásnapló"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:26
+msgid "Advanced..."
+msgstr "Speciális..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:781
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1002
+msgid "General"
+msgstr "Általános"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:48
+msgid "Tiling Popup"
+msgstr "Csempéző felugró ablak"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
+msgid "Open after tiling a window"
+msgstr "Megnyitás egy ablak csempézése után"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:62
+msgid "Include apps from all workspaces"
+msgstr "Az összes munkaterületen szereplő ablak belevétele"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:83
+msgid "Tile Groups"
+msgstr "Csempe csoportok"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
+msgid "Disable Tile Groups"
+msgstr "Csempe csoportok kikapcsolása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
+msgid ""
+"Tiled windows will no longer adapt their size to other tiled windows nor be "
+"raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
+"and the Tiling Popup will also no longer work."
+msgstr ""
+"Csempézett ablakok nem fognak alkalmazkodni más csempézett ablakokhoz, és "
+"nem fognak együtt sem előtérbe jönni, sem átméreteződni. A dinamikus "
+"gyorsbillentyű viselkedései közül az 'Ablak fókuszálása' és a Csempéző "
+"felugró ablak nem fog működni."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
+msgid "Raise together"
+msgstr "Előtérbe hozás együtt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
+msgid ""
+"A tile group is created when a window gets tiled. If a tiled window is "
+"raised, raise the other windows of its tile group as well"
+msgstr ""
+"Egy csempe csoport jön létre, amikor ablakok csempézésekor. Ha egy "
+"csempézett ablak előtérbe kerül, akkor a csoport többi tagja is vele együtt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:114
+msgid "App Switcher and Tiling Popup"
+msgstr "Alkalmazásváltó és csempéző felugró ablak"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:115
+msgid ""
+"This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
+"may need to re-enable this or the other extension after toggling this setting"
+msgstr ""
+"Összeütközhet más alkalmazásváltó (más néven Alt+Tab) kiterjesztésekkel. "
+"Ennek vagy a másik a kiterjesztésnek a ki-be kapcsolása lehet szükséges "
+"ennek a beállításnak a megváltoztatása után"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
+msgid "Gaps"
+msgstr "Hézagok"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
+msgid "Windows"
+msgstr "Ablakok"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:156
+msgid "Screen Edges"
+msgstr "Képernyő szélek"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
+msgid "Screen Edge Top"
+msgstr "Képernyő felső széle"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
+msgid "Screen Edge Left"
+msgstr "Képernyő bal széle"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
+msgid "Screen Edge Right"
+msgstr "Képernyő jobb széle"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
+msgid "Screen Edge Bottom"
+msgstr "Képernyő alsó széle"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+msgid "Maximized Windows"
+msgstr "Maximalizált ablakok"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
+msgid "Dynamic Keybinding Behaviour"
+msgstr "Dinamikus gyorsbillentyűk viselkedése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
+msgid ""
+"The keybindings to maximize and tile to the top/bottom/left/right may change "
+"their behaviour based on the window's tiling state"
+msgstr ""
+"A gyorsbillentyűk az ablakok maximalizálásához és fel/le/jobbra/balra "
+"csempézéséhez az ablak csempézettségétől függően máshogy működhetnek"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:599
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:619
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:639
+msgid "Disabled"
+msgstr "Kikapcsolva"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
+msgid "Don't change the keybindings' behaviour"
+msgstr "A gyorsbillentyűk működése nem változik"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
+msgid "Window Focus"
+msgstr "Ablak fókuszálása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:297
+msgid ""
+"Switch focus to the tiled window in the direction of the pressed shortcut"
+msgstr "A leütött gyorsbillentyű irányában levő ablak fókuszálása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
+msgid "Tiling State"
+msgstr "Csempézettség állapota"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:309
+msgid ""
+"Adapt the tiling state to the pressed shortcut. For instance, a window tiled "
+"to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
+"is activated"
+msgstr ""
+"A ablak csempézettség állapotától függ a gyorsbillentyű működése. Például, "
+"ha egy ablak a a képernyő jobb szélére van csempézve, akkor a képernyő jobb "
+"alsó sarkába fog ugrani a 'csempézés alulra' gyorsbillentyű használatakor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
+msgid "Tiling State (Windows)"
+msgstr "Csempézettség állapota (ablakok)"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:321
+msgid ""
+"Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
+"bottom and the 'tile to bottom' shortcut is activated, minimize the window"
+msgstr ""
+"Mint a 'csempézettség állapota', de ha az ablak nincs csempézve, vagy már "
+"alulra van csempézve a 'csempézés alulra' gyorsbillentyű megnyomásakor az "
+"ablak minimalizálódni fog"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
+msgid "Favorite Layout"
+msgstr "Kedvenc elrendezés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
+msgid "Move the window along your favorite Layout"
+msgstr "Ablak mozgatása a kedvenc elrendezés mentén"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
+msgid "Active Window Hint"
+msgstr "Aktív ablak kiemelése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
+msgid "Don't indicate the focused window"
+msgstr "A fókuszált ablak megjelölésének kikapcsolása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
+msgid "Minimal"
+msgstr "Minimális"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
+msgid ""
+"Temporarily indicate the focused window when switching to a workspace with "
+"multiple non-overlapping windows"
+msgstr ""
+"A fókuszált ablak ideiglenesen megjelölése, több, egymást nem átfedő "
+"ablakkal rendelkező munkaterületre váltásakor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
+msgid "Always"
+msgstr "Mindig"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
+msgid ""
+"Always indicate the focused window unless it's maximized or in fullscreen. "
+"There are issues on Wayland with GTK4 popups"
+msgstr ""
+"A fókuszált ablak megjelölése, hacsak nem maximalizált, vagy teljes "
+"képernyős. Problémák fordulhatnak elő Wayland és GTK4 felugró ablakokkal"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
+msgid "Hint Color"
+msgstr "Kiemelés színe"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
+msgid "The color of the frame indicating the focused window"
+msgstr "A fókuszált ablak kiemelésének a színe"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
+msgid "Border Size"
+msgstr "Szegély mérete"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
+msgid ""
+"The border size of the frame indicating the focused window for the always "
+"active hint"
+msgstr ""
+"A fókuszált ablakot kiemelő keret szegélyének a mérete a mindig aktív "
+"kiemelésnél"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
+msgid "Inner Border Size"
+msgstr "Belső szegély mérete"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
+msgid ""
+"The border for the always active hint reaching inside the window frame. This "
+"is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
+"the window behind the hint for whatever reason..."
+msgstr ""
+"A mindig aktív kiemeléshez tartozó szegély az ablak keretén belül. El "
+"kellene takarnia a lekerekített sarkokat. Azonban GTK4 felugró ablakok "
+"Waylanden az ablakot a kiemelés mögött jelenítik meg valamiért..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
+msgid "Animations"
+msgstr "Animációk"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:460
+msgid "Tiling"
+msgstr "Csempézés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:471
+msgid "Untiling"
+msgstr "Csempézés megszüntetése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
+msgid "Default Window Movement Mode"
+msgstr "Alapértelmezett ablak mozgatási mód"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:848
+msgid "Edge Tiling"
+msgstr "Szél csempézés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
+msgid ""
+"Moving the window to the screen edges or corners will open the default tile "
+"preview"
+msgstr ""
+"A képernyő széléhez húzott ablak az alapértelmezett csempe előnézetet nyitja "
+"meg"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:504
+msgid "Adaptive Tiling"
+msgstr "Adaptív csempézés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:505
+msgid ""
+"Releasing the grab on a window while hovering over a tile will push the "
+"overlapped window(s) aside"
+msgstr ""
+"Ha az ablak egy csempe fölött lett elengedve, akkor odébb fogja tolni az "
+"átfedő ablakot, ablakokat"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+msgid ""
+"The tile preview will stick to your favorite layout from the 'Layouts' page"
+msgstr ""
+"A csempe előnézet csak a kedvenc elrendezést fogja használni az "
+"'Elrendezések' oldalról"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
+msgid "Ignore Tiling Assistant"
+msgstr "Csempézési segéd mellőzése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
+msgid "Use Edge Tiling without Tiling Assistant's features"
+msgstr "Szél csempézés használata, a 'Tiling Assistant' funkciói nélkül"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
+msgid "Other"
+msgstr "Egyéb"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
+msgid "Monitor Switch Grace Period"
+msgstr "Monitorváltás türelmi ideje"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
+msgid ""
+"When a window is dragged to a new monitor the tile preview will stick to the "
+"old monitor for a very short time. This way you can tile windows by "
+"'throwing' it towards any screen edge even if a monitor is bordering that "
+"edge."
+msgstr ""
+"Egy ablak a új monitorra húzásakor, a csempe előnézet a régi monitorhoz fog "
+"ragadni egy nagyon rövid ideig. Így lehetséges az ablakok csempézése a "
+"képernyő széle felé való \"dobással\", még akkor is, ha egy másik monitor "
+"található azon az oldalon."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
+msgid "Low Performance Movement Mode"
+msgstr "Alacsony teljesítményű mozgatás mód"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
+msgid ""
+"Use this if there is a lag when moving windows around. This will however "
+"decrease the precision of the tile preview updates."
+msgstr ""
+"Ablakok mozgatásakor jelentkező késleltetéskor ajánlott bekapcsolni. Azonban "
+"ez a mód az előnézetek frissítésének a pontosságát is csökkenti."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
+msgid "Adapt 'Edge Tiling' to your Favorite Layout"
+msgstr "A 'szél csempézés' alkalmazása a kedvenc elrendezéshez"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:591
+msgid "'Adaptive Tiling' Move Mode Activator"
+msgstr "'Adaptív csempézés' mozgatási mód aktiválója"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
+msgid "Alt"
+msgstr "Alt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:642
+msgid "RMB"
+msgstr "Jobbklikk"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
+msgid "Super"
+msgstr "Szuper"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:611
+msgid "'Favorite Layout' Move Mode Activator"
+msgstr "'Kedvenc elrendezés' mozgatási mód aktiválója"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
+msgid "'Ignore Tiling Assistant' Mode Activator"
+msgstr "'Csempézési segéd mellőzése' mód aktiválója"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
+msgid "Vertical Edge Preview Trigger Area"
+msgstr "Függőleges szél előnézet aktiváló terület"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:674
+msgid "Horizontal Edge Preview Trigger Area"
+msgstr "Vízszintes szél előnézet aktiváló terület"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:697
+msgid "Inverse Top Screen Edge Action Timer"
+msgstr "Fordított felső képernyő szél művelet időzítő"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:720
+msgid "Inverse Top Screen Edge Action for Landscape Displays"
+msgstr "Fordított felső képernyő szél művelet fekvő kijelzőkhöz"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:735
+msgid "Inverse Top Screen Edge Action for Portrait Displays"
+msgstr "Fordított felső képernyő szél művelet álló kijelzőkhöz"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:750
+msgid "Restore Window Size on"
+msgstr "Ablakok méretének visszaállítása ilyenkor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:751
+msgid ""
+"Tiled windows may not properly restore their size on Wayland. If that's the "
+"case, use 'Restore Window Size on Grab End'"
+msgstr ""
+"Csempézett ablakok néha nem tudják megfelelően helyreállítani a méretüket "
+"Waylanden. Ezt az 'Megfogás végén' funkció kiválasztásával megoldható"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:759
+msgid "Grab Start"
+msgstr "Megfogás elején"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:760
+msgid "Grab End"
+msgstr "Megfogás végén"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:774
+msgid "Keybindings"
+msgstr "Gyorsbillentyűk"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:784
+msgid "Toggle 'Tiling Popup'"
+msgstr "'Csempéző felugró ablak' be/ki"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:789
+msgid "Tile Editing Mode"
+msgstr "Csempe szerkesztő mód"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:790
+msgid "A keyboard-driven mode to manage your tiled windows"
+msgstr "Billentyűzet vezérelt mód, a csempézett ablakok kezelésére"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:795
+msgid "Auto-Tile"
+msgstr "Auto-csempézés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
+msgid "Un/tile the current window based on the visible tiles"
+msgstr ""
+"Az aktuális ablak csempézése, vagy csempézés megszüntetése a látható csempék "
+"alapján"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:801
+msgid "Toggle 'Always on Top'"
+msgstr "'Mindig felül' be/ki"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:810
+msgid "Toggle Maximization"
+msgstr "Maximalizálás be/ki"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:815
+msgid "Toggle Vertical Maximization"
+msgstr "Függőleges maximalizálás be/ki"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:824
+msgid "Toggle Horizontal Maximization"
+msgstr "Vízszintes maximalizálás be/ki"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:833
+msgid "Restore Window Size"
+msgstr "Ablak méretének visszaállítása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:838
+msgid "Move Window to Center"
+msgstr "Ablak középre mozgatása"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:851
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:911
+msgid "Tile to top"
+msgstr "Csempézés felülre"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:856
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:916
+msgid "Tile to bottom"
+msgstr "Csempézés alulra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:861
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:921
+msgid "Tile to left"
+msgstr "Csempézés balra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:866
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:926
+msgid "Tile to right"
+msgstr "Csempézés jobbra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:876
+msgid "Corner Tiling"
+msgstr "Sarok csempézés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:879
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:943
+msgid "Tile to top-left"
+msgstr "Csempézés bal felülre"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:884
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:948
+msgid "Tile to top-right"
+msgstr "Csempézés jobb felülre"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:889
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:953
+msgid "Tile to bottom-left"
+msgstr "Csempézés bal alulra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:894
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:958
+msgid "Tile to bottom-right"
+msgstr "Csempézés jobb alulra"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:904
+msgid "Edge Tiling without Tiling Assistant"
+msgstr "Szél csempézés használata 'Tiling Assistant' nélkül"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:936
+msgid "Corner Tiling without Tiling Assistant"
+msgstr "Sarok csempézés használata 'Tiling Assistant' nélkül"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
+msgid "Debugging"
+msgstr "Hibakeresés"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:975
+msgid "Show Tiled Rects"
+msgstr "Csempézett téglalapok megjelenítése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:980
+msgid "Show Free Screen Rects"
+msgstr "Üres képernyő téglalapok megjelenítése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:991
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1027
+msgid "Layouts"
+msgstr "Elrendezések"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1005
+msgid "Panel Indicator"
+msgstr "Jelző a felső sávon"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1016
+msgid "Search for a Layout"
+msgstr "Elrendezés keresése"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1017
+msgid "Open a popup listing all the available layouts"
+msgstr "Felugró ablak megnyitása az elérhető elrendezések listájával"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1051
+msgid "Add a new Layout."
+msgstr "Új elrendezés hozzáadása."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1058
+msgid "Save the layouts to the disk. Invalid changes will be lost!"
+msgstr "Elrendezés mentése a lemezre. Érvénytelen változások el fognak veszni!"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1065
+msgid "Reload the layouts from the disk - discarding all non-saved changes."
+msgstr ""
+"Elrendezések újratöltése a lemezről, az el nem mentett változások "
+"elvetésével."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1122
+msgid "Advanced / Experimental Settings"
+msgstr "Speciális / Kísérleti beállítások"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
+msgid "Show more settings in the main preference window"
+msgstr "Több beállítás megjelenítése a beállítások ablakban"
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:11
+msgid ""
+"Replace the keyboard shortcuts. Press 'space' or 'return' when listening for "
+"a shortcut to append a new one to the existing shortcuts instead."
+msgstr ""
+"Gyorsbillentyűk kicserélése. Gyorsbillentyűk megadásakor 'szóköz' vagy "
+"'enter' megnyomásával egy új gyorsbillentyű fűzése a meglévő mögé."
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:23
+msgid "Clear the keyboard shortcuts"
+msgstr "Gyorsbillentyűk eltávolítása"
+
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
+msgid "Tiling popup enabled"
+msgstr "Csempéző felugró ablak bekapcsolva"
+
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
+msgid "Tiling popup was disabled"
+msgstr "Csempéző felugró ablak kikapcsolva"
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:488
+msgid "No valid layouts defined."
+msgstr "Nem található érvényes elrendezés."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
+msgid "Popup Layouts: App not found."
+msgstr "Felugró elrendezések: Alkalmazás nem található."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:335
+msgid "Type to search..."
+msgstr "Kereséshez kezdjen el gépelni..."
+
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:441
+msgid "Nameless layout..."
+msgstr "Névtelen elrendezés..."
+
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:66
+msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
+msgstr ""
+"Nem lehet a 'Csempe szerkesztő mód'-ba belépni, ha nincs egy ablak se "
+"csempézve."
+
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
+msgid "'User Guide' for help..."
+msgstr "Felhasználói dokumentáció segíthet..."
