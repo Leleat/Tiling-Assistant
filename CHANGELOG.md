@@ -1,268 +1,332 @@
 # Changelog
 
-## v39
-**Fixed**
+## [39] - 2022-11-23
+
+### Fixed
+
 - Clean up settings signals properly (technically only relevant for the active hint since it may be destroyed before the settings singleton)
 
-## v38
-**Fixed**
-- issue with always active window hint (there is still a problem with GTK4 popups on Wayland)
+## [38] - 2022-11-23
 
-## v37
-**Added**
-- added active window hint. By default the `Minimal` option will be chosen (#210) 
-- added an option to not use T-A features (Tiling Popup and grouping) when DNDing a window via a modifier and via additional keyboard shortcuts. Features are hidden behind the advanced settings (#212)
-- added setting for a single/uniform screen gap instead of splitting it into edges (each edge is still available, if the advanced settings are enabled)
+### Fixed
 
-**Changed**
-- increased possible maximum of gaps to 500 (#205)
-- changed/shuffled some of the preferences around
+- Issue with always active window hint (there is still a problem with GTK4 popups on Wayland)
 
-## v36
-**Added**
-- support GNOME 43
+## [37] - 2022-11-22
 
-**Changed**
-- removed the 'row'-look of shortcuts in the layouts
+### Added
 
-**Fixed**
-- consider monitor scale when calculating window gaps (#196)
+- Added active window hint. By default the `Minimal` option will be chosen (#210)
+- Added an option to not use T-A features (Tiling Popup and grouping) when DNDing a window via a modifier and via additional keyboard shortcuts. Features are hidden behind the advanced settings (#212)
+- Added setting for a single/uniform screen gap instead of splitting it into edges (each edge is still available, if the advanced settings are enabled)
 
-## v35
-**Added**
-- added setting to disable multi-monitor grace period (#189)
+### Changed
 
-**Changed**
-- make the 'improved performance behaviour' opt-in (in the advanced settings) since it impacts the precision of the tile preview (#190)
+- Increased possible maximum of gaps to 500 (#205)
+- Changed/shuffled some of the preferences around
 
-**Fixed**
-- fixed issue about windows maximizing to wrong monitor under some circumstances setups (#188)
+## [36] - 2022-09-04
 
-**Removed**
-- removed in-app changelog
+### Added
 
-## v34
-**Added**
-- added setting to completely disable tile groups. That means no resizing, raising or suggestions anymore (#180)
-- added the ability to only resize the absolutely necessary windows in a tile group when holding `Ctrl` before resizing started (#155)
+- Support GNOME 43
 
-**Changed**
-- improved perfromance when dragging a window around for lower performance machines (#181)
-- split the screen gap setting into top, bottom, left and right parts by CharlieQLe (#146)
-- don't open the changelog window after an extension update in the prefs by default anymore
+### Changed
 
-**Fixed**
-- added a workaround for a multi-monitor bug where windows may untile incorrectly under Wayland (#137)
-- fixed issue with RMB as a `Move Mode Activator` under Wayland (#170)
-- added Meta as a `Move Mode Activator` and set it as default, if `Alt` is the default window action key (#172)
+- Removed the 'row'-look of shortcuts in the layouts
 
-## v33
-**Added*
-- german (Switzerland) tl by MrReSc #152
-- german (Germany) tl by pjanze #161
-- italian translation by starise #164
-- spanish translation by fjsevilla-dev #168
+### Fixed
 
-**Changed**
-- port to GNOME 42 and drop support for older versions
+- Consider monitor scale when calculating window gaps (#196)
+
+## [35] - 2022-07-23
+
+### Added
+
+- Added setting to disable multi-monitor grace period (#189)
+
+### Changed
+
+- Make the 'improved performance behaviour' opt-in (in the advanced settings) since it impacts the precision of the tile preview (#190)
+
+### Fixed
+
+- Fixed issue about windows maximizing to wrong monitor under some circumstances setups (#188)
+
+### Removed
+
+- Removed in-app changelog
+
+## [34] - 2022-07-13
+
+### Added
+
+- Added setting to completely disable tile groups. That means no resizing, raising or suggestions anymore (#180)
+- Added the ability to only resize the absolutely necessary windows in a tile group when holding `Ctrl` before resizing started (#155)
+
+### Changed
+
+- Improved perfromance when dragging a window around for lower performance machines (#181)
+- Split the screen gap setting into top, bottom, left and right parts by CharlieQLe (#146)
+- Don't open the changelog window after an extension update in the prefs by default anymore
+
+### Fixed
+
+- Added a workaround for a multi-monitor bug where windows may untile incorrectly under Wayland (#137)
+- Fixed issue with RMB as a `Move Mode Activator` under Wayland (#170)
+- Added Meta as a `Move Mode Activator` and set it as default, if `Alt` is the default window action key (#172)
+
+## [33] - 2022-05-07
+
+### Added
+
+- German (Switzerland) tl by MrReSc #152
+- German (Germany) tl by pjanze #161
+- Italian translation by starise #164
+- Spanish translation by fjsevilla-dev #168
+
+### Changed
+
+- Port to GNOME 42 and drop support for older versions
 - Brazillian Portuguese tl by ItzJaum #157
-- if an app is attached to a layout rect, try to tile an existing window instance first before opening a new one
+- If an app is attached to a layout rect, try to tile an existing window instance first before opening a new one
 
-**Removed**
-- deprecate 'App Switcher and Tiling Popup' setting
-- hacky partial touch 'support'
+### Removed
 
-**Fixed**
-- override GNOME's default shortcuts only if they are set in Tiling Assistant
+- Deprecate 'App Switcher and Tiling Popup' setting
+- Hacky partial touch 'support'
 
-## v32
-**Added**
-- added new keyboard shortcuts:
+### Fixed
+
+- Override GNOME's default shortcuts only if they are set in Tiling Assistant
+
+## [32] - 2022-01-22
+
+### Added
+
+- Added new keyboard shortcuts:
     - Restore window size (#134)
     - Toggle Vertical Maximization
     - Toggle Horizontal Maximization
     - Move Window to Center (#132)
     - Toggle `Always on Top`
-- added ability to move tile groups to a new workspace/monitor using the Tile Editing Mode:
+- Added ability to move tile groups to a new workspace/monitor using the Tile Editing Mode:
     - `Shift`+`Directions` moves the tile group to a new monitor
     - `Shift`+`Alt`+`Directions` moves the tile group to a new workspace
-- tiled windows will untile themselves if they change workspaces
-- allow one action to have multiple keyboard shortcuts (press `Enter` or `Space` when listening for a new keyboard shortcut to append shortcuts to existing ones)
-- added GNOME's native tiling behaviour (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
+- Tiled windows will untile themselves if they change workspaces
+- Allow one action to have multiple keyboard shortcuts (press `Enter` or `Space` when listening for a new keyboard shortcut to append shortcuts to existing ones)
+- Added GNOME's native tiling behaviour (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
 
-**Changed**
-- adapt edge-tiling only if it doesn't cover existing tiles. Use `Ctrl`-drag (mouse) or the `Tile Editing Mode` (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups
-- reworked tile group detection when a window is tiled
-- renamed `Split Tiles` mode to `Adaptive Tiling`. This is the mode when moving a window around while holding `Ctrl`
-- disabled grouping tiled windows in the app switcher by default and mark that setting as experimental
-- introduce concept of deprecated settings and deprecate the `Toggle Tiling Popup` and `Auto-Tile` keyboard shortcuts
+### Changed
+
+- Adapt edge-tiling only if it doesn't cover existing tiles. Use `Ctrl`-drag (mouse) or the `Tile Editing Mode` (keyboard) to 'replace/cover' existing tiles. That way 1 window can be part of multiple tile groups
+- Reworked tile group detection when a window is tiled
+- Renamed `Split Tiles` mode to `Adaptive Tiling`. This is the mode when moving a window around while holding `Ctrl`
+- Disabled grouping tiled windows in the app switcher by default and mark that setting as experimental
+- Introduce concept of deprecated settings and deprecate the `Toggle Tiling Popup` and `Auto-Tile` keyboard shortcuts
     - Deprecated settings won't be visible in the prefs window anymore unless they have a non-default value set
 
-**Fixed**
-- fixed a compatibility issue introduced in v31 with other alt-Tab extensions (#126)
-- fixed the Tiling Popup ignoring the Tile Group setting `App Switcher and Tiling Popup`
-- shortcuts may no longer change unintentionally after using the clear-shortcut-button
+### Fixed
+
+- Fixed a compatibility issue introduced in v31 with other alt-Tab extensions (#126)
+- Fixed the Tiling Popup ignoring the Tile Group setting `App Switcher and Tiling Popup`
+- Shortcuts may no longer change unintentionally after using the clear-shortcut-button
 - Fixed the URLs in the prefs' popup menu freezing the prefs - Wayland only (#136)
 
-## v31
-**Fixed**
-- fixed crash introduced in v28 (#125)
+## [31] - 2021-12-10
 
-## v30
-**Fixed**
-- fixed crash introduced in v28 (#124)
+### Fixed
 
-## v29
-**Fixed**
-- removed timer sources according to EGO review
+- Fixed crash introduced in v28 (#125)
 
-## v28
-**Added**
-- added a Panel Indicator for the layouts (disabled by default). With it you can activate a layout with your pointer or change your `Favorite Layout` (per monitor)
-- added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup
-- when dnd-ing a window, hold `Super` to make the tile preview span multiple rectangles. This only works in the `Favorite Layout` or `Split Tiles` preview modes
-- added a `hidden` setting to not adapt the Edge-Tiling to the favorite layouts
+## [30] - 2021-12-10
 
-**Removed**
-- removed the `Change favorite layouts` keyboard shortcut (Use the Panel Indicator instead)
-- removed the favorite button from the `Layouts` in the preferences (Use the Panel Indicator instead)
+### Fixed
+- Fixed crash introduced in v28 (#124)
 
-**Changed**
-- show the entire Layout when moving a window with the `Favorite Layout` preview mode
-- updated the jp translation (by k-fog #112)
-- untile tiled windows, if they are moved to a new monitor or workspace (#114)
+## [29] - 2021-12-09
+
+### Fixed
+- Removed timer sources according to EGO review
+
+## [28] - 2021-12-09
+
+### Added
+
+- Added a Panel Indicator for the layouts (disabled by default). With it you can activate a layout with your pointer or change your `Favorite Layout` (per monitor)
+- Added a setting to group tileGroups in the AppSwitcher (altTab) and Tiling Popup
+- When dnd-ing a window, hold `Super` to make the tile preview span multiple rectangles. This only works in the `Favorite Layout` or `Split Tiles` preview modes
+- Added a `hidden` setting to not adapt the Edge-Tiling to the favorite layouts
+
+### Removed
+
+- Removed the `Change favorite layouts` keyboard shortcut (Use the Panel Indicator instead)
+- Removed the favorite button from the `Layouts` in the preferences (Use the Panel Indicator instead)
+
+### Changed
+
+- Show the entire Layout when moving a window with the `Favorite Layout` preview mode
+- Updated the jp translation (by k-fog #112)
+- Untile tiled windows, if they are moved to a new monitor or workspace (#114)
 - `Tile Editing Mode`: Pressing `Space` will always open the Tiling Popup (even if there is already a window in that spot)
-- visual tweaks to the preference window
+- Visual tweaks to the preference window
 
-**Fixed**
-- when dragging a window to a new monitor there is a short `Grace Period` (150 ms), in which, if the grab is released, the window will tile to the old monitor. Fix: The `Tiling Popup` will appear on the correct monitor now.
-- fixed artifacts due to the rounded corners of the `Changelog Dialog` (only works on Wayland)
-- fixed animations being skipped, if an animation was already running (#58)
+### Fixed
 
+- When dragging a window to a new monitor there is a short `Grace Period` (150 ms), in which, if the grab is released, the window will tile to the old monitor. Fix: The `Tiling Popup` will appear on the correct monitor now.
+- Fixed artifacts due to the rounded corners of the `Changelog Dialog` (only works on Wayland)
+- Fixed animations being skipped, if an animation was already running (#58)
 
-## v27
-**Added**
+## [27] - 2021-11-01
+
+### Added
+
 - `Favorite Layout`, a new window movement mode, as an alternative to the default Edge Tiling (issue #94)
     - It allows users to dnd a window to a predefined layout (Check out the `GUIDE.md` for details)
     - It also adapts the keyboard shortcuts and edge previews to the favorite layout
 - Changelog dialog to prefs window on new extension version (deactivatable in `Hidden Settings`)
 
-**Removed**
-- the color selection for the Tile Editing Mode because now we can always follow the system's native Tile-Preview style
+### Removed
 
-**Changed**
+- The color selection for the Tile Editing Mode because now we can always follow the system's native Tile-Preview style
+
+### Changed
+
 - Split gaps into `Window Gaps` and `Screen Gaps` (i. e. when windows are touching the screen edges) (discussion #109)
 - `Tile to top` & `Toggle Maximization` cycle between top tiling and maximization in `Tiling State` and `Tiling State (Windows)`
-- reworked the preference window to follow GNOME's HIG a bit more closely
-- moved the `Inverse Top Screen Edge Action` settings to the `Hidden Setting`
-- moved the `Include apps from all workspaces` for the Tiling Popup to the general settings
-- and some other minor settings tweaks
+- Reworked the preference window to follow GNOME's HIG a bit more closely
+- Moved the `Inverse Top Screen Edge Action` settings to the `Hidden Setting`
+- Moved the `Include apps from all workspaces` for the Tiling Popup to the general settings
+- And some other minor settings tweaks
 
+## [26] - 2021-10-14
 
-## v26
-**Added**
-- ~~AUR package~~ (not by me, see #85)
+### Added
 
-**Changed**
-- hid the `Layouts` behind the 'Advanced / Experimental Settings' switch (in `Hidden Settings`)
-- renamed `Layout` to `Popup Layout` since just `Layout` may be misleading
+- AUR package (not by me, see #85)
+
+### Changed
+
+- Hid the `Layouts` behind the 'Advanced / Experimental Settings' switch (in `Hidden Settings`)
+- Renamed `Layout` to `Popup Layout` since just `Layout` may be misleading
 - Tile Editing Mode's resizing now follows GNOME native keyboard resizing style (see `Alt` + `F8`)
-- removed the PieMenu
-- removed support for GNOME < 40
-- refactored code & created scripts to automate stuff like building, updating translations...
+- Removed the PieMenu
+- Removed support for GNOME < 40
+- Refactored code & created scripts to automate stuff like building, updating translations...
 
+## [25] - 2021-09-27
 
-## v25
-**Fixed**
-- bug when PieMenu is enabled
+### Fixed
 
+- Bug when PieMenu is enabled
 
-## v24
-**Added**
-- clear-keybindings button
+## [24] - 2021-09-27
+
+### Added
+
+- Clear-keybindings button
 - Dutch translation (by Vistaus #95)
-- partial japanese translation (by k-fog #89)
-- added Brazillian Portuguese translation (by msmafra #92)
-- windows-like minimize option for the dynamic keybindings
-- hidden settings: choose secondary mode (tile preview) activator and option to default to secondary mode (#90)
+- Partial japanese translation (by k-fog #89)
+- Added Brazillian Portuguese translation (by msmafra #92)
+- Windows-like minimize option for the dynamic keybindings
+- Hidden settings: choose secondary mode (tile preview) activator and option to default to secondary mode (#90)
 
-**Fixed**
+### Fixed
+
 - GNOME Shell 41: use new function, which got replaced in GS
 
+## [23]
 
-## v23
-**Added**
-- partial Traditional Chinese translation for users in Taiwan (by laichiaheng #84)
-- added dynamic tiling options: disabled, focus & tiling states (#87)
-- added the 'layout selector' as an option for the pieMenu
+### Added
 
-**Changed**
-- moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
-- removed experimental semi-autotiling mode (#70)
-- simplify tl file (removed duplicates)
+- Partial Traditional Chinese translation for users in Taiwan (by laichiaheng #84)
+- Added dynamic tiling options: disabled, focus & tiling states (#87)
+- Added the 'layout selector' as an option for the pieMenu
 
-**Fixed**
-- multimonitor: wrong position for the focus indicator of the tile editing mode
-- multimonitor: wrong position for the layout selector
-- multimonitor: inconsistent behaviour for tiling a window via DND within the 'grace period'
+### Changed
 
+- Moved 'Tile Editing Mode: Focus Color' to the 'Hidden Settings'
+- Removed experimental semi-autotiling mode (#70)
+- Simplify tl file (removed duplicates)
 
-## v22
-**Added**
-- link to a list of known incompatible apps/extensions (github issue #61)
+### Fixed
+
+- Multimonitor: wrong position for the focus indicator of the tile editing mode
+- Multimonitor: wrong position for the layout selector
+- Multimonitor: inconsistent behaviour for tiling a window via DND within the 'grace period'
+
+## [22]
+
+### Added
+
+- Link to a list of known incompatible apps/extensions (github issue #61)
 - Czech translation (by pervoj #81)
 
-**Fixed**
-- correctly position PieMenu on multimonitor setup (#78)
-- wrong tilePreview, if window was at the very top display edge
-- stop an extension crash, if ~/.config/tiling-assistant didn't exist, when the screen got locked (#80)
+### Fixed
 
+- Correctly position PieMenu on multimonitor setup (#78)
+- Wrong tilePreview, if window was at the very top display edge
+- Stop an extension crash, if ~/.config/tiling-assistant didn't exist, when the screen got locked (#80)
 
-## v21
-**Bugfixes:**
-- reenable focus on prefs40.ui
-- correctly use pointer position when moving window with keyboard `Alt` + `F7` + `Arrow` keys (#76)
+## [21]
 
+### Fixed
 
-## v20
-**Features:**
+- Reenable focus on prefs40.ui
+- Correctly use pointer position when moving window with keyboard `Alt` + `F7` + `Arrow` keys (#76)
+
+## [20]
+
+### Added
+
 - Tile Editing Mode: add option to 'equalize' window sizes (see 6bfbc07)
 - Layouts: add dynamic rectangles to enable layouts like Master & Stack (see the tooltip in the `Layouts` tab of the settings)
 - Experimental: Semi Tiling Mode (see 'Hidden Settings')
+- Setup `translations/` for translations
 
-**Miscellaneous:**
-- remove `User Guide` and `Changelog` tabs from the settings page (instead create .md files in repo)
-- setup `translations/` for translations
+### Changed
 
-**Bugfixes:**
-- restore tile states properly after a screen lock
+- Remove `User Guide` and `Changelog` tabs from the settings page (instead create .md files in repo)
 
+### Fixed
 
-## v17 - 19
-**Features:**
+- Restore tile states properly after a screen lock
+
+## [17] - [19]
+
+### Added
+
 - Experimental: app attachments to layouts
 
-**Miscellaneous:**
+### Changed
+
 - Layouts: move layouts file from the extension folder to $XDG_CONFIG_HOME/tiling-assistant/layouts.json (#68)
 
-**Bugfixes:**
-- raise tileGroups with sloppy mouse focus mode only on click
+### Fixed
 
+- Raise tileGroups with sloppy mouse focus mode only on click
 
-## v16
+## [16]
+
+### Added
+
 - Pie menu: Super + RMB a window
 - Settings: gaps on maximized windows (off by default)
 - Settings: 'restore window size on grab end' (workaround for Wayland)
 - Experimental: Tile Editing Mode
 
+## [13] - [15]
 
-## v13 - 15
-- dynamic tiling ('focus and tiling')
-- ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
-- inverse top screen edge action (by c-ridgway)
-- multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
-- default keybindings with the numpad for tiling (by c-ridgway)
-- dynamic numbers of layouts & layout selector
-- add 'User Guide' and 'Changelog' settings tab
-- other minor settings additions/removals/changes
-- refactor and minor bugfixes
+### Added
+
+- Dynamic tiling ('focus and tiling')
+- Ctrl-dragging a window now also works for multiple windows (by dragging the window to the very edges of other windows/free screen rects)
+- Inverse top screen edge action (by c-ridgway)
+- Multi-monitor: the tile preview will stick to the old monitor when changing monitors for a short period to easier tile quickly on the old monitor (by c-ridgway)
+- Default keybindings with the numpad for tiling (by c-ridgway)
+- Dynamic numbers of layouts & layout selector
+- Add 'User Guide' and 'Changelog' settings tab
+
+### Changed
+
+- Other minor settings additions/removals/changes
