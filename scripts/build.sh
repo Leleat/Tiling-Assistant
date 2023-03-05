@@ -7,15 +7,24 @@ set -e
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
 cd $SCRIPT_DIR/../
 
-# create extension zip including the schemas and translations
-echo Packaging extension...
-gnome-extensions pack tiling-assistant@leleat-on-github \
-    --force \
-    --podir="../translations" \
-    --extra-source="src" \
-    --extra-source="media"
-echo Packaging complete.
-echo
+# compile settings
+glib-compile-schemas tiling-assistant@leleat-on-github/schemas
+
+# compile tl: requires gettext
+for FILE in translations/*.po; do
+    LANG=$(basename "$FILE" .po)
+    mkdir -p "locale/$LANG/LC_MESSAGES"
+    msgfmt -c "$FILE" -o "locale/$LANG/LC_MESSAGES/tiling-assistant@leleat-on-github.mo"
+done
+
+# create zip package and delete locale directory
+rm -f tiling-assistant@leleat-on-github.shell-extension.zip
+mv locale tiling-assistant@leleat-on-github/
+cd tiling-assistant@leleat-on-github
+zip -qr tiling-assistant@leleat-on-github.shell-extension.zip *
+rm -rf locale
+cd ..
+mv tiling-assistant@leleat-on-github/tiling-assistant@leleat-on-github.shell-extension.zip ./
 
 while getopts i FLAG; do
     case $FLAG in
