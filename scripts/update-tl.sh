@@ -5,7 +5,7 @@ set -e
 
 # cd to repo dir
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd $SCRIPT_DIR/../
+cd "$SCRIPT_DIR"/../
 
 # update main.pot
 echo -n Updating \'translations/main.pot\'

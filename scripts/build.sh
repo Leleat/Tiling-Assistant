@@ -5,7 +5,7 @@ set -e
 
 # cd to repo dir
 SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd $SCRIPT_DIR/../
+cd "$SCRIPT_DIR"/../
 
 # compile settings
 glib-compile-schemas tiling-assistant@leleat-on-github/schemas
@@ -21,7 +21,7 @@ done
 rm -f tiling-assistant@leleat-on-github.shell-extension.zip
 mv locale tiling-assistant@leleat-on-github/
 cd tiling-assistant@leleat-on-github
-zip -qr tiling-assistant@leleat-on-github.shell-extension.zip *
+zip -qr tiling-assistant@leleat-on-github.shell-extension.zip ./*
 rm -rf locale
 cd ..
 mv tiling-assistant@leleat-on-github/tiling-assistant@leleat-on-github.shell-extension.zip ./
