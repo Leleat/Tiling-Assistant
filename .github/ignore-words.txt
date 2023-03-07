@@ -1,0 +1,13 @@
+allws
+Distro
+fullscreen
+gettext
+Journalctl
+journalctl
+leleat
+Msgid
+msgid
+msgstr
+prefs
+Rects
+Untiling

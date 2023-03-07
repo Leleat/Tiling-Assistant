@@ -1,0 +1,82 @@
+name: CI
+run-name: Check ${{ github.ref_name }} by @${{ github.actor }}
+on: pull_request
+jobs:
+  linters:
+    name: Run linters
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "*"
+      - name: Prepare Linters
+        run: npm install -g eslint stylelint stylelint-config-standard
+      - name: Run ESLint (*.js)
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          grep -E "\.js$" |
+          xargs -r eslint
+      - name: Run stylelint (*.css)
+        if: success() || failure()
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          grep -E "\.css$" |
+          xargs -r stylelint
+      - name: Run ShellCheck (*.sh)
+        if: success() || failure()
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          grep -E "\.sh$" |
+          xargs -r shellcheck
+
+  # Unsure, if I really want to do cspell (for .md and .pot files)... The .pot
+  # file will never be touched by contributors directly. So getting a false flag
+  # there won't be an issue. That leaves .md files to be spell checked by
+  # potentional contributors. It kinda makes sense. Problem could be reliability.
+  spellcheck:
+    name: Run spell check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "*"
+      - run: pip install codespell && npm install -g cspell
+      # The case sensitivity of codespeller for ignore-words seems to be buggy. See
+      # issue tracker. According to the help page it should be case sensitive but
+      # only 'allws' makes codespeller ignore 'allWs' in code files.
+      - name: Run codespell
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          xargs -r codespell -q 3 --skip="*.po*,*.git/*" --ignore-words .github/ignore-words.txt
+      - name: Configure custom dictionary for cspell based on the ignore list
+        run: >
+          echo '{
+            "version": "0.2",
+            "dictionaryDefinitions": [{
+                "name": "dict",
+                "path": ".github/ignore-words.txt",
+                "addWords": true
+            }],
+            "dictionaries": ["dict"],
+          }' >> cspell.json
+      - name: Run cspell (*.md and *.pot)
+        if: success() || failure()
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          grep -E "\.(md|pot)$" |
+          npx cspell lint --color --exclude "CHANGELOG.md" --file-list stdin \
+            --no-must-find-files --show-context --show-suggestions --unique
+
+  build:
+    name: Run build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - run: sudo apt-get update -q && sudo apt-get install gettext
+      - run: bash scripts/build.sh
