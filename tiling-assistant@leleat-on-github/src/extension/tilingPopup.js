@@ -19,7 +19,7 @@ const AltTab = Me.imports.src.extension.altTab;
 
 var TilingSwitcherPopup = GObject.registerClass({
     Signals: {
-        // Bool indicates wether the Tiling Popup was canceled
+        // Bool indicates whether the Tiling Popup was canceled
         // (or if a window was tiled with this popup)
         'closed': { param_types: [GObject.TYPE_BOOLEAN] }
     }
@@ -301,7 +301,7 @@ var TilingSwitcherPopup = GObject.registerClass({
         // work for GNOME Terminal if it is maximized before trying to tile it.
         // It won't be tiled properly in that case for some reason... Instead
         // activate first but clear the tiling signals before so that the old
-        // tile group won't be accidently raised.
+        // tile group won't be accidentally raised.
         Twm.clearTilingProps(window.get_id());
         window.activate(global.get_current_time());
         Twm.tile(window, rect, { monitorNr: this._monitor, openTilingPopup: this._allowConsecutivePopup });

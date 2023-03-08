@@ -161,7 +161,7 @@ function disable() {
     Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
     this._getDraggableWindowForPosition = null;
 
-    // Relete custom tiling properties.
+    // Delete custom tiling properties.
     const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
     openWindows.forEach(w => {
         delete w.isTiled;

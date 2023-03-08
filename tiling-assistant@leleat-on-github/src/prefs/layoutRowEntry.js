@@ -108,11 +108,11 @@ var LayoutRowEntry = GObject.registerClass({
     }
 
     /**
-     * Validates wether `text` follows the format \
+     * Validates whether `text` follows the format \
      * 'Float--Float--Float--Float[--String]'
      *
      * @param {string} text
-     * @returns {[boolean, string]} wether the `text` is valid and a
+     * @returns {[boolean, string]} whether the `text` is valid and a
      *      potential error message.
      */
     _validateFormat(text) {

@@ -84,7 +84,7 @@
           <child>
             <object class="AdwActionRow">
               <property name="title" translatable="yes">Disable Tile Groups</property>
-              <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' and the Tiling Popup will also no longer work.</property>
+              <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' and the Tiling Popup will also no longer work.</property>
               <property name="activatable-widget">disable_tile_groups</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
@@ -275,16 +275,16 @@
         </object>
       </child>
       <!-- ======================================================================================== -->
-      <!-- = Group: Dynamic Keybinding Behaviour ================================================== -->
+      <!-- = Group: Dynamic Keybinding Behavior ================================================== -->
       <!-- ======================================================================================== -->
       <child>
         <object class="AdwPreferencesGroup">
-          <property name="title" translatable="yes">Dynamic Keybinding Behaviour</property>
-          <property name="description" translatable="yes">The keybindings to maximize and tile to the top/bottom/left/right may change their behaviour based on the window's tiling state</property>
+          <property name="title" translatable="yes">Dynamic Keybinding Behavior</property>
+          <property name="description" translatable="yes">The keybindings to maximize and tile to the top/bottom/left/right may change their behavior based on the window's tiling state</property>
           <child>
             <object class="AdwActionRow" id="dynamic_keybinding_disabled_row">
               <property name="title" translatable="yes">Disabled</property>
-              <property name="subtitle" translatable="yes">Don't change the keybindings' behaviour</property>
+              <property name="subtitle" translatable="yes">Don't change the keybindings' behavior</property>
               <property name="activatable-widget">dynamic_keybinding_disabled_button</property>
               <child type="prefix">
                 <object class="GtkCheckButton" id="dynamic_keybinding_disabled_button"/>

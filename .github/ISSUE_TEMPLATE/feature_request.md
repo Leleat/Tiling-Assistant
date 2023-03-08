@@ -7,8 +7,8 @@ assignees: ''
 
 ---
 
-<!-- Before you suggest a feature, please consider wether your idea would benefit
-a generic user and wether it fits Tiling Assistant's intended workflow. A suggestion
+<!-- Before you suggest a feature, please consider whether your idea would benefit
+a generic user and whether it fits Tiling Assistant's intended workflow. A suggestion
 that depends on a very specific setup or one that completely changes Tiling Assistant's
 behavior is very unlikely to be implemented. Please explain your rationale below. -->
 

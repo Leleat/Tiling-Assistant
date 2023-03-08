@@ -94,7 +94,7 @@ var Prefs = class TilingLayoutsPrefs {
         // Custom layouts are already defined in the file.
         if (contents.length) {
             layouts = JSON.parse(ByteArray.toString(contents));
-            // Ensure at least 1 empty row otherwhise the listbox won't have
+            // Ensure at least 1 empty row otherwise the listbox won't have
             // a height but a weird looking shadow only.
             layouts.length
                 ? layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout))

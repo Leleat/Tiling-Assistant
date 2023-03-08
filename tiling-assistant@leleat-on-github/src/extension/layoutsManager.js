@@ -41,7 +41,7 @@ var LayoutManager = class TilingLayoutsManager {
         this._currItem = null;
         this._currRect = null;
 
-        // Preview to show where the window will tile to, similiar
+        // Preview to show where the window will tile to, similar
         // to the tile preview when dnding to the screen edges
         this._rectPreview = null;
 

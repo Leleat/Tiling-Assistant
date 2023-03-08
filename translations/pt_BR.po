@@ -66,7 +66,7 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
-"raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
+"raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
 
@@ -128,13 +128,13 @@ msgid "Maximized Windows"
 msgstr "Janelas Maximizadas"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
-msgid "Dynamic Keybinding Behaviour"
+msgid "Dynamic Keybinding Behavior"
 msgstr "Comportamento de Atalhos de Teclado Dinâmico"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
-"their behaviour based on the window's tiling state"
+"their behavior based on the window's tiling state"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
@@ -146,7 +146,7 @@ msgid "Disabled"
 msgstr "Desativado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
-msgid "Don't change the keybindings' behaviour"
+msgid "Don't change the keybindings' behavior"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
@@ -608,7 +608,7 @@ msgstr "'Guia do Usuário' para ajuda..."
 
 #~ msgid ""
 #~ "The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
-#~ "right won't change their behaviour based on the window's tiling state"
+#~ "right won't change their behavior based on the window's tiling state"
 #~ msgstr ""
 #~ "Os atalhos de teclado para maximizar e ladrilhar para cima, baixo, "
 #~ "esquerda, e direita não mudarão seu comportamento baseado no estado de "
@@ -671,7 +671,7 @@ msgstr "'Guia do Usuário' para ajuda..."
 #~ "The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
 #~ "right may change depending on the tiling state of the focused window.\n"
 #~ "\n"
-#~ "<b>Disabled</b>: The shortcuts won't change their behaviour based on the "
+#~ "<b>Disabled</b>: The shortcuts won't change their behavior based on the "
 #~ "window's tiling state.\n"
 #~ "\n"
 #~ "<b>Focus</b>: If the current window is tiled and there is a tiled window "

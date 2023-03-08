@@ -29,7 +29,7 @@ var Util = class Utility {
      * @param {number} value
      * @param {number} value2
      * @param {number} [margin=4]
-     * @returns {boolean} wether the values are approximately equal.
+     * @returns {boolean} whether the values are approximately equal.
      */
     static equal(value, value2, margin = 4) {
         return Math.abs(value - value2) <= margin;
@@ -49,7 +49,7 @@ var Util = class Utility {
     /**
      * @param {number} keyVal
      * @param {Direction} direction
-     * @returns {boolean} wether the `keyVal` is considered to be in the
+     * @returns {boolean} whether the `keyVal` is considered to be in the
      *      direction of `direction`.
      */
     static isDirection(keyVal, direction) {
@@ -120,7 +120,7 @@ var Util = class Utility {
 
     /**
      * @param {number} modMask a Clutter.ModifierType.
-     * @returns wether the current event the modifier at `modMask`.
+     * @returns whether the current event the modifier at `modMask`.
      */
     static isModPressed(modMask) {
         return global.get_pointer()[2] & modMask;
@@ -361,7 +361,7 @@ var Rect = class Rect {
     }
 
     /**
-     * Checks wether `this` borders another rectangle on this' east edge.
+     * Checks whether `this` borders another rectangle on this' east edge.
      *
      * @param {Rect} rect
      * @returns {boolean}
@@ -371,7 +371,7 @@ var Rect = class Rect {
     }
 
     /**
-     * Checks wether `this` borders another rectangle on this' south edge.
+     * Checks whether `this` borders another rectangle on this' south edge.
      *
      * @param {Rect} rect
      * @returns {boolean}
@@ -430,7 +430,7 @@ var Rect = class Rect {
      * @param {Direction} dir the direction that is looked into.
      * @param {Rect[]} rects an array of the available Rects. It may contain
      *      `this` itself. The rects shouldn't overlap each other.
-     * @param {boolean} [wrap=true] wether wrap is enabled,
+     * @param {boolean} [wrap=true] whether wrap is enabled,
      *      if there is no Rect in the direction of `dir`.
      * @returns {Rect|null} the nearest Rect.
      */
@@ -507,7 +507,7 @@ var Rect = class Rect {
      *      splitting this rectangle.
      * @param {number} unitSize the size of 1 partial unit of the rectangle.
      * @param {Orientation} orientation determines the split orientation
-     *      (horizonally or vertically).
+     *      (horizontally or vertically).
      * @returns {Rect} the rectangle at `index` after the split.
      */
     getUnitAt(index, unitSize, orientation) {
@@ -559,7 +559,7 @@ var Rect = class Rect {
 
     /**
      * Gets the Rects, which remain from `this` after `rect` was cut off
-     * / substracted from it.
+     * / subtracted from it.
      *
      * Original idea from: \
      * https://en.wikibooks.org/wiki/Algorithm_Implementation/Geometry/Rectangle_difference \

@@ -67,7 +67,7 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
-"raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
+"raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
 
@@ -131,13 +131,13 @@ msgid "Maximized Windows"
 msgstr "Maximierte Fenster"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
-msgid "Dynamic Keybinding Behaviour"
+msgid "Dynamic Keybinding Behavior"
 msgstr "Dynamisches Tastenbindungsverhalten"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
-"their behaviour based on the window's tiling state"
+"their behavior based on the window's tiling state"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
@@ -149,7 +149,7 @@ msgid "Disabled"
 msgstr "Deaktiviert"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
-msgid "Don't change the keybindings' behaviour"
+msgid "Don't change the keybindings' behavior"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
@@ -617,7 +617,7 @@ msgstr "'Benutzerhandbuch' für Hilfe..."
 
 #~ msgid ""
 #~ "The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
-#~ "right won't change their behaviour based on the window's tiling state"
+#~ "right won't change their behavior based on the window's tiling state"
 #~ msgstr ""
 #~ "Die Tastenkombinationen zum Maximieren und Kacheln nach oben, unten, "
 #~ "links und rechts ändern ihr Verhalten nicht mehr abhängig vom "

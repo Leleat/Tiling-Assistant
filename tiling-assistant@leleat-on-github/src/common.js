@@ -21,7 +21,7 @@ var Settings = class Settings {
     static SCREEN_RIGHT_GAP = 'screen-right-gap';
     static SCREEN_BOTTOM_GAP = 'screen-bottom-gap';
     static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
-    static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behaviour';
+    static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behavior';
     static ACTIVE_WINDOW_HINT = 'active-window-hint';
     static ACTIVE_WINDOW_HINT_COLOR = 'active-window-hint-color';
     static ACTIVE_WINDOW_HINT_BORDER_SIZE = 'active-window-hint-border-size';
@@ -240,12 +240,12 @@ var Shortcuts = class Shortcuts {
 };
 
 // Enums:
-var RestoreOn = class RestoreWindowSizeBehaviour {
+var RestoreOn = class RestoreWindowSizeBehavior {
     static ON_GRAB_START = 0; // Grab Start
     static ON_GRAB_END = 1; // 'Grab End'
 };
 
-var DynamicKeybindings = class DynamicKeybindingBehaviour {
+var DynamicKeybindings = class DynamicKeybindingBehavior {
     // Order comes from prefs
     static DISABLED = 0;
     static FOCUS = 1;
@@ -367,7 +367,7 @@ var Layout = class Layout {
     }
 
     /**
-     * @returns {[boolean, string]} wether the layout has valid rects and
+     * @returns {[boolean, string]} whether the layout has valid rects and
      *      a potential error message.
      */
     validate() {

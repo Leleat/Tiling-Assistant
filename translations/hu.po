@@ -67,7 +67,7 @@ msgstr "Csempe csoportok kikapcsolása"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
-"raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
+"raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
 "Csempézett ablakok nem fognak alkalmazkodni más csempézett ablakokhoz, és "
@@ -133,13 +133,13 @@ msgid "Maximized Windows"
 msgstr "Maximalizált ablakok"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
-msgid "Dynamic Keybinding Behaviour"
+msgid "Dynamic Keybinding Behavior"
 msgstr "Dinamikus gyorsbillentyűk viselkedése"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
-"their behaviour based on the window's tiling state"
+"their behavior based on the window's tiling state"
 msgstr ""
 "A gyorsbillentyűk az ablakok maximalizálásához és fel/le/jobbra/balra "
 "csempézéséhez az ablak csempézettségétől függően máshogy működhetnek"
@@ -153,7 +153,7 @@ msgid "Disabled"
 msgstr "Kikapcsolva"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
-msgid "Don't change the keybindings' behaviour"
+msgid "Don't change the keybindings' behavior"
 msgstr "A gyorsbillentyűk működése nem változik"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296

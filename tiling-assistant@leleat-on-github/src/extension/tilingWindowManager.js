@@ -69,7 +69,7 @@ var TilingWindowManager = class TilingWindowManager {
     /**
      * Gets windows, which can be tiled
      *
-     * @param {boolean} [allWorkspaces=false] determines wether we only want
+     * @param {boolean} [allWorkspaces=false] determines whether we only want
      *      the windows from the current workspace.
      * @returns {Meta.Windows[]} an array of of the open Meta.Windows in
      *      stacking order.
@@ -97,7 +97,7 @@ var TilingWindowManager = class TilingWindowManager {
     /**
      * @param {Meta.Window} window a Meta.Window.
      * @param {Meta.WorkArea|Rect|null} workArea useful for the grace period
-     * @returns wether the window is maximized. Be it using GNOME's native
+     * @returns whether the window is maximized. Be it using GNOME's native
      *      maximization or the maximization by this extension when using gaps.
      */
     static isMaximized(window, workArea = null) {
@@ -115,7 +115,7 @@ var TilingWindowManager = class TilingWindowManager {
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
      * @param {number} [number=null] is used to get the workArea in which the
-     *      window tiles on. It's used for gap calcuation. We can't always rely on
+     *      window tiles on. It's used for gap calculation. We can't always rely on
      *      window.get_monitor with its monitor or global.display.get_current_monitor
      *      (the pointer monitor) because of the 'grace period' during a quick dnd
      *      towards a screen border since the pointer and the window will be on the
@@ -240,7 +240,7 @@ var TilingWindowManager = class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window to untile.
      * @param {boolean} [restoreFullPos=true] decides, if we restore the
-     *      pre-tile position or wether the size while keeping the titlebar
+     *      pre-tile position or whether the size while keeping the titlebar
      *      at the relative same position.
      * @param {number} [xAnchor=undefined] used when wanting to restore the
      *      size while keeping titlebar at the relative x position. By default,
@@ -376,7 +376,7 @@ var TilingWindowManager = class TilingWindowManager {
     /**
      * Creates a tile group of windows to raise them together, if one of them
      * is raised by (re)connecting signals. Usually, this is done automatically
-     * by calling tile() and thus shouldn't be done manually. tile() only alllows
+     * by calling tile() and thus shouldn't be done manually. tile() only allows
      * unique/non-overlapping tile groups, so 1 window can't be part of multiple
      * tile groups. But we specifically allow the user to do that sometimes
      * (i. e. ctrl-drag or tile editing mode+space). So manually create the
@@ -519,7 +519,7 @@ var TilingWindowManager = class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [skipTopWindow=true] wether we ignore the top window
+     * @param {boolean} [skipTopWindow=true] whether we ignore the top window
      *      in the active search for the top tile group. The top window may
      *      still be part of the returned array if it is part of another high-
      *      stacked window's tile group. This is mainly only useful, if the
@@ -576,7 +576,7 @@ var TilingWindowManager = class TilingWindowManager {
 
     /**
      * Gets the free screen space (1 big Rect). If the free screen space
-     * is ambigious that means it consists of multiple (unaligned) rectangles
+     * is ambiguous that means it consists of multiple (unaligned) rectangles
      * (for ex.: 2 diagonally opposing quarters). In that case we return null.
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
@@ -661,9 +661,9 @@ var TilingWindowManager = class TilingWindowManager {
                 return result;
             }, { before: [], after: [] });
 
-            // If we want to check wether the current rect can expand on a certain
+            // If we want to check whether the current rect can expand on a certain
             // side (let's say we expand the height), we need to check the *other*
-            // (unexpanded) side. So wether the current rect is bordering the free
+            // (unexpanded) side. So whether the current rect is bordering the free
             // screen rects along its *entire width*. We do this by 'union-ing' the
             // free screen rects along the relevant side (our ex.: width). For this
             // reason we needed to sort the free rects in ascending order before
@@ -753,7 +753,7 @@ var TilingWindowManager = class TilingWindowManager {
      *      It may contain the current window itself. The windows shouldn't
      *      overlap each other.
      * @param {Direction} dir the direction that is look into.
-     * @param {boolean} [wrap=true] wether we wrap around,
+     * @param {boolean} [wrap=true] whether we wrap around,
      *      if there is no Meta.Window in the direction of `dir`.
      * @returns {Meta.Window|null} the nearest Meta.Window.
      */
@@ -794,7 +794,7 @@ var TilingWindowManager = class TilingWindowManager {
 
         const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
         // getTileFor is used to get the adaptive tiles for dnd & tiling keyboard
-        // shortcuts. Thats why the top most window needs to be ignored when
+        // shortcuts. That's why the top most window needs to be ignored when
         // calculating the new tile rect. The top most window is already ignored
         // for dnd in the getTopTileGroup() call. While the top most window will
         // be ignored for the active search in getTopTileGroup, it may still be
@@ -991,7 +991,7 @@ var TilingWindowManager = class TilingWindowManager {
 
             // Don't immediately disconnect the signal in case the launched
             // window doesn't match the original app. It may be a loading screen
-            // or the user started an app inbetween etc... but in case the checks/
+            // or the user started an app in between etc... but in case the checks/
             // signals above fail disconnect the signals after 1 min at the latest
             this._openAppTiledTimerId && GLib.Source.remove(this._openAppTiledTimerId);
             this._openAppTiledTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
@@ -1224,8 +1224,8 @@ var TilingWindowManager = class TilingWindowManager {
      * since a monitor change will also trigger a workspace-change signal.
      * Previously, we tried to adapt the tiled window's size to the new monitor
      * but that is probably too unpredictable. First, it may introduce rounding
-     * errors when moving multipe windows of the same tileGroup and second (and
-     * more importantly) the behaviour with regards to tileGroups isn't clear...
+     * errors when moving multiple windows of the same tileGroup and second (and
+     * more importantly) the behavior with regards to tileGroups isn't clear...
      * Should the entire tileGroup move, if 1 tiled window is moved? If not,
      * there should probably be a way to just detach 1 window from a group. What
      * happens on the new monitor, if 1 window is moved? Should it create a new
@@ -1239,7 +1239,7 @@ var TilingWindowManager = class TilingWindowManager {
         // Closing a window triggers a ws-changed signal, which may lead to a
         // crash, if we try to operate on it any further. So we listen to the
         // 'unmanaging'-signal to see, if there is a 'true  workspace change'
-        // or wether the window was just closed
+        // or whether the window was just closed
         if (this._unmanagingWindows.includes(window.get_stable_sequence()))
             return;
 

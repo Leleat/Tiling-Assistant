@@ -19,7 +19,7 @@ const Side = {
 };
 
 /**
- * This class gets to handle the resize events of windows (wether they are
+ * This class gets to handle the resize events of windows (whether they are
  * tiled or not). If a window isn't tiled, nothing happens. If the resized
  * window is tiled, auto-resize the complementing tiled windows. Intercardinal
  * resizing is split into its [H]orizontal and [V]ertical components.
@@ -289,7 +289,7 @@ var Handler = class TilingResizeHandler {
 
         // First calculate the new tiledRect for window:
         // The new x / y coord for the window's tiledRect can be calculated by
-        // a simple difference because resizing on the E / S side wont change
+        // a simple difference because resizing on the E / S side won't change
         // x / y and resizing on the N or W side will translate into a 1:1 shift
         const grabbedsNewRect = new Rect(window.get_frame_rect());
         const grabbedsOldRect = this._preGrabRects.get(window);

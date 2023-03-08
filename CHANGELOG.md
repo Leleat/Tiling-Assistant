@@ -47,7 +47,7 @@
 
 ### Changed
 
-- Make the 'improved performance behaviour' opt-in (in the advanced settings) since it impacts the precision of the tile preview (#190)
+- Make the 'improved performance behavior' opt-in (in the advanced settings) since it impacts the precision of the tile preview (#190)
 
 ### Fixed
 
@@ -66,7 +66,7 @@
 
 ### Changed
 
-- Improved perfromance when dragging a window around for lower performance machines (#181)
+- Improved performance when dragging a window around for lower performance machines (#181)
 - Split the screen gap setting into top, bottom, left and right parts by CharlieQLe (#146)
 - Don't open the changelog window after an extension update in the prefs by default anymore
 
@@ -88,7 +88,7 @@
 ### Changed
 
 - Port to GNOME 42 and drop support for older versions
-- Brazillian Portuguese tl by ItzJaum #157
+- Brazilian Portuguese tl by ItzJaum #157
 - If an app is attached to a layout rect, try to tile an existing window instance first before opening a new one
 
 ### Removed
@@ -115,7 +115,7 @@
     - `Shift`+`Alt`+`Directions` moves the tile group to a new workspace
 - Tiled windows will untile themselves if they change workspaces
 - Allow one action to have multiple keyboard shortcuts (press `Enter` or `Space` when listening for a new keyboard shortcut to append shortcuts to existing ones)
-- Added GNOME's native tiling behaviour (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
+- Added GNOME's native tiling behavior (`Super`+`Up`/`Down`/`Left`/`Right`) to the default shortcuts
 
 ### Changed
 
@@ -227,7 +227,7 @@
 - Clear-keybindings button
 - Dutch translation (by Vistaus #95)
 - Partial japanese translation (by k-fog #89)
-- Added Brazillian Portuguese translation (by msmafra #92)
+- Added Brazilian Portuguese translation (by msmafra #92)
 - Windows-like minimize option for the dynamic keybindings
 - Hidden settings: choose secondary mode (tile preview) activator and option to default to secondary mode (#90)
 
@@ -253,7 +253,7 @@
 
 - Multimonitor: wrong position for the focus indicator of the tile editing mode
 - Multimonitor: wrong position for the layout selector
-- Multimonitor: inconsistent behaviour for tiling a window via DND within the 'grace period'
+- Multimonitor: inconsistent behavior for tiling a window via DND within the 'grace period'
 
 ## [22]
 
@@ -272,7 +272,7 @@
 
 ### Fixed
 
-- Reenable focus on prefs40.ui
+- Re-enable focus on prefs40.ui
 - Correctly use pointer position when moving window with keyboard `Alt` + `F7` + `Arrow` keys (#76)
 
 ## [20]

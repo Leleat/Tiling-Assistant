@@ -103,7 +103,7 @@ var LayoutRow = GObject.registerClass({
     }
 
     /**
-     * toggles wether the layout's rects are visible.
+     * toggles whether the layout's rects are visible.
      */
     toggleReveal() {
         this._revealer.reveal_child = !this._revealer.reveal_child;
@@ -139,7 +139,7 @@ var LayoutRow = GObject.registerClass({
     }
 
     /**
-     * @returns {[boolean, string]} wether the preview was successful and a
+     * @returns {[boolean, string]} whether the preview was successful and a
      *      potential error message.
      */
     _updatePreview() {
@@ -149,7 +149,7 @@ var LayoutRow = GObject.registerClass({
             this._errorLabel.set_label(errMsg);
             this._drawingArea.set_draw_func(() => {});
         } else {
-            // Draw the acual preview for the rects
+            // Draw the actual preview for the rects
             this._errorLabel.set_label('');
             this._drawingArea.set_draw_func((drawingArea, cr) => {
                 const color = new Gdk.RGBA();
@@ -216,13 +216,13 @@ var LayoutRow = GObject.registerClass({
 
     _onRowEntryChanged(entry, ok) {
         // ok only is about the change being ok for the *individual* entry
-        // i. e. wether their format is correct
+        // i. e. whether their format is correct
         if (!ok) {
             this.emit('changed', ok);
             return;
         }
 
-        // allOk is about wether the guiEntries are also valid as a whole
+        // allOk is about whether the guiEntries are also valid as a whole
         const [allOk] = this._updatePreview();
         this.emit('changed', allOk);
     }

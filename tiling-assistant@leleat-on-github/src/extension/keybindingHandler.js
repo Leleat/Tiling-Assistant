@@ -194,8 +194,8 @@ var Handler = class TilingKeybindingHandler {
             Twm.toggleTiling(window, rect, { ignoreTA: true });
         // Tile a window
         } else {
-            const dynamicBehaviour = Settings.DYNAMIC_KEYBINDINGS;
-            const dynamicSetting = Settings.getInt(dynamicBehaviour);
+            const dynamicBehavior = Settings.DYNAMIC_KEYBINDINGS;
+            const dynamicSetting = Settings.getInt(dynamicBehavior);
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;
             const workArea = new Rect(window.get_work_area_current_monitor());
@@ -270,7 +270,7 @@ var Handler = class TilingKeybindingHandler {
         // extensions-app wasn't open.
         nearestWindow.focus(global.get_current_time());
 
-        // Animation for visibilty with a tmp 'tile preview'
+        // Animation for visibility with a tmp 'tile preview'
         const fromRect = window.get_frame_rect();
         const focusIndicator = new St.Widget({
             style_class: 'tile-preview',

@@ -32,10 +32,10 @@ function fillPreferencesWindow(window) {
     builder.set_translation_domain(Me.metadata.uuid);
     builder.add_from_file(`${Me.path}/src/ui/prefs.ui`);
 
-    // Add general perference page
+    // Add general preference page
     window.add(builder.get_object('general'));
 
-    // Add keybindings perference page
+    // Add keybindings preference page
     window.add(builder.get_object('keybindings'));
 
     // Add layouts preference page on condition of advanced setting

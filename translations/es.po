@@ -67,7 +67,7 @@ msgstr "Desactivar los grupos de mosaicos"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
-"raised or resized together. The Dynamic Keybinding Behaviour 'Window Focus' "
+"raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
 
@@ -130,13 +130,13 @@ msgid "Maximized Windows"
 msgstr "Ventanas maximizadas"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
-msgid "Dynamic Keybinding Behaviour"
+msgid "Dynamic Keybinding Behavior"
 msgstr "Comportamiento dinámico de los atajos de teclado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
-"their behaviour based on the window's tiling state"
+"their behavior based on the window's tiling state"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
@@ -148,7 +148,7 @@ msgid "Disabled"
 msgstr "Desactivado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
-msgid "Don't change the keybindings' behaviour"
+msgid "Don't change the keybindings' behavior"
 msgstr "No cambie el comportamiento de los enlaces de las teclas"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
@@ -622,7 +622,7 @@ msgstr "Ver 'Guía de usuario' para obtener ayuda..."
 
 #~ msgid ""
 #~ "The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
-#~ "right won't change their behaviour based on the window's tiling state"
+#~ "right won't change their behavior based on the window's tiling state"
 #~ msgstr ""
 #~ "Los atajos de teclado para maximizar y posicionar la ventana en mosaico "
 #~ "en la parte superior, inferior, izquierda y derecha no cambiarán su "
