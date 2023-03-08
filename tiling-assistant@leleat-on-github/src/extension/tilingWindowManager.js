@@ -158,6 +158,8 @@ var TilingWindowManager = class TilingWindowManager {
         const monitor = monitorNr ?? window.get_monitor();
         const workArea = new Rect(window.get_work_area_for_monitor(monitor));
         const maximize = newRect.equal(workArea);
+        const verticalMaximize = !maximize && newRect.height === workArea.height;
+        const horizontalMaximize = !maximize && newRect.width === workArea.width;
 
         window.isTiled = !maximize;
         if (!window.untiledRect)
@@ -193,6 +195,11 @@ var TilingWindowManager = class TilingWindowManager {
                 Meta.SizeChange.MAXIMIZE
             );
         }
+
+        if (verticalMaximize)
+            window.maximize(Meta.MaximizeFlags.VERTICAL);
+        else if (horizontalMaximize)
+            window.maximize(Meta.MaximizeFlags.HORIZONTAL);
 
         // See issue #137.
         // Under some circumstances it's possible that windows will tile to the wrong
