@@ -519,11 +519,11 @@ var TilingWindowManager = class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [skipTopWindow=true] whether we ignore the top window
-     *      in the active search for the top tile group. The top window may
+     * @param {boolean} [skipTopWindow=true] whether we ignore the focused window
+     *      in the active search for the top tile group. The focused window may
      *      still be part of the returned array if it is part of another high-
      *      stacked window's tile group. This is mainly only useful, if the
-     *      top window isn't tiled (for example when dnd-ing a window).
+     *      focused window isn't tiled (for example when dnd-ing a window).
      * @param {number} [monitor=null] get the group for the monitor number.
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
@@ -536,11 +536,22 @@ var TilingWindowManager = class TilingWindowManager {
             Settings.getBoolean(Settings.DISABLE_TILE_GROUPS)
         ) {
             const openWindows = this.getWindows();
-            const ignoredWindows = [];
-            const mon = monitor ?? openWindows[0]?.get_monitor();
+            if (!openWindows.length)
+                return [];
 
-            for (let i = skipTopWindow ? 1 : 0; i < openWindows.length; i++) {
-                const window = openWindows[i];
+            if (skipTopWindow) {
+                // the focused window isn't necessarily the top window due to always
+                // on top windows.
+                const idx = openWindows.indexOf(global.display.focus_window);
+                idx !== -1 && openWindows.splice(idx, 1);
+            }
+
+            const ignoredWindows = [];
+            const mon = monitor ??
+                global.display.focus_window?.get_monitor() ??
+                openWindows[0].get_monitor();
+
+            for (const window of openWindows) {
                 if (window.get_monitor() !== mon)
                     continue;
 
@@ -800,8 +811,7 @@ var TilingWindowManager = class TilingWindowManager {
         // be ignored for the active search in getTopTileGroup, it may still be
         // part of the returned array if it's part of another high-stackeing
         // window's tile group.
-        const openWindows = this.getWindows();
-        const idx = topTileGroup.indexOf(openWindows[0]);
+        const idx = topTileGroup.indexOf(global.display.focus_window);
         idx !== -1 && topTileGroup.splice(idx, 1);
         const favLayout = Util.getFavoriteLayout(monitor);
         const useFavLayout = favLayout.length && Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
@@ -1013,9 +1023,14 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static _getWindowsForBuildingTileGroup(monitor = null) {
         const openWindows = this.getWindows();
+        if (!openWindows.length)
+            return [];
+
         const ignoredWindows = [];
         const result = [];
-        const mon = monitor ?? openWindows[0]?.get_monitor();
+        const mon = monitor ??
+            global.display.focus_window?.get_monitor() ??
+            openWindows[0].get_monitor();
 
         for (const window of openWindows) {
             if (window.get_monitor() !== mon)
@@ -1070,12 +1085,23 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
         const openWindows = this.getWindows();
+        if (!openWindows.length)
+            return [];
+
+        if (skipTopWindow) {
+            // the focused window isn't necessarily the top window due to always
+            // on top windows.
+            const idx = openWindows.indexOf(global.display.focus_window);
+            idx !== -1 && openWindows.splice(idx, 1);
+        }
+
         const topTiledWindows = [];
         const ignoredWindows = [];
-        const mon = monitor ?? openWindows[0]?.get_monitor();
+        const mon = monitor ??
+            global.display.focus_window?.get_monitor() ??
+            openWindows[0].get_monitor();
 
-        for (let i = skipTopWindow ? 1 : 0; i < openWindows.length; i++) {
-            const window = openWindows[i];
+        for (const window of openWindows) {
             if (window.get_monitor() !== mon)
                 continue;
 
