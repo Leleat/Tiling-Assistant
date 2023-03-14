@@ -109,6 +109,10 @@ class MinimalActiveWindowHint extends Hint {
     }
 
     _reset() {
+        if (this._laterId) {
+            Meta.later_remove(this._laterId);
+            delete this._laterId;
+        }
         this._windowClone?.destroy();
         this._windowClone = null;
         this.hide();
@@ -194,10 +198,13 @@ class MinimalActiveWindowHint extends Hint {
         if (!actor)
             return;
 
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
-            global.window_group.set_child_below_sibling(this, actor);
-            return false;
-        });
+        if (!this._laterId) {
+            this._laterId = Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
+                global.window_group.set_child_below_sibling(this, actor);
+                delete this._laterId;
+                return false;
+            });
+        }
 
         const { x, y, width, height } = window.get_frame_rect();
         this.set({ x, y, width, height });
@@ -261,6 +268,11 @@ class AlwaysActiveWindowHint extends Hint {
     }
 
     _reset() {
+        if (this._showLater) {
+            Meta.later_remove(this._showLater);
+            delete this._showLater;
+        }
+
         this._signalIds.forEach(id => this._window.disconnect(id));
         this._signalIds = [];
         this._window = null;
@@ -293,7 +305,11 @@ class AlwaysActiveWindowHint extends Hint {
         this.set({ x, y, width, height });
 
         const actor = window.get_compositor_private();
-        actor && Meta.later_add(Meta.LaterType.IDLE, () => {
+
+        if (!actor || this._showLater)
+            return;
+
+        this._showLater = Meta.later_add(Meta.LaterType.IDLE, () => {
             if (this._hideQueued) {
                 this._hideQueued = false;
                 return false;
@@ -301,6 +317,7 @@ class AlwaysActiveWindowHint extends Hint {
 
             global.window_group.set_child_below_sibling(this, actor);
             this.show();
+            delete this._showLater;
             return false;
         });
     }
