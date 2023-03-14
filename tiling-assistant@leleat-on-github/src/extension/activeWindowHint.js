@@ -240,7 +240,6 @@ class AlwaysActiveWindowHint extends Hint {
 
         this._window = null;
         this._signalIds = [];
-        this._hideQueued = false;
 
         this._updateGeometry();
         this._updateStyle();
@@ -267,16 +266,24 @@ class AlwaysActiveWindowHint extends Hint {
         super.destroy();
     }
 
-    _reset() {
-        if (this._showLater) {
-            Meta.later_remove(this._showLater);
-            delete this._showLater;
-        }
+    vfunc_hide() {
+        this._cancelShowLater();
+        super.vfunc_hide();
+    }
 
+    _reset() {
+        this._cancelShowLater();
         this._signalIds.forEach(id => this._window.disconnect(id));
         this._signalIds = [];
         this._window = null;
-        this._hideQueued = false;
+    }
+
+    _cancelShowLater() {
+        if (!this._showLater)
+            return;
+
+        Meta.later_remove(this._showLater);
+        delete this._showLater;
     }
 
     _updateGeometry() {
@@ -285,7 +292,6 @@ class AlwaysActiveWindowHint extends Hint {
         const window = global.display.focus_window;
         const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
         if (!window || !allowTypes.includes(window.get_window_type())) {
-            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -296,7 +302,6 @@ class AlwaysActiveWindowHint extends Hint {
 
         // Don't show hint on maximzed/fullscreen windows
         if (window.is_fullscreen() || Twm.isMaximized(window)) {
-            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -310,11 +315,6 @@ class AlwaysActiveWindowHint extends Hint {
             return;
 
         this._showLater = Meta.later_add(Meta.LaterType.IDLE, () => {
-            if (this._hideQueued) {
-                this._hideQueued = false;
-                return false;
-            }
-
             global.window_group.set_child_below_sibling(this, actor);
             this.show();
             delete this._showLater;
