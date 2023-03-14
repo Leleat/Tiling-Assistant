@@ -7,6 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Settings } = Me.imports.src.common;
+const { Util } = Me.imports.src.extension.utility;
 const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 var Handler = class ActiveWindowHintHandler {
@@ -110,7 +111,7 @@ class MinimalActiveWindowHint extends Hint {
 
     _reset() {
         if (this._laterId) {
-            Meta.later_remove(this._laterId);
+            Util.laterRemove(this._laterId);
             delete this._laterId;
         }
         this._windowClone?.destroy();
@@ -199,7 +200,7 @@ class MinimalActiveWindowHint extends Hint {
             return;
 
         if (!this._laterId) {
-            this._laterId = Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
+            this._laterId = Util.laterAdd(Meta.LaterType.BEFORE_REDRAW, () => {
                 global.window_group.set_child_below_sibling(this, actor);
                 delete this._laterId;
                 return false;
@@ -230,9 +231,9 @@ class MinimalActiveWindowHint extends Hint {
 // TODO a solid bg color looks better than a border when launching an app since
 // the border will appear before the window is fully visible. However there was
 // an issue with global.window_group.set_child_below_sibling not putting the hint
-// below the window for some reason. Meta.later_add solved it but I don't know
+// below the window for some reason. Util.laterAdd solved it but I don't know
 // why. So as to not potentially cover the entire window's content use the border
-// style until I figure out if Meta.later_add is the proper solution...
+// style until I figure out if Util.laterAdd is the proper solution...
 const AlwaysHint = GObject.registerClass(
 class AlwaysActiveWindowHint extends Hint {
     _init() {
@@ -282,7 +283,8 @@ class AlwaysActiveWindowHint extends Hint {
         if (!this._showLater)
             return;
 
-        Meta.later_remove(this._showLater);
+
+        Util.laterRemove(this._showLater);
         delete this._showLater;
     }
 
@@ -314,7 +316,7 @@ class AlwaysActiveWindowHint extends Hint {
         if (!actor || this._showLater)
             return;
 
-        this._showLater = Meta.later_add(Meta.LaterType.IDLE, () => {
+        this._showLater = Util.laterAdd(Meta.LaterType.IDLE, () => {
             global.window_group.set_child_below_sibling(this, actor);
             this.show();
             delete this._showLater;
