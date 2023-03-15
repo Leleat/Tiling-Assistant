@@ -36,6 +36,115 @@ const { Rect, Util } = Me.imports.src.extension.utility;
  *  => resizeHandler.js (when resizing a window)
  */
 
+class SettingsOverrider {
+    constructor(settings) {
+        this._settings = settings;
+        this._overrides = new Map();
+        this._originalSettings = new Map();
+        this._maybeNullValue = GLib.Variant.new_maybe(
+            new GLib.VariantType('b'), null);
+
+        const savedSettings = this._settings.getUserValue('overridden-settings');
+        this._wasOverridden = savedSettings !== null;
+    }
+
+    _maybeUpdateOverriden(schemaId, key, value) {
+        if (this._wasOverridden)
+            return undefined;
+
+        const savedSettings = this._settings.getValue(
+            'overridden-settings').deepUnpack();
+        const prefKey = `${schemaId}.${key}`;
+        const oldValue = savedSettings[prefKey];
+
+        if (value !== undefined)
+            savedSettings[prefKey] = value ?? this._maybeNullValue;
+        else
+            delete savedSettings[prefKey];
+
+        this._settings.setValue('overridden-settings',
+            new GLib.Variant('a{sv}', savedSettings));
+
+        return oldValue;
+    }
+
+    add(settings, key, value) {
+        this._originalSettings.set(settings.schemaId, settings);
+        const userValue = settings.get_user_value(key);
+
+        const values = this._overrides.get(settings.schemaId) ?? new Map();
+        if (!values.size)
+            this._overrides.set(settings.schemaId, values);
+        values.set(key, userValue);
+
+        settings.set_value(key, value);
+
+        this._maybeUpdateOverriden(settings.schemaId, key,
+            userValue ?? this._maybeNullValue);
+    }
+
+    remove(schema, key) {
+        const settings = this._originalSettings.get(schema);
+        if (!settings)
+            return;
+
+        const values = this._overrides.get(settings.schemaId);
+        const value = values?.get(key);
+
+        if (value === undefined)
+            return;
+
+        if (value)
+            settings.set_value(key, value);
+        else
+            settings.reset(key);
+
+        values.delete(key);
+        this._maybeUpdateOverriden(settings.schemaId, key, undefined);
+    }
+
+    _clear() {
+        if (this._wasOverridden) {
+            const savedSettings = this._settings.getValue(
+                'overridden-settings').unpack();
+
+            Object.entries(savedSettings).forEach(([path, value]) => {
+                const splits = path.split('.');
+                const key = splits.at(-1);
+                const schemaId = splits.slice(0, -1).join('.');
+
+                const settings = this._originalSettings.get(schemaId) ??
+                    ExtensionUtils.getSettings(schemaId);
+
+                value = value.get_variant();
+                if (value.equal(this._maybeNullValue))
+                    settings.reset(key);
+                else
+                    settings.set_value(key, value);
+            });
+        } else {
+            this._originalSettings.forEach(settings => {
+                this._overrides.get(settings.schemaId).forEach((value, key) => {
+                    if (value)
+                        settings.set_value(key, value);
+                    else
+                        settings.reset(key);
+                });
+            });
+        }
+
+        this._settings.reset('overridden-settings');
+    }
+
+    destroy() {
+        this._clear();
+        this._maybeNullValue = null;
+        this._originalSettings = null;
+        this._overrides = null;
+        this._settings = null;
+    }
+}
+
 function init() {
     ExtensionUtils.initTranslations(Me.metadata.uuid);
 }
@@ -43,6 +152,7 @@ function init() {
 function enable() {
     this._settings = Me.imports.src.common.Settings;
     this._settings.initialize();
+    this._settingsOverrider = new SettingsOverrider(this._settings);
 
     this._twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
     this._twm.initialize();
@@ -62,45 +172,36 @@ function enable() {
     this._altTabOverride = new AltTabOverride();
 
     // Disable native tiling.
-    this._gnomeMutterSettings = ExtensionUtils.getSettings('org.gnome.mutter');
-    this._gnomeMutterEdgeTilingUserValue = this._gnomeMutterSettings.get_user_value('edge-tiling');
-    this._gnomeMutterSettings.set_boolean('edge-tiling', false);
-
-    if (Gio.SettingsSchemaSource.get_default().lookup('org.gnome.shell.overrides', true)) {
-        this._gnomeShellSettings = ExtensionUtils.getSettings('org.gnome.shell.overrides');
-        this._gnomeShellEdgeTilingUserValue = this._gnomeShellSettings.get_user_value('edge-tiling');
-        this._gnomeShellSettings.set_boolean('edge-tiling', false);
-    }
+    this._settingsOverrider.add(ExtensionUtils.getSettings('org.gnome.mutter'),
+        'edge-tiling', new GLib.Variant('b', false));
 
     // Disable native keybindings for Super+Up/Down/Left/Right
-    this._gnomeMutterKeybindings = ExtensionUtils.getSettings('org.gnome.mutter.keybindings');
-    this._gnomeDesktopKeybindings = ExtensionUtils.getSettings('org.gnome.desktop.wm.keybindings');
-    this._nativeKeybindings = [];
+    const gnomeMutterKeybindings = ExtensionUtils.getSettings(
+        'org.gnome.mutter.keybindings');
+    const gnomeDesktopKeybindings = ExtensionUtils.getSettings(
+        'org.gnome.desktop.wm.keybindings');
     const sc = Me.imports.src.common.Shortcuts;
+    const emptyStrvVariant = new GLib.Variant('as', []);
 
-    if (this._gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
+    if (gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
             this._settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
-        const userValue = this._gnomeDesktopKeybindings.get_value('maximize');
-        this._gnomeDesktopKeybindings.set_strv('maximize', []);
-        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'maximize', userValue]);
+        this._settingsOverrider.add(gnomeDesktopKeybindings,
+            'maximize', emptyStrvVariant);
     }
-    if (this._gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
+    if (gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
             this._settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
-        const userValue = this._gnomeDesktopKeybindings.get_value('unmaximize');
-        this._gnomeDesktopKeybindings.set_strv('unmaximize', []);
-        this._nativeKeybindings.push([this._gnomeDesktopKeybindings, 'unmaximize', userValue]);
+        this._settingsOverrider.add(gnomeDesktopKeybindings,
+            'unmaximize', emptyStrvVariant);
     }
-    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
+    if (gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
             this._settings.getStrv(sc.LEFT).includes('<Super>Left')) {
-        const userValue = this._gnomeMutterKeybindings.get_value('toggle-tiled-left');
-        this._gnomeMutterKeybindings.set_strv('toggle-tiled-left', []);
-        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-left', userValue]);
+        this._settingsOverrider.add(gnomeMutterKeybindings,
+            'toggle-tiled-left', emptyStrvVariant);
     }
-    if (this._gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
+    if (gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
             this._settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
-        const userValue = this._gnomeMutterKeybindings.get_value('toggle-tiled-right');
-        this._gnomeMutterKeybindings.set_strv('toggle-tiled-right', []);
-        this._nativeKeybindings.push([this._gnomeMutterKeybindings, 'toggle-tiled-right', userValue]);
+        this._settingsOverrider.add(gnomeMutterKeybindings,
+            'toggle-tiled-right', emptyStrvVariant);
     }
 
     // Include tiled windows when dragging from the top panel.
@@ -134,6 +235,8 @@ function disable() {
     // them after the session is unlocked again.
     _saveBeforeSessionLock();
 
+    this._settingsOverrider.destroy();
+    this._settingsOverrider = null;
     this._moveHandler.destroy();
     this._moveHandler = null;
     this._resizeHandler.destroy();
@@ -153,33 +256,6 @@ function disable() {
 
     this._settings.destroy();
     this._settings = null;
-
-    const restoreSetting = (gsettings, key, oldValue) => {
-        if (gsettings) {
-            if (oldValue)
-                gsettings.set_value(key, oldValue);
-            else
-                gsettings.reset(key);
-        }
-    };
-
-    // Re-enable native tiling.
-    restoreSetting(this._gnomeMutterSettings,
-        'edge-tiling', this._gnomeMutterEdgeTilingUserValue);
-    this._gnomeMutterEdgeTilingUserValue = null;
-    this._gnomeMutterSettings = null;
-
-    restoreSetting(this._gnomeShellSettings,
-        'edge-tiling', this._gnomeShellEdgeTilingUserValue);
-    this._gnomeShellEdgeTilingUserValue = null;
-    this._gnomeShellSettings = null;
-
-    // Restore native keybindings for Super+Up/Down/Left/Right
-    this._nativeKeybindings.forEach(([kbSetting, kbName, kbOldValue]) =>
-        restoreSetting(kbSetting, kbName, kbOldValue));
-    this._nativeKeybindings = [];
-    this._gnomeMutterKeybindings = null;
-    this._gnomeDesktopKeybindings = null;
 
     // Restore old functions.
     Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;

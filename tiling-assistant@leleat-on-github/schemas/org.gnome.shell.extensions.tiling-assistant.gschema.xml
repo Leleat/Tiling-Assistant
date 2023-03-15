@@ -279,5 +279,9 @@
 		<key name="last-version-installed" type="i">
 			<default>-1</default>
 		</key>
+		<key name="overridden-settings" type="a{sv}">
+			<!-- Private key for remembering the overridden values -->
+			<default>[]</default>
+		</key>
 	</schema>
 </schemalist>
