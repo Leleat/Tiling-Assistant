@@ -7,6 +7,7 @@ const ExtensionUtils = imports.misc.extensionUtils;
 const Me = ExtensionUtils.getCurrentExtension();
 
 const { Settings } = Me.imports.src.common;
+const { Util } = Me.imports.src.extension.utility;
 const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
 
 var Handler = class ActiveWindowHintHandler {
@@ -109,6 +110,10 @@ class MinimalActiveWindowHint extends Hint {
     }
 
     _reset() {
+        if (this._laterId) {
+            Util.laterRemove(this._laterId);
+            delete this._laterId;
+        }
         this._windowClone?.destroy();
         this._windowClone = null;
         this.hide();
@@ -194,10 +199,13 @@ class MinimalActiveWindowHint extends Hint {
         if (!actor)
             return;
 
-        Meta.later_add(Meta.LaterType.BEFORE_REDRAW, () => {
-            global.window_group.set_child_below_sibling(this, actor);
-            return false;
-        });
+        if (!this._laterId) {
+            this._laterId = Util.laterAdd(Meta.LaterType.BEFORE_REDRAW, () => {
+                global.window_group.set_child_below_sibling(this, actor);
+                delete this._laterId;
+                return false;
+            });
+        }
 
         const { x, y, width, height } = window.get_frame_rect();
         this.set({ x, y, width, height });
@@ -223,9 +231,9 @@ class MinimalActiveWindowHint extends Hint {
 // TODO a solid bg color looks better than a border when launching an app since
 // the border will appear before the window is fully visible. However there was
 // an issue with global.window_group.set_child_below_sibling not putting the hint
-// below the window for some reason. Meta.later_add solved it but I don't know
+// below the window for some reason. Util.laterAdd solved it but I don't know
 // why. So as to not potentially cover the entire window's content use the border
-// style until I figure out if Meta.later_add is the proper solution...
+// style until I figure out if Util.laterAdd is the proper solution...
 const AlwaysHint = GObject.registerClass(
 class AlwaysActiveWindowHint extends Hint {
     _init() {
@@ -233,7 +241,6 @@ class AlwaysActiveWindowHint extends Hint {
 
         this._window = null;
         this._signalIds = [];
-        this._hideQueued = false;
 
         this._updateGeometry();
         this._updateStyle();
@@ -260,11 +267,25 @@ class AlwaysActiveWindowHint extends Hint {
         super.destroy();
     }
 
+    vfunc_hide() {
+        this._cancelShowLater();
+        super.vfunc_hide();
+    }
+
     _reset() {
+        this._cancelShowLater();
         this._signalIds.forEach(id => this._window.disconnect(id));
         this._signalIds = [];
         this._window = null;
-        this._hideQueued = false;
+    }
+
+    _cancelShowLater() {
+        if (!this._showLater)
+            return;
+
+
+        Util.laterRemove(this._showLater);
+        delete this._showLater;
     }
 
     _updateGeometry() {
@@ -273,7 +294,6 @@ class AlwaysActiveWindowHint extends Hint {
         const window = global.display.focus_window;
         const allowTypes = [Meta.WindowType.NORMAL, Meta.WindowType.DIALOG, Meta.WindowType.MODAL_DIALOG];
         if (!window || !allowTypes.includes(window.get_window_type())) {
-            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -284,7 +304,6 @@ class AlwaysActiveWindowHint extends Hint {
 
         // Don't show hint on maximzed/fullscreen windows
         if (window.is_fullscreen() || Twm.isMaximized(window)) {
-            this._hideQueued = true;
             this.hide();
             return;
         }
@@ -293,14 +312,14 @@ class AlwaysActiveWindowHint extends Hint {
         this.set({ x, y, width, height });
 
         const actor = window.get_compositor_private();
-        actor && Meta.later_add(Meta.LaterType.IDLE, () => {
-            if (this._hideQueued) {
-                this._hideQueued = false;
-                return false;
-            }
 
+        if (!actor || this._showLater)
+            return;
+
+        this._showLater = Util.laterAdd(Meta.LaterType.IDLE, () => {
             global.window_group.set_child_below_sibling(this, actor);
             this.show();
+            delete this._showLater;
             return false;
         });
     }

@@ -185,6 +185,29 @@ var Util = class Utility {
     }
 
     /**
+     * Add a Meta.Later depending on the shell version
+     *
+     * @param laterType
+     * @param callback
+     */
+    static laterAdd(laterType, callback) {
+        return global.compositor?.get_laters?.().add(laterType, callback) ??
+            Meta.later_add(laterType, callback);
+    }
+
+    /**
+     * Removes a Meta.Later depending on the shell version
+     *
+     * @param id
+     */
+    static laterRemove(id) {
+        if (global.compositor?.get_laters)
+            global.compositor?.get_laters().remove(id);
+        else
+            Meta.later_remove(id);
+    }
+
+    /**
      * Shows the tiled rects of the top tile group.
      *
      * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.

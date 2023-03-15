@@ -427,7 +427,7 @@ var Handler = class TilingMoveHandler {
     }
 
     _restoreSizeAndRestartGrab(window, px, py, grabOp) {
-        global.display.end_grab_op(global.get_current_time());
+        global.display.end_grab_op?.(global.get_current_time());
 
         const rect = window.get_frame_rect();
         const x = px - rect.x;
@@ -438,6 +438,12 @@ var Handler = class TilingMoveHandler {
             xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
+
+        if (!global.display.begin_grab_op) {
+            this._onMoveStarted(window, grabOp);
+            return;
+        }
+
         // untiledRect is null, if the window was maximized via non-extension
         // way (dblc-ing the titlebar, maximize button...). So just get the
         // restored window's rect directly... doesn't work on Wayland because
@@ -486,7 +492,8 @@ var Handler = class TilingMoveHandler {
                     // Only update the monitorNr, if the latest timer timed out.
                     if (timerId === this._latestMonitorLockTimerId) {
                         this._monitorNr = global.display.get_current_monitor();
-                        if (global.display.get_grab_op() === grabOp) // !
+                        if (global.display.is_grabbed?.() ||
+                            global.display.get_grab_op?.() === grabOp) // !
                             this._edgeTilingPreview(window, grabOp);
                     }
 
