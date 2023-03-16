@@ -245,6 +245,18 @@ export class TilingWindowManager {
                 window.set_maximize_flags(Meta.MaximizeFlags.HORIZONTAL);
             else
                 window.maximize(Meta.MaximizeFlags.HORIZONTAL);
+        } else if (!maximize && window.override_constraints) {
+            const leftConstraint = newRect.x === workArea.x
+                ? Meta.WindowConstraint.MONITOR : Meta.WindowConstraint.WINDOW;
+            const rightConstraint = newRect.x2 === workArea.x2
+                ? Meta.WindowConstraint.MONITOR : Meta.WindowConstraint.WINDOW;
+            const topConstraint = newRect.y === workArea.y
+                ? Meta.WindowConstraint.MONITOR : Meta.WindowConstraint.WINDOW;
+            const bottomConstraint = newRect.y2 === workArea.y2
+                ? Meta.WindowConstraint.MONITOR : Meta.WindowConstraint.WINDOW;
+
+            window.override_constraints(topConstraint, leftConstraint,
+                rightConstraint, bottomConstraint);
         }
 
         // See issue #137.
@@ -333,6 +345,12 @@ export class TilingWindowManager {
                 window.get_frame_rect(),
                 Meta.SizeChange.UNMAXIMIZE
             );
+        }
+
+        if (!wasMaximized && window.override_constraints) {
+            window.override_constraints(Meta.WindowConstraint.NONE,
+                Meta.WindowConstraint.NONE, Meta.WindowConstraint.NONE,
+                Meta.WindowConstraint.NONE);
         }
 
         // userOp means that the window won't clamp to the workspace. For DND
