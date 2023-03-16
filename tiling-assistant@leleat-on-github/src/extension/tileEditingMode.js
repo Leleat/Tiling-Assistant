@@ -50,6 +50,8 @@ class TileEditingMode extends St.Widget {
     }
 
     open() {
+        this._windows = Twm.getTopTileGroup();
+
         const grab = Main.pushModal(this);
         // We expect at least a keyboard grab here
         if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
@@ -59,7 +61,6 @@ class TileEditingMode extends St.Widget {
 
         this._grab = grab;
         this._haveModal = true;
-        this._windows = Twm.getTopTileGroup();
 
         const openWindows = Twm.getWindows();
         if (!openWindows.length || !this._windows.length) {
