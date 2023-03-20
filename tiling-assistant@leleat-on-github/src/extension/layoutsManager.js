@@ -295,13 +295,12 @@ const LayoutSearch = GObject.registerClass({
 }, class TilingLayoutsSearch extends St.Widget {
     _init(layouts) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const allWorkArea = activeWs.get_work_area_all_monitors();
         super._init({
             reactive: true,
-            x: allWorkArea.x,
-            y: allWorkArea.y,
-            width: allWorkArea.width,
-            height: allWorkArea.height
+            x: Main.uiGroup.x,
+            y: Main.uiGroup.y,
+            width: Main.uiGroup.width,
+            height: Main.uiGroup.height
         });
         Main.uiGroup.add_child(this);
 
