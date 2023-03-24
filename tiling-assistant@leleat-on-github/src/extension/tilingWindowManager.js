@@ -152,7 +152,7 @@ var TilingWindowManager = class TilingWindowManager {
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
-        window.raise();
+        window.raise_and_make_recent?.() ?? window.raise();
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = monitorNr ?? window.get_monitor();
@@ -260,7 +260,7 @@ var TilingWindowManager = class TilingWindowManager {
         // one. So untiling the initial window after tiling more windows with
         // the popup (without re-focusing the initial window), means the
         // untiled window will be below the others.
-        window.raise();
+        window.raise_and_make_recent?.() ?? window.raise();
 
         // Animation
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
@@ -437,7 +437,7 @@ var TilingWindowManager = class TilingWindowManager {
 
                         // Prevent an infinite loop of windows raising each other
                         w.block_signal_handler(otherRaiseId);
-                        w.raise();
+                        w.raise_and_make_recent?.() ?? w.raise();
                         w.unblock_signal_handler(otherRaiseId);
                     });
 
@@ -446,7 +446,7 @@ var TilingWindowManager = class TilingWindowManager {
                     // it may be below other tiled windows.
                     const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
                     raisedWindow.block_signal_handler(signalId);
-                    raisedWindow.raise();
+                    raisedWindow.raise_and_make_recent?.() ?? raisedWindow.raise();
                     raisedWindow.unblock_signal_handler(signalId);
                 }
 
