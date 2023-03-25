@@ -287,7 +287,7 @@ function _openBugReport(window) {
 }
 
 function _openUserGuide(window) {
-    Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/blob/main/GUIDE.md', Gdk.CURRENT_TIME);
+    Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/wiki', Gdk.CURRENT_TIME);
 }
 
 function _openChangelog(window) {
