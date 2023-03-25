@@ -19,10 +19,10 @@ done
 
 # create zip package and delete locale directory
 rm -f tiling-assistant@leleat-on-github.shell-extension.zip
+rm -rf tiling-assistant@leleat-on-github/locale
 mv locale tiling-assistant@leleat-on-github/
 cd tiling-assistant@leleat-on-github
 zip -qr tiling-assistant@leleat-on-github.shell-extension.zip ./*
-rm -rf locale
 cd ..
 mv tiling-assistant@leleat-on-github/tiling-assistant@leleat-on-github.shell-extension.zip ./
 
