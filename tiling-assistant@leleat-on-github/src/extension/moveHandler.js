@@ -450,7 +450,7 @@ var Handler = class TilingMoveHandler {
         // get_frame_rect() doesn't return the correct size immediately after
         // calling untile()... in that case just guess a random size
         if (!untiledRect && !Meta.is_wayland_compositor())
-            untiledRect = new Rect(rect);
+            untiledRect = new Rect(window.get_frame_rect());
 
         const untiledWidth = untiledRect?.width ?? 1000;
         const postUntileRect = window.get_frame_rect();
