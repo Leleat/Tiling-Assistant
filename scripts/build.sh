@@ -13,17 +13,14 @@ glib-compile-schemas tiling-assistant@leleat-on-github/schemas
 # compile tl: requires gettext
 for FILE in translations/*.po; do
     LANG=$(basename "$FILE" .po)
-    mkdir -p "locale/$LANG/LC_MESSAGES"
-    msgfmt -c "$FILE" -o "locale/$LANG/LC_MESSAGES/tiling-assistant@leleat-on-github.mo"
+    mkdir -p "tiling-assistant@leleat-on-github/locale/$LANG/LC_MESSAGES"
+    msgfmt -c "$FILE" -o "tiling-assistant@leleat-on-github/locale/$LANG/LC_MESSAGES/tiling-assistant@leleat-on-github.mo"
 done
 
 # create zip package and delete locale directory
 rm -f tiling-assistant@leleat-on-github.shell-extension.zip
-rm -rf tiling-assistant@leleat-on-github/locale
-mv locale tiling-assistant@leleat-on-github/
 cd tiling-assistant@leleat-on-github
 zip -qr tiling-assistant@leleat-on-github.shell-extension.zip ./*
-rm -rf locale
 cd ..
 mv tiling-assistant@leleat-on-github/tiling-assistant@leleat-on-github.shell-extension.zip ./
 
