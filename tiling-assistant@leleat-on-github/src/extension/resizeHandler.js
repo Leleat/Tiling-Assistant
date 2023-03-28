@@ -45,10 +45,14 @@ var Handler = class TilingResizeHandler {
         };
 
         const g1 = global.display.connect('grab-op-begin', (d, window, grabOp) => {
+            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+
             if (window && isResizing(grabOp))
                 this._onResizeStarted(window, grabOp);
         });
         const g2 = global.display.connect('grab-op-end', (d, window, grabOp) => {
+            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+
             if (window && isResizing(grabOp))
                 this._onResizeFinished(window, grabOp);
         });

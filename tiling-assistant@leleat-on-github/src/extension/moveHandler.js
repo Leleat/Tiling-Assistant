@@ -24,6 +24,8 @@ var Handler = class TilingMoveHandler {
 
         this._displaySignals = [];
         const g1Id = global.display.connect('grab-op-begin', (src, window, grabOp) => {
+            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+
             if (window && moveOps.includes(grabOp))
                 this._onMoveStarted(window, grabOp);
         });
