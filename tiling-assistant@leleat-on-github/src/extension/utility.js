@@ -2,6 +2,7 @@
 
 const { Clutter, Gio, GLib, Meta, St } = imports.gi;
 const { main: Main } = imports.ui;
+const { _gi: Gi } = imports;
 const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -205,6 +206,37 @@ var Util = class Utility {
             global.compositor?.get_laters().remove(id);
         else
             Meta.later_remove(id);
+    }
+
+    /**
+     * Allow to override a virtual function with another one
+     *
+     * @param prototype, name, func
+     */
+    static overrideVFunc(prototype, name, func) {
+        const replaceVfunc = () => {
+            const originalVFunc = prototype[`vfunc_${name}`];
+            if (Gi.gobject_prototype_symbol && Gi.gobject_prototype_symbol in prototype)
+                prototype = prototype[Gi.gobject_prototype_symbol];
+
+            prototype[Gi.hook_up_vfunc_symbol](name, func);
+            return originalVFunc;
+        };
+
+        try {
+            // This may fail if trying to reset to a never-overridden vfunc
+            // as gjs doesn't consider it a function, even if it's true that
+            // originalVFunc instanceof Function.
+            return replaceVfunc(prototype, name, func);
+        } catch {
+            try {
+                replaceVfunc(prototype, name, function (...args) {
+                    return func.call(this, ...args);
+                });
+            } catch (e) {
+                logError(e, `Removing vfunc_${name}`);
+            }
+        }
     }
 
     /**
