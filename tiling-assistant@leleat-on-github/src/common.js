@@ -144,6 +144,14 @@ var Settings = class Settings {
         return this._settings.get_boolean(key);
     }
 
+    static getValue(key) {
+        return this._settings.get_value(key);
+    }
+
+    static getUserValue(key) {
+        return this._settings.get_user_value(key);
+    }
+
     /**
      * Setters
      */
@@ -166,6 +174,14 @@ var Settings = class Settings {
 
     static setBoolean(key, value) {
         this._settings.set_boolean(key, value);
+    }
+
+    static setValue(key, value) {
+        return this._settings.set_value(key, value);
+    }
+
+    static reset(key) {
+        this._settings.reset(key);
     }
 };
 
