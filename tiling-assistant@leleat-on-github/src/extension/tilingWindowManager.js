@@ -557,7 +557,7 @@ var TilingWindowManager = class TilingWindowManager {
 
                 // Ignore non-tiled windows, which are always-on-top, for the
                 // calculation since they are probably some utility apps etc.
-                if (window.is_above())
+                if (window.is_above() && !window.isTiled)
                     continue;
 
                 // Find the first not overlapped tile group, if it exists
@@ -1036,7 +1036,7 @@ var TilingWindowManager = class TilingWindowManager {
             if (window.get_monitor() !== mon)
                 continue;
 
-            if (window.is_above())
+            if (window.is_above() && !window.isTiled)
                 continue;
 
             if (window.isTiled) {
@@ -1105,7 +1105,7 @@ var TilingWindowManager = class TilingWindowManager {
             if (window.get_monitor() !== mon)
                 continue;
 
-            if (window.is_above())
+            if (window.is_above() && !window.isTiled)
                 continue;
 
             if (window.isTiled) {
