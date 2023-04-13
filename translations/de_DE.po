@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 02:29+0100\n"
+"POT-Creation-Date: 2023-04-13 20:30+0200\n"
 "PO-Revision-Date: 2022-04-24 12:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -70,10 +70,10 @@ msgid ""
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
-"Gekachelte Fenster passen ihre Größe nicht mehr an andere gekachelte "
-"Fenster an und werden nicht mehr gemeinsam vergrößert oder verändert."
-"Die dynamische Tastenbindung 'Fensterfokus' und das Kachel-Popup "
-"funktionieren dann ebenfalls nicht mehr."
+"Gekachelte Fenster passen ihre Größe nicht mehr an andere gekachelte Fenster "
+"an und werden nicht mehr gemeinsam vergrößert oder verändert.Die dynamische "
+"Tastenbindung 'Fensterfokus' und das Kachel-Popup funktionieren dann "
+"ebenfalls nicht mehr."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
@@ -142,9 +142,8 @@ msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
 msgstr ""
-"Die Tastenkombinationen zum Maximieren und Kacheln nach "
-"oben/unten/links/rechts können ihr Verhalten je nach "
-"Kachelzustand des Fensters ändern"
+"Die Tastenkombinationen zum Maximieren und Kacheln nach oben/unten/links/"
+"rechts können ihr Verhalten je nach Kachelzustand des Fensters ändern"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
@@ -235,7 +234,7 @@ msgid ""
 "There are issues on Wayland with GTK4 popups"
 msgstr ""
 "Zeigt immer das fokussierte Fenster an, es sei denn, es ist maximiert oder "
-"im Vollbildmodus. Es gibt Probleme unter Wayland mit GTK4 Popups" 
+"im Vollbildmodus. Es gibt Probleme unter Wayland mit GTK4 Popups"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
@@ -268,8 +267,8 @@ msgid ""
 "the window behind the hint for whatever reason..."
 msgstr ""
 "Die Umrandung des immer aktiven Hinweises reicht bis in den Fensterrahmen. "
-"Dies ist dazu gedacht, abgerundete Ecken abzudecken. Allerdings werden "
-"GTK4-Popups unter Wayland das Fenster aus irgendeinem Grund dahinter setzen"
+"Dies ist dazu gedacht, abgerundete Ecken abzudecken. Allerdings werden GTK4-"
+"Popups unter Wayland das Fenster aus irgendeinem Grund dahinter setzen"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
@@ -343,9 +342,9 @@ msgid ""
 "edge."
 msgstr ""
 "Wenn ein Fenster auf einen neuen Monitor gezogen wird, bleibt die "
-"Kachelvorschau für eine sehr kurze Zeit auf dem alten Monitor aktiv. "
-"Auf diese Weise können Sie Fenster kacheln, indem Sie sie auf eine beliebige "
-"Bildschirmkanten 'werfen', selbst wenn ein Monitor an diese Kante angrenzt." 
+"Kachelvorschau für eine sehr kurze Zeit auf dem alten Monitor aktiv. Auf "
+"diese Weise können Sie Fenster kacheln, indem Sie sie auf eine beliebige "
+"Bildschirmkanten 'werfen', selbst wenn ein Monitor an diese Kante angrenzt."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
@@ -616,7 +615,7 @@ msgid "Tiling popup was disabled"
 msgstr "Kachel Popup wurde deaktiviert"
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:488
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
 msgid "No valid layouts defined."
 msgstr "Keine gültigen Layouts definiert."
 
@@ -624,15 +623,15 @@ msgstr "Keine gültigen Layouts definiert."
 msgid "Popup Layouts: App not found."
 msgstr "Popup Layouts: App nicht gefunden."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:335
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
 msgid "Type to search..."
 msgstr "Schreiben um zu suchen..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:441
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
 msgid "Nameless layout..."
 msgstr "Unbenanntes Layout..."
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:66
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "Der Kachelbearbeitungsmodus kann nicht aufgerufen werden, wenn kein "

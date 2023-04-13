@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-11-23 02:29+0100\n"
+"POT-Creation-Date: 2023-04-13 20:30+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -562,7 +562,7 @@ msgid "Tiling popup was disabled"
 msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:488
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
 msgid "No valid layouts defined."
 msgstr ""
 
@@ -570,15 +570,15 @@ msgstr ""
 msgid "Popup Layouts: App not found."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:335
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
 msgid "Type to search..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:441
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
 msgid "Nameless layout..."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:66
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 
