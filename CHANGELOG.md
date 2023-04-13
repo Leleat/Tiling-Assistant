@@ -1,5 +1,28 @@
 # Changelog
 
+## [40] - 2023-04-13
+
+### Added
+
+- Support for GNOME Shell 44 by 3v1n0 (mostly #234)
+- Github CI: linting and spell checking
+- Spanish translations by IngrownMink4 (#216)
+- Dutch translations by flipflop97 (#215)
+- Italian translations by albanobattistella (#220)
+- German translations by affengeist (#231)
+- Hungarian translations by infeeeee (#236)
+
+### Fixed
+
+- The position of the fix-search-a-layout popup now appears correctly on multi-monitor setups (#247)
+- Fix tiling when there are always-on-top windows (#240)
+- Fix non-extension maximization window-restore position (#251)
+
+### Changed
+
+- Move UserGuide.MD into the [github wiki](https://github.com/Leleat/Tiling-Assistant/wiki)
+- Update Scipts and a bugfix by SubOptimal (#248, #249, #250)
+
 ## [39] - 2022-11-23
 
 ### Fixed
