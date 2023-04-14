@@ -4,8 +4,7 @@
 set -e
 
 # cd to repo dir
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd "$SCRIPT_DIR"/../
+cd -P -- "$(dirname -- "$0")"/../
 
 METADATA=tiling-assistant@leleat-on-github/metadata.json
 

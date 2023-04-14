@@ -4,8 +4,7 @@
 set -e
 
 # cd to repo dir
-SCRIPT_DIR="$( cd "$( dirname "$0" )" && pwd )"
-cd "$SCRIPT_DIR"/../
+cd -P -- "$(dirname -- "$0")"/../
 
 # compile settings
 glib-compile-schemas tiling-assistant@leleat-on-github/schemas
@@ -17,12 +16,11 @@ for FILE in translations/*.po; do
     msgfmt -c "$FILE" -o "tiling-assistant@leleat-on-github/locale/$LANG/LC_MESSAGES/tiling-assistant@leleat-on-github.mo"
 done
 
-# create zip package and delete locale directory
-rm -f tiling-assistant@leleat-on-github.shell-extension.zip
+# create zip package
 cd tiling-assistant@leleat-on-github
-zip -qr tiling-assistant@leleat-on-github.shell-extension.zip ./*
+zip -FSqr tiling-assistant@leleat-on-github.shell-extension.zip ./*
+mv -f tiling-assistant@leleat-on-github.shell-extension.zip ./../
 cd ..
-mv tiling-assistant@leleat-on-github/tiling-assistant@leleat-on-github.shell-extension.zip ./
 
 while getopts i FLAG; do
     case $FLAG in

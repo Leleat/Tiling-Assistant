@@ -21,7 +21,7 @@
 ### Changed
 
 - Move UserGuide.MD into the [github wiki](https://github.com/Leleat/Tiling-Assistant/wiki)
-- Update Scipts and a bugfix by SubOptimal (#248, #249, #250)
+- Update Scripts and a bugfix by SubOptimal (#248, #249, #250)
 
 ## [39] - 2022-11-23
 
