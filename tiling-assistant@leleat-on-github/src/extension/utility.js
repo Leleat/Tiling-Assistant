@@ -535,20 +535,39 @@ var Rect = class Rect {
      */
     getUnitAt(index, unitSize, orientation) {
         unitSize = Math.floor(unitSize);
-        const isVertical = orientation === Orientation.V;
-        const firstUnitRect = new Rect(
-            this.x,
-            this.y,
-            isVertical ? unitSize : this.width,
-            isVertical ? this.height : unitSize
-        );
 
-        if (index <= 0) {
-            return firstUnitRect;
-        } else {
-            const remaining = this.minus(firstUnitRect)[0];
-            return remaining.getUnitAt(index - 1, unitSize, orientation);
-        }
+        const isVertical = orientation === Orientation.V;
+        const lastIndex = Math.round(this[isVertical ? 'width' : 'height'] / unitSize) - 1;
+
+        const getLastRect = () => {
+            const margin = unitSize * index;
+            return new Rect(
+                isVertical ? this.x + margin : this.x,
+                isVertical ? this.y : this.y + margin,
+                isVertical ? this.width - margin : this.width,
+                isVertical ? this.height : this.height - margin
+            );
+        };
+        const getNonLastRect = (remainingRect, idx) => {
+            const firstUnitRect = new Rect(
+                remainingRect.x,
+                remainingRect.y,
+                isVertical ? unitSize : remainingRect.width,
+                isVertical ? remainingRect.height : unitSize
+            );
+
+            if (idx <= 0) {
+                return firstUnitRect;
+            } else {
+                const remaining = remainingRect.minus(firstUnitRect)[0];
+                return getNonLastRect(remaining, idx - 1);
+            }
+        };
+
+        if (index === lastIndex)
+            return getLastRect();
+        else
+            return getNonLastRect(this, index);
     }
 
     /**
