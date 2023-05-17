@@ -1,5 +1,12 @@
 # Changelog
 
+## [41] - 2023-05-17
+
+### Fixed
+
+- Tiling Popup not appearing under some circumstances (#259)
+- Properly restore tiling props on all workspaces (#262)
+
 ## [40] - 2023-04-13
 
 ### Added
