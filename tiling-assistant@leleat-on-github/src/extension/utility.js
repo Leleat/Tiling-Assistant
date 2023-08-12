@@ -1,22 +1,14 @@
-'use strict';
+import { Clutter, Gio, GLib, Meta, St } from '../dependencies/gi.js';
+import { Main } from '../dependencies/shell.js';
 
-const { Clutter, Gio, GLib, Meta, St } = imports.gi;
-const { main: Main } = imports.ui;
-const ByteArray = imports.byteArray;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Direction, Orientation, Settings } = Me.imports.src.common;
-
-const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
+import { Direction, Orientation, Settings } from '../common.js';
 
 /**
  * Library of commonly used functions for the extension.js' files
  * (and *not* the prefs files)
  */
 
-var Util = class Utility {
+export class Util {
     /**
      * Performs an approximate equality check. There will be times when
      * there will be inaccuracies. For example, the user may enable window
@@ -141,7 +133,7 @@ var Util = class Utility {
         if (!success || !contents.length)
             return [];
 
-        return JSON.parse(ByteArray.toString(contents));
+        return JSON.parse(new TextDecoder().decode(contents));
     }
 
     /**
@@ -212,8 +204,8 @@ var Util = class Utility {
      *
      * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.
      */
-    static ___debugShowTiledRects() {
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+    static async ___debugShowTiledRects() {
+        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         if (!topTileGroup.length) {
             Main.notify('Tiling Assistant', 'No tiled windows / tiled rects.');
@@ -243,11 +235,11 @@ var Util = class Utility {
      * @returns {St.Widget[]} an array of St.Widgets to indicate the free
      *      screen rects.
      */
-    static ___debugShowFreeScreenRects() {
+    static async ___debugShowFreeScreenRects() {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         const tRects = topTileGroup.map(w => w.tiledRect);
         const freeScreenSpace = twm.getFreeScreen(tRects);
@@ -276,9 +268,9 @@ var Util = class Utility {
     /**
      * Print the tile groups to the logs.
      */
-    static __debugPrintTileGroups() {
+    static async __debugPrintTileGroups() {
         log('--- Tiling Assistant: Start ---');
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+        const twm = await import('./tilingWindowManager.js');
         const openWindows = twm.getWindows();
         openWindows.forEach(w => {
             if (!w.isTiled)
@@ -291,12 +283,12 @@ var Util = class Utility {
         });
         log('--- Tiling Assistant: End ---');
     }
-};
+}
 
 /**
  * Wrapper for Meta.Rectangle to add some more functions.
  */
-var Rect = class Rect {
+export class Rect {
     /**
      * @param  {...any} params No parameters, 1 Meta.Rectangle or the x, y,
      * width and height values should be passed to the constructor.
@@ -817,4 +809,4 @@ var Rect = class Rect {
     set height(value) {
         this._rect.height = Math.floor(value);
     }
-};
+}

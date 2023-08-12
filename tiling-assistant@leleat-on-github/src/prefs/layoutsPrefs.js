@@ -1,12 +1,6 @@
-'use strict';
+import { Gio, GLib } from '../dependencies/prefs/gi.js';
 
-const { Gio, GLib } = imports.gi;
-const ByteArray = imports.byteArray;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const LayoutRow = Me.imports.src.prefs.layoutRow.LayoutRow;
+import { LayoutRow } from './layoutRow.js';
 
 /**
  * This class takes care of everything related to layouts (at least on the
@@ -37,8 +31,8 @@ const LayoutRow = Me.imports.src.prefs.layoutRow.LayoutRow;
  * an existing feature... thus it's hidden
  */
 
-var Prefs = class TilingLayoutsPrefs {
-    constructor(settings, builder) {
+export default class {
+    constructor(settings, builder, path) {
         // Keep a reference to the settings for the shortcuts
         this._settings = settings;
 
@@ -74,10 +68,10 @@ var Prefs = class TilingLayoutsPrefs {
         });
 
         // Finally, load the existing settings.
-        this._loadLayouts();
+        this._loadLayouts(path);
     }
 
-    _loadLayouts() {
+    _loadLayouts(path) {
         this._applySaveButtonStyle('');
 
         this._forEachLayoutRow(row => row.destroy());
@@ -93,7 +87,7 @@ var Prefs = class TilingLayoutsPrefs {
 
         // Custom layouts are already defined in the file.
         if (contents.length) {
-            layouts = JSON.parse(ByteArray.toString(contents));
+            layouts = JSON.parse(new TextDecoder().decode(contents));
             // Ensure at least 1 empty row otherwise the listbox won't have
             // a height but a weird looking shadow only.
             layouts.length
@@ -108,12 +102,12 @@ var Prefs = class TilingLayoutsPrefs {
                 return;
 
             this._settings.set_boolean(importExamples, false);
-            const exampleFile = this._makeFile(`${Me.path}/src`, 'layouts_example.json');
+            const exampleFile = this._makeFile(`${path}/src`, 'layouts_example.json');
             const [succ, c] = exampleFile.load_contents(null);
             if (!succ)
                 return;
 
-            layouts = c.length ? JSON.parse(ByteArray.toString(c)) : [];
+            layouts = c.length ? JSON.parse(new TextDecoder().decode(c)) : [];
             layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
             this._saveLayouts();
         }
@@ -225,4 +219,4 @@ var Prefs = class TilingLayoutsPrefs {
             child = nxtSibling;
         }
     }
-};
+}

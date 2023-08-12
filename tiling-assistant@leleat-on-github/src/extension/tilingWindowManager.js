@@ -1,20 +1,15 @@
-'use strict';
+import { Clutter, GLib, GObject, Meta, Shell } from '../dependencies/gi.js';
+import { Main } from '../dependencies/shell.js';
+import { getWindows } from '../dependencies/unexported/altTab.js';
 
-const { altTab: AltTab, main: Main } = imports.ui;
-const { Clutter, GLib, GObject, Meta, Shell, St } = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Orientation, Settings, Shortcuts } = Me.imports.src.common;
-const { Axis, Rect, Util } = Me.imports.src.extension.utility;
-const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
+import { Orientation, Settings, Shortcuts } from '../common.js';
+import { Rect, Util } from './utility.js';
 
 /**
  * Singleton responsible for tiling. Implement the signals in a separate Clutter
  * class so this doesn't need to be instanced.
  */
-var TilingWindowManager = class TilingWindowManager {
+export class TilingWindowManager {
     static initialize() {
         this._signals = new TilingSignals();
 
@@ -76,7 +71,7 @@ var TilingWindowManager = class TilingWindowManager {
      */
     static getWindows(allWorkspaces = false) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const openWindows = AltTab.getWindows(allWorkspaces ? null : activeWs);
+        const openWindows = getWindows(allWorkspaces ? null : activeWs);
         // The open windows are not sorted properly when tiling with the Tiling
         // Popup because altTab sorts by focus.
         const sorted = global.display.sort_windows_by_stacking(openWindows);
@@ -125,7 +120,7 @@ var TilingWindowManager = class TilingWindowManager {
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static tile(window, newRect, {
+    static async tile(window, newRect, {
         openTilingPopup = true,
         ignoreTA = false,
         monitorNr = null,
@@ -232,7 +227,7 @@ var TilingWindowManager = class TilingWindowManager {
             this.emit('window-tiled', window);
 
             if (openTilingPopup)
-                this.tryOpeningTilingPopup();
+                await this.tryOpeningTilingPopup();
         }
     }
 
@@ -928,7 +923,7 @@ var TilingWindowManager = class TilingWindowManager {
      * Opens the Tiling Popup, if there is unambiguous free screen space,
      * and offer to tile an open window to that spot.
      */
-    static tryOpeningTilingPopup() {
+    static async tryOpeningTilingPopup() {
         if (!Settings.getBoolean(Settings.ENABLE_TILING_POPUP))
             return;
 
@@ -945,7 +940,7 @@ var TilingWindowManager = class TilingWindowManager {
         if (!freeSpace)
             return;
 
-        const TilingPopup = Me.imports.src.extension.tilingPopup;
+        const TilingPopup = await import('./tilingPopup.js');
         const popup = new TilingPopup.TilingSwitcherPopup(openWindows, freeSpace);
         if (!popup.show(topTileGroup))
             popup.destroy();
@@ -1284,7 +1279,7 @@ var TilingWindowManager = class TilingWindowManager {
             this.untile(window, { restoreFullPos: false, clampToWorkspace: true, skipAnim: Main.overview.visible });
         }
     }
-};
+}
 
 /**
  * This is instanced by the 'TilingWindowManager'. It implements the tiling

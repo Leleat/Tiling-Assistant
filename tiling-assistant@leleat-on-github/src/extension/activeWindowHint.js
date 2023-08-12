@@ -1,16 +1,11 @@
-'use strict';
+import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
+import { Main } from '../dependencies/shell.js';
 
-const { main: Main } = imports.ui;
-const { Clutter, GObject, Meta, St } = imports.gi;
+import { Settings } from '../common.js';
+import { Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Settings } = Me.imports.src.common;
-const { Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-
-var Handler = class ActiveWindowHintHandler {
+export default class ActiveWindowHintHandler {
     constructor() {
         // On a fresh install no color is set for the hint yet. Use the bg color
         // from the tile preview style by using a temporary widget.
@@ -56,7 +51,7 @@ var Handler = class ActiveWindowHintHandler {
                 this._hint = new AlwaysHint();
         }
     }
-};
+}
 
 const Hint = GObject.registerClass(
 class ActiveWindowHint extends St.Widget {
