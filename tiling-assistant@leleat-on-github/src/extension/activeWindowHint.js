@@ -2,7 +2,6 @@ import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 
 import { Settings } from '../common.js';
-import { Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 export default class ActiveWindowHintHandler {
@@ -106,7 +105,7 @@ class MinimalActiveWindowHint extends Hint {
 
     _reset() {
         if (this._laterId) {
-            Util.laterRemove(this._laterId);
+            global.compositor.get_laters().remove(this._laterId);
             delete this._laterId;
         }
         this._windowClone?.destroy();
@@ -195,11 +194,14 @@ class MinimalActiveWindowHint extends Hint {
             return;
 
         if (!this._laterId) {
-            this._laterId = Util.laterAdd(Meta.LaterType.BEFORE_REDRAW, () => {
-                global.window_group.set_child_below_sibling(this, actor);
-                delete this._laterId;
-                return false;
-            });
+            this._laterId = global.compositor.get_laters().add(
+                Meta.LaterType.BEFORE_REDRAW,
+                () => {
+                    global.window_group.set_child_below_sibling(this, actor);
+                    delete this._laterId;
+                    return false;
+                }
+            );
         }
 
         const { x, y, width, height } = window.get_frame_rect();
@@ -226,9 +228,9 @@ class MinimalActiveWindowHint extends Hint {
 // TODO a solid bg color looks better than a border when launching an app since
 // the border will appear before the window is fully visible. However there was
 // an issue with global.window_group.set_child_below_sibling not putting the hint
-// below the window for some reason. Util.laterAdd solved it but I don't know
+// below the window for some reason. laters-add solved it but I don't know
 // why. So as to not potentially cover the entire window's content use the border
-// style until I figure out if Util.laterAdd is the proper solution...
+// style until I figure out if laters-add is the proper solution...
 const AlwaysHint = GObject.registerClass(
 class AlwaysActiveWindowHint extends Hint {
     _init() {
@@ -279,7 +281,7 @@ class AlwaysActiveWindowHint extends Hint {
             return;
 
 
-        Util.laterRemove(this._showLater);
+        global.compositor.get_laters().remove(this._showLater);
         delete this._showLater;
     }
 
@@ -311,12 +313,15 @@ class AlwaysActiveWindowHint extends Hint {
         if (!actor || this._showLater)
             return;
 
-        this._showLater = Util.laterAdd(Meta.LaterType.IDLE, () => {
-            global.window_group.set_child_below_sibling(this, actor);
-            this.show();
-            delete this._showLater;
-            return false;
-        });
+        this._showLater = global.compositor.get_laters().add(
+            Meta.LaterType.IDLE,
+            () => {
+                global.window_group.set_child_below_sibling(this, actor);
+                this.show();
+                delete this._showLater;
+                return false;
+            }
+        );
     }
 
     _updateStyle() {

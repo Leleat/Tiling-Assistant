@@ -427,46 +427,13 @@ export default class TilingMoveHandler {
     }
 
     _restoreSizeAndRestartGrab(window, px, py, grabOp) {
-        global.display.end_grab_op?.(global.get_current_time());
-
-        const rect = window.get_frame_rect();
-        const x = px - rect.x;
-        const relativeX = x / rect.width;
-        let untiledRect = window.untiledRect;
         Twm.untile(window, {
             restoreFullPos: false,
             xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
 
-        if (!global.display.begin_grab_op) {
-            this._onMoveStarted(window, grabOp);
-            return;
-        }
-
-        // untiledRect is null, if the window was maximized via non-extension
-        // way (dblc-ing the titlebar, maximize button...). So just get the
-        // restored window's rect directly... doesn't work on Wayland because
-        // get_frame_rect() doesn't return the correct size immediately after
-        // calling untile()... in that case just guess a random size
-        if (!untiledRect && !Meta.is_wayland_compositor())
-            untiledRect = new Rect(window.get_frame_rect());
-
-        const untiledWidth = untiledRect?.width ?? 1000;
-        const postUntileRect = window.get_frame_rect();
-
-        global.display.begin_grab_op(
-            window,
-            grabOp,
-            true, // Pointer already grabbed
-            true, // Frame action
-            -1, // Button
-            global.get_pointer()[2], // modifier
-            global.get_current_time(),
-            postUntileRect.x + untiledWidth * relativeX,
-            // So the pointer isn't above the window in some cases.
-            Math.max(py, postUntileRect.y)
-        );
+        this._onMoveStarted(window, grabOp);
     }
 
     /**
