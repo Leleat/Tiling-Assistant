@@ -43,7 +43,7 @@ bash scripts/build.sh
 
 # commit changes
 echo Committing version bump...
-git add $METADATA $PKGBUILD scripts/aur-build/.SRCINFO translations/*.po translations/*.pot
+git add $METADATA $PKGBUILD CHANGELOG.md scripts/aur-build/.SRCINFO translations/*.po translations/*.pot
 git commit -m "Release: Bump version to $NEW_VERSION_NR"
 echo
 
