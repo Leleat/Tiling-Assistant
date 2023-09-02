@@ -32,10 +32,6 @@ jobs:
           grep -E "\.sh$" |
           xargs -r shellcheck
 
-  # Unsure, if I really want to do cspell (for .md and .pot files)... The .pot
-  # file will never be touched by contributors directly. So getting a false flag
-  # there won't be an issue. That leaves .md files to be spell checked by
-  # potentional contributors. It kinda makes sense. Problem could be reliability.
   spellcheck:
     name: Run spell check
     runs-on: ubuntu-latest
@@ -46,7 +42,7 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: "*"
-      - run: pip install codespell && npm install -g cspell
+      - run: pip install codespell
       # The case sensitivity of codespeller for ignore-words seems to be buggy. See
       # issue tracker. According to the help page it should be case sensitive but
       # only 'allws' makes codespeller ignore 'allWs' in code files.
@@ -54,24 +50,6 @@ jobs:
         run: >
           git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
           xargs -r codespell -q 3 --skip="*.po*,*.git/*" --ignore-words .github/ignore-words.txt
-      - name: Configure custom dictionary for cspell based on the ignore list
-        run: >
-          echo '{
-            "version": "0.2",
-            "dictionaryDefinitions": [{
-                "name": "dict",
-                "path": ".github/ignore-words.txt",
-                "addWords": true
-            }],
-            "dictionaries": ["dict"],
-          }' >> cspell.json
-      - name: Run cspell (*.md and *.pot)
-        if: success() || failure()
-        run: >
-          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
-          grep -E "\.(md|pot)$" |
-          npx cspell lint --color --exclude "CHANGELOG.md" --file-list stdin \
-            --no-must-find-files --show-context --show-suggestions --unique
 
   build:
     name: Run build
