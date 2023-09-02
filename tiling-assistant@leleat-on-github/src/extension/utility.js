@@ -1,4 +1,4 @@
-import { Clutter, Gio, GLib, Meta, St } from '../dependencies/gi.js';
+import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 
 import { Direction, Orientation, Settings } from '../common.js';
@@ -263,15 +263,15 @@ export class Util {
 }
 
 /**
- * Wrapper for Meta.Rectangle to add some more functions.
+ * Wrapper for Mtk.Rectangle to add some more functions.
  */
 export class Rect {
     /**
-     * @param  {...any} params No parameters, 1 Meta.Rectangle or the x, y,
+     * @param  {...any} params No parameters, 1 Mtk.Rectangle or the x, y,
      * width and height values should be passed to the constructor.
      */
     constructor(...params) {
-        this._rect = new Meta.Rectangle();
+        this._rect = new Mtk.Rectangle();
 
         switch (params.length) {
             case 0:
@@ -386,7 +386,7 @@ export class Rect {
      * @returns {boolean}
      */
     containsRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.contains_rect(rect);
     }
 
@@ -402,7 +402,7 @@ export class Rect {
      * @returns {boolean}
      */
     couldFitRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.could_fit_rect(rect);
     }
 
@@ -411,7 +411,7 @@ export class Rect {
      * @returns {boolean}
      */
     equal(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.equal(rect);
     }
 
@@ -544,7 +544,7 @@ export class Rect {
      * @returns {boolean}
      */
     horizOverlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.horiz_overlap(rect);
     }
 
@@ -553,7 +553,7 @@ export class Rect {
      * @returns {[boolean, Rect]}
      */
     intersect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         const [ok, intersection] = this._rect.intersect(rect);
         return [ok, new Rect(intersection)];
     }
@@ -585,7 +585,7 @@ export class Rect {
      * @returns {Rect[]} an array of Rects. It contains 0 - 4 rects.
      */
     _minusRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? new Rect(rect) : rect;
+        rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
         if (rect.containsRect(this))
             return [];
 
@@ -657,7 +657,7 @@ export class Rect {
      * @returns {boolean}
      */
     overlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.overlap(rect);
     }
 
@@ -672,7 +672,7 @@ export class Rect {
      * @returns {Rect} a reference to this.
      */
     tryAlignWith(rect, margin = 4) {
-        rect = rect instanceof Meta.Rectangle ? new Rect(rect) : rect;
+        rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
         const equalApprox = (value1, value2) => Math.abs(value1 - value2) <= margin;
 
         if (equalApprox(rect.x, this.x))
@@ -703,7 +703,7 @@ export class Rect {
      * @returns {Rect}
      */
     union(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return new Rect(this._rect.union(rect));
     }
 
@@ -712,7 +712,7 @@ export class Rect {
      * @returns {boolean}
      */
     vertOverlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.vert_overlap(rect);
     }
 

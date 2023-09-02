@@ -1,4 +1,4 @@
-import { Clutter, GLib, GObject, Gio, Meta } from '../dependencies/gi.js';
+import { Clutter, GLib, GObject, Gio, Meta, Mtk } from '../dependencies/gi.js';
 import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
@@ -862,7 +862,7 @@ class TilePreview extends WindowManager.TilePreview {
         const monitor = Main.layoutManager.monitors[monitorIndex];
 
         if (!this._showing || changeMonitor) {
-            const monitorRect = new Meta.Rectangle({
+            const monitorRect = new Mtk.Rectangle({
                 x: monitor.x,
                 y: monitor.y,
                 width: monitor.width,

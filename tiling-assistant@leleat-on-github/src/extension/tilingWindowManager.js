@@ -1,4 +1,4 @@
-import { Clutter, GLib, GObject, Meta, Shell } from '../dependencies/gi.js';
+import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
@@ -680,7 +680,7 @@ export class TilingWindowManager {
 
             // Orientation doesn't matter here since we are always comparing sides
             // of the same orientation. So just make the side always horizontal.
-            const makeSide = (startPoint, endPoint) => new Meta.Rectangle({
+            const makeSide = (startPoint, endPoint) => new Mtk.Rectangle({
                 x: startPoint,
                 width: endPoint - startPoint,
                 height: 1
