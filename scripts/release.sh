@@ -15,6 +15,9 @@ VERSION_LINE=$(cat $METADATA | grep \"version\":)
 VERSION_NR=$(echo "$VERSION_LINE" | cut -d ':' -f 2 | xargs)
 NEW_VERSION_NR=$((VERSION_NR + 1))
 
+# switch to new release branch
+git checkout -b "release-$NEW_VERSION_NR"
+
 # bump up version nr in metadata.json
 echo Updating metadata.json...
 sed -i "s/\"version\": $VERSION_NR/\"version\": $NEW_VERSION_NR/" $METADATA
@@ -41,13 +44,7 @@ bash scripts/build.sh
 # commit changes
 echo Committing version bump...
 git add $METADATA $PKGBUILD scripts/aur-build/.SRCINFO translations/*.po translations/*.pot
-git commit -m "bump version to $NEW_VERSION_NR"
-echo
-
-# tag new release
-echo Creating tag \'v$NEW_VERSION_NR\'...
-git tag v$NEW_VERSION_NR
-echo Tag created.
+git commit -m "Release: Bump version to $NEW_VERSION_NR"
 echo
 
 echo Release done.
@@ -55,5 +52,6 @@ echo
 
 echo TODO:
 echo
-echo [] Push the commits and tags to Github
+echo [] Push release branch and and create pull request
+echo [] Create and push tag
 echo [] Upload the extension to EGO
