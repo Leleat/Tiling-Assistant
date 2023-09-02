@@ -1,5 +1,15 @@
 # Changelog
 
+## [42] - 2023-09-03
+
+### Added
+
+- Italian translation by albanobattistella (#271)
+
+### Fixed
+
+- Move modes update correctly when the grabbed window changes the monitor (#279)
+
 ## [41] - 2023-05-17
 
 ### Fixed
@@ -28,7 +38,7 @@
 ### Changed
 
 - Move UserGuide.MD into the [github wiki](https://github.com/Leleat/Tiling-Assistant/wiki)
-- Update Scipts and a bugfix by SubOptimal (#248, #249, #250)
+- Update Scripts and a bugfix by SubOptimal (#248, #249, #250)
 
 ## [39] - 2022-11-23
 
