@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-13 20:30+0200\n"
+"POT-Creation-Date: 2023-09-17 20:08+0200\n"
 "PO-Revision-Date: 2022-04-11 16:53-0300\n"
 "Last-Translator: Fernando Omori <feh.omori@gmail.com>\n"
 "Language-Team: \n"
@@ -571,38 +571,38 @@ msgstr ""
 msgid "Clear the keyboard shortcuts"
 msgstr "Limpar os atalhos de teclado"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:56
 msgid "Tiling popup enabled"
 msgstr "Janela instantânea de ladrilhamento ativada"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
 msgid "Tiling popup was disabled"
 msgstr "Janela instantânea de ladrilhamento foi desativada"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:489
 msgid "No valid layouts defined."
 msgstr "Nenhum Layout válido definido."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
 msgid "Popup Layouts: App not found."
 msgstr "Layouts de Janela Instantânea: App não encontrado."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:333
 msgid "Type to search..."
 msgstr "Digite para procurar..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:439
 msgid "Nameless layout..."
 msgstr "Layout sem nome..."
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:61
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "Não é possível entrar no 'Modo de Edição de Ladrilho' se não há janelas "
 "ladrilhadas visíveis."
 
-#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
 msgstr "'Guia do Usuário' para ajuda..."
 

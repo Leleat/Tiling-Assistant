@@ -1,5 +1,11 @@
 # Changelog
 
+## [44] - 2023-09-18
+
+### Added
+
+- support for GNOME 45 (#281)
+
 ## [43] - 2023-09-17
 
 ### Fixed

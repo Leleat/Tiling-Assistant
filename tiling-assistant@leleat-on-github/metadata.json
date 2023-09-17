@@ -8,5 +8,5 @@
   "uuid": "tiling-assistant@leleat-on-github",
   "gettext-domain": "tiling-assistant@leleat-on-github",
   "settings-schema": "org.gnome.shell.extensions.tiling-assistant",
-  "version": 43
+  "version": 44
 }
