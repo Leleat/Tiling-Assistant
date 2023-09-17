@@ -14,7 +14,9 @@ Here is a table showing the GNOME Shell releases and the latest extension versio
 
 | GNOME Shell | Tiling Assistant |
 |:-------------:|:-----------:|
-| 43 | 39 |
+| 45 | 44 |
+| 44 | 43 |
+| 43 | 43 |
 | 42 | 36 |
 | 41 | 32 |
 | 40 | 32 |
