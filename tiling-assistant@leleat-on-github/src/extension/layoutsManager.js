@@ -1,18 +1,15 @@
-'use strict';
+import { Clutter, Gio, GObject, Meta, Shell, St } from '../dependencies/gi.js';
+import {
+    _,
+    Extension,
+    Main,
+    PanelMenu,
+    PopupMenu
+} from '../dependencies/shell.js';
 
-const { Clutter, Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
-const { main: Main, panelMenu: PanelMenu, popupMenu: PopupMenu } = imports.ui;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Layout, Settings } = Me.imports.src.common;
-const { Rect, Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-
-const Gettext = imports.gettext;
-const Domain = Gettext.domain(Me.metadata.uuid);
-const _ = Domain.gettext;
+import { Layout, Settings } from '../common.js';
+import { Rect, Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
@@ -32,7 +29,7 @@ const _ = Domain.gettext;
  * the Edge Tiling.
  */
 
-var LayoutManager = class TilingLayoutsManager {
+export default class TilingLayoutsManager {
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios
@@ -79,7 +76,9 @@ var LayoutManager = class TilingLayoutsManager {
 
         // Add panel indicator
         this._panelIndicator = new PanelIndicator();
-        Main.panel.addToStatusArea(Me.metadata.uuid, this._panelIndicator);
+        Main.panel.addToStatusArea(
+            'tiling-assistant@leleat-on-github',
+            this._panelIndicator);
         this._settingsId = Settings.changed(Settings.SHOW_LAYOUT_INDICATOR, () => {
             this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
         });
@@ -211,7 +210,7 @@ var LayoutManager = class TilingLayoutsManager {
         this._step();
     }
 
-    _openTilingPopup() {
+    async _openTilingPopup() {
         // There are no open windows left to tile using the Tiling Popup.
         // However there may be items with appIds, which we want to open.
         // So continue...
@@ -232,7 +231,7 @@ var LayoutManager = class TilingLayoutsManager {
         });
 
         // Create the Tiling Popup
-        const TilingPopup = Me.imports.src.extension.tilingPopup;
+        const TilingPopup = await import('./tilingPopup.js');
         const popup = new TilingPopup.TilingSwitcherPopup(
             this._remainingWindows,
             this._currRect,
@@ -285,7 +284,7 @@ var LayoutManager = class TilingLayoutsManager {
             this._step(this._currItem.loopType);
         }
     }
-};
+}
 
 /**
  * The GUI class for the Layout search.
@@ -456,7 +455,10 @@ const PanelIndicator = GObject.registerClass({
     _init() {
         super._init(0.0, 'Layout Indicator (Tiling Assistant)');
 
-        const path = Me.dir.get_child('media/preferences-desktop-apps-symbolic.svg').get_path();
+        const path = Extension.lookupByURL(import.meta.url)
+            .dir
+            .get_child('media/preferences-desktop-apps-symbolic.svg')
+            .get_path();
         const gicon = new Gio.FileIcon({ file: Gio.File.new_for_path(path) });
         this.add_child(new St.Icon({
             gicon,
@@ -515,15 +517,8 @@ const PanelIndicator = GObject.registerClass({
         // Center button without changing the size (for the hover highlight)
         settingsButton._icon.set_x_expand(true);
         settingsButton.label.set_x_expand(true);
-        settingsButton.connect('activate', () => {
-            try {
-                Main.overview.hide();
-                const cmd = `gnome-extensions prefs ${Me.metadata.uuid}`;
-                GLib.spawn_command_line_async(cmd);
-            } catch (e) {
-                logError(e);
-            }
-        });
+        settingsButton.connect('activate',
+            () => Extension.lookupByURL(import.meta.url).openPreferences());
         this.menu.addMenuItem(settingsButton);
     }
 });

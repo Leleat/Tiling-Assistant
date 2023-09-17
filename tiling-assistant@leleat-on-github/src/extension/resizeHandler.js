@@ -1,14 +1,8 @@
-'use strict';
+import { Clutter, Meta } from '../dependencies/gi.js';
 
-const { Clutter, Meta } = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Orientation } = Me.imports.src.common;
-const Settings = Me.imports.src.common.Settings;
-const { Rect, Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+import { Orientation, Settings } from '../common.js';
+import { Rect, Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const Side = {
     NONE: 0,
@@ -25,7 +19,7 @@ const Side = {
  * resizing is split into its [H]orizontal and [V]ertical components.
  */
 
-var Handler = class TilingResizeHandler {
+export default class TilingResizeHandler {
     constructor() {
         const isResizing = grabOp => {
             switch (grabOp) {
@@ -493,7 +487,7 @@ var Handler = class TilingResizeHandler {
         findBorderingWindows(tileGroup, sameSide, oppositeSide, resizeIsNOrW);
         return [...sameSide, ...oppositeSide];
     }
-};
+}
 
 /**
  * Saves information on which side a window will resize to complement the

@@ -16,16 +16,16 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-'use strict';
+import { Gio, GLib, Meta } from './src/dependencies/gi.js';
+import { Extension, Main } from './src/dependencies/shell.js';
 
-const { Gio, GLib, Meta } = imports.gi;
-const ByteArray = imports.byteArray;
-const Main = imports.ui.main;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Rect, Util } = Me.imports.src.extension.utility;
+import MoveHandler from './src/extension/moveHandler.js';
+import ResizeHandler from './src/extension/resizeHandler.js';
+import KeybindingHandler from './src/extension/keybindingHandler.js';
+import LayoutsManager from './src/extension/layoutsManager.js';
+import ActiveWindowHint from './src/extension/activeWindowHint.js';
+import AltTabOverride from './src/extension/altTab.js';
+import { Rect } from './src/extension/utility.js';
 
 /**
  * 2 entry points:
@@ -37,8 +37,8 @@ const { Rect, Util } = Me.imports.src.extension.utility;
  */
 
 class SettingsOverrider {
-    constructor(settings) {
-        this._settings = settings;
+    constructor(settingsSingleton) {
+        this._settings = settingsSingleton;
         this._overrides = new Map();
         this._originalSettings = new Map();
         this._maybeNullValue = GLib.Variant.new_maybe(
@@ -114,7 +114,7 @@ class SettingsOverrider {
                 const schemaId = splits.slice(0, -1).join('.');
 
                 const settings = this._originalSettings.get(schemaId) ??
-                    ExtensionUtils.getSettings(schemaId);
+                    new Gio.Settings({ schema_id: schemaId });
 
                 value = value.get_variant();
                 if (value.equal(this._maybeNullValue))
@@ -145,222 +145,218 @@ class SettingsOverrider {
     }
 }
 
-function init() {
-    ExtensionUtils.initTranslations(Me.metadata.uuid);
-}
+export default class TilingAssistantExtension extends Extension {
+    async enable() {
+        this.settings = (await import('./src/common.js')).Settings;
+        this.settings.initialize(this.getSettings());
+        this._settingsOverrider = new SettingsOverrider(this.settings);
 
-function enable() {
-    this._settings = Me.imports.src.common.Settings;
-    this._settings.initialize();
-    this._settingsOverrider = new SettingsOverrider(this._settings);
+        const twmModule = await import('./src/extension/tilingWindowManager.js');
 
-    this._twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-    this._twm.initialize();
+        this._twm = twmModule.TilingWindowManager;
+        this._twm.initialize();
 
-    const MoveHandler = Me.imports.src.extension.moveHandler;
-    this._moveHandler = new MoveHandler.Handler();
-    const ResizeHandler = Me.imports.src.extension.resizeHandler;
-    this._resizeHandler = new ResizeHandler.Handler();
-    const KeybindingHandler = Me.imports.src.extension.keybindingHandler;
-    this._keybindingHandler = new KeybindingHandler.Handler();
-    const LayoutsManager = Me.imports.src.extension.layoutsManager;
-    this._layoutsManager = new LayoutsManager.LayoutManager();
-    const activeWindowHint = Me.imports.src.extension.activeWindowHint;
-    this._activeWindowHintHandler = new activeWindowHint.Handler();
+        this._moveHandler = new MoveHandler();
+        this._resizeHandler = new ResizeHandler();
+        this._keybindingHandler = new KeybindingHandler();
+        this._layoutsManager = new LayoutsManager();
+        this._activeWindowHintHandler = new ActiveWindowHint();
+        this._altTabOverride = new AltTabOverride();
 
-    const AltTabOverride = Me.imports.src.extension.altTab.Override;
-    this._altTabOverride = new AltTabOverride();
+        // Disable native tiling.
+        this._settingsOverrider.add(new Gio.Settings({
+            schema_id: 'org.gnome.mutter'
+        }), 'edge-tiling', new GLib.Variant('b', false));
 
-    // Disable native tiling.
-    this._settingsOverrider.add(ExtensionUtils.getSettings('org.gnome.mutter'),
-        'edge-tiling', new GLib.Variant('b', false));
-
-    // Disable native keybindings for Super+Up/Down/Left/Right
-    const gnomeMutterKeybindings = ExtensionUtils.getSettings(
-        'org.gnome.mutter.keybindings');
-    const gnomeDesktopKeybindings = ExtensionUtils.getSettings(
-        'org.gnome.desktop.wm.keybindings');
-    const sc = Me.imports.src.common.Shortcuts;
-    const emptyStrvVariant = new GLib.Variant('as', []);
-
-    if (gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
-            this._settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
-        this._settingsOverrider.add(gnomeDesktopKeybindings,
-            'maximize', emptyStrvVariant);
-    }
-    if (gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
-            this._settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
-        this._settingsOverrider.add(gnomeDesktopKeybindings,
-            'unmaximize', emptyStrvVariant);
-    }
-    if (gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
-            this._settings.getStrv(sc.LEFT).includes('<Super>Left')) {
-        this._settingsOverrider.add(gnomeMutterKeybindings,
-            'toggle-tiled-left', emptyStrvVariant);
-    }
-    if (gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
-            this._settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
-        this._settingsOverrider.add(gnomeMutterKeybindings,
-            'toggle-tiled-right', emptyStrvVariant);
-    }
-
-    // Include tiled windows when dragging from the top panel.
-    this._getDraggableWindowForPosition = Main.panel._getDraggableWindowForPosition;
-    Main.panel._getDraggableWindowForPosition = function (stageX) {
-        const workspaceManager = global.workspace_manager;
-        const windows = workspaceManager.get_active_workspace().list_windows();
-        const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
-
-        return allWindowsByStacking.find(w => {
-            const rect = w.get_frame_rect();
-            const workArea = w.get_work_area_current_monitor();
-            return w.is_on_primary_monitor() &&
-                    w.showing_on_its_workspace() &&
-                    w.get_window_type() !== Meta.WindowType.DESKTOP &&
-                    (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
-                    stageX > rect.x && stageX < rect.x + rect.width;
+        // Disable native keybindings for Super+Up/Down/Left/Right
+        const gnomeMutterKeybindings = new Gio.Settings({
+            schema_id: 'org.gnome.mutter.keybindings'
         });
-    };
+        const gnomeDesktopKeybindings = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.wm.keybindings'
+        });
+        const sc = (await import('./src/common.js')).Shortcuts;
+        const emptyStrvVariant = new GLib.Variant('as', []);
 
-    // Restore tiled window properties after session was unlocked.
-    _loadAfterSessionLock();
+        if (gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
+                this.settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
+            this._settingsOverrider.add(gnomeDesktopKeybindings,
+                'maximize', emptyStrvVariant);
+        }
+        if (gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
+                this.settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
+            this._settingsOverrider.add(gnomeDesktopKeybindings,
+                'unmaximize', emptyStrvVariant);
+        }
+        if (gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
+                this.settings.getStrv(sc.LEFT).includes('<Super>Left')) {
+            this._settingsOverrider.add(gnomeMutterKeybindings,
+                'toggle-tiled-left', emptyStrvVariant);
+        }
+        if (gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
+                this.settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
+            this._settingsOverrider.add(gnomeMutterKeybindings,
+                'toggle-tiled-right', emptyStrvVariant);
+        }
 
-    // Setting used for detection of a fresh install and do compatibility
-    // changes if necessary...
-    this._settings.setInt('last-version-installed', Me.metadata.version);
-}
+        // Include tiled windows when dragging from the top panel.
+        this._getDraggableWindowForPosition = Main.panel._getDraggableWindowForPosition;
+        Main.panel._getDraggableWindowForPosition = function (stageX) {
+            const workspaceManager = global.workspace_manager;
+            const windows = workspaceManager.get_active_workspace().list_windows();
+            const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
 
-function disable() {
-    // Save tiled window properties, if the session was locked to restore
-    // them after the session is unlocked again.
-    _saveBeforeSessionLock();
-
-    this._settingsOverrider.destroy();
-    this._settingsOverrider = null;
-    this._moveHandler.destroy();
-    this._moveHandler = null;
-    this._resizeHandler.destroy();
-    this._resizeHandler = null;
-    this._keybindingHandler.destroy();
-    this._keybindingHandler = null;
-    this._layoutsManager.destroy();
-    this._layoutsManager = null;
-    this._activeWindowHintHandler.destroy();
-    this._activeWindowHintHandler = null;
-
-    this._altTabOverride.destroy();
-    this._altTabOverride = null;
-
-    this._twm.destroy();
-    this._twm = null;
-
-    this._settings.destroy();
-    this._settings = null;
-
-    // Restore old functions.
-    Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
-    this._getDraggableWindowForPosition = null;
-
-    // Delete custom tiling properties.
-    const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
-    openWindows.forEach(w => {
-        delete w.isTiled;
-        delete w.tiledRect;
-        delete w.untiledRect;
-    });
-}
-
-/**
- * Extensions are disabled when the screen is locked. So save the custom tiling
- * properties of windows before locking the screen.
- */
-function _saveBeforeSessionLock() {
-    if (!Main.sessionMode.isLocked)
-        return;
-
-    this._wasLocked = true;
-
-    const rectToJsObj = rect => rect && {
-        x: rect.x,
-        y: rect.y,
-        width: rect.width,
-        height: rect.height
-    };
-
-    // can't just check for isTiled because maximized windows may
-    // have an untiledRect as well in case window gaps are used
-    const openWindows = this._twm.getWindows(true);
-    const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
-        return {
-            windowId: w.get_stable_sequence(),
-            isTiled: w.isTiled,
-            tiledRect: rectToJsObj(w.tiledRect),
-            untiledRect: rectToJsObj(w.untiledRect)
+            return allWindowsByStacking.find(w => {
+                const rect = w.get_frame_rect();
+                const workArea = w.get_work_area_current_monitor();
+                return w.is_on_primary_monitor() &&
+                        w.showing_on_its_workspace() &&
+                        w.get_window_type() !== Meta.WindowType.DESKTOP &&
+                        (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
+                        stageX > rect.x && stageX < rect.x + rect.width;
+            });
         };
-    });
 
-    const saveObj = {
-        'windows': savedWindows,
-        'tileGroups': Array.from(this._twm.getTileGroups())
-    };
+        // Restore tiled window properties after session was unlocked.
+        this._loadAfterSessionLock();
 
-    const userPath = GLib.get_user_config_dir();
-    const parentPath = GLib.build_filenamev([userPath, '/tiling-assistant']);
-    const parent = Gio.File.new_for_path(parentPath);
-    try { parent.make_directory_with_parents(null); } catch (e) {}
-    const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore.json']);
-    const file = Gio.File.new_for_path(path);
-    try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
-    file.replace_contents(JSON.stringify(saveObj), null, false,
-        Gio.FileCreateFlags.REPLACE_DESTINATION, null);
-}
+        // Setting used for detection of a fresh install and do compatibility
+        // changes if necessary...
+        this.settings.setInt('last-version-installed', this.metadata.version);
+    }
 
-/**
- * Extensions are disabled when the screen is locked. After having saved them,
- * reload them here.
- */
-function _loadAfterSessionLock() {
-    if (!this._wasLocked)
-        return;
+    disable() {
+        // Save tiled window properties, if the session was locked to restore
+        // them after the session is unlocked again.
+        this._saveBeforeSessionLock();
 
-    this._wasLocked = false;
+        this._settingsOverrider.destroy();
+        this._settingsOverrider = null;
+        this._moveHandler.destroy();
+        this._moveHandler = null;
+        this._resizeHandler.destroy();
+        this._resizeHandler = null;
+        this._keybindingHandler.destroy();
+        this._keybindingHandler = null;
+        this._layoutsManager.destroy();
+        this._layoutsManager = null;
+        this._activeWindowHintHandler.destroy();
+        this._activeWindowHintHandler = null;
 
-    const userPath = GLib.get_user_config_dir();
-    const path = GLib.build_filenamev([userPath, '/tiling-assistant/tiledSessionRestore.json']);
-    const file = Gio.File.new_for_path(path);
-    if (!file.query_exists(null))
-        return;
+        this._altTabOverride.destroy();
+        this._altTabOverride = null;
 
-    try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
-    const [success, contents] = file.load_contents(null);
-    if (!success || !contents.length)
-        return;
+        this._twm.destroy();
+        this._twm = null;
 
-    const openWindows = this._twm.getWindows(true);
-    const saveObj = JSON.parse(ByteArray.toString(contents));
+        this.settings.destroy();
+        this.settings = null;
 
-    const windowObjects = saveObj['windows'];
-    windowObjects.forEach(wObj => {
-        const { windowId, isTiled, tiledRect, untiledRect } = wObj;
-        const window = openWindows.find(w => w.get_stable_sequence() === windowId);
-        if (!window)
+        // Restore old functions.
+        Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
+        this._getDraggableWindowForPosition = null;
+
+        // Delete custom tiling properties.
+        const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
+        openWindows.forEach(w => {
+            delete w.isTiled;
+            delete w.tiledRect;
+            delete w.untiledRect;
+        });
+    }
+
+    /**
+     * Extensions are disabled when the screen is locked. So save the custom tiling
+     * properties of windows before locking the screen.
+     */
+    _saveBeforeSessionLock() {
+        if (!Main.sessionMode.isLocked)
             return;
 
-        const jsToRect = jsRect => jsRect && new Rect(
-            jsRect.x, jsRect.y, jsRect.width, jsRect.height
-        );
+        this._wasLocked = true;
 
-        window.isTiled = isTiled;
-        window.tiledRect = jsToRect(tiledRect);
-        window.untiledRect = jsToRect(untiledRect);
-    });
+        const rectToJsObj = rect => rect && {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height
+        };
 
-    const tileGroups = new Map(saveObj['tileGroups']);
-    this._twm.setTileGroups(tileGroups);
-    openWindows.forEach(w => {
-        if (tileGroups.has(w.get_id())) {
-            const group = this._twm.getTileGroupFor(w);
-            this._twm.updateTileGroup(group);
-        }
-    });
+        // can't just check for isTiled because maximized windows may
+        // have an untiledRect as well in case window gaps are used
+        const openWindows = this._twm.getWindows(true);
+        const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
+            return {
+                windowId: w.get_stable_sequence(),
+                isTiled: w.isTiled,
+                tiledRect: rectToJsObj(w.tiledRect),
+                untiledRect: rectToJsObj(w.untiledRect)
+            };
+        });
+
+        const saveObj = {
+            'windows': savedWindows,
+            'tileGroups': Array.from(this._twm.getTileGroups())
+        };
+
+        const userPath = GLib.get_user_config_dir();
+        const parentPath = GLib.build_filenamev([userPath, '/tiling-assistant']);
+        const parent = Gio.File.new_for_path(parentPath);
+        try { parent.make_directory_with_parents(null); } catch (e) {}
+        const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore.json']);
+        const file = Gio.File.new_for_path(path);
+        try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
+        file.replace_contents(JSON.stringify(saveObj), null, false,
+            Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+    }
+
+    /**
+     * Extensions are disabled when the screen is locked. After having saved them,
+     * reload them here.
+     */
+    _loadAfterSessionLock() {
+        if (!this._wasLocked)
+            return;
+
+        this._wasLocked = false;
+
+        const userPath = GLib.get_user_config_dir();
+        const path = GLib.build_filenamev([userPath, '/tiling-assistant/tiledSessionRestore.json']);
+        const file = Gio.File.new_for_path(path);
+        if (!file.query_exists(null))
+            return;
+
+        try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
+        const [success, contents] = file.load_contents(null);
+        if (!success || !contents.length)
+            return;
+
+        const openWindows = this._twm.getWindows(true);
+        const saveObj = JSON.parse(new TextDecoder().decode(contents));
+
+        const windowObjects = saveObj['windows'];
+        windowObjects.forEach(wObj => {
+            const { windowId, isTiled, tiledRect, untiledRect } = wObj;
+            const window = openWindows.find(w => w.get_stable_sequence() === windowId);
+            if (!window)
+                return;
+
+            const jsToRect = jsRect => jsRect && new Rect(
+                jsRect.x, jsRect.y, jsRect.width, jsRect.height
+            );
+
+            window.isTiled = isTiled;
+            window.tiledRect = jsToRect(tiledRect);
+            window.untiledRect = jsToRect(untiledRect);
+        });
+
+        const tileGroups = new Map(saveObj['tileGroups']);
+        this._twm.setTileGroups(tileGroups);
+        openWindows.forEach(w => {
+            if (tileGroups.has(w.get_id())) {
+                const group = this._twm.getTileGroupFor(w);
+                this._twm.updateTileGroup(group);
+            }
+        });
+    }
 }

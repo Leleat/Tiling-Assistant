@@ -1,47 +1,86 @@
-'use strict';
+import {
+    Atk,
+    Clutter,
+    Gio,
+    GLib,
+    GObject,
+    Meta,
+    Shell,
+    St
+} from '../dependencies/gi.js';
+import {
+    AltTab,
+    Extension,
+    Main,
+    SwitcherPopup
+} from '../dependencies/shell.js';
+import {
+    baseIconSizes,
+    APP_ICON_HOVER_TIMEOUT
+} from '../dependencies/unexported/altTab.js';
 
-const { altTab: AltTab, main: Main, switcherPopup: SwitcherPopup } = imports.ui;
-const { Gio, GLib, GObject, Meta, Shell, St } = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Settings } = Me.imports.src.common;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+import { Settings } from '../common.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
  * Optionally, override GNOME's altTab / appSwitcher to group tileGroups
  */
-var Override = class AltTabOverride {
+export default class AltTabOverride {
     constructor() {
-        this._originalAltTab = AltTab.AppSwitcherPopup;
-
         if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
-            AltTab.AppSwitcherPopup = TilingAppSwitcherPopup;
+            this._overrideNativeAppSwitcher();
 
         this._settingsId = Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
-            AltTab.AppSwitcherPopup = Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)
-                ? TilingAppSwitcherPopup
-                : this._originalAltTab;
+            if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
+                this._overrideNativeAppSwitcher();
+            else
+                this._restoreNativeAppSwitcher();
         });
     }
 
     destroy() {
         Settings.disconnect(this._settingsId);
-        AltTab.AppSwitcherPopup = this._originalAltTab;
+        this._restoreNativeAppSwitcher();
     }
-};
 
-var TilingAppSwitcherPopup = GObject.registerClass(
+    _overrideNativeAppSwitcher() {
+        Main.wm.setCustomKeybindingHandler(
+            'switch-applications',
+            Shell.ActionMode.NORMAL,
+            this._startSwitcher.bind(this)
+        );
+    }
+
+    _restoreNativeAppSwitcher() {
+        Main.wm.setCustomKeybindingHandler(
+            'switch-applications',
+            Shell.ActionMode.NORMAL,
+            Main.wm._startSwitcher.bind(Main.wm)
+        );
+    }
+
+    /**
+     * Copy-pasta from windowManager.js. Removed unused stuff...
+     *
+     * @param {*} display -
+     * @param {*} window -
+     * @param {*} binding -
+     */
+    _startSwitcher(display, window, binding) {
+        if (Main.wm._workspaceSwitcherPopup !== null)
+            Main.wm._workspaceSwitcherPopup.destroy();
+
+        const tabPopup = new TilingAppSwitcherPopup();
+
+        if (!tabPopup.show(binding.is_reversed(), binding.get_name(), binding.get_mask()))
+            tabPopup.destroy();
+    }
+}
+
+export const TilingAppSwitcherPopup = GObject.registerClass(
 class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
     _init() {
         SwitcherPopup.SwitcherPopup.prototype._init.call(this);
-
-        this._thumbnails = null;
-        this._thumbnailTimeoutId = 0;
-        this._currentWindow = -1;
-
-        this.thumbnailsVisible = false;
 
         const settings = new Gio.Settings({ schema_id: 'org.gnome.shell.app-switcher' });
         const workspace = settings.get_boolean('current-workspace-only')
@@ -80,13 +119,12 @@ class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
     }
 });
 
-var TilingAppSwitcher = GObject.registerClass(
-class TilingAppSwitcher extends AltTab.AppSwitcher {
+export const TilingAppSwitcher = GObject.registerClass(
+class TilingAppSwitcher extends SwitcherPopup.SwitcherList {
     _init(altTabPopup, windows) {
         // Don't make the SwitcherButtons squares since 1 SwitcherButton
         // may contain multiple AppIcons for a tileGroup.
-        const squareItems = false;
-        SwitcherPopup.SwitcherList.prototype._init.call(this, squareItems);
+        super._init(false);
 
         this.icons = [];
         this._arrows = [];
@@ -163,6 +201,163 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
         this._apps = [];
     }
 
+    _setIconSize() {
+        let j = 0;
+        while (this._items.length > 1 && this._items[j].style_class !== 'item-box')
+            j++;
+
+        let themeNode = this._items[j].get_theme_node();
+        this._list.ensure_style();
+
+        let iconPadding = themeNode.get_horizontal_padding();
+        let iconBorder = themeNode.get_border_width(St.Side.LEFT) + themeNode.get_border_width(St.Side.RIGHT);
+        let [, labelNaturalHeight] = this.icons[j].label.get_preferred_height(-1);
+        let iconSpacing = labelNaturalHeight + iconPadding + iconBorder;
+        let totalSpacing = this._list.spacing * (this._items.length - 1);
+
+        // We just assume the whole screen here due to weirdness happening with the passed width
+        let primary = Main.layoutManager.primaryMonitor;
+        let parentPadding = this.get_parent().get_theme_node().get_horizontal_padding();
+        let availWidth = primary.width - parentPadding - this.get_theme_node().get_horizontal_padding();
+
+        let scaleFactor = St.ThemeContext.get_for_stage(global.stage).scale_factor;
+        let iconSizes = baseIconSizes.map(s => s * scaleFactor);
+        let iconSize = baseIconSizes[0];
+
+        if (this._items.length > 1) {
+            for (let i = 0; i < baseIconSizes.length; i++) {
+                iconSize = baseIconSizes[i];
+                let height = iconSizes[i] + iconSpacing;
+                let w = height * this._items.length + totalSpacing;
+                if (w <= availWidth)
+                    break;
+            }
+        }
+
+        this._iconSize = iconSize;
+
+        for (let i = 0; i < this.icons.length; i++) {
+            // eslint-disable-next-line eqeqeq
+            if (this.icons[i].icon != null)
+                break;
+            this.icons[i].set_size(iconSize);
+        }
+    }
+
+    vfunc_get_preferred_height(forWidth) {
+        if (!this._iconSize)
+            this._setIconSize();
+
+        return super.vfunc_get_preferred_height(forWidth);
+    }
+
+    vfunc_allocate(box) {
+        // Allocate the main list items
+        super.vfunc_allocate(box);
+
+        let contentBox = this.get_theme_node().get_content_box(box);
+
+        let arrowHeight = Math.floor(this.get_theme_node().get_padding(St.Side.BOTTOM) / 3);
+        let arrowWidth = arrowHeight * 2;
+
+        // Now allocate each arrow underneath its item
+        let childBox = new Clutter.ActorBox();
+        for (let i = 0; i < this._items.length; i++) {
+            let itemBox = this._items[i].allocation;
+            childBox.x1 = contentBox.x1 + Math.floor(itemBox.x1 + (itemBox.x2 - itemBox.x1 - arrowWidth) / 2);
+            childBox.x2 = childBox.x1 + arrowWidth;
+            childBox.y1 = contentBox.y1 + itemBox.y2 + arrowHeight;
+            childBox.y2 = childBox.y1 + arrowHeight;
+            this._arrows[i].allocate(childBox);
+        }
+    }
+
+    // We override SwitcherList's _onItemMotion method to delay
+    // activation when the thumbnail list is open
+    _onItemMotion(item) {
+        if (item === this._items[this._highlighted] ||
+            item === this._items[this._delayedHighlighted])
+            return Clutter.EVENT_PROPAGATE;
+
+        const index = this._items.indexOf(item);
+
+        if (this._mouseTimeOutId !== 0) {
+            GLib.source_remove(this._mouseTimeOutId);
+            this._delayedHighlighted = -1;
+            this._mouseTimeOutId = 0;
+        }
+
+        if (this._altTabPopup.thumbnailsVisible) {
+            this._delayedHighlighted = index;
+            this._mouseTimeOutId = GLib.timeout_add(
+                GLib.PRIORITY_DEFAULT,
+                APP_ICON_HOVER_TIMEOUT,
+                () => {
+                    this._enterItem(index);
+                    this._delayedHighlighted = -1;
+                    this._mouseTimeOutId = 0;
+                    return GLib.SOURCE_REMOVE;
+                });
+            GLib.Source.set_name_by_id(this._mouseTimeOutId, '[gnome-shell] this._enterItem');
+        } else {
+            this._itemEntered(index);
+        }
+
+        return Clutter.EVENT_PROPAGATE;
+    }
+
+    _enterItem(index) {
+        let [x, y] = global.get_pointer();
+        let pickedActor = global.stage.get_actor_at_pos(Clutter.PickMode.ALL, x, y);
+        if (this._items[index].contains(pickedActor))
+            this._itemEntered(index);
+    }
+
+    // We override SwitcherList's highlight() method to also deal with
+    // the AppSwitcher->ThumbnailSwitcher arrows. Apps with only 1 window
+    // will hide their arrows by default, but show them when their
+    // thumbnails are visible (ie, when the app icon is supposed to be
+    // in justOutline mode). Apps with multiple windows will normally
+    // show a dim arrow, but show a bright arrow when they are
+    // highlighted.
+    highlight(n, justOutline) {
+        if (this.icons[this._highlighted]) {
+            if (this.icons[this._highlighted].cachedWindows.length === 1)
+                this._arrows[this._highlighted].hide();
+            else
+                this._arrows[this._highlighted].remove_style_pseudo_class('highlighted');
+        }
+
+        super.highlight(n, justOutline);
+
+        if (this._highlighted !== -1) {
+            if (justOutline && this.icons[this._highlighted].cachedWindows.length === 1)
+                this._arrows[this._highlighted].show();
+            else
+                this._arrows[this._highlighted].add_style_pseudo_class('highlighted');
+        }
+    }
+
+    _addIcon(appIcon) {
+        this.icons.push(appIcon);
+        let item = this.addItem(appIcon, appIcon.label);
+
+        appIcon.app.connectObject('notify::state', app => {
+            if (app.state !== Shell.AppState.RUNNING)
+                this._removeIcon(app);
+        }, this);
+
+        let arrow = new St.DrawingArea({ style_class: 'switcher-arrow' });
+        arrow.connect('repaint', () => SwitcherPopup.drawArrow(arrow, St.Side.BOTTOM));
+        this.add_actor(arrow);
+        this._arrows.push(arrow);
+
+        if (appIcon.cachedWindows.length === 1)
+            arrow.hide();
+        else
+            item.add_accessible_state(Atk.StateType.EXPANDABLE);
+    }
+
     _removeIcon(item) {
         const index = this.icons.findIndex(i => i === item);
         if (index === -1)
@@ -181,7 +376,7 @@ class TilingAppSwitcher extends AltTab.AppSwitcher {
  * This may contain multiple AppIcons to represent a tileGroup with chain icons
  * between the AppIcons.
  */
-var AppSwitcherItem = GObject.registerClass({
+const AppSwitcherItem = GObject.registerClass({
     Signals: { 'all-icons-removed': {} }
 }, class AppSwitcherItem extends St.BoxLayout {
     _init(windows) {
@@ -220,7 +415,9 @@ var AppSwitcherItem = GObject.registerClass({
         this.chainIcons = [];
 
         const winTracker = Shell.WindowTracker.get_default();
-        const path = Me.dir.get_child('media/insert-link-symbolic.svg').get_path();
+        const path = Extension.lookupByURL(import.meta.url)
+            .dir.get_child('media/insert-link-symbolic.svg')
+            .get_path();
         const icon = new Gio.FileIcon({ file: Gio.File.new_for_path(path) });
 
         const apps = this.isTileGroup

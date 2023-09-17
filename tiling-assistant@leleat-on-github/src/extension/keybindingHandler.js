@@ -1,25 +1,16 @@
-'use strict';
+import { Clutter, Meta, Shell, St } from '../dependencies/gi.js';
+import { _, Main } from '../dependencies/shell.js';
 
-const { Clutter, Meta, Shell, St } = imports.gi;
-const Main = imports.ui.main;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Direction, DynamicKeybindings, Settings, Shortcuts } = Me.imports.src.common;
-const { Rect, Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-
-const Gettext = imports.gettext;
-const Domain = Gettext.domain(Me.metadata.uuid);
-const _ = Domain.gettext;
+import { Direction, DynamicKeybindings, Settings, Shortcuts } from '../common.js';
+import { Rect, Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
  * Class to handle the keyboard shortcuts (on the extension side) except the
  * ones related to the Layouts. For those, see layoutsManager.js.
  */
 
-var Handler = class TilingKeybindingHandler {
+export default class TilingKeybindingHandler {
     constructor() {
         const allowInOverview = [Shortcuts.TOGGLE_POPUP];
         this._keyBindings = Shortcuts.getAllKeys();
@@ -42,7 +33,7 @@ var Handler = class TilingKeybindingHandler {
     /**
      * @param {string} shortcutName
      */
-    _onCustomKeybindingPressed(shortcutName) {
+    async _onCustomKeybindingPressed(shortcutName) {
         // Debugging
         const debugging = [Shortcuts.DEBUGGING, Shortcuts.DEBUGGING_FREE_RECTS];
         if (debugging.includes(shortcutName)) {
@@ -53,7 +44,7 @@ var Handler = class TilingKeybindingHandler {
                 const createIndicators = shortcutName === Shortcuts.DEBUGGING
                     ? Util.___debugShowTiledRects
                     : Util.___debugShowFreeScreenRects;
-                this._debuggingIndicators = createIndicators.call(Util);
+                this._debuggingIndicators = await createIndicators.call(Util);
             }
             return;
 
@@ -85,7 +76,7 @@ var Handler = class TilingKeybindingHandler {
 
         // Tile Editing Mode
         } else if (shortcutName === Shortcuts.EDIT_MODE) {
-            const TileEditingMode = Me.imports.src.extension.tileEditingMode;
+            const TileEditingMode = await import('./tileEditingMode.js');
             const tileEditor = new TileEditingMode.TileEditor();
             tileEditor.open();
 
@@ -559,4 +550,4 @@ var Handler = class TilingKeybindingHandler {
             toggleTiling();
         }
     }
-};
+}

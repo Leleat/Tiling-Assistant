@@ -1,22 +1,14 @@
-'use strict';
+import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
+import { Main } from '../dependencies/shell.js';
 
-const { Clutter, Gio, GLib, Meta, St } = imports.gi;
-const { main: Main } = imports.ui;
-const ByteArray = imports.byteArray;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Direction, Orientation, Settings } = Me.imports.src.common;
-
-const GNOME_VERSION = parseFloat(imports.misc.config.PACKAGE_VERSION);
+import { Direction, Orientation, Settings } from '../common.js';
 
 /**
  * Library of commonly used functions for the extension.js' files
  * (and *not* the prefs files)
  */
 
-var Util = class Utility {
+export class Util {
     /**
      * Performs an approximate equality check. There will be times when
      * there will be inaccuracies. For example, the user may enable window
@@ -141,7 +133,7 @@ var Util = class Utility {
         if (!success || !contents.length)
             return [];
 
-        return JSON.parse(ByteArray.toString(contents));
+        return JSON.parse(new TextDecoder().decode(contents));
     }
 
     /**
@@ -185,35 +177,12 @@ var Util = class Utility {
     }
 
     /**
-     * Add a Meta.Later depending on the shell version
-     *
-     * @param laterType
-     * @param callback
-     */
-    static laterAdd(laterType, callback) {
-        return global.compositor?.get_laters?.().add(laterType, callback) ??
-            Meta.later_add(laterType, callback);
-    }
-
-    /**
-     * Removes a Meta.Later depending on the shell version
-     *
-     * @param id
-     */
-    static laterRemove(id) {
-        if (global.compositor?.get_laters)
-            global.compositor?.get_laters().remove(id);
-        else
-            Meta.later_remove(id);
-    }
-
-    /**
      * Shows the tiled rects of the top tile group.
      *
      * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.
      */
-    static ___debugShowTiledRects() {
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+    static async ___debugShowTiledRects() {
+        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         if (!topTileGroup.length) {
             Main.notify('Tiling Assistant', 'No tiled windows / tiled rects.');
@@ -243,11 +212,11 @@ var Util = class Utility {
      * @returns {St.Widget[]} an array of St.Widgets to indicate the free
      *      screen rects.
      */
-    static ___debugShowFreeScreenRects() {
+    static async ___debugShowFreeScreenRects() {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         const tRects = topTileGroup.map(w => w.tiledRect);
         const freeScreenSpace = twm.getFreeScreen(tRects);
@@ -276,9 +245,9 @@ var Util = class Utility {
     /**
      * Print the tile groups to the logs.
      */
-    static __debugPrintTileGroups() {
+    static async __debugPrintTileGroups() {
         log('--- Tiling Assistant: Start ---');
-        const twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+        const twm = await import('./tilingWindowManager.js');
         const openWindows = twm.getWindows();
         openWindows.forEach(w => {
             if (!w.isTiled)
@@ -291,18 +260,18 @@ var Util = class Utility {
         });
         log('--- Tiling Assistant: End ---');
     }
-};
+}
 
 /**
- * Wrapper for Meta.Rectangle to add some more functions.
+ * Wrapper for Mtk.Rectangle to add some more functions.
  */
-var Rect = class Rect {
+export class Rect {
     /**
-     * @param  {...any} params No parameters, 1 Meta.Rectangle or the x, y,
+     * @param  {...any} params No parameters, 1 Mtk.Rectangle or the x, y,
      * width and height values should be passed to the constructor.
      */
     constructor(...params) {
-        this._rect = new Meta.Rectangle();
+        this._rect = new Mtk.Rectangle();
 
         switch (params.length) {
             case 0:
@@ -417,7 +386,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     containsRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.contains_rect(rect);
     }
 
@@ -433,7 +402,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     couldFitRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.could_fit_rect(rect);
     }
 
@@ -442,7 +411,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     equal(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.equal(rect);
     }
 
@@ -575,7 +544,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     horizOverlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.horiz_overlap(rect);
     }
 
@@ -584,7 +553,7 @@ var Rect = class Rect {
      * @returns {[boolean, Rect]}
      */
     intersect(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         const [ok, intersection] = this._rect.intersect(rect);
         return [ok, new Rect(intersection)];
     }
@@ -616,7 +585,7 @@ var Rect = class Rect {
      * @returns {Rect[]} an array of Rects. It contains 0 - 4 rects.
      */
     _minusRect(rect) {
-        rect = rect instanceof Meta.Rectangle ? new Rect(rect) : rect;
+        rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
         if (rect.containsRect(this))
             return [];
 
@@ -688,7 +657,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     overlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.overlap(rect);
     }
 
@@ -703,7 +672,7 @@ var Rect = class Rect {
      * @returns {Rect} a reference to this.
      */
     tryAlignWith(rect, margin = 4) {
-        rect = rect instanceof Meta.Rectangle ? new Rect(rect) : rect;
+        rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
         const equalApprox = (value1, value2) => Math.abs(value1 - value2) <= margin;
 
         if (equalApprox(rect.x, this.x))
@@ -734,7 +703,7 @@ var Rect = class Rect {
      * @returns {Rect}
      */
     union(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return new Rect(this._rect.union(rect));
     }
 
@@ -743,7 +712,7 @@ var Rect = class Rect {
      * @returns {boolean}
      */
     vertOverlap(rect) {
-        rect = rect instanceof Meta.Rectangle ? rect : rect.meta;
+        rect = rect instanceof Mtk.Rectangle ? rect : rect.meta;
         return this._rect.vert_overlap(rect);
     }
 
@@ -817,4 +786,4 @@ var Rect = class Rect {
     set height(value) {
         this._rect.height = Math.floor(value);
     }
-};
+}

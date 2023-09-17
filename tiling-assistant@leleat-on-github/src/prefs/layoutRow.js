@@ -1,16 +1,8 @@
-'use strict';
+import { Gdk, Gtk, GObject } from '../dependencies/prefs/gi.js';
+import { _ } from '../dependencies/prefs.js';
 
-const { Gdk, Gio, Gtk, GObject } = imports.gi;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const Layout = Me.imports.src.common.Layout;
-const LayoutRowEntry = Me.imports.src.prefs.layoutRowEntry.LayoutRowEntry;
-
-const Gettext = imports.gettext;
-const Domain = Gettext.domain(Me.metadata.uuid);
-const _ = Domain.gettext;
+import { Layout } from '../common.js';
+import { LayoutRowEntry } from './layoutRowEntry.js';
 
 /**
  * 1 LayoutRow represents 1 Layout in the preference window. It's just instanced
@@ -20,9 +12,9 @@ const _ = Domain.gettext;
  * { rect, appId, loopType }. The rect is mandatory, the rest not.
  */
 
-var LayoutRow = GObject.registerClass({
+export const LayoutRow = GObject.registerClass({
     GTypeName: 'TilingLayoutRow',
-    Template: Gio.File.new_for_path(`${Me.path}/src/ui/layoutRow.ui`).get_uri(),
+    Template: import.meta.url.replace(/prefs\/(.*)\.js$/, 'ui/$1.ui'),
     InternalChildren: [
         'addRowEntryButton',
         'deleteButton',

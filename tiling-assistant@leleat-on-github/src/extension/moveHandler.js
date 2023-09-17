@@ -1,14 +1,10 @@
-'use strict';
+import { Clutter, GLib, GObject, Gio, Meta, Mtk } from '../dependencies/gi.js';
+import { Main, WindowManager } from '../dependencies/shell.js';
+import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
-const { Clutter, GLib, GObject, Meta } = imports.gi;
-const { main: Main, windowManager: WindowManager } = imports.ui;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } = Me.imports.src.common;
-const { Rect, Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
+import { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } from '../common.js';
+import { Rect, Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
@@ -18,7 +14,7 @@ const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
  * is a setting to restore a tiled window's size on the actual grab end.
  */
 
-var Handler = class TilingMoveHandler {
+export default class TilingMoveHandler {
     constructor() {
         const moveOps = [Meta.GrabOp.MOVING, Meta.GrabOp.KEYBOARD_MOVING];
 
@@ -48,7 +44,9 @@ var Handler = class TilingMoveHandler {
         // The mouse button mod to move/resize a window may be changed to Alt.
         // So switch Alt and Super in our own prefs, if the user switched from
         // Super to Alt.
-        const wmPrefs = ExtensionUtils.getSettings('org.gnome.desktop.wm.preferences');
+        const wmPrefs = new Gio.Settings({
+            schema_id: 'org.gnome.desktop.wm.preferences'
+        });
         const altAsMod = wmPrefs.get_string('mouse-button-modifier') === '<Alt>';
         if (altAsMod) {
             for (const s of [Settings.ADAPTIVE_TILING_MOD, Settings.FAVORITE_LAYOUT_MOD]) {
@@ -429,46 +427,13 @@ var Handler = class TilingMoveHandler {
     }
 
     _restoreSizeAndRestartGrab(window, px, py, grabOp) {
-        global.display.end_grab_op?.(global.get_current_time());
-
-        const rect = window.get_frame_rect();
-        const x = px - rect.x;
-        const relativeX = x / rect.width;
-        let untiledRect = window.untiledRect;
         Twm.untile(window, {
             restoreFullPos: false,
             xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
 
-        if (!global.display.begin_grab_op) {
-            this._onMoveStarted(window, grabOp);
-            return;
-        }
-
-        // untiledRect is null, if the window was maximized via non-extension
-        // way (dblc-ing the titlebar, maximize button...). So just get the
-        // restored window's rect directly... doesn't work on Wayland because
-        // get_frame_rect() doesn't return the correct size immediately after
-        // calling untile()... in that case just guess a random size
-        if (!untiledRect && !Meta.is_wayland_compositor())
-            untiledRect = new Rect(window.get_frame_rect());
-
-        const untiledWidth = untiledRect?.width ?? 1000;
-        const postUntileRect = window.get_frame_rect();
-
-        global.display.begin_grab_op(
-            window,
-            grabOp,
-            true, // Pointer already grabbed
-            true, // Frame action
-            -1, // Button
-            global.get_pointer()[2], // modifier
-            global.get_current_time(),
-            postUntileRect.x + untiledWidth * relativeX,
-            // So the pointer isn't above the window in some cases.
-            Math.max(py, postUntileRect.y)
-        );
+        this._onMoveStarted(window, grabOp);
     }
 
     /**
@@ -864,7 +829,7 @@ var Handler = class TilingMoveHandler {
         this._tileRect = null;
         this._tilePreview.close();
     }
-};
+}
 
 const TilePreview = GObject.registerClass(
 class TilePreview extends WindowManager.TilePreview {
@@ -897,7 +862,7 @@ class TilePreview extends WindowManager.TilePreview {
         const monitor = Main.layoutManager.monitors[monitorIndex];
 
         if (!this._showing || changeMonitor) {
-            const monitorRect = new Meta.Rectangle({
+            const monitorRect = new Mtk.Rectangle({
                 x: monitor.x,
                 y: monitor.y,
                 width: monitor.width,
@@ -919,7 +884,7 @@ class TilePreview extends WindowManager.TilePreview {
                 width: tileRect.width,
                 height: tileRect.height,
                 opacity: 255,
-                duration: WindowManager.WINDOW_ANIMATION_TIME,
+                duration: WINDOW_ANIMATION_TIME,
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD
             };
         } else {
@@ -928,7 +893,7 @@ class TilePreview extends WindowManager.TilePreview {
             animateTo.width === undefined && this.set_width(tileRect.width);
             animateTo.height === undefined && this.set_height(tileRect.height);
             animateTo.opacity === undefined && this.set_opacity(255);
-            animateTo.duration = animateTo.duration ?? WindowManager.WINDOW_ANIMATION_TIME;
+            animateTo.duration = animateTo.duration ?? WINDOW_ANIMATION_TIME;
             animateTo.mode = animateTo.mode ?? Clutter.AnimationMode.EASE_OUT_QUAD;
         }
 

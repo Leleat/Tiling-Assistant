@@ -1,18 +1,9 @@
-'use strict';
+import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
+import { _, Main } from '../dependencies/shell.js';
 
-const { Clutter, GObject, Meta, St } = imports.gi;
-const Main = imports.ui.main;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Direction, Orientation, Settings } = Me.imports.src.common;
-const { Rect, Util } = Me.imports.src.extension.utility;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-
-const Gettext = imports.gettext;
-const Domain = Gettext.domain(Me.metadata.uuid);
-const _ = Domain.gettext;
+import { Direction, Orientation, Settings } from '../common.js';
+import { Rect, Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const SCALE_SIZE = 100;
 const Modes = {
@@ -31,7 +22,7 @@ const Modes = {
  * 'on key released' function.
  */
 
-var TileEditor = GObject.registerClass(
+export const TileEditor = GObject.registerClass(
 class TileEditingMode extends St.Widget {
     _init() {
         super._init({ reactive: true });
@@ -47,6 +38,9 @@ class TileEditingMode extends St.Widget {
         this._keyHandler = null;
 
         Main.uiGroup.add_child(this);
+
+        this.connect('key-press-event', (__, event) =>
+            this._onKeyPressEvent(event));
     }
 
     open() {
@@ -81,7 +75,7 @@ class TileEditingMode extends St.Widget {
 
         // The windows may not be at the foreground. They just weren't
         // overlapping other windows. So raise the entire tile group.
-        this._windows.forEach(w => w.raise_and_make_recent?.() ?? w.raise());
+        this._windows.forEach(w => w.raise_and_make_recent());
 
         // Create the active selection indicator.
         const window = this._windows[0];
@@ -120,8 +114,8 @@ class TileEditingMode extends St.Widget {
         this.close();
     }
 
-    vfunc_key_press_event(keyEvent) {
-        const mods = keyEvent.modifier_state;
+    async _onKeyPressEvent(keyEvent) {
+        const mods = keyEvent.get_state();
         let newMode;
 
         // Swap windows
@@ -142,7 +136,7 @@ class TileEditingMode extends St.Widget {
             this._switchMode(newMode);
 
         // Handle the key press and get mode depending on that.
-        newMode = this._keyHandler.handleKeyPress(keyEvent);
+        newMode = await this._keyHandler.handleKeyPress(keyEvent);
 
         if (newMode && newMode !== this._mode)
             this._switchMode(newMode);
@@ -256,8 +250,8 @@ const DefaultKeyHandler = class DefaultKeyHandler {
      * @param {number} keyEvent
      * @returns {Modes} The mode to enter after the event was handled.
      */
-    handleKeyPress(keyEvent) {
-        const keyVal = keyEvent.keyval;
+    async handleKeyPress(keyEvent) {
+        const keyVal = keyEvent.get_key_symbol();
 
         // [Directions] to move focus with WASD, hjkl or arrow keys
         const dir = Util.getDirection(keyVal);
@@ -333,7 +327,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.CLOSE;
 
             // Re-raise tile group, so it isn't below the just-untiled window
-            this._windows[0].raise_and_make_recent?.() ?? this._windows[0].raise();
+            this._windows[0].raise_and_make_recent();
             this._selectIndicator.focus(selectedRect, null);
 
         // [Enter] / [Esc]ape Tile Editing Mode
@@ -344,8 +338,8 @@ const DefaultKeyHandler = class DefaultKeyHandler {
         } else if (keyVal === Clutter.KEY_space) {
             const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
             const openWindows = Twm.getWindows(allWs).filter(w => !this._windows.includes(w));
-            const { TilingSwitcherPopup } = Me.imports.src.extension.tilingPopup;
-            const tilingPopup = new TilingSwitcherPopup(
+            const TilingPopup = await import('./tilingPopup.js');
+            const tilingPopup = new TilingPopup.TilingSwitcherPopup(
                 openWindows,
                 this._selectIndicator.rect,
                 false
@@ -437,21 +431,21 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
     }
 
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.keyval);
+        const direction = Util.getDirection(keyEvent.get_key_symbol());
 
         // [Directions] to choose a window to swap with WASD, hjkl or arrow keys
         if (direction)
             this._focusInDir(direction);
 
         // [Esc]ape Tile Editing Mode
-        else if (keyEvent.keyval === Clutter.KEY_Escape)
+        else if (keyEvent.get_key_symbol() === Clutter.KEY_Escape)
             return Modes.DEFAULT;
 
         return Modes.SWAP;
     }
 
     handleKeyRelease(keyEvent) {
-        const keyVal = keyEvent.keyval;
+        const keyVal = keyEvent.get_key_symbol();
         const ctrlKeys = [Clutter.KEY_Control_L, Clutter.KEY_Control_R];
 
         if (ctrlKeys.includes(keyVal)) {
@@ -485,8 +479,8 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
  */
 const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.keyval);
-        const moveWorkspace = keyEvent.modifier_state & Clutter.ModifierType.MOD1_MASK;
+        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const moveWorkspace = keyEvent.get_state() & Clutter.ModifierType.MOD1_MASK;
 
         // [Directions] to move the tile group
         if (direction) {
@@ -533,7 +527,7 @@ const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
             return Modes.CLOSE;
 
         // [Esc] to return to default mode
-        } else if (keyEvent.keyval === Clutter.KEY_Escape) {
+        } else if (keyEvent.get_key_symbol() === Clutter.KEY_Escape) {
             return Modes.DEFAULT;
         }
 
@@ -561,7 +555,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
 
     handleKeyPress(keyEvent) {
         // [Directions] to resize with WASD, hjkl or arrow keys
-        const direction = Util.getDirection(keyEvent.keyval);
+        const direction = Util.getDirection(keyEvent.get_key_symbol());
         if (direction) {
             const window = this._selectIndicator.window;
             if (!window)
@@ -599,7 +593,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
             this._resizeSideIndicator.updatePos(window.tiledRect);
 
         // [Esc]ape Tile Editing Mode
-        } else if (keyEvent.keyval === Clutter.KEY_Escape) {
+        } else if (keyEvent.get_key_symbol() === Clutter.KEY_Escape) {
             return Modes.CLOSE;
         }
 
@@ -607,7 +601,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
     }
 
     handleKeyRelease(keyEvent) {
-        const keyVal = keyEvent.keyval;
+        const keyVal = keyEvent.get_key_symbol();
         const superKeys = [Clutter.KEY_Super_L, Clutter.KEY_Super_R];
         return superKeys.includes(keyVal) ? Modes.DEFAULT : Modes.RESIZE;
     }

@@ -1,5 +1,3 @@
-'use strict';
-
 /**
  * Helper classes / enums for the settings.xml used in the extension files
  * *and* prefs files
@@ -8,7 +6,7 @@
 /**
  * A Singleton providing access to the settings.
  */
-var Settings = class Settings {
+export class Settings {
     static _settings;
     static ENABLE_TILING_POPUP = 'enable-tiling-popup';
     static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
@@ -46,14 +44,12 @@ var Settings = class Settings {
     static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
     static RESTORE_SIZE_ON = 'restore-window-size-on';
 
-    static initialize() {
-        const ExtensionUtils = imports.misc.extensionUtils;
-        const Me = ExtensionUtils.getCurrentExtension();
-        this._settings = ExtensionUtils.getSettings(Me.metadata['settings-schema']);
+    static initialize(gioSettings) {
+        this._settings = gioSettings;
     }
 
     static destroy() {
-        this._settings.run_dispose();
+        this._settings = null;
     }
 
     /**
@@ -183,13 +179,13 @@ var Settings = class Settings {
     static reset(key) {
         this._settings.reset(key);
     }
-};
+}
 
 /**
  * A Singleton providing access to the shortcut keys except the
  * ones related to the Layouts.
  */
-var Shortcuts = class Shortcuts {
+export class Shortcuts {
     static TOGGLE_POPUP = 'toggle-tiling-popup';
     static EDIT_MODE = 'tile-edit-mode';
     static AUTO_FILL = 'auto-tile';
@@ -253,37 +249,37 @@ var Shortcuts = class Shortcuts {
             this.DEBUGGING_FREE_RECTS
         ];
     }
-};
+}
 
 // Enums:
-var RestoreOn = class RestoreWindowSizeBehavior {
+export class RestoreOn {
     static ON_GRAB_START = 0; // Grab Start
     static ON_GRAB_END = 1; // 'Grab End'
-};
+}
 
-var DynamicKeybindings = class DynamicKeybindingBehavior {
+export class DynamicKeybindings {
     // Order comes from prefs
     static DISABLED = 0;
     static FOCUS = 1;
     static TILING_STATE = 2;
     static TILING_STATE_WINDOWS = 3;
     static FAVORITE_LAYOUT = 4;
-};
+}
 
-var MoveModes = class MoveModes {
+export class MoveModes {
     // Order comes from prefs
     static EDGE_TILING = 0;
     static ADAPTIVE_TILING = 1;
     static FAVORITE_LAYOUT = 2;
     static IGNORE_TA = 3;
-};
+}
 
-var Orientation = class Orientation {
+export class Orientation {
     static H = 1;
     static V = 2;
-};
+}
 
-var Direction = class Direction {
+export class Direction {
     static N = 1;
     static E = 2;
     static S = 4;
@@ -302,11 +298,11 @@ var Direction = class Direction {
 
         return opposite;
     }
-};
+}
 
 // Classes for the layouts:
 // See src/prefs/layoutsPrefs.js for details on layouts.
-var Layout = class Layout {
+export class Layout {
     /**
      * @param {object} layout is the parsed object from the layouts file.
      */
@@ -416,7 +412,7 @@ var Layout = class Layout {
 
         return [true, '', -1];
     }
-};
+}
 
 var LayoutItem = class LayoutItem {
     constructor() {

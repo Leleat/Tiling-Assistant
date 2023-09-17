@@ -1,15 +1,10 @@
-'use strict';
+import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
+import { Main, SwitcherPopup } from '../dependencies/shell.js';
 
-const { Clutter, GObject, Meta, Shell, St } = imports.gi;
-const { main: Main, switcherPopup: SwitcherPopup } = imports.ui;
-
-const ExtensionUtils = imports.misc.extensionUtils;
-const Me = ExtensionUtils.getCurrentExtension();
-
-const { Direction, Orientation } = Me.imports.src.common;
-const Util = Me.imports.src.extension.utility.Util;
-const Twm = Me.imports.src.extension.tilingWindowManager.TilingWindowManager;
-const AltTab = Me.imports.src.extension.altTab;
+import { Direction, Orientation } from '../common.js';
+import { Util } from './utility.js';
+import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import * as AltTab from './altTab.js';
 
 /**
  * Classes for the Tiling Popup, which opens when tiling a window
@@ -17,7 +12,7 @@ const AltTab = Me.imports.src.extension.altTab;
  * Mostly based on GNOME's altTab.js
  */
 
-var TilingSwitcherPopup = GObject.registerClass({
+export const TilingSwitcherPopup = GObject.registerClass({
     Signals: {
         // Bool indicates whether the Tiling Popup was canceled
         // (or if a window was tiled with this popup)
@@ -210,7 +205,7 @@ var TilingSwitcherPopup = GObject.registerClass({
     }
 
     vfunc_button_press_event(buttonEvent) {
-        const btn = buttonEvent.button;
+        const btn = buttonEvent.get_button();
         if (btn === Clutter.BUTTON_MIDDLE || btn === Clutter.BUTTON_SECONDARY) {
             this._finish(global.get_current_time());
             return Clutter.EVENT_PROPAGATE;
