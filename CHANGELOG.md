@@ -1,5 +1,11 @@
 # Changelog
 
+## [43] - 2023-09-17
+
+### Fixed
+
+- Window not resizing correctly when it enters another monitor - by domferr (#290)
+
 ## [42] - 2023-09-03
 
 ### Added
