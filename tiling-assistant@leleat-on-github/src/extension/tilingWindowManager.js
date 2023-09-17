@@ -208,6 +208,7 @@ var TilingWindowManager = class TilingWindowManager {
         // to workaround that by first only moving the window and then resizing it. That
         // workaround was already necessary under Wayland because of some apps. E. g.
         // first tiling Nautilus and then Firefox using the Tiling Popup.
+        window.move_to_monitor(monitor);
         window.move_frame(true, x, y);
         window.move_resize_frame(true, x, y, width, height);
 
