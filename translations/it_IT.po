@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Tiling-Assistant\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-13 20:30+0200\n"
+"POT-Creation-Date: 2023-09-17 20:08+0200\n"
 "PO-Revision-Date: 2023-06-16 22:11+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
@@ -71,9 +71,10 @@ msgid ""
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
-"Le finestre affiancate non adatteranno più le loro dimensioni ad altre finestre affiancate né saranno "
-"sollevate o ridimensionate insieme. Il comportamento dinamico di associazione dei tasti 'Window Focus' "
-"e anche il Tiling Popup non funzionerà più."
+"Le finestre affiancate non adatteranno più le loro dimensioni ad altre "
+"finestre affiancate né saranno sollevate o ridimensionate insieme. Il "
+"comportamento dinamico di associazione dei tasti 'Window Focus' e anche il "
+"Tiling Popup non funzionerà più."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
@@ -142,8 +143,9 @@ msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
 msgstr ""
-"Le combinazioni di tasti per massimizzare e affiancare in alto/basso/sinistra/destra potrebbero cambiare "
-"il loro comportamento basato sullo stato di affiancamento della finestra"
+"Le combinazioni di tasti per massimizzare e affiancare in alto/basso/"
+"sinistra/destra potrebbero cambiare il loro comportamento basato sullo stato "
+"di affiancamento della finestra"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
@@ -165,7 +167,8 @@ msgstr "Stato attivo"
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
-"Passa lo stato attivo alla finestra affiancata nella direzione della scorciatoia premuta"
+"Passa lo stato attivo alla finestra affiancata nella direzione della "
+"scorciatoia premuta"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
 msgid "Tiling State"
@@ -177,9 +180,9 @@ msgid ""
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
 "is activated"
 msgstr ""
-"Adatta lo stato di affiancamento alla scorciatoia premuta. Ad esempio, una finestra affiancata "
-"alla metà destra si affiancherà al quarto in basso a destra, se 'affianca in basso' "
-"è attivato"
+"Adatta lo stato di affiancamento alla scorciatoia premuta. Ad esempio, una "
+"finestra affiancata alla metà destra si affiancherà al quarto in basso a "
+"destra, se 'affianca in basso' è attivato"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
 msgid "Tiling State (Windows)"
@@ -230,8 +233,8 @@ msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
 msgstr ""
-"Indica sempre la finestra focalizzata a meno che non sia ingrandita o a schermo intero. "
-"Ci sono problemi su Wayland con i popup di GTK4"
+"Indica sempre la finestra focalizzata a meno che non sia ingrandita o a "
+"schermo intero. Ci sono problemi su Wayland con i popup di GTK4"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
@@ -250,8 +253,8 @@ msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
 msgstr ""
-"La dimensione del bordo della cornice che indica la finestra focalizzata per il suggerimento "
-"sempre attivo"
+"La dimensione del bordo della cornice che indica la finestra focalizzata per "
+"il suggerimento sempre attivo"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
@@ -263,9 +266,10 @@ msgid ""
 "is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
 "the window behind the hint for whatever reason..."
 msgstr ""
-"Il bordo per il suggerimento sempre attivo che si estende all'interno della cornice della finestra. Questo "
-"ha lo scopo di coprire gli angoli arrotondati. Tuttavia, i popup di GTK4 su Wayland metteranno "
-"la finestra dietro il suggerimento per qualsiasi motivo..."
+"Il bordo per il suggerimento sempre attivo che si estende all'interno della "
+"cornice della finestra. Questo ha lo scopo di coprire gli angoli "
+"arrotondati. Tuttavia, i popup di GTK4 su Wayland metteranno la finestra "
+"dietro il suggerimento per qualsiasi motivo..."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
@@ -338,10 +342,10 @@ msgid ""
 "'throwing' it towards any screen edge even if a monitor is bordering that "
 "edge."
 msgstr ""
-"Quando una finestra viene trascinata su un nuovo monitor, l'anteprima del riquadro si attaccherà al "
-"vecchio monitor per un tempo molto breve. In questo modo puoi affiancare le finestre "
-"'lanciandole' verso qualsiasi bordo dello schermo anche se c'è un monitor confinante con quel "
-"bordo."
+"Quando una finestra viene trascinata su un nuovo monitor, l'anteprima del "
+"riquadro si attaccherà al vecchio monitor per un tempo molto breve. In "
+"questo modo puoi affiancare le finestre 'lanciandole' verso qualsiasi bordo "
+"dello schermo anche se c'è un monitor confinante con quel bordo."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
@@ -352,8 +356,9 @@ msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
 msgstr ""
-"Usare questo se c'è un ritardo quando si spostano le finestre. Questo sarà comunque "
-"ridurrà la precisione degli aggiornamenti dell'anteprima del riquadro."
+"Usare questo se c'è un ritardo quando si spostano le finestre. Questo sarà "
+"comunque ridurrà la precisione degli aggiornamenti dell'anteprima del "
+"riquadro."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
@@ -598,38 +603,38 @@ msgstr ""
 msgid "Clear the keyboard shortcuts"
 msgstr "Cancella scorciatoie"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:56
 msgid "Tiling popup enabled"
 msgstr "Popup finestre affiancate abilitato"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
 msgid "Tiling popup was disabled"
 msgstr "Popup finestre affiancate disabilitato"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:489
 msgid "No valid layouts defined."
 msgstr "Nessun layout valido definito."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
 msgid "Popup Layouts: App not found."
 msgstr "Layout popup: app non trovata."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:333
 msgid "Type to search..."
 msgstr "Digita per cercare..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:439
 msgid "Nameless layout..."
 msgstr "Layout senza nome..."
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:61
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "Impossibile avviare \"Editor delle finestre affiancate\", quando non è "
 "visibile alcuna finestra affiancata."
 
-#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
 msgstr "\"Guida utente\" per assistenza..."
 

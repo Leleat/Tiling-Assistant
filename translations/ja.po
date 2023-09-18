@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2023-04-13 20:30+0200\n"
+"POT-Creation-Date: 2023-09-17 20:08+0200\n"
 "PO-Revision-Date: 2021-11-03 17:47+0900\n"
 "Last-Translator: k-fog <kiridasuku@gmail.com>\n"
 "Language-Team: Japanese <>\n"
@@ -560,38 +560,38 @@ msgstr ""
 msgid "Clear the keyboard shortcuts"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:65
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:56
 msgid "Tiling popup enabled"
 msgstr "タイリングポップアップが有効になりました"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:66
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
 msgid "Tiling popup was disabled"
 msgstr "タイリングポップアップが無効になりました"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:487
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:489
 msgid "No valid layouts defined."
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:196
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
 msgid "Popup Layouts: App not found."
 msgstr "ポップアップレイアウト：アプリケーションが見つかりません"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:334
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:333
 msgid "Type to search..."
 msgstr "入力して検索..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:440
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:439
 msgid "Nameless layout..."
 msgstr "無題のレイアウト..."
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:61
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "整列されたウィンドウが表示されていない場合、[タイル編集モード]に切り替えられ"
 "ません。"
 
-#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:45
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
 msgstr "[ユーザーガイド]からヘルプを参照..."
 
