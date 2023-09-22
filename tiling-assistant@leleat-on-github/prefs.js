@@ -1,6 +1,6 @@
 'use strict';
 
-const { Gdk, Gio, GLib, Gtk } = imports.gi;
+const { Adw, Gdk, Gio, GLib, Gtk } = imports.gi;
 const ByteArray = imports.byteArray;
 
 const ExtensionUtils = imports.misc.extensionUtils;
@@ -250,7 +250,24 @@ function _addHeaderBarInfoButton(window, settings, builder) {
     const pages_stack = page.get_parent(); // AdwViewStack
     const content_stack = pages_stack.get_parent().get_parent(); // GtkStack
     const preferences = content_stack.get_parent(); // GtkBox
-    const headerbar = preferences.get_first_child(); // AdwHeaderBar
+    let headerbar = preferences.get_first_child(); // AdwHeaderBar
+
+    if (!(headerbar instanceof Adw.HeaderBar)) {
+        // with new libadwaita 1.4 widgets
+        headerbar = page
+            .get_parent()
+            .get_parent()
+            .get_parent()
+            .get_next_sibling()
+            .get_first_child()
+            .get_first_child()
+            .get_first_child();
+
+        // So that prefs don't error out, if the headerbar cant't be found
+        if (!(headerbar instanceof Adw.HeaderBar))
+            return;
+    }
+
     headerbar.pack_start(builder.get_object('info_menu'));
 
     // Setup menu actions
