@@ -1,39 +1,40 @@
-# Maintainer: Leleat
-pkgname='gnome-shell-extension-tiling-assistant'
+# Contributor: VeldoraTheDragon <127216238+VeldoraTheDragon@users.noreply.github.com>
+
+pkgname=gnome-shell-extension-tiling-assistant
 pkgver=44
 pkgrel=1
 pkgdesc="A GNOME Shell extension to expand GNOME's native 2 column design."
-arch=('x86_64')
+arch=('any')
 url="https://github.com/Leleat/Tiling-Assistant"
-license=('GPL')
-depends=('gnome-shell>=40')
-install='INSTALL'
-source=("${url}/archive/refs/tags/v${pkgver}.tar.gz")
-noextract=("*tiling-assistant@leleat-on-github*")
-md5sums=('SKIP')
+license=('GPL2')
+depends=('gnome-shell')
+makedepends=('gettext')
+provides=("${pkgname}")
+conflicts=("${pkgname}")
+source=("${pkgname}::git+https://github.com/Leleat/Tiling-Assistant.git#tag=v${pkgver}")
+sha256sums=('SKIP')
+
+_uuid="tiling-assistant@leleat-on-github"
+
+prepare() {
+    install -dm755 "${srcdir}/${pkgname}/${_uuid}/locale"
+}
 
 build() {
-	# cd into repo dir
-	cd "${srcdir}/Tiling-Assistant-${pkgver}"
+	cd "${srcdir}/${pkgname}/${_uuid}"
 
-	# package extension to compile settings and translations
-	gnome-extensions pack tiling-assistant@leleat-on-github \
-		--force \
-		--podir="../translations" \
-		--extra-source="src" \
-		--extra-source="media"
+	# compile gschema
+	glib-compile-schemas ./schemas/
+
+	# compile tl
+	for FILE in ${srcdir}/${pkgname}/translations/*.po; do
+		LANG=$(basename "$FILE" .po)
+		mkdir -p "${srcdir}/${pkgname}/${_uuid}/locale/$LANG/LC_MESSAGES"
+		msgfmt -c "$FILE" -o "${srcdir}/${pkgname}/${_uuid}/locale/$LANG/LC_MESSAGES/${_uuid}.mo"
+	done
 }
 
 package() {
-	# cd into repo dir
-	cd "${srcdir}/Tiling-Assistant-${pkgver}"
-
-	# instead of using gnome-extensions to install the extension package
-	# unzip to $pkgdir/usr/share/gnome-shell/extensions/ since gnome-extensions
-	# installs the extension locally while on Arch it seems like /usr/ is the
-	# convention
-	_UUID="tiling-assistant@leleat-on-github"
-	mkdir -p "${pkgdir}/usr/share/gnome-shell/extensions"
-	unzip ${_UUID}.shell-extension.zip \
-		-d "${pkgdir}/usr/share/gnome-shell/extensions/${_UUID}"
+	install -dm755 "${pkgdir}/usr/share/gnome-shell/extensions"
+	cp -r "${srcdir}/${pkgname}/${_uuid}" "${pkgdir}/usr/share/gnome-shell/extensions/${_uuid}"
 }
