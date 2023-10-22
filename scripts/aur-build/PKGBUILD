@@ -1,13 +1,15 @@
+# Maintainer: Leleat
 # Contributor: VeldoraTheDragon <127216238+VeldoraTheDragon@users.noreply.github.com>
 
 pkgname=gnome-shell-extension-tiling-assistant
 pkgver=44
 pkgrel=1
 pkgdesc="A GNOME Shell extension to expand GNOME's native 2 column design."
-arch=('any')
+arch=('x86_64')
 url="https://github.com/Leleat/Tiling-Assistant"
 license=('GPL2')
-depends=('gnome-shell')
+depends=('gnome-shell>=40')
+install='INSTALL'
 makedepends=('gettext')
 provides=("${pkgname}")
 conflicts=("${pkgname}")
