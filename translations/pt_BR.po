@@ -61,7 +61,7 @@ msgstr "Grupos de Ladrilhos"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Desabilitar Grupos de Ladrilhos"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
