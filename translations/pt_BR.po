@@ -61,7 +61,7 @@ msgstr "Grupos de Ladrilhos"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
 msgid "Disable Tile Groups"
-msgstr ""
+msgstr "Desabilitar Grupos de Ladrilhos"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
 msgid ""
@@ -69,6 +69,9 @@ msgid ""
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
+"Ladrilhos não irão mais adaptar seu tamanho à outros ladrilhos nem levantados "
+"ou redimensionados juntos. O Comportamento de Atalhos de Teclado Dinâmico "
+"'Foco da Janela' e o 'Popup de Ladrilhamento' não mais funcionarão."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
@@ -109,19 +112,19 @@ msgstr "Bordas da Tela"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
 msgid "Screen Edge Top"
-msgstr ""
+msgstr "Borda Superior"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
 msgid "Screen Edge Left"
-msgstr ""
+msgstr "Borda Esquerda"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
 msgid "Screen Edge Right"
-msgstr ""
+msgstr "Borda Direita"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
 msgid "Screen Edge Bottom"
-msgstr ""
+msgstr "Borda Inferior"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 msgid "Maximized Windows"
@@ -136,6 +139,8 @@ msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
 msgstr ""
+"Os atalhos de teclado e o ladrilho para topo/baixo/esquerda/direita podem "
+"mudar o comportamento baseado no estado do ladrilho"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
@@ -147,7 +152,7 @@ msgstr "Desativado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Don't change the keybindings' behavior"
-msgstr ""
+msgstr "Não mude o comportamento das teclas de atalho"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
 msgid "Window Focus"
@@ -157,6 +162,7 @@ msgstr "Foco da Janela"
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
+"Mudar foco para o ladrilho na direção do atalho utilizado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
 msgid "Tiling State"
@@ -168,6 +174,9 @@ msgid ""
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
 "is activated"
 msgstr ""
+"Adaptar o estado do ladrilhamento ao atalho utilizado. Por exemplo, um ladrilho "
+"à metade da direita vai ocupar o quadrante da direita inferior, se o 'ladrilhar "
+" abaixo' estiver ativado"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
 msgid "Tiling State (Windows)"
@@ -192,53 +201,59 @@ msgstr "Mover a janela junto ao seu Layout favorito"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
 msgid "Active Window Hint"
-msgstr ""
+msgstr "Ativar Dica de Janela"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
 msgid "Don't indicate the focused window"
-msgstr ""
+msgstr "Não indicar a janela em foco"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
 msgid "Minimal"
-msgstr ""
+msgstr "Minimalista"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
 msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
 msgstr ""
+"Temporariamente indicar a janela focada quando trocar de área de trabalho "
+"com múltiplas janelas não sobrepostas"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
-msgstr ""
+msgstr "Sempre"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
 msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
 msgstr ""
+"Sempre indicar a janela focada a menos que esteja maximizada ou tela cheia. "
+"Há problemas no Wayland com popups GTK4"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
 msgid "Hint Color"
-msgstr ""
+msgstr "Cor da Dica"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "The color of the frame indicating the focused window"
-msgstr ""
+msgstr "A cor da moldura indicando a janela em foco"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
 msgid "Border Size"
-msgstr ""
+msgstr "Tamanho da Borda"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
 msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
 msgstr ""
+"O tamanho da borda da moldura indicando a janela em foco para a dica "
+"sempre ativa"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Inner Border Size"
-msgstr ""
+msgstr "Tamanho Borda Interno"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
@@ -246,6 +261,9 @@ msgid ""
 "is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
 "the window behind the hint for whatever reason..."
 msgstr ""
+"A borda para dica sempre ativa alcançando dentro da moldura da janela. Isso "
+"serve para cobrir os cantos arrendondados. Entretanto, popups GTK4 no Wayland "
+"vão colocar a janela atrás da dica por algum motivo..."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
 msgid "Animations"
@@ -297,19 +315,19 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
-msgstr ""
+msgstr "Ignore o Assistente de Ladrilhamento"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
-msgstr ""
+msgstr "Use Ladrilhamento de Borda sem os recursos do Assistente de Ladrilhamento"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
-msgstr ""
+msgstr "Outro"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:548
 msgid "Monitor Switch Grace Period"
-msgstr ""
+msgstr "Período de Carência para Troca de Monitor"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
 msgid ""
@@ -318,16 +336,22 @@ msgid ""
 "'throwing' it towards any screen edge even if a monitor is bordering that "
 "edge."
 msgstr ""
+"Quando a janela é arrastado para um novo monitor o preview do ladrilho vai "
+"permanecer no monitor antigo for um momento. Dessa forma, você pode organizar "
+"ladrilhos 'jogando' eles em direção a qualquer canto da tela se o monitor "
+"estiver limítrofe aquela borda."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
 msgid "Low Performance Movement Mode"
-msgstr ""
+msgstr "Modo de Movimento de Baixo Desempenho"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
 msgstr ""
+"Use isso se houver um atraso ao mover janelas. Isso, no entanto, "
+"diminuirá a precisão das atualizações de visualização dos blocos."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
@@ -359,7 +383,7 @@ msgstr "Clique Secundário"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
 msgid "Super"
-msgstr ""
+msgstr "Super"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:611
 msgid "'Favorite Layout' Move Mode Activator"
@@ -367,7 +391,7 @@ msgstr "Ativator de Modo de Movimentação de 'Layout Favorito'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
 msgid "'Ignore Tiling Assistant' Mode Activator"
-msgstr ""
+msgstr "Ativador do Modo 'Ignorar Assistente de Ladrilhamento'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Vertical Edge Preview Trigger Area"
@@ -399,7 +423,7 @@ msgid ""
 "case, use 'Restore Window Size on Grab End'"
 msgstr ""
 "Janelas ladrilhadas podem não restaurar seu tamanho apropriadamente no "
-"Wayland. Se esse é seu caso, use \"Restaurar Tamanho da Janela ao Soltar"
+"Wayland. Se esse é seu caso, use 'Restaurar Tamanho da Janela ao Soltar'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:759
 msgid "Grab Start"
@@ -503,11 +527,11 @@ msgstr "Ladrilhar abaixo e direita"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:904
 msgid "Edge Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Ladrilhamento da borda sem Assistente"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:936
 msgid "Corner Tiling without Tiling Assistant"
-msgstr ""
+msgstr "Ladrilhamento do Canto sem Assistente"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
 msgid "Debugging"
@@ -557,7 +581,7 @@ msgstr "Configurações Avançadas / Experimentais"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
 msgid "Show more settings in the main preference window"
-msgstr ""
+msgstr "Mostrar mais configurações na janela de preferências principal"
 
 #: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:11
 msgid ""
