@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-17 20:08+0200\n"
-"PO-Revision-Date: 2024-01-14 14:20+0200\n"
+"PO-Revision-Date: 2024-01-14 14:43+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk\n"
@@ -23,7 +23,7 @@ msgstr "Повідомити про ваду"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
 msgid "User Guide"
-msgstr "Довідка користувача"
+msgstr "Довідка"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
 msgid "License"
@@ -466,7 +466,7 @@ msgstr "Укласти/відокремити поточне вікно з ур�
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:801
 msgid "Toggle 'Always on Top'"
-msgstr "'Завжди зверху'"
+msgstr "Завжди зверху"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:810
 msgid "Toggle Maximization"
@@ -633,4 +633,4 @@ msgstr "'Режим редагування мозаїки' недоступни�
 
 #: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
-msgstr "'Довідка користувача'..."
+msgstr "Довідка"
