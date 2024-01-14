@@ -1,14 +1,14 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the PACKAGE package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+# Ukrainian translation of the Tiling Assistant GNOME Shell extension.
+# Copyright (C) 2024 Tiling-Assistant Contributors
+# This file is distributed under the same license as the Tiling-Assistant package.
+# Yevhen Popok <xalt7x.service@gmail.com>, 2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-17 20:08+0200\n"
-"PO-Revision-Date: 2024-01-04 23:05+0200\n"
+"PO-Revision-Date: 2024-01-14 14:20+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk\n"
@@ -72,7 +72,7 @@ msgstr ""
 "Вікна, укладені як плитки, більше не будуть припасовуватися до розмірів "
 "інших вікон мозаїки, як і не будуть одночасно підійматися та змінювати свої "
 "розміри. Cпливаюче вікно мозаїки та динамічні клавіатурні скорочення "
-"\"Фокусування вікон\" також перестануть працювати."
+"'Фокусування вікон' також перестануть працювати."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
 msgid "Raise together"
@@ -97,7 +97,7 @@ msgid ""
 "may need to re-enable this or the other extension after toggling this setting"
 msgstr ""
 "Це може створити несумісність з іншими розширеннями перемикача програм "
-"(\"alt+Tab\"). Можливо, вам доведеться переувімкнути поточне, або ж інше "
+"(alt+Tab). Можливо, вам доведеться переувімкнути поточне, або ж інше "
 "розширення після зміни цього параметра"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
@@ -188,9 +188,9 @@ msgid ""
 "Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
 "bottom and the 'tile to bottom' shortcut is activated, minimize the window"
 msgstr ""
-"Відмінність від \"Положення плиток\" полягає в тому, що у разі, коли вікно "
-"не укладене чи укладене знизу, активація скорочення \"укласти знизу\" "
-"приховає вікно"
+"Відмінність від 'Положення плиток' полягає в тому, що у разі, коли вікно не "
+"укладене чи укладене знизу, активація скорочення 'укласти знизу' приховає "
+"вікно"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
@@ -312,7 +312,7 @@ msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
 "Пропозиція щодо укладання буде формуватися в залежності від вашого "
-"улюбленого макета зі сторінки \"Макети\""
+"улюбленого макета зі сторінки 'Макети'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:528
 msgid "Ignore Tiling Assistant"
@@ -320,8 +320,7 @@ msgstr "Ігнорувати Tiling Assistant"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
-msgstr ""
-"Використовувати \"Укладання від краю\" без функціоналу Tiling Assistant"
+msgstr "Використовувати 'Укладання від краю' без функціоналу Tiling Assistant"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
@@ -340,7 +339,7 @@ msgid ""
 msgstr ""
 "Коли вікно перетягується на інший монітор, пропозиція щодо укладання "
 "короткочасно активується на початковому моніторі. Таким чином, є можливість "
-"укладати вікна, \"cкидаючи\" їх до краю екрана, навіть якщо монітори межують "
+"укладати вікна, 'cкидаючи' їх до краю екрана, навіть якщо монітори межують "
 "по цьому краю."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:560
@@ -357,11 +356,11 @@ msgstr ""
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:576
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
-msgstr "\"Укладання від краю\" буде адаптовано до вашого улюбленого макету"
+msgstr "'Укладання від краю' буде адаптовано до вашого улюбленого макету"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:591
 msgid "'Adaptive Tiling' Move Mode Activator"
-msgstr "Активує переміщення в режимі \"Адаптивне укладання\""
+msgstr "Активує переміщення в режимі 'Адаптивне укладання'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
@@ -393,7 +392,7 @@ msgstr "Активує переміщення в режимі 'Улюблени�
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
 msgid "'Ignore Tiling Assistant' Mode Activator"
-msgstr "Активує переміщення в режимі \"Ігнорувати Tiling Assistant\""
+msgstr "Активує переміщення в режимі 'Ігнорувати Tiling Assistant'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Vertical Edge Preview Trigger Area"
@@ -430,8 +429,8 @@ msgid ""
 "case, use 'Restore Window Size on Grab End'"
 msgstr ""
 "Вікна, укладені як плитки, можуть неправильно відновлювати свої розміри на "
-"Wayland. В такому разі використовуйте опцію \"Відновлювати розмір під час "
-"відпускання\""
+"Wayland. В такому разі використовуйте опцію 'Відновлювати розмір під час "
+"відпускання'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:759
 msgid "Grab Start"
@@ -447,7 +446,7 @@ msgstr "Клавіатурні скорочення"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:784
 msgid "Toggle 'Tiling Popup'"
-msgstr "Увімкнути \"Спливаюче вікно мозаїки\""
+msgstr "Увімкнути 'Спливаюче вікно мозаїки'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:789
 msgid "Tile Editing Mode"
@@ -467,7 +466,7 @@ msgstr "Укласти/відокремити поточне вікно з ур�
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:801
 msgid "Toggle 'Always on Top'"
-msgstr "\"Завжди зверху\""
+msgstr "'Завжди зверху'"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:810
 msgid "Toggle Maximization"
@@ -634,4 +633,4 @@ msgstr "'Режим редагування мозаїки' недоступни�
 
 #: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
-msgstr "'Довідка користувача' для допомоги..."
+msgstr "'Довідка користувача'..."
