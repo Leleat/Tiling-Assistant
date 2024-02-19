@@ -260,6 +260,19 @@ export class Util {
         });
         log('--- Tiling Assistant: End ---');
     }
+
+    /**
+     * Adds a widget inside a container. Needed because in Gnome46 add_actor was
+     * removed, and replaced with add_child.
+     * @param {*} obj The container
+     * @param {*} actor The widget to add
+     */
+    static addActor(obj, actor) {
+        if (obj.add_actor)
+            obj.add_actor(actor)
+        else
+            obj.add_child(actor)
+    }
 }
 
 /**

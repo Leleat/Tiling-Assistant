@@ -147,7 +147,8 @@ export class TilingWindowManager {
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
-        window.raise_and_make_recent();
+        if (window.raise_and_make_recent)
+            window.raise_and_make_recent();
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = monitorNr ?? window.get_monitor();
@@ -256,7 +257,8 @@ export class TilingWindowManager {
         // one. So untiling the initial window after tiling more windows with
         // the popup (without re-focusing the initial window), means the
         // untiled window will be below the others.
-        window.raise_and_make_recent();
+        if (window.raise_and_make_recent)
+            window.raise_and_make_recent();
 
         // Animation
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
@@ -433,7 +435,8 @@ export class TilingWindowManager {
 
                         // Prevent an infinite loop of windows raising each other
                         w.block_signal_handler(otherRaiseId);
-                        w.raise_and_make_recent();
+                        if (w.raise_and_make_recent)
+                            w.raise_and_make_recent();
                         w.unblock_signal_handler(otherRaiseId);
                     });
 
@@ -441,9 +444,11 @@ export class TilingWindowManager {
                     // other tiled windows otherwise when untiling via keyboard
                     // it may be below other tiled windows.
                     const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
-                    raisedWindow.block_signal_handler(signalId);
-                    raisedWindow.raise_and_make_recent();
-                    raisedWindow.unblock_signal_handler(signalId);
+                    if (raisedWindow.raise_and_make_recent) {
+                        raisedWindow.block_signal_handler(signalId);
+                        raisedWindow.raise_and_make_recent();
+                        raisedWindow.unblock_signal_handler(signalId);
+                    }
                 }
 
                 // Update the tileGroup (and reconnect the raised signals) to allow windows
