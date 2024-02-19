@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Tiling-Assistant\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-09-17 20:08+0200\n"
-"PO-Revision-Date: 2023-06-16 22:11+0100\n"
+"PO-Revision-Date: 2023-11-26 17:11+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -223,6 +223,8 @@ msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
 msgstr ""
+"Indica temporaneamente la finestra focalizzata quando si passa a un'area di lavoro con "
+"più finestre non sovrapposte"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
 msgid "Always"
@@ -325,7 +327,7 @@ msgstr "Ignora l'Assistente di affiancamento"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
 msgid "Use Edge Tiling without Tiling Assistant's features"
-msgstr ""
+msgstr "Usa affiancamento bordi senza le funzionalità dell'assistente di affiancamento"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:545
 msgid "Other"
