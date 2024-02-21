@@ -44,20 +44,44 @@ export default class TilingMoveHandler {
         // The mouse button mod to move/resize a window may be changed to Alt.
         // So switch Alt and Super in our own prefs, if the user switched from
         // Super to Alt.
-        const wmPrefs = new Gio.Settings({
+        const modKeys = [
+            Settings.ADAPTIVE_TILING_MOD,
+            Settings.FAVORITE_LAYOUT_MOD,
+            Settings.IGNORE_TA_MOD
+        ];
+        const handleWindowActionKeyConflict = () => {
+            const currMod = this._wmPrefs.get_string('mouse-button-modifier');
+
+            if (currMod === '<Alt>') {
+                for (const key of modKeys) {
+                    const mod = Settings.getInt(key);
+                    if (mod === 2) // Alt
+                        Settings.setInt(key, 0);
+                }
+            } else if (currMod === '<Super>') {
+                for (const key of modKeys) {
+                    const mod = Settings.getInt(key);
+                    if (mod === 4) // Super
+                        Settings.setInt(key, 0);
+                }
+            }
+        };
+
+        this._wmPrefs = new Gio.Settings({
             schema_id: 'org.gnome.desktop.wm.preferences'
         });
-        const altAsMod = wmPrefs.get_string('mouse-button-modifier') === '<Alt>';
-        if (altAsMod) {
-            for (const s of [Settings.ADAPTIVE_TILING_MOD, Settings.FAVORITE_LAYOUT_MOD]) {
-                const mod = Settings.getInt(s);
-                if (mod === 1) // 1 -> Alt; see settings ui
-                    Settings.setInt(s, 3); // 3 -> Super; see settings ui
-            }
-        }
+        this._wmPrefs.connectObject(
+            'changed::mouse-button-modifier',
+            () => handleWindowActionKeyConflict(),
+            this
+        );
+        handleWindowActionKeyConflict();
     }
 
     destroy() {
+        this._wmPrefs.disconnectObject(this);
+        this._wmPrefs = null;
+
         this._displaySignals.forEach(sId => global.display.disconnect(sId));
         this._tilePreview.destroy();
 
