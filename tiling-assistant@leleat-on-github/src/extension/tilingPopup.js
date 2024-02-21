@@ -27,8 +27,9 @@ export const TilingSwitcherPopup = GObject.registerClass({
      * @param {boolean} allowConsecutivePopup allow the popup to create another
      *      Tiling Popup, if there is still unambiguous free screen space after
      *      this popup tiled a window.
+     * @param {boolean} skipAnim
      */
-    _init(openWindows, freeScreenRect, allowConsecutivePopup = true) {
+    _init(openWindows, freeScreenRect, allowConsecutivePopup = true, skipAnim = false) {
         this._freeScreenRect = freeScreenRect;
         this._shadeBG = null;
         this._monitor = -1;
@@ -43,6 +44,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
         // or null, if the popup was closed with tiling a window
         this.tiledWindow = null;
         this._allowConsecutivePopup = allowConsecutivePopup;
+        this._skipAnim = skipAnim;
 
         this._switcherList = new TSwitcherList(this, openWindows);
         this._items = this._switcherList.icons;
@@ -299,7 +301,11 @@ export const TilingSwitcherPopup = GObject.registerClass({
         // tile group won't be accidentally raised.
         Twm.clearTilingProps(window.get_id());
         window.activate(global.get_current_time());
-        Twm.tile(window, rect, { monitorNr: this._monitor, openTilingPopup: this._allowConsecutivePopup });
+        Twm.tile(window, rect, {
+            monitorNr: this._monitor,
+            openTilingPopup: this._allowConsecutivePopup,
+            skipAnim: this._skipAnim
+        });
     }
 
     // Dont _finish(), if no mods are pressed
