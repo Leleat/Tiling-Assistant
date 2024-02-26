@@ -349,7 +349,7 @@ class TilingAppSwitcher extends SwitcherPopup.SwitcherList {
 
         let arrow = new St.DrawingArea({ style_class: 'switcher-arrow' });
         arrow.connect('repaint', () => SwitcherPopup.drawArrow(arrow, St.Side.BOTTOM));
-        this.add_actor(arrow);
+        this.add_child(arrow);
         this._arrows.push(arrow);
 
         if (appIcon.cachedWindows.length === 1)

@@ -147,7 +147,10 @@ export class TilingWindowManager {
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
-        window.raise_and_make_recent();
+        if (window.raise_and_make_recent_on_workspace)
+            window.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+        else
+            window.raise_and_make_recent();
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = monitorNr ?? window.get_monitor();
@@ -256,7 +259,10 @@ export class TilingWindowManager {
         // one. So untiling the initial window after tiling more windows with
         // the popup (without re-focusing the initial window), means the
         // untiled window will be below the others.
-        window.raise_and_make_recent();
+        if (window.raise_and_make_recent_on_workspace)
+            window.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+        else
+            window.raise_and_make_recent();
 
         // Animation
         const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
@@ -433,7 +439,10 @@ export class TilingWindowManager {
 
                         // Prevent an infinite loop of windows raising each other
                         w.block_signal_handler(otherRaiseId);
-                        w.raise_and_make_recent();
+                        if (w.raise_and_make_recent_on_workspace)
+                            w.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+                        else
+                            w.raise_and_make_recent();
                         w.unblock_signal_handler(otherRaiseId);
                     });
 
@@ -442,7 +451,10 @@ export class TilingWindowManager {
                     // it may be below other tiled windows.
                     const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
                     raisedWindow.block_signal_handler(signalId);
-                    raisedWindow.raise_and_make_recent();
+                    if (raisedWindow.raise_and_make_recent_on_workspace)
+                        raisedWindow.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+                    else
+                        raisedWindow.raise_and_make_recent();
                     raisedWindow.unblock_signal_handler(signalId);
                 }
 

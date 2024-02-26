@@ -75,7 +75,12 @@ class TileEditingMode extends St.Widget {
 
         // The windows may not be at the foreground. They just weren't
         // overlapping other windows. So raise the entire tile group.
-        this._windows.forEach(w => w.raise_and_make_recent());
+        this._windows.forEach(w => {
+            if (w.raise_and_make_recent_on_workspace)
+                w.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+            else
+                w.raise_and_make_recent();
+        });
 
         // Create the active selection indicator.
         const window = this._windows[0];
@@ -327,7 +332,10 @@ const DefaultKeyHandler = class DefaultKeyHandler {
                 return Modes.CLOSE;
 
             // Re-raise tile group, so it isn't below the just-untiled window
-            this._windows[0].raise_and_make_recent();
+            if (this._windows[0].raise_and_make_recent_on_workspace)
+                this._windows[0].raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
+            else
+                this._windows[0].raise_and_make_recent();
             this._selectIndicator.focus(selectedRect, null);
 
         // [Enter] / [Esc]ape Tile Editing Mode
