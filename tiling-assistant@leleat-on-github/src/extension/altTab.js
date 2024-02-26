@@ -21,7 +21,6 @@ import {
 
 import { Settings } from '../common.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
-import { Util } from './utility.js';
 
 /**
  * Optionally, override GNOME's altTab / appSwitcher to group tileGroups
