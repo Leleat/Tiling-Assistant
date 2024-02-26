@@ -81,7 +81,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
         this._switcherList.connect('item-activated', this._itemActivated.bind(this));
         this._switcherList.connect('item-entered', this._itemEntered.bind(this));
         this._switcherList.connect('item-removed', this._itemRemoved.bind(this));
-        Util.add_child(this, this._switcherList);
+        this.add_child(this._switcherList);
 
         // Need to force an allocation so we can figure out
         // whether we need to scroll when selecting
