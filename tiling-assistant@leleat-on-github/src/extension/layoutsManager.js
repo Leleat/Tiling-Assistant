@@ -202,10 +202,14 @@ export default class TilingLayoutsManager {
         const window = this._remainingWindows[idx];
         idx !== -1 && this._remainingWindows.splice(idx, 1);
 
-        if (window)
-            Twm.tile(window, this._currRect, { openTilingPopup: false });
-        else if (app.can_open_new_window())
+        if (window) {
+            Twm.tile(window, this._currRect, {
+                openTilingPopup: false,
+                skipAnim: true
+            });
+        } else if (app.can_open_new_window()) {
             Twm.openAppTiled(app, this._currRect);
+        }
 
         this._step();
     }
@@ -238,7 +242,8 @@ export default class TilingLayoutsManager {
             // If this._currItem is the last item and we don't loop over it,
             // allow the Tiling Popup itself to spawn another instance of
             // a Tiling Popup, if there is free screen space.
-            this._currItem === this._items.at(-1) && !this._currItem.loopType
+            this._currItem === this._items.at(-1) && !this._currItem.loopType,
+            true
         );
         const stacked = global.display.sort_windows_by_stacking(this._tiledWithLayout);
         const tileGroup = stacked.reverse();

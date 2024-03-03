@@ -485,6 +485,7 @@
       <child>
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Default Window Movement Mode</property>
+          <property name="description" translatable="yes">The movement mode that is activated when no modifier key is pressed</property>
           <property name="visible"
                     bind-source="enable_advanced_experimental_features"
                     bind-property="active"
