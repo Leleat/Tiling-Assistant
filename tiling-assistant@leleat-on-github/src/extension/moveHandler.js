@@ -2,7 +2,7 @@ import { Clutter, GLib, GObject, Gio, Meta, Mtk } from '../dependencies/gi.js';
 import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
-import { Orientation, RestoreOn, MoveModes, Settings, Shortcuts } from '../common.js';
+import { Orientation, MoveModes, Settings, Shortcuts } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -121,10 +121,7 @@ export default class TilingMoveHandler {
         const [x, y] = global.get_pointer();
 
         // Try to restore the window size
-        const restoreSetting = Settings.getInt(Settings.RESTORE_SIZE_ON);
-        if ((window.tiledRect || this._wasMaximizedOnStart) &&
-            restoreSetting === RestoreOn.ON_GRAB_START
-        ) {
+        if (window.tiledRect || this._wasMaximizedOnStart) {
             let counter = 0;
             this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
@@ -244,16 +241,6 @@ export default class TilingMoveHandler {
             // of a different tile group, with ctrl-(super)-drag. The window may
             // be maximized by ctrl-super-drag.
             isCtrlReplacement && window.isTiled && Twm.updateTileGroup(ctrlReplacedTileGroup);
-        } else {
-            const restoreSetting = Settings.getInt(Settings.RESTORE_SIZE_ON);
-            const restoreOnEnd = restoreSetting === RestoreOn.ON_GRAB_END;
-            restoreOnEnd && Twm.untile(
-                window, {
-                    restoreFullPos: false,
-                    xAnchor: this._lastPointerPos.x,
-                    skipAnim: this._wasMaximizedOnStart
-                }
-            );
         }
 
         this._favoriteLayout = [];

@@ -42,7 +42,6 @@ export class Settings {
     static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
     static ENABLE_HOLD_INVERSE_LANDSCAPE = 'enable-hold-maximize-inverse-landscape';
     static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
-    static RESTORE_SIZE_ON = 'restore-window-size-on';
 
     static initialize(gioSettings) {
         this._settings = gioSettings;
@@ -111,8 +110,7 @@ export class Settings {
             this.HORIZONTAL_PREVIEW_AREA,
             this.INVERSE_TOP_MAXIMIZE_TIMER,
             this.ENABLE_HOLD_INVERSE_LANDSCAPE,
-            this.ENABLE_HOLD_INVERSE_PORTRAIT,
-            this.RESTORE_SIZE_ON
+            this.ENABLE_HOLD_INVERSE_PORTRAIT
         ];
     }
 
@@ -249,12 +247,6 @@ export class Shortcuts {
             this.DEBUGGING_FREE_RECTS
         ];
     }
-}
-
-// Enums:
-export class RestoreOn {
-    static ON_GRAB_START = 0; // Grab Start
-    static ON_GRAB_END = 1; // 'Grab End'
 }
 
 export class DynamicKeybindings {

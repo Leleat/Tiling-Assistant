@@ -746,24 +746,6 @@
               </child>
             </object>
           </child>
-          <child>
-            <object class="AdwComboRow" id="restore_window_size_on">
-              <property name="title" translatable="yes">Restore Window Size on</property>
-              <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;</property>
-              <property name="visible"
-                        bind-source="enable_advanced_experimental_features"
-                        bind-property="active"
-                        bind-flags="sync-create"/>
-              <property name="model">
-                <object class="GtkStringList">
-                  <items>
-                    <item translatable="yes">Grab Start</item>
-                    <item translatable="yes">Grab End</item>
-                  </items>
-                </object>
-              </property>
-            </object>
-          </child>
         </object>
       </child>
   </object>

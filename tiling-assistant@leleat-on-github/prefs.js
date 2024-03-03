@@ -120,8 +120,7 @@ export default class Prefs extends ExtensionPreferences {
         const comboRows = [
             Settings.ADAPTIVE_TILING_MOD,
             Settings.FAVORITE_LAYOUT_MOD,
-            Settings.IGNORE_TA_MOD,
-            Settings.RESTORE_SIZE_ON
+            Settings.IGNORE_TA_MOD
         ];
 
         comboRows.forEach(key => {

@@ -266,10 +266,6 @@
 		<key name="enable-hold-maximize-inverse-portrait" type="b">
 			<default>false</default>
 		</key>
-		<key name="restore-window-size-on" type="i">
-			<!-- 0: Grab Start, 1: Grab End -->
-			<default>0</default>
-		</key>
 		<key name="debugging-show-tiled-rects" type="as">
 			<default>[]</default>
 		</key>
