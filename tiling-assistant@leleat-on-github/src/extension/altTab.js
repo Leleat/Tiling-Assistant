@@ -27,11 +27,11 @@ import { TilingWindowManager as Twm } from './tilingWindowManager.js';
  */
 export default class AltTabOverride {
     constructor() {
-        if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
+        if (Settings.getBoolean('tilegroups-in-app-switcher'))
             this._overrideNativeAppSwitcher();
 
-        this._settingsId = Settings.changed(Settings.TILEGROUPS_IN_APP_SWITCHER, () => {
-            if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER))
+        this._settingsId = Settings.changed('tilegroups-in-app-switcher', () => {
+            if (Settings.getBoolean('tilegroups-in-app-switcher'))
                 this._overrideNativeAppSwitcher();
             else
                 this._restoreNativeAppSwitcher();
@@ -138,7 +138,7 @@ class TilingAppSwitcher extends SwitcherPopup.SwitcherList {
 
         // Group windows based on their tileGroup, if tileGroup.length > 1.
         // Otherwise group them based on their respective apps.
-        if (Settings.getBoolean(Settings.TILEGROUPS_IN_APP_SWITCHER)) {
+        if (Settings.getBoolean('tilegroups-in-app-switcher')) {
             groupedWindows = windows.reduce((allGroups, w) => {
                 for (const group of allGroups) {
                     if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {

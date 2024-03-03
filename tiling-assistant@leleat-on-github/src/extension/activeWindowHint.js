@@ -8,14 +8,14 @@ export default class ActiveWindowHintHandler {
     constructor() {
         // On a fresh install no color is set for the hint yet. Use the bg color
         // from the tile preview style by using a temporary widget.
-        if (Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR) === '') {
+        if (Settings.getString('active-window-hint-color') === '') {
             const widget = new St.Widget({ style_class: 'tile-preview' });
             global.stage.add_child(widget);
 
             const color = widget.get_theme_node().get_background_color();
             const { red, green, blue } = color;
 
-            Settings.setString(Settings.ACTIVE_WINDOW_HINT_COLOR, `rgb(${red},${green},${blue})`);
+            Settings.setString('active-window-hint-color', `rgb(${red},${green},${blue})`);
 
             widget.destroy();
         }
@@ -25,7 +25,7 @@ export default class ActiveWindowHintHandler {
 
         this._setupHint();
 
-        this._settingsId = Settings.changed(Settings.ACTIVE_WINDOW_HINT,
+        this._settingsId = Settings.changed('active-window-hint',
             () => this._setupHint());
     }
 
@@ -36,7 +36,7 @@ export default class ActiveWindowHintHandler {
     }
 
     _setupHint() {
-        switch (Settings.getInt(Settings.ACTIVE_WINDOW_HINT)) {
+        switch (Settings.getInt('active-window-hint')) {
             case 0: // Disabled
                 this._hint?.destroy();
                 this._hint = null;
@@ -57,19 +57,19 @@ class ActiveWindowHint extends St.Widget {
     _init() {
         super._init();
 
-        this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
-        this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
-        this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE); // 'Inner border' to cover rounded corners
+        this._color = Settings.getString('active-window-hint-color');
+        this._borderSize = Settings.getInt('active-window-hint-border-size');
+        this._innerBorderSize = Settings.getInt('active-window-hint-inner-border-size'); // 'Inner border' to cover rounded corners
         this._settingsIds = [];
 
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
-            this._color = Settings.getString(Settings.ACTIVE_WINDOW_HINT_COLOR);
+        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
+            this._color = Settings.getString('active-window-hint-color');
         }));
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
-            this._borderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE);
+        this._settingsIds.push(Settings.changed('active-window-hint-border-size', () => {
+            this._borderSize = Settings.getInt('active-window-hint-border-size');
         }));
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
-            this._innerBorderSize = Settings.getInt(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE);
+        this._settingsIds.push(Settings.changed('active-window-hint-inner-border-size', () => {
+            this._innerBorderSize = Settings.getInt('active-window-hint-inner-border-size');
         }));
 
         global.window_group.add_child(this);
@@ -90,7 +90,7 @@ class MinimalActiveWindowHint extends Hint {
 
         this._updateStyle();
 
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
+        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
             this._updateStyle();
         }));
 
@@ -245,15 +245,15 @@ class AlwaysActiveWindowHint extends Hint {
         global.display.connectObject('notify::focus-window',
             () => this._updateGeometry(), this);
 
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_COLOR, () => {
+        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
             this._updateStyle();
             this._updateGeometry();
         }));
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE, () => {
+        this._settingsIds.push(Settings.changed('active-window-hint-border-size', () => {
             this._updateStyle();
             this._updateGeometry();
         }));
-        this._settingsIds.push(Settings.changed(Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE, () => {
+        this._settingsIds.push(Settings.changed('active-window-hint-inner-border-size', () => {
             this._updateStyle();
             this._updateGeometry();
         }));

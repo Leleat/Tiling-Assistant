@@ -1,6 +1,6 @@
 import { Clutter, Meta } from '../dependencies/gi.js';
 
-import { Orientation, Settings } from '../common.js';
+import { Orientation } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -277,12 +277,12 @@ export default class TilingResizeHandler {
 
         const monitor = window.get_monitor();
         const screenTopGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap(Settings.SCREEN_TOP_GAP, monitor)
-            : Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
+            ? Util.getScaledGap('screen-top-gap', monitor)
+            : Util.getScaledGap('single-screen-gap', monitor);
         const screenLeftGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor)
-            : Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
-        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);
+            ? Util.getScaledGap('screen-left-gap', monitor)
+            : Util.getScaledGap('single-screen-gap', monitor);
+        const windowGap = Util.getScaledGap('window-gap', monitor);
         const workArea = window.get_work_area_for_monitor(monitor);
 
         // First calculate the new tiledRect for window:
@@ -391,7 +391,7 @@ export default class TilingResizeHandler {
         const resizedRect = new Rect(resizedWindow.get_frame_rect());
         const wRect = new Rect(window.get_frame_rect());
         const preGrabRect = this._preGrabRects.get(window);
-        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, window.get_monitor());
+        const windowGap = Util.getScaledGap('window-gap', window.get_monitor());
 
         switch (grabOp) {
             case Meta.GrabOp.RESIZING_N:

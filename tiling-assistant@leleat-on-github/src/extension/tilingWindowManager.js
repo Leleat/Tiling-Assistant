@@ -2,7 +2,7 @@ import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js'
 import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
-import { Orientation, Settings, Shortcuts } from '../common.js';
+import { Orientation, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 
 /**
@@ -161,7 +161,7 @@ export class TilingWindowManager {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        if (maximize && !Settings.getBoolean(Settings.MAXIMIZE_WITH_GAPS)) {
+        if (maximize && !Settings.getBoolean('maximize-with-gap')) {
             window.tiledRect = null;
             // It's possible for a window to maximize() to the wrong monitor.
             // This is very easy to reproduce when dragging a window on the
@@ -180,7 +180,7 @@ export class TilingWindowManager {
 
         // Animations
         const wActor = window.get_compositor_private();
-        if (Settings.getBoolean(Settings.ENABLE_TILE_ANIMATIONS) && wActor && !skipAnim) {
+        if (Settings.getBoolean('enable-tile-animations') && wActor && !skipAnim) {
             wActor.remove_all_transitions();
             // HACK => journalctl: 'error in size change accounting'...?
             // TODO: no animation if going from maximized -> tiled and back to back multiple times?
@@ -218,7 +218,7 @@ export class TilingWindowManager {
         } else if (!fakeTile) {
             // Make the tile group only consist of the window itself to stop
             // resizing or raising together. Also don't call the Tiling Popup.
-            if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS) || ignoreTA) {
+            if (Settings.getBoolean('disable-tile-groups') || ignoreTA) {
                 this.updateTileGroup([window]);
                 return;
             }
@@ -265,7 +265,7 @@ export class TilingWindowManager {
             window.raise_and_make_recent();
 
         // Animation
-        const untileAnim = Settings.getBoolean(Settings.ENABLE_UNTILE_ANIMATIONS);
+        const untileAnim = Settings.getBoolean('enable-untile-animations');
         const wActor = window.get_compositor_private();
         if (untileAnim && !wasMaximized && wActor && !skipAnim) {
             wActor.remove_all_transitions();
@@ -423,7 +423,7 @@ export class TilingWindowManager {
 
             const raiseId = window.connect('raised', raisedWindow => {
                 const raisedWindowId = raisedWindow.get_id();
-                if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS)) {
+                if (Settings.getBoolean('enable-raise-tile-group')) {
                     const raisedWindowsTileGroup = this._tileGroups.get(raisedWindowId);
                     raisedWindowsTileGroup.forEach(wId => {
                         const w = this._getWindow(wId);
@@ -540,8 +540,8 @@ export class TilingWindowManager {
         // tile group. Same thing for the setting 'Disable Tile Groups' because
         // it's implemented by just making the tile groups consist of single
         // windows (the tiled window itself).
-        if (Settings.getBoolean(Settings.RAISE_TILE_GROUPS) ||
-            Settings.getBoolean(Settings.DISABLE_TILE_GROUPS)
+        if (Settings.getBoolean('enable-raise-tile-group') ||
+            Settings.getBoolean('disable-tile-groups')
         ) {
             const openWindows = this.getWindows();
             if (!openWindows.length)
@@ -792,12 +792,12 @@ export class TilingWindowManager {
      * isn't limited to just keyboard shortcuts. This is also used when
      * dnd-ing a window.
      *
-     * Examples: Shortcuts.LEFT gets the left-most rectangle with the height
-     * of the workArea. Shortcuts.BOTTOM_LEFT gets the rectangle touching the
+     * Examples: 'tile-left-half' gets the left-most rectangle with the height
+     * of the workArea. 'tile-bottomleft-quarter' gets the rectangle touching the
      * bottom left screen corner etc... If there is no other rect to adapt to
      * we default to half the workArea.
      *
-     * @param {Shortcuts} shortcut the side / quarter to get the tile rect for.
+     * @param {string} shortcut the side / quarter to get the tile rect for.
      * @param {Rect} workArea the workArea.
      * @param {number} [monitor=null] the monitor number we want to get the
      *      rect for. This may not always be the current monitor. It is only
@@ -808,7 +808,7 @@ export class TilingWindowManager {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         // Don't try to adapt a tile rect
-        if (Settings.getBoolean(Settings.DISABLE_TILE_GROUPS))
+        if (Settings.getBoolean('disable-tile-groups'))
             return this.getDefaultTileFor(shortcut, workArea);
 
         const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
@@ -822,7 +822,7 @@ export class TilingWindowManager {
         const idx = topTileGroup.indexOf(global.display.focus_window);
         idx !== -1 && topTileGroup.splice(idx, 1);
         const favLayout = Util.getFavoriteLayout(monitor);
-        const useFavLayout = favLayout.length && Settings.getBoolean(Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT);
+        const useFavLayout = favLayout.length && Settings.getBoolean('adapt-edge-tiling-to-favorite-layout');
         const twRects = useFavLayout && favLayout || topTileGroup.map(w => w.tiledRect);
 
         if (!twRects.length)
@@ -841,50 +841,50 @@ export class TilingWindowManager {
 
         const screenRects = twRects.concat(workArea.minus(twRects));
         switch (shortcut) {
-            case Shortcuts.MAXIMIZE: {
+            case 'tile-maximize': {
                 return workArea.copy();
-            } case Shortcuts.LEFT: {
+            } case 'tile-left-half': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
                 const result = new Rect(workArea.x, workArea.y, width, workArea.height);
                 return getTile(result);
-            } case Shortcuts.RIGHT: {
+            } case 'tile-right-half': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
                 const result = new Rect(workArea.x2 - width, workArea.y, width, workArea.height);
                 return getTile(result);
-            } case Shortcuts.TOP: {
+            } case 'tile-top-half': {
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x, workArea.y, workArea.width, height);
                 return getTile(result);
-            } case Shortcuts.BOTTOM: {
+            } case 'tile-bottom-half': {
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x, workArea.y2 - height, workArea.width, height);
                 return getTile(result);
-            } case Shortcuts.TOP_LEFT: {
+            } case 'tile-topleft-quarter': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x, workArea.y, width, height);
                 return getTile(result);
-            } case Shortcuts.TOP_RIGHT: {
+            } case 'tile-topright-quarter': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
                 const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x2 - width, workArea.y, width, height);
                 return getTile(result);
-            } case Shortcuts.BOTTOM_LEFT: {
+            } case 'tile-bottomleft-quarter': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
                 const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
                 const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x, workArea.y2 - height, width, height);
                 return getTile(result);
-            } case Shortcuts.BOTTOM_RIGHT: {
+            } case 'tile-bottomright-quarter': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
                 const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
@@ -896,37 +896,37 @@ export class TilingWindowManager {
     }
 
     /**
-     * @param {Shortcuts} shortcut determines, which half/quarter to get the tile for
+     * @param {string} shortcut determines, which half/quarter to get the tile for
      * @param {Rect} workArea
      * @returns
      */
     static getDefaultTileFor(shortcut, workArea) {
         switch (shortcut) {
-            case Shortcuts.MAXIMIZE:
+            case 'tile-maximize':
                 return workArea.copy();
-            case Shortcuts.LEFT:
-            case Shortcuts.LEFT_IGNORE_TA:
+            case 'tile-left-half':
+            case 'tile-left-half-ignore-ta':
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-            case Shortcuts.RIGHT:
-            case Shortcuts.RIGHT_IGNORE_TA:
+            case 'tile-right-half':
+            case 'tile-right-half-ignore-ta':
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-            case Shortcuts.TOP:
-            case Shortcuts.TOP_IGNORE_TA:
+            case 'tile-top-half':
+            case 'tile-top-half-ignore-ta':
                 return workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-            case Shortcuts.BOTTOM:
-            case Shortcuts.BOTTOM_IGNORE_TA:
+            case 'tile-bottom-half':
+            case 'tile-bottom-half-ignore-ta':
                 return workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-            case Shortcuts.TOP_LEFT:
-            case Shortcuts.TOP_LEFT_IGNORE_TA:
+            case 'tile-topleft-quarter':
+            case 'tile-topleft-quarter-ignore-ta':
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
-            case Shortcuts.TOP_RIGHT:
-            case Shortcuts.TOP_RIGHT_IGNORE_TA:
+            case 'tile-topright-quarter':
+            case 'tile-topright-quarter-ignore-ta':
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
-            case Shortcuts.BOTTOM_LEFT:
-            case Shortcuts.BOTTOM_LEFT_IGNORE_TA:
+            case 'tile-bottomleft-quarter':
+            case 'tile-bottomleft-quarter-ignore-ta':
                 return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
-            case Shortcuts.BOTTOM_RIGHT:
-            case Shortcuts.BOTTOM_RIGHT_IGNORE_TA:
+            case 'tile-bottomright-quarter':
+            case 'tile-bottomright-quarter-ignore-ta':
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
         }
     }
@@ -936,10 +936,10 @@ export class TilingWindowManager {
      * and offer to tile an open window to that spot.
      */
     static async tryOpeningTilingPopup() {
-        if (!Settings.getBoolean(Settings.ENABLE_TILING_POPUP))
+        if (!Settings.getBoolean('enable-tiling-popup'))
             return;
 
-        const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+        const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         const openWindows = this.getWindows(allWs);
         const topTileGroup = this.getTopTileGroup();
         topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));

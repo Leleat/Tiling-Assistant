@@ -2,7 +2,7 @@ import { Gdk, Gio, GLib, Gtk } from './src/dependencies/prefs/gi.js';
 import { ExtensionPreferences } from './src/dependencies/prefs.js';
 
 import LayoutPrefs from './src/prefs/layoutsPrefs.js';
-import { Settings, Shortcuts } from './src/common.js';
+import { Shortcuts } from './src/common.js';
 // eslint-disable-next-line no-unused-vars
 import { ShortcutListener } from './src/prefs/shortcutListener.js';
 
@@ -33,13 +33,13 @@ export default class Prefs extends ExtensionPreferences {
 
         // Add layouts preference page on condition of advanced setting
         const layoutsPage = builder.get_object('layouts');
-        settings.connect(`changed::${Settings.ENABLE_ADV_EXP_SETTINGS}`, () => {
-            settings.get_boolean(Settings.ENABLE_ADV_EXP_SETTINGS)
+        settings.connect('changed::enable-advanced-experimental-features', () => {
+            settings.get_boolean('enable-advanced-experimental-features')
                 ? window.add(layoutsPage)
                 : window.remove(layoutsPage);
         });
 
-        if (settings.get_boolean(Settings.ENABLE_ADV_EXP_SETTINGS))
+        if (settings.get_boolean('enable-advanced-experimental-features'))
             window.add(layoutsPage);
 
         // Bind settings to GUI
@@ -66,21 +66,21 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindSwitches(settings, builder) {
         const switches = [
-            Settings.ENABLE_TILING_POPUP,
-            Settings.POPUP_ALL_WORKSPACES,
-            Settings.RAISE_TILE_GROUPS,
-            Settings.TILEGROUPS_IN_APP_SWITCHER,
-            Settings.MAXIMIZE_WITH_GAPS,
-            Settings.SHOW_LAYOUT_INDICATOR,
-            Settings.ENABLE_ADV_EXP_SETTINGS,
-            Settings.DISABLE_TILE_GROUPS,
-            Settings.LOW_PERFORMANCE_MOVE_MODE,
-            Settings.MONITOR_SWITCH_GRACE_PERIOD,
-            Settings.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
-            Settings.ENABLE_TILE_ANIMATIONS,
-            Settings.ENABLE_UNTILE_ANIMATIONS,
-            Settings.ENABLE_HOLD_INVERSE_LANDSCAPE,
-            Settings.ENABLE_HOLD_INVERSE_PORTRAIT
+            'enable-tiling-popup',
+            'tiling-popup-all-workspace',
+            'enable-raise-tile-group',
+            'tilegroups-in-app-switcher',
+            'maximize-with-gap',
+            'show-layout-panel-indicator',
+            'enable-advanced-experimental-features',
+            'disable-tile-groups',
+            'low-performance-move-mode',
+            'monitor-switch-grace-period',
+            'adapt-edge-tiling-to-favorite-layout',
+            'enable-tile-animations',
+            'enable-untile-animations',
+            'enable-hold-maximize-inverse-landscape',
+            'enable-hold-maximize-inverse-portrait'
         ];
 
         switches.forEach(key => {
@@ -94,17 +94,17 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindSpinbuttons(settings, builder) {
         const spinButtons = [
-            Settings.WINDOW_GAP,
-            Settings.SINGLE_SCREEN_GAP,
-            Settings.SCREEN_TOP_GAP,
-            Settings.SCREEN_LEFT_GAP,
-            Settings.SCREEN_RIGHT_GAP,
-            Settings.SCREEN_BOTTOM_GAP,
-            Settings.ACTIVE_WINDOW_HINT_BORDER_SIZE,
-            Settings.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE,
-            Settings.INVERSE_TOP_MAXIMIZE_TIMER,
-            Settings.VERTICAL_PREVIEW_AREA,
-            Settings.HORIZONTAL_PREVIEW_AREA
+            'window-gap',
+            'single-screen-gap',
+            'screen-top-gap',
+            'screen-left-gap',
+            'screen-right-gap',
+            'screen-bottom-gap',
+            'active-window-hint-border-size',
+            'active-window-hint-inner-border-size',
+            'toggle-maximize-tophalf-timer',
+            'vertical-preview-area',
+            'horizontal-preview-area'
         ];
 
         spinButtons.forEach(key => {
@@ -118,9 +118,9 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindComboRows(settings, builder) {
         const comboRows = [
-            Settings.ADAPTIVE_TILING_MOD,
-            Settings.FAVORITE_LAYOUT_MOD,
-            Settings.IGNORE_TA_MOD
+            'move-adaptive-tiling-mod',
+            'move-favorite-layout-mod',
+            'ignore-ta-mod'
         ];
 
         comboRows.forEach(key => {
@@ -135,7 +135,7 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindColorButtons(settings, builder) {
         const switches = [
-            Settings.ACTIVE_WINDOW_HINT_COLOR
+            'active-window-hint-color'
         ];
 
         switches.forEach(key => {
@@ -160,7 +160,7 @@ export default class Prefs extends ExtensionPreferences {
         // (an int) which saves the current 'selection'.
         const radioButtons = [
             {
-                key: Settings.DYNAMIC_KEYBINDINGS,
+                key: 'dynamic-keybinding-behavior',
                 rowNames: [
                     'dynamic_keybinding_disabled_row',
                     'dynamic_keybinding_window_focus_row',
@@ -170,7 +170,7 @@ export default class Prefs extends ExtensionPreferences {
                 ]
             },
             {
-                key: Settings.ACTIVE_WINDOW_HINT,
+                key: 'active-window-hint',
                 rowNames: [
                     'active_window_hint_disabled_row',
                     'active_window_hint_minimal_row',
@@ -178,7 +178,7 @@ export default class Prefs extends ExtensionPreferences {
                 ]
             },
             {
-                key: Settings.DEFAULT_MOVE_MODE,
+                key: 'default-move-mode',
                 rowNames: [
                     'edge_tiling_row',
                     'adaptive_tiling_row',

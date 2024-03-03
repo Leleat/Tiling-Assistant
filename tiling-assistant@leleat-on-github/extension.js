@@ -175,26 +175,25 @@ export default class TilingAssistantExtension extends Extension {
         const gnomeDesktopKeybindings = new Gio.Settings({
             schema_id: 'org.gnome.desktop.wm.keybindings'
         });
-        const sc = (await import('./src/common.js')).Shortcuts;
         const emptyStrvVariant = new GLib.Variant('as', []);
 
         if (gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
-                this.settings.getStrv(sc.MAXIMIZE).includes('<Super>Up')) {
+                this.settings.getStrv('tile-maximize').includes('<Super>Up')) {
             this._settingsOverrider.add(gnomeDesktopKeybindings,
                 'maximize', emptyStrvVariant);
         }
         if (gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
-                this.settings.getStrv(sc.RESTORE_WINDOW).includes('<Super>Down')) {
+                this.settings.getStrv('restore-window').includes('<Super>Down')) {
             this._settingsOverrider.add(gnomeDesktopKeybindings,
                 'unmaximize', emptyStrvVariant);
         }
         if (gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
-                this.settings.getStrv(sc.LEFT).includes('<Super>Left')) {
+                this.settings.getStrv('tile-left-half').includes('<Super>Left')) {
             this._settingsOverrider.add(gnomeMutterKeybindings,
                 'toggle-tiled-left', emptyStrvVariant);
         }
         if (gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
-                this.settings.getStrv(sc.RIGHT).includes('<Super>Right')) {
+                this.settings.getStrv('tile-right-half').includes('<Super>Right')) {
             this._settingsOverrider.add(gnomeMutterKeybindings,
                 'toggle-tiled-right', emptyStrvVariant);
         }
