@@ -231,7 +231,7 @@ export default class Prefs extends ExtensionPreferences {
         // Switches
         ['tilegroups-in-app-switcher'].forEach(s => {
             const isNonDefault = settings.get_boolean(s) !== settings.get_default_value(s).get_boolean();
-            builder.get_object(`${s.replaceAll('-', '_')}_row`).set_visible(isNonDefault);
+            builder.get_object(s.replaceAll('-', '_')).set_visible(isNonDefault);
         });
     }
 
