@@ -237,7 +237,6 @@ class AlwaysActiveWindowHint extends Hint {
         super._init();
 
         this._window = null;
-        this._signalIds = [];
 
         this._updateGeometry();
         this._updateStyle();
@@ -271,8 +270,8 @@ class AlwaysActiveWindowHint extends Hint {
 
     _reset() {
         this._cancelShowLater();
-        this._signalIds.forEach(id => this._window.disconnect(id));
-        this._signalIds = [];
+
+        this._window?.disconnectObject(this);
         this._window = null;
     }
 
@@ -296,8 +295,16 @@ class AlwaysActiveWindowHint extends Hint {
         }
 
         this._window = window;
-        this._signalIds.push(window.connect('position-changed', () => this._updateGeometry()));
-        this._signalIds.push(window.connect('size-changed', () => this._updateGeometry()));
+        this._window.connectObject(
+            'position-changed',
+            () => this._updateGeometry(),
+            this
+        );
+        this._window.connectObject(
+            'size-changed',
+            () => this._updateGeometry(),
+            this
+        );
 
         // Don't show hint on maximzed/fullscreen windows
         if (window.is_fullscreen() || Twm.isMaximized(window)) {

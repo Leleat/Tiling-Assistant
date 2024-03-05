@@ -18,17 +18,22 @@ export default class TilingMoveHandler {
     constructor() {
         const moveOps = [Meta.GrabOp.MOVING, Meta.GrabOp.KEYBOARD_MOVING];
 
-        this._displaySignals = [];
-        const g1Id = global.display.connect('grab-op-begin', (src, window, grabOp) => {
-            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+        global.display.connectObject(
+            'grab-op-begin',
+            (src, window, grabOp) => {
+                grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-            if (window && moveOps.includes(grabOp))
-                this._onMoveStarted(window, grabOp);
-        });
-        this._displaySignals.push(g1Id);
+                if (window && moveOps.includes(grabOp))
+                    this._onMoveStarted(window, grabOp);
+            },
+            this
+        );
 
-        const wId = global.display.connect('window-entered-monitor', this._onMonitorEntered.bind(this));
-        this._displaySignals.push(wId);
+        global.display.connectObject(
+            'window-entered-monitor',
+            this._onMonitorEntered.bind(this),
+            this
+        );
 
         // Save the windows, which need to make space for the
         // grabbed window (this is for the so called 'adaptive mode'):
@@ -82,7 +87,8 @@ export default class TilingMoveHandler {
         this._wmPrefs.disconnectObject(this);
         this._wmPrefs = null;
 
-        this._displaySignals.forEach(sId => global.display.disconnect(sId));
+        global.display.disconnectObject(this);
+
         this._tilePreview.destroy();
 
         if (this._latestMonitorLockTimerId) {

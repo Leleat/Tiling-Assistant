@@ -19,16 +19,23 @@ export class TilingWindowManager {
         // [windowIds]
         this._unmanagingWindows = [];
 
-        this._wsAddedId = global.workspace_manager.connect('workspace-added', this._onWorkspaceAdded.bind(this));
-        this._wsRemovedId = global.workspace_manager.connect('workspace-removed', this._onWorkspaceRemoved.bind(this));
+        global.workspace_manager.connectObject(
+            'workspace-added',
+            this._onWorkspaceAdded.bind(this),
+            this
+        );
+        global.workspace_manager.connectObject(
+            'workspace-removed',
+            this._onWorkspaceRemoved.bind(this),
+            this
+        );
     }
 
     static destroy() {
         this._signals.destroy();
         this._signals = null;
 
-        global.workspace_manager.disconnect(this._wsAddedId);
-        global.workspace_manager.disconnect(this._wsRemovedId);
+        global.workspace_manager.disconnectObject(this);
 
         this._tileGroups.clear();
         this._unmanagingWindows = [];
