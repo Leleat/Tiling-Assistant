@@ -1,5 +1,23 @@
 # Changelog
 
+## [46] - 2024-03-24
+
+### Added
+
+- Brazilian Portuguese translation by nunseik (#310)
+- Italian translation by albanobattistella (#312)
+- Ukrainian translation by xalt7x (#317)
+- Support for GNOME 46 by sergio-costas (#319)
+
+### Fixed
+
+- Rework arch PKGBUILD to compile completely from source to enable building inside a docker-container by VeldoraTheDragon (#296, #301)
+- Handle change of window action key while the extension is enabled (#321)
+
+### Changed
+
+- Disable animations when using layouts as a workaround for freezing windows according to #304 (#321)
+
 ## [44] - 2023-09-18
 
 ### Added
