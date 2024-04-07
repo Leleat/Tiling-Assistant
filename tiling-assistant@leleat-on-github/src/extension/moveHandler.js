@@ -448,8 +448,7 @@ export default class TilingMoveHandler {
                     // Only update the monitorNr, if the latest timer timed out.
                     if (timerId === this._latestMonitorLockTimerId) {
                         this._monitorNr = global.display.get_current_monitor();
-                        if (global.display.is_grabbed?.() ||
-                            global.display.get_grab_op?.() === grabOp) // !
+                        if (global.display.is_grabbed())
                             this._edgeTilingPreview(window, grabOp);
                     }
 
