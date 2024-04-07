@@ -301,10 +301,22 @@ export default class TilingAssistantExtension extends Extension {
         const userPath = GLib.get_user_config_dir();
         const parentPath = GLib.build_filenamev([userPath, '/tiling-assistant']);
         const parent = Gio.File.new_for_path(parentPath);
-        try { parent.make_directory_with_parents(null); } catch (e) {}
+
+        try {
+            parent.make_directory_with_parents(null);
+        } catch (e) {
+            logError(e);
+        }
+
         const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore.json']);
         const file = Gio.File.new_for_path(path);
-        try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
+
+        try {
+            file.create(Gio.FileCreateFlags.NONE, null);
+        } catch (e) {
+            logError(e);
+        }
+
         file.replace_contents(JSON.stringify(saveObj), null, false,
             Gio.FileCreateFlags.REPLACE_DESTINATION, null);
     }
@@ -325,7 +337,12 @@ export default class TilingAssistantExtension extends Extension {
         if (!file.query_exists(null))
             return;
 
-        try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
+        try {
+            file.create(Gio.FileCreateFlags.NONE, null);
+        } catch (e) {
+            logError(e);
+        }
+
         const [success, contents] = file.load_contents(null);
         if (!success || !contents.length)
             return;

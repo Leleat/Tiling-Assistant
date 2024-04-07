@@ -165,13 +165,23 @@ export default class {
         const dirLocation = parentPath ||
                 GLib.build_filenamev([userConfigDir, '/tiling-assistant']);
         const parentDir = Gio.File.new_for_path(dirLocation);
-        try { parentDir.make_directory_with_parents(null); } catch (e) {}
+
+        try {
+            parentDir.make_directory_with_parents(null);
+        } catch (e) {
+            logError(e);
+        }
 
         // Create file, if it doesn't exist.
         const fName = fileName || 'layouts.json';
         const filePath = GLib.build_filenamev([dirLocation, '/', fName]);
         const file = Gio.File.new_for_path(filePath);
-        try { file.create(Gio.FileCreateFlags.NONE, null); } catch (e) {}
+
+        try {
+            file.create(Gio.FileCreateFlags.NONE, null);
+        } catch (e) {
+            logError(e);
+        }
 
         return file;
     }

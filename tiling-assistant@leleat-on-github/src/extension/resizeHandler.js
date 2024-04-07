@@ -41,20 +41,20 @@ export default class TilingResizeHandler {
         global.display.connectObject(
             'grab-op-begin',
             (d, window, grabOp) => {
-            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+                grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-            if (window && isResizing(grabOp))
-                this._onResizeStarted(window, grabOp);
+                if (window && isResizing(grabOp))
+                    this._onResizeStarted(window, grabOp);
             },
             this
         );
         global.display.connectObject(
             'grab-op-end',
             (d, window, grabOp) => {
-            grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
+                grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-            if (window && isResizing(grabOp))
-                this._onResizeFinished(window, grabOp);
+                if (window && isResizing(grabOp))
+                    this._onResizeFinished(window, grabOp);
             },
             this
         );
