@@ -95,11 +95,6 @@ export default class TilingMoveHandler {
             this._latestPreviewTimerId = null;
         }
 
-        if (this._cursorChangeTimerId) {
-            GLib.Source.remove(this._cursorChangeTimerId);
-            this._cursorChangeTimerId = null;
-        }
-
         if (this._restoreSizeTimerId) {
             GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = null;
@@ -130,33 +125,10 @@ export default class TilingMoveHandler {
         if ((window.tiledRect || this._wasMaximizedOnStart) &&
             restoreSetting === RestoreOn.ON_GRAB_START
         ) {
-            // HACK:
-            // The grab begin signal (and thus this function call) gets fired
-            // at the moment of the first click. However I don't want to restore
-            // the window size on just a click. Only if the user actually wanted
-            // to start a grab i.e. if the click is held for a bit or if the
-            // cursor moved while holding the click. I assume a cursor change
-            // means the grab was released since I couldn't find a better way...
-            let grabReleased = false;
-            let cursorId = global.display.connect('cursor-updated', () => {
-                grabReleased = true;
-                cursorId && global.display.disconnect(cursorId);
-                cursorId = 0;
-            });
-            // Clean up in case my assumption mentioned above is wrong
-            // and the cursor never gets updated or something else...
-            this._cursorChangeTimerId && GLib.Source.remove(this._cursorChangeTimerId);
-            this._cursorChangeTimerId = GLib.timeout_add(GLib.PRIORITY_LOW, 400, () => {
-                cursorId && global.display.disconnect(cursorId);
-                cursorId = 0;
-                this._cursorChangeTimerId = null;
-                return GLib.SOURCE_REMOVE;
-            });
-
             let counter = 0;
             this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
-                if (grabReleased) {
+                if (!global.display.is_grabbed()) {
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
