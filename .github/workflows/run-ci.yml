@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: "*"
       - name: Prepare Linters
-        run: npm install -g eslint stylelint stylelint-config-standard
+        run: npm install -g eslint stylelint stylelint-config-standard && npm i @eslint/js 
       - name: Run ESLint (*.js)
         run: >
           git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |

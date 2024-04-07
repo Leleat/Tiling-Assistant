@@ -1,0 +1,16 @@
+{
+    "name": "tiling-assistant",
+    "version": "46.0",
+    "description": "Expand GNOME's 2 column tiling and add a Windows-snap-assist-inspired popup...",
+    "private": true,
+    "homepage": "https://github.com/Leleat/Tiling-Assistant",
+    "main": "tiling-assistant@leleat-on-github/extension.js",
+    "scripts": {},
+    "author": "Leleat",
+    "license": "GPL-2.0-or-later",
+    "type": "module",
+    "devDependencies": {
+        "@eslint/js": "^9.0.0",
+        "eslint": "^9.0.0"
+    }
+}
