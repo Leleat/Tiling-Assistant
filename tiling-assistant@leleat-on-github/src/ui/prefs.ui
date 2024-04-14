@@ -47,30 +47,18 @@
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Tiling Popup</property>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="enable_tiling_popup">
               <property name="title" translatable="yes">Open after tiling a window</property>
-              <property name="activatable-widget">enable_tiling_popup</property>
-              <child>
-                <object class="GtkSwitch" id="enable_tiling_popup">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="tiling_popup_all_workspace">
               <property name="title" translatable="yes">Include apps from all workspaces</property>
-              <property name="activatable-widget">tiling_popup_all_workspace</property>
               <property name="sensitive">False</property>
               <property name="sensitive"
                         bind-source="enable_tiling_popup"
                         bind-property="active"
                         bind-flags="default"/>
-              <child>
-                <object class="GtkSwitch" id="tiling_popup_all_workspace">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
         </object>
@@ -82,47 +70,29 @@
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Tile Groups</property>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="disable_tile_groups">
               <property name="title" translatable="yes">Disable Tile Groups</property>
               <property name="subtitle" translatable="yes">Tiled windows will no longer adapt their size to other tiled windows nor be raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' and the Tiling Popup will also no longer work.</property>
-              <property name="activatable-widget">disable_tile_groups</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSwitch" id="disable_tile_groups">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="enable_raise_tile_group">
               <property name="title" translatable="yes">Raise together</property>
               <property name="subtitle" translatable="yes">A tile group is created when a window gets tiled. If a tiled window is raised, raise the other windows of its tile group as well</property>
-              <property name="activatable-widget">enable_raise_tile_group</property>
-              <child>
-                <object class="GtkSwitch" id="enable_raise_tile_group">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow" id="tilegroups_in_app_switcher_row">
+            <object class="AdwSwitchRow" id="tilegroups_in_app_switcher">
               <property name="title" translatable="yes">App Switcher and Tiling Popup</property>
               <property name="subtitle" translatable="yes">This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You may need to re-enable this or the other extension after toggling this setting</property>
-              <property name="activatable-widget">tilegroups_in_app_switcher</property>
               <property name="sensitive"
                         bind-source="enable_raise_tile_group"
                         bind-property="active"
                         bind-flags="default"/>
-              <child>
-                <object class="GtkSwitch" id="tilegroups_in_app_switcher">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
         </object>
@@ -134,142 +104,106 @@
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Gaps</property>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="window_gap">
               <property name="title" translatable="yes">Windows</property>
               <property name="activatable-widget">window_gap</property>
-              <child>
-                <object class="GtkSpinButton" id="window_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="single_screen_gap">
               <property name="title" translatable="yes">Screen Edges</property>
               <property name="activatable-widget">single_screen_gap</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="invert-boolean"/>
-              <child>
-                <object class="GtkSpinButton" id="single_screen_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="screen_top_gap">
               <property name="title" translatable="yes">Screen Edge Top</property>
               <property name="activatable-widget">screen_top_gap</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="screen_top_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="screen_left_gap">
               <property name="title" translatable="yes">Screen Edge Left</property>
               <property name="activatable-widget">screen_left_gap</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="screen_left_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="screen_right_gap">
               <property name="title" translatable="yes">Screen Edge Right</property>
               <property name="activatable-widget">screen_right_gap</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="screen_right_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="screen_bottom_gap">
               <property name="title" translatable="yes">Screen Edge Bottom</property>
               <property name="activatable-widget">screen_bottom_gap</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="screen_bottom_gap">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">500</property>
-                      <property name="step-increment">2</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">500</property>
+                  <property name="step-increment">2</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="maximize_with_gap">
               <property name="title" translatable="yes">Maximized Windows</property>
-              <property name="activatable-widget">maximize_with_gap</property>
-              <child>
-                <object class="GtkSwitch" id="maximize_with_gap">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
         </object>
@@ -406,41 +340,31 @@
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="active_window_hint_border_size">
               <property name="title" translatable="yes">Border Size</property>
               <property name="subtitle" translatable="yes">The border size of the frame indicating the focused window for the always active hint</property>
               <property name="activatable-widget">active_window_hint_border_size</property>
-              <child>
-                <object class="GtkSpinButton" id="active_window_hint_border_size">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">50</property>
-                      <property name="step-increment">1</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">50</property>
+                  <property name="step-increment">1</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="active_window_hint_inner_border_size">
               <property name="title" translatable="yes">Inner Border Size</property>
               <property name="subtitle" translatable="yes">The border for the always active hint reaching inside the window frame. This is meant to cover rounded corners. However, GTK4 popups on Wayland will put the window behind the hint for whatever reason...</property>
               <property name="activatable-widget">active_window_hint_inner_border_size</property>
-              <child>
-                <object class="GtkSpinButton" id="active_window_hint_inner_border_size">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="upper">50</property>
-                      <property name="step-increment">1</property>
-                      <property name="page-increment">8</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">50</property>
+                  <property name="step-increment">1</property>
+                  <property name="page-increment">8</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
         </object>
@@ -456,25 +380,13 @@
                     bind-property="active"
                     bind-flags="sync-create"/>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="enable_tile_animations">
               <property name="title" translatable="yes">Tiling</property>
-              <property name="activatable-widget">enable_tile_animations</property>
-              <child>
-                <object class="GtkSwitch" id="enable_tile_animations">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="enable_untile_animations">
               <property name="title" translatable="yes">Untiling</property>
-              <property name="activatable-widget">enable_untile_animations</property>
-              <child>
-                <object class="GtkSwitch" id="enable_untile_animations">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
         </object>
@@ -545,46 +457,28 @@
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes">Other</property>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="monitor_switch_grace_period">
               <property name="title" translatable="yes">Monitor Switch Grace Period</property>
               <property name="subtitle" translatable="yes">When a window is dragged to a new monitor the tile preview will stick to the old monitor for a very short time. This way you can tile windows by 'throwing' it towards any screen edge even if a monitor is bordering that edge.</property>
-              <property name="activatable-widget">monitor_switch_grace_period</property>
-              <child>
-                <object class="GtkSwitch" id="monitor_switch_grace_period">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="low_performance_move_mode">
               <property name="title" translatable="yes">Low Performance Movement Mode</property>
               <property name="subtitle" translatable="yes">Use this if there is a lag when moving windows around. This will however decrease the precision of the tile preview updates.</property>
-              <property name="activatable-widget">low_performance_move_mode</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSwitch" id="low_performance_move_mode">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSwitchRow" id="adapt_edge_tiling_to_favorite_layout">
               <property name="title" translatable="yes">Adapt 'Edge Tiling' to your Favorite Layout</property>
-              <property name="activatable-widget">adapt_edge_tiling_to_favorite_layout</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSwitch" id="adapt_edge_tiling_to_favorite_layout">
-                  <property name="valign">center</property>
-                </object>
-              </child>
             </object>
           </child>
           <child>
@@ -648,120 +542,75 @@
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="vertical_preview_area">
               <property name="title" translatable="yes">Vertical Edge Preview Trigger Area</property>
               <property name="activatable-widget">vertical_preview_area</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="vertical_preview_area">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="lower">5</property>
-                      <property name="upper">500</property>
-                      <property name="step-increment">5</property>
-                      <property name="page-increment">10</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="lower">5</property>
+                  <property name="upper">500</property>
+                  <property name="step-increment">5</property>
+                  <property name="page-increment">10</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="horizontal_preview_area">
               <property name="title" translatable="yes">Horizontal Edge Preview Trigger Area</property>
               <property name="activatable-widget">horizontal_preview_area</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="horizontal_preview_area">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="lower">10</property>
-                      <property name="upper">500</property>
-                      <property name="step-increment">5</property>
-                      <property name="page-increment">10</property>
-                    </object>
-                  </property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="lower">10</property>
+                  <property name="upper">500</property>
+                  <property name="step-increment">5</property>
+                  <property name="page-increment">10</property>
                 </object>
-              </child>
+              </property>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow">
+            <object class="AdwSpinRow" id="toggle_maximize_tophalf_timer">
               <property name="title" translatable="yes">Inverse Top Screen Edge Action Timer</property>
               <property name="activatable-widget">toggle_maximize_tophalf_timer</property>
               <property name="visible"
                         bind-source="enable_advanced_experimental_features"
                         bind-property="active"
                         bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSpinButton" id="toggle_maximize_tophalf_timer">
-                  <property name="valign">center</property>
-                  <property name="adjustment">
-                    <object class="GtkAdjustment">
-                      <property name="lower">300</property>
-                      <property name="upper">1500</property>
-                      <property name="step-increment">50</property>
-                      <property name="page-increment">10</property>
-                    </object>
-                  </property>
-                </object>
-              </child>
-            </object>
-          </child>
-          <child>
-            <object class="AdwActionRow">
-              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
-              <property name="activatable-widget">enable_hold_maximize_inverse_landscape</property>
-              <property name="visible"
-                        bind-source="enable_advanced_experimental_features"
-                        bind-property="active"
-                        bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSwitch" id="enable_hold_maximize_inverse_landscape">
-                  <property name="valign">center</property>
-                </object>
-              </child>
-            </object>
-          </child>
-          <child>
-            <object class="AdwActionRow">
-              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
-              <property name="activatable-widget">enable_hold_maximize_inverse_portrait</property>
-              <property name="visible"
-                        bind-source="enable_advanced_experimental_features"
-                        bind-property="active"
-                        bind-flags="sync-create"/>
-              <child>
-                <object class="GtkSwitch" id="enable_hold_maximize_inverse_portrait">
-                  <property name="valign">center</property>
-                </object>
-              </child>
-            </object>
-          </child>
-          <child>
-            <object class="AdwComboRow" id="restore_window_size_on">
-              <property name="title" translatable="yes">Restore Window Size on</property>
-              <property name="subtitle" translatable="yes">Tiled windows may not properly restore their size on Wayland. If that's the case, use &apos;Restore Window Size on Grab End&apos;</property>
-              <property name="visible"
-                        bind-source="enable_advanced_experimental_features"
-                        bind-property="active"
-                        bind-flags="sync-create"/>
-              <property name="model">
-                <object class="GtkStringList">
-                  <items>
-                    <item translatable="yes">Grab Start</item>
-                    <item translatable="yes">Grab End</item>
-                  </items>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="lower">300</property>
+                  <property name="upper">1500</property>
+                  <property name="step-increment">50</property>
+                  <property name="page-increment">10</property>
                 </object>
               </property>
+            </object>
+          </child>
+          <child>
+            <object class="AdwSwitchRow" id="enable_hold_maximize_inverse_landscape">
+              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Landscape Displays</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
+            </object>
+          </child>
+          <child>
+            <object class="AdwSwitchRow" id="enable_hold_maximize_inverse_portrait">
+              <property name="title" translatable="yes">Inverse Top Screen Edge Action for Portrait Displays</property>
+              <property name="visible"
+                        bind-source="enable_advanced_experimental_features"
+                        bind-property="active"
+                        bind-flags="sync-create"/>
             </object>
           </child>
         </object>
@@ -1002,14 +851,8 @@
       <object class="AdwPreferencesGroup">
         <property name="title" translatable="yes">General</property>
         <child>
-          <object class="AdwActionRow">
+          <object class="AdwSwitchRow" id="show_layout_panel_indicator">
             <property name="title" translatable="yes">Panel Indicator</property>
-            <property name="activatable-widget">show_layout_panel_indicator</property>
-            <child>
-              <object class="GtkSwitch" id="show_layout_panel_indicator">
-                <property name="valign">center</property>
-              </object>
-            </child>
           </object>
         </child>
         <child>
@@ -1119,15 +962,9 @@
             <child>
               <object class="AdwPreferencesGroup">
                 <child>
-                  <object class="AdwActionRow">
+                  <object class="AdwSwitchRow" id="enable_advanced_experimental_features">
                     <property name="title" translatable="yes">Advanced / Experimental Settings</property>
                     <property name="subtitle" translatable="yes">Show more settings in the main preference window</property>
-                    <property name="activatable-widget">enable_advanced_experimental_features</property>
-                    <child>
-                      <object class="GtkSwitch" id="enable_advanced_experimental_features">
-                        <property name="valign">center</property>
-                      </object>
-                    </child>
                   </object>
                 </child>
               </object>

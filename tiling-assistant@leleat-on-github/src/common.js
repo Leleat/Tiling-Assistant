@@ -8,41 +8,6 @@
  */
 export class Settings {
     static _settings;
-    static ENABLE_TILING_POPUP = 'enable-tiling-popup';
-    static POPUP_ALL_WORKSPACES = 'tiling-popup-all-workspace';
-    static RAISE_TILE_GROUPS = 'enable-raise-tile-group';
-    static TILEGROUPS_IN_APP_SWITCHER = 'tilegroups-in-app-switcher';
-    static WINDOW_GAP = 'window-gap';
-    static SINGLE_SCREEN_GAP = 'single-screen-gap';
-    static SCREEN_TOP_GAP = 'screen-top-gap';
-    static SCREEN_LEFT_GAP = 'screen-left-gap';
-    static SCREEN_RIGHT_GAP = 'screen-right-gap';
-    static SCREEN_BOTTOM_GAP = 'screen-bottom-gap';
-    static MAXIMIZE_WITH_GAPS = 'maximize-with-gap';
-    static DYNAMIC_KEYBINDINGS = 'dynamic-keybinding-behavior';
-    static ACTIVE_WINDOW_HINT = 'active-window-hint';
-    static ACTIVE_WINDOW_HINT_COLOR = 'active-window-hint-color';
-    static ACTIVE_WINDOW_HINT_BORDER_SIZE = 'active-window-hint-border-size';
-    static ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE = 'active-window-hint-inner-border-size';
-    static SHOW_LAYOUT_INDICATOR = 'show-layout-panel-indicator';
-    static ENABLE_ADV_EXP_SETTINGS = 'enable-advanced-experimental-features';
-    static DISABLE_TILE_GROUPS = 'disable-tile-groups';
-    static ENABLE_TILE_ANIMATIONS = 'enable-tile-animations';
-    static ENABLE_UNTILE_ANIMATIONS = 'enable-untile-animations';
-    static FAVORITE_LAYOUTS = 'favorite-layouts';
-    static DEFAULT_MOVE_MODE = 'default-move-mode';
-    static LOW_PERFORMANCE_MOVE_MODE = 'low-performance-move-mode';
-    static MONITOR_SWITCH_GRACE_PERIOD = 'monitor-switch-grace-period';
-    static ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT = 'adapt-edge-tiling-to-favorite-layout';
-    static ADAPTIVE_TILING_MOD = 'move-adaptive-tiling-mod';
-    static FAVORITE_LAYOUT_MOD = 'move-favorite-layout-mod';
-    static IGNORE_TA_MOD = 'ignore-ta-mod';
-    static VERTICAL_PREVIEW_AREA = 'vertical-preview-area';
-    static HORIZONTAL_PREVIEW_AREA = 'horizontal-preview-area';
-    static INVERSE_TOP_MAXIMIZE_TIMER = 'toggle-maximize-tophalf-timer';
-    static ENABLE_HOLD_INVERSE_LANDSCAPE = 'enable-hold-maximize-inverse-landscape';
-    static ENABLE_HOLD_INVERSE_PORTRAIT = 'enable-hold-maximize-inverse-portrait';
-    static RESTORE_SIZE_ON = 'restore-window-size-on';
 
     static initialize(gioSettings) {
         this._settings = gioSettings;
@@ -71,49 +36,6 @@ export class Settings {
 
     static disconnect(id) {
         this._settings.disconnect(id);
-    }
-
-    /**
-     * @returns {string[]} the settings keys except the ones for shortcuts.
-     */
-    static getAllKeys() {
-        return [
-            this.ENABLE_TILING_POPUP,
-            this.POPUP_ALL_WORKSPACES,
-            this.RAISE_TILE_GROUPS,
-            this.TILEGROUPS_IN_APP_SWITCHER,
-            this.WINDOW_GAP,
-            this.SINGLE_SCREEN_GAP,
-            this.SCREEN_TOP_GAP,
-            this.SCREEN_LEFT_GAP,
-            this.SCREEN_RIGHT_GAP,
-            this.SCREEN_BOTTOM_GAP,
-            this.MAXIMIZE_WITH_GAPS,
-            this.DYNAMIC_KEYBINDINGS,
-            this.ACTIVE_WINDOW_HINT,
-            this.ACTIVE_WINDOW_HINT_COLOR,
-            this.ACTIVE_WINDOW_HINT_BORDER_SIZE,
-            this.ACTIVE_WINDOW_HINT_INNER_BORDER_SIZE,
-            this.SHOW_LAYOUT_INDICATOR,
-            this.ENABLE_ADV_EXP_SETTINGS,
-            this.DISABLE_TILE_GROUPS,
-            this.ENABLE_TILE_ANIMATIONS,
-            this.ENABLE_UNTILE_ANIMATIONS,
-            this.FAVORITE_LAYOUTS,
-            this.DEFAULT_MOVE_MODE,
-            this.LOW_PERFORMANCE_MOVE_MODE,
-            this.MONITOR_SWITCH_GRACE_PERIOD,
-            this.ADAPT_EDGE_TILING_TO_FAVORITE_LAYOUT,
-            this.ADAPTIVE_TILING_MOD,
-            this.FAVORITE_LAYOUT_MOD,
-            this.IGNORE_TA_MOD,
-            this.VERTICAL_PREVIEW_AREA,
-            this.HORIZONTAL_PREVIEW_AREA,
-            this.INVERSE_TOP_MAXIMIZE_TIMER,
-            this.ENABLE_HOLD_INVERSE_LANDSCAPE,
-            this.ENABLE_HOLD_INVERSE_PORTRAIT,
-            this.RESTORE_SIZE_ON
-        ];
     }
 
     /**
@@ -186,75 +108,41 @@ export class Settings {
  * ones related to the Layouts.
  */
 export class Shortcuts {
-    static TOGGLE_POPUP = 'toggle-tiling-popup';
-    static EDIT_MODE = 'tile-edit-mode';
-    static AUTO_FILL = 'auto-tile';
-    static ALWAYS_ON_TOP = 'toggle-always-on-top';
-    static MAXIMIZE = 'tile-maximize';
-    static MAXIMIZE_V = 'tile-maximize-vertically';
-    static MAXIMIZE_H = 'tile-maximize-horizontally';
-    static RESTORE_WINDOW = 'restore-window';
-    static CENTER_WINDOW = 'center-window';
-    static TOP = 'tile-top-half';
-    static BOTTOM = 'tile-bottom-half';
-    static LEFT = 'tile-left-half';
-    static RIGHT = 'tile-right-half';
-    static TOP_LEFT = 'tile-topleft-quarter';
-    static TOP_RIGHT = 'tile-topright-quarter';
-    static BOTTOM_LEFT = 'tile-bottomleft-quarter';
-    static BOTTOM_RIGHT = 'tile-bottomright-quarter';
-    static TOP_IGNORE_TA = 'tile-top-half-ignore-ta';
-    static BOTTOM_IGNORE_TA = 'tile-bottom-half-ignore-ta';
-    static LEFT_IGNORE_TA = 'tile-left-half-ignore-ta';
-    static RIGHT_IGNORE_TA = 'tile-right-half-ignore-ta';
-    static TOP_LEFT_IGNORE_TA = 'tile-topleft-quarter-ignore-ta';
-    static TOP_RIGHT_IGNORE_TA = 'tile-topright-quarter-ignore-ta';
-    static BOTTOM_LEFT_IGNORE_TA = 'tile-bottomleft-quarter-ignore-ta';
-    static BOTTOM_RIGHT_IGNORE_TA = 'tile-bottomright-quarter-ignore-ta';
-    static DEBUGGING = 'debugging-show-tiled-rects';
-    static DEBUGGING_FREE_RECTS = 'debugging-free-rects';
-
     /**
      * @returns {string[]} the settings keys for the shortcuts in the same
      *      order as they appear in the preference window.
      */
     static getAllKeys() {
         return [
-            this.TOGGLE_POPUP,
-            this.EDIT_MODE,
-            this.AUTO_FILL,
-            this.ALWAYS_ON_TOP,
-            this.MAXIMIZE,
-            this.MAXIMIZE_V,
-            this.MAXIMIZE_H,
-            this.RESTORE_WINDOW,
-            this.CENTER_WINDOW,
-            this.TOP,
-            this.BOTTOM,
-            this.LEFT,
-            this.RIGHT,
-            this.TOP_LEFT,
-            this.TOP_RIGHT,
-            this.BOTTOM_LEFT,
-            this.BOTTOM_RIGHT,
-            this.TOP_IGNORE_TA,
-            this.BOTTOM_IGNORE_TA,
-            this.LEFT_IGNORE_TA,
-            this.RIGHT_IGNORE_TA,
-            this.TOP_LEFT_IGNORE_TA,
-            this.TOP_RIGHT_IGNORE_TA,
-            this.BOTTOM_LEFT_IGNORE_TA,
-            this.BOTTOM_RIGHT_IGNORE_TA,
-            this.DEBUGGING,
-            this.DEBUGGING_FREE_RECTS
+            'toggle-tiling-popup',
+            'tile-edit-mode',
+            'auto-tile',
+            'toggle-always-on-top',
+            'tile-maximize',
+            'tile-maximize-vertically',
+            'tile-maximize-horizontally',
+            'restore-window',
+            'center-window',
+            'tile-top-half',
+            'tile-bottom-half',
+            'tile-left-half',
+            'tile-right-half',
+            'tile-topleft-quarter',
+            'tile-topright-quarter',
+            'tile-bottomleft-quarter',
+            'tile-bottomright-quarter',
+            'tile-top-half-ignore-ta',
+            'tile-bottom-half-ignore-ta',
+            'tile-left-half-ignore-ta',
+            'tile-right-half-ignore-ta',
+            'tile-topleft-quarter-ignore-ta',
+            'tile-topright-quarter-ignore-ta',
+            'tile-bottomleft-quarter-ignore-ta',
+            'tile-bottomright-quarter-ignore-ta',
+            'debugging-show-tiled-rects',
+            'debugging-free-rects'
         ];
     }
-}
-
-// Enums:
-export class RestoreOn {
-    static ON_GRAB_START = 0; // Grab Start
-    static ON_GRAB_END = 1; // 'Grab End'
 }
 
 export class DynamicKeybindings {

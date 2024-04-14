@@ -344,7 +344,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
 
         // [Space] to activate the Tiling Popup
         } else if (keyVal === Clutter.KEY_space) {
-            const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+            const allWs = Settings.getBoolean('tiling-popup-all-workspace');
             const openWindows = Twm.getWindows(allWs).filter(w => !this._windows.includes(w));
             const TilingPopup = await import('./tilingPopup.js');
             const tilingPopup = new TilingPopup.TilingSwitcherPopup(

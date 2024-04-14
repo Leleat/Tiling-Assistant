@@ -79,10 +79,10 @@ export default class TilingLayoutsManager {
         Main.panel.addToStatusArea(
             'tiling-assistant@leleat-on-github',
             this._panelIndicator);
-        this._settingsId = Settings.changed(Settings.SHOW_LAYOUT_INDICATOR, () => {
-            this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
+        this._settingsId = Settings.changed('show-layout-panel-indicator', () => {
+            this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
         });
-        this._panelIndicator.visible = Settings.getBoolean(Settings.SHOW_LAYOUT_INDICATOR);
+        this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
         this._panelIndicator.connect('layout-activated', (src, idx) => this.startLayouting(idx));
     }
 
@@ -119,7 +119,7 @@ export default class TilingLayoutsManager {
         if (!layout)
             return;
 
-        const allWs = Settings.getBoolean(Settings.POPUP_ALL_WORKSPACES);
+        const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         this._remainingWindows = Twm.getWindows(allWs);
         this._items = new Layout(layout).getItems();
         this._currItem = null;
@@ -496,12 +496,12 @@ const PanelIndicator = GObject.registerClass({
             this.menu.addMenuItem(item);
         } else {
             // Update favorites with monitor count and fill with '-1', if necessary
-            const tmp = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+            const tmp = Settings.getStrv('favorite-layouts');
             const count = Math.max(Main.layoutManager.monitors.length, tmp.length);
             const favorites = [...new Array(count)].map((m, monitorIndex) => {
                 return tmp[monitorIndex] ?? '-1';
             });
-            Settings.setStrv(Settings.FAVORITE_LAYOUTS, favorites);
+            Settings.setStrv('favorite-layouts', favorites);
 
             // Create popup menu items
             layouts.forEach((layout, idx) => {
@@ -542,7 +542,7 @@ const PopupFavoriteMenuItem = GObject.registerClass({
             x_expand: true
         }));
 
-        const favorites = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+        const favorites = Settings.getStrv('favorite-layouts');
         Main.layoutManager.monitors.forEach((m, monitorIndex) => {
             const favoriteButton = new St.Button({
                 child: new St.Icon({
@@ -554,9 +554,9 @@ const PopupFavoriteMenuItem = GObject.registerClass({
 
             // Update gSetting with new Favorite (act as a toggle button)
             favoriteButton.connect('clicked', () => {
-                const currFavorites = Settings.getStrv(Settings.FAVORITE_LAYOUTS);
+                const currFavorites = Settings.getStrv('favorite-layouts');
                 currFavorites[monitorIndex] = currFavorites[monitorIndex] === `${layoutIndex}` ? '-1' : `${layoutIndex}`;
-                Settings.setStrv(Settings.FAVORITE_LAYOUTS, currFavorites);
+                Settings.setStrv('favorite-layouts', currFavorites);
                 this.emit('favorite-changed', monitorIndex);
             });
         });

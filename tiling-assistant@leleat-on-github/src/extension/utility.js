@@ -103,10 +103,10 @@ export class Util {
 
     static useIndividualGaps(monitor) {
         // Prefer individual gaps over the single one
-        const screenTopGap = this.getScaledGap(Settings.SCREEN_TOP_GAP, monitor);
-        const screenLeftGap = this.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
-        const screenRightGap = this.getScaledGap(Settings.SCREEN_RIGHT_GAP, monitor);
-        const screenBottomGap = this.getScaledGap(Settings.SCREEN_BOTTOM_GAP, monitor);
+        const screenTopGap = this.getScaledGap('screen-top-gap', monitor);
+        const screenLeftGap = this.getScaledGap('screen-left-gap', monitor);
+        const screenRightGap = this.getScaledGap('screen-right-gap', monitor);
+        const screenBottomGap = this.getScaledGap('screen-bottom-gap', monitor);
         return screenTopGap || screenLeftGap || screenRightGap || screenBottomGap;
     }
 
@@ -148,7 +148,7 @@ export class Util {
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const favoriteLayout = [];
         const layouts = this.getLayouts();
-        const layout = layouts?.[Settings.getStrv(Settings.FAVORITE_LAYOUTS)[monitor]];
+        const layout = layouts?.[Settings.getStrv('favorite-layouts')[monitor]];
 
         if (!layout)
             return [];
@@ -305,12 +305,12 @@ export class Rect {
      * @returns {Rect} the rectangle after the gaps were taken into account
      */
     addGaps(workArea, monitor) {
-        const screenTopGap = Util.getScaledGap(Settings.SCREEN_TOP_GAP, monitor);
-        const screenLeftGap = Util.getScaledGap(Settings.SCREEN_LEFT_GAP, monitor);
-        const screenRightGap = Util.getScaledGap(Settings.SCREEN_RIGHT_GAP, monitor);
-        const screenBottomGap = Util.getScaledGap(Settings.SCREEN_BOTTOM_GAP, monitor);
-        const singleScreenGap = Util.getScaledGap(Settings.SINGLE_SCREEN_GAP, monitor);
-        const windowGap = Util.getScaledGap(Settings.WINDOW_GAP, monitor);
+        const screenTopGap = Util.getScaledGap('screen-top-gap', monitor);
+        const screenLeftGap = Util.getScaledGap('screen-left-gap', monitor);
+        const screenRightGap = Util.getScaledGap('screen-right-gap', monitor);
+        const screenBottomGap = Util.getScaledGap('screen-bottom-gap', monitor);
+        const singleScreenGap = Util.getScaledGap('single-screen-gap', monitor);
+        const windowGap = Util.getScaledGap('window-gap', monitor);
         const r = this.copy();
 
         // Prefer individual gaps
