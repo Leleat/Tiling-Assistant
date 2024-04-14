@@ -2,7 +2,6 @@ import { Gdk, Gio, GLib, Gtk } from './src/dependencies/prefs/gi.js';
 import { ExtensionPreferences } from './src/dependencies/prefs.js';
 
 import LayoutPrefs from './src/prefs/layoutsPrefs.js';
-import { Shortcuts } from './src/common.js';
 // eslint-disable-next-line no-unused-vars
 import { ShortcutListener } from './src/prefs/shortcutListener.js';
 
@@ -207,8 +206,35 @@ export default class Prefs extends ExtensionPreferences {
     * Bind keybinding widgets to settings.
     */
     _bindKeybindings(settings, builder) {
-        const shortcuts = Shortcuts.getAllKeys();
-        shortcuts.forEach(key => {
+        [
+            'toggle-tiling-popup',
+            'tile-edit-mode',
+            'auto-tile',
+            'toggle-always-on-top',
+            'tile-maximize',
+            'tile-maximize-vertically',
+            'tile-maximize-horizontally',
+            'restore-window',
+            'center-window',
+            'tile-top-half',
+            'tile-bottom-half',
+            'tile-left-half',
+            'tile-right-half',
+            'tile-topleft-quarter',
+            'tile-topright-quarter',
+            'tile-bottomleft-quarter',
+            'tile-bottomright-quarter',
+            'tile-top-half-ignore-ta',
+            'tile-bottom-half-ignore-ta',
+            'tile-left-half-ignore-ta',
+            'tile-right-half-ignore-ta',
+            'tile-topleft-quarter-ignore-ta',
+            'tile-topright-quarter-ignore-ta',
+            'tile-bottomleft-quarter-ignore-ta',
+            'tile-bottomright-quarter-ignore-ta',
+            'debugging-show-tiled-rects',
+            'debugging-free-rects'
+        ].forEach(key => {
             const shortcut = builder.get_object(key.replaceAll('-', '_'));
             shortcut.initialize(key, settings);
         });

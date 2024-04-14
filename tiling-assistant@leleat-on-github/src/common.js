@@ -103,48 +103,6 @@ export class Settings {
     }
 }
 
-/**
- * A Singleton providing access to the shortcut keys except the
- * ones related to the Layouts.
- */
-export class Shortcuts {
-    /**
-     * @returns {string[]} the settings keys for the shortcuts in the same
-     *      order as they appear in the preference window.
-     */
-    static getAllKeys() {
-        return [
-            'toggle-tiling-popup',
-            'tile-edit-mode',
-            'auto-tile',
-            'toggle-always-on-top',
-            'tile-maximize',
-            'tile-maximize-vertically',
-            'tile-maximize-horizontally',
-            'restore-window',
-            'center-window',
-            'tile-top-half',
-            'tile-bottom-half',
-            'tile-left-half',
-            'tile-right-half',
-            'tile-topleft-quarter',
-            'tile-topright-quarter',
-            'tile-bottomleft-quarter',
-            'tile-bottomright-quarter',
-            'tile-top-half-ignore-ta',
-            'tile-bottom-half-ignore-ta',
-            'tile-left-half-ignore-ta',
-            'tile-right-half-ignore-ta',
-            'tile-topleft-quarter-ignore-ta',
-            'tile-topright-quarter-ignore-ta',
-            'tile-bottomleft-quarter-ignore-ta',
-            'tile-bottomright-quarter-ignore-ta',
-            'debugging-show-tiled-rects',
-            'debugging-free-rects'
-        ];
-    }
-}
-
 export class DynamicKeybindings {
     // Order comes from prefs
     static DISABLED = 0;
