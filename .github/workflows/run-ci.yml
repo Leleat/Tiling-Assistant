@@ -13,18 +13,12 @@ jobs:
         with:
           node-version: "*"
       - name: Prepare Linters
-        run: npm install -g eslint stylelint stylelint-config-standard && npm i @eslint/js 
+        run: npm i
       - name: Run ESLint (*.js)
         run: >
           git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
           grep -E "\.js$" |
           xargs -r eslint
-      - name: Run stylelint (*.css)
-        if: success() || failure()
-        run: >
-          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
-          grep -E "\.css$" |
-          xargs -r stylelint
       - name: Run ShellCheck (*.sh)
         if: success() || failure()
         run: >

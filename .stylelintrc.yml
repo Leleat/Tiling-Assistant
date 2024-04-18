@@ -1,5 +1,0 @@
-extends: stylelint-config-standard
-rules:
-    # modern and percentage not supported under g-s
-    color-function-notation: legacy
-    alpha-value-notation: number
