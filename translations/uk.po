@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 03:42+0100\n"
+"POT-Creation-Date: 2024-04-21 14:58+0200\n"
 "PO-Revision-Date: 2024-01-14 14:43+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: \n"
@@ -38,8 +38,8 @@ msgid "Advanced..."
 msgstr "Додатково"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:782
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1003
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:852
 msgid "General"
 msgstr "Загальне"
 
@@ -51,19 +51,19 @@ msgstr "Спливаюче вікно мозаїки"
 msgid "Open after tiling a window"
 msgstr "Відкривати після укладання вікна як плитки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:62
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:56
 msgid "Include apps from all workspaces"
 msgstr "Включити програми з усіх робочих просторів"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:83
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:71
 msgid "Tile Groups"
 msgstr "Групи плиток"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:74
 msgid "Disable Tile Groups"
 msgstr "Не використовувати групи плиток"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:75
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
@@ -74,11 +74,11 @@ msgstr ""
 "розміри. Cпливаюче вікно мозаїки та динамічні клавіатурні скорочення "
 "'Фокусування вікон' також перестануть працювати."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:84
 msgid "Raise together"
 msgstr "Підіймати одночасно"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:85
 msgid ""
 "A tile group is created when a window gets tiled. If a tiled window is "
 "raised, raise the other windows of its tile group as well"
@@ -87,11 +87,11 @@ msgstr ""
 "одне вікно мозаїки, то інші вікна, що належать до групи плиток, підіймаються "
 "також"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:114
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:90
 msgid "App Switcher and Tiling Popup"
 msgstr "Перемикач програм та спливаюче вікно мозаїки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:115
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:91
 msgid ""
 "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
 "may need to re-enable this or the other extension after toggling this setting"
@@ -100,43 +100,43 @@ msgstr ""
 "(alt+Tab). Можливо, вам доведеться переувімкнути поточне, або ж інше "
 "розширення після зміни цього параметра"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:105
 msgid "Gaps"
 msgstr "Відступи"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:108
 msgid "Windows"
 msgstr "Вікна"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:156
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:121
 msgid "Screen Edges"
 msgstr "Краї екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
 msgid "Screen Edge Top"
 msgstr "Верхній край екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:155
 msgid "Screen Edge Left"
 msgstr "Лівий край екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:172
 msgid "Screen Edge Right"
 msgstr "Правий край екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:189
 msgid "Screen Edge Bottom"
 msgstr "Нижній край екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:206
 msgid "Maximized Windows"
 msgstr "Розгорнуті вікна"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:216
 msgid "Dynamic Keybinding Behavior"
 msgstr "Поведінка динамічних клавіатурних скорочень"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:217
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
@@ -144,32 +144,32 @@ msgstr ""
 "Клавіатурні скорочення розгортання та укладання згори/знизу/ліворуч/"
 "праворуч, можуть змінювати свою поведінку в залежності від розміщення вікна"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:220
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:290
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:514
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
 msgid "Disabled"
 msgstr "Вимкнено"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:221
 msgid "Don't change the keybindings' behavior"
 msgstr "Не змінювати поведінку клавіатурних скорочень"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:230
 msgid "Window Focus"
 msgstr "Фокусування вікон"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:297
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:231
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr "Перемикати фокус на вікно мозаїки у напрямку клавіатурного скорочення"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:242
 msgid "Tiling State"
 msgstr "Положення плиток "
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:309
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:243
 msgid ""
 "Adapt the tiling state to the pressed shortcut. For instance, a window tiled "
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
@@ -179,11 +179,11 @@ msgstr ""
 "скорочення. Наприклад, вікно, укладене на правій половині, при активації "
 "'укласти знизу', переміститься до правої нижньої чверті"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:254
 msgid "Tiling State (Windows)"
 msgstr "Положення плиток (вікна)"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:321
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:255
 msgid ""
 "Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
 "bottom and the 'tile to bottom' shortcut is activated, minimize the window"
@@ -192,28 +192,28 @@ msgstr ""
 "укладене чи укладене знизу, активація скорочення 'укласти знизу' приховає "
 "вікно"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Favorite Layout"
 msgstr "Улюблений макет"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:267
 msgid "Move the window along your favorite Layout"
 msgstr "Розміщувати вікна, як на улюбленому макеті"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Active Window Hint"
 msgstr "Підказка щодо активного вікна"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:291
 msgid "Don't indicate the focused window"
 msgstr "Не позначати вікно в фокусі"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:300
 msgid "Minimal"
 msgstr "Мінімально"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:301
 msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
@@ -221,11 +221,11 @@ msgstr ""
 "Тимчасово позначати вікно в фокусі під час перемикання на робочий простір з "
 "декількома вікнами, що не перекриваютьcя"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:312
 msgid "Always"
 msgstr "Завжди"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:313
 msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
@@ -233,30 +233,30 @@ msgstr ""
 "Завжди позначати вікно з фокусом. Виключення становлять розгорнуті та "
 "повноекранні вікна. Є проблеми зі спливаючими вікнами GTK4 на Wayland"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
 msgid "Hint Color"
 msgstr "Колір підказки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
 msgid "The color of the frame indicating the focused window"
 msgstr "Колір рамки, що позначає вікно з фокусом"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:344
 msgid "Border Size"
 msgstr "Розмір рамки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:345
 msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
 msgstr ""
 "Розмір рамки, яка позначає вікно з фокусом для завжди активної підказки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:358
 msgid "Inner Border Size"
 msgstr "Розмір внутрішньої рамки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:359
 msgid ""
 "The border for the always active hint reaching inside the window frame. This "
 "is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
@@ -266,32 +266,32 @@ msgstr ""
 "заокруглених кутів. Проте, спливаючі вікна GTK4 на Wayland з якоїсь причини "
 "розміщуються за підказкою..."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:377
 msgid "Animations"
 msgstr "Анімації"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:460
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:384
 msgid "Tiling"
 msgstr "Укладання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:471
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:389
 msgid "Untiling"
 msgstr "Відокремлення"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "Default Window Movement Mode"
 msgstr "Типовий режим переміщення вікон"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:488
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:400
 msgid "The movement mode that is activated when no modifier key is pressed"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:849
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:407
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
 msgid "Edge Tiling"
 msgstr "Укладання від краю"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:496
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:408
 msgid ""
 "Moving the window to the screen edges or corners will open the default tile "
 "preview"
@@ -299,11 +299,11 @@ msgstr ""
 "Після пересування вікна до краю чи кута екрана буде відкриватися типове "
 "спливаюче вікно пропозиції щодо укладання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:505
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:417
 msgid "Adaptive Tiling"
 msgstr "Адаптивне укладання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:506
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:418
 msgid ""
 "Releasing the grab on a window while hovering over a tile will push the "
 "overlapped window(s) aside"
@@ -311,30 +311,30 @@ msgstr ""
 "Якщо відпустити захоплене вікна над частиною мозаїки, то перекрите(-і) "
 "вікно(-а) посунуться вбік"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:518
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
 "Пропозиція щодо укладання буде формуватися в залежності від вашого "
 "улюбленого макета зі сторінки 'Макети'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:441
 msgid "Ignore Tiling Assistant"
 msgstr "Ігнорувати Tiling Assistant"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:530
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:442
 msgid "Use Edge Tiling without Tiling Assistant's features"
 msgstr "Використовувати 'Укладання від краю' без функціоналу Tiling Assistant"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:546
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:458
 msgid "Other"
 msgstr "Інше"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:461
 msgid "Monitor Switch Grace Period"
 msgstr "Затримка під час переміщення між моніторами"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:550
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:462
 msgid ""
 "When a window is dragged to a new monitor the tile preview will stick to the "
 "old monitor for a very short time. This way you can tile windows by "
@@ -346,11 +346,11 @@ msgstr ""
 "укладати вікна, 'cкидаючи' їх до краю екрана, навіть якщо монітори межують "
 "по цьому краю."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:467
 msgid "Low Performance Movement Mode"
 msgstr "Режим переміщення за низької продуктивності"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:562
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:468
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
@@ -358,238 +358,217 @@ msgstr ""
 "Використовуйте у разі, якщо є затримка при переміщенні вікон. Зауважте, що "
 "це знизить точність оновлення пропозиції щодо укладання."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:577
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:477
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
 msgstr "'Укладання від краю' буде адаптовано до вашого улюбленого макету"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:592
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:486
 msgid "'Adaptive Tiling' Move Mode Activator"
 msgstr "Активує переміщення в режимі 'Адаптивне укладання'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:515
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:535
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:642
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:496
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:536
 msgid "Alt"
 msgstr "Alt"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:497
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:537
 msgid "RMB"
 msgstr "Права кнопка миші"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:604
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:644
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:498
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:518
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:538
 msgid "Super"
 msgstr "Super"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:612
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:506
 msgid "'Favorite Layout' Move Mode Activator"
 msgstr "Активує переміщення в режимі 'Улюблений макет'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:632
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:526
 msgid "'Ignore Tiling Assistant' Mode Activator"
 msgstr "Активує переміщення в режимі 'Ігнорувати Tiling Assistant'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:652
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:546
 msgid "Vertical Edge Preview Trigger Area"
 msgstr ""
 "Ділянка біля вертикальної межі, на якій активується пропозиції щодо укладання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:675
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:564
 msgid "Horizontal Edge Preview Trigger Area"
 msgstr ""
 "Ділянка біля горизонтальної межі, на якій активується пропозиції щодо "
 "укладання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:582
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "Таймер зворотної дії у верхній частині екрана"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:721
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
 msgid "Inverse Top Screen Edge Action for Landscape Displays"
 msgstr ""
 "Зворотня дія у верхній частині екрана для дисплеїв з альбомною орієнтацією"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:736
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:609
 msgid "Inverse Top Screen Edge Action for Portrait Displays"
 msgstr ""
 "Зворотня дія у верхній частині екрана для дисплеїв з портретною орієнтацією"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:751
-msgid "Restore Window Size on"
-msgstr "Відновлювати розмір під час"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:752
-msgid ""
-"Tiled windows may not properly restore their size on Wayland. If that's the "
-"case, use 'Restore Window Size on Grab End'"
-msgstr ""
-"Вікна, укладені як плитки, можуть неправильно відновлювати свої розміри на "
-"Wayland. В такому разі використовуйте опцію 'Відновлювати розмір під час "
-"відпускання'"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:760
-msgid "Grab Start"
-msgstr "захоплення"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:761
-msgid "Grab End"
-msgstr "відпускання"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:775
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
 msgid "Keybindings"
 msgstr "Клавіатурні скорочення"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:785
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:634
 msgid "Toggle 'Tiling Popup'"
 msgstr "Увімкнути 'Спливаюче вікно мозаїки'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:790
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:639
 msgid "Tile Editing Mode"
 msgstr "Режим редагування мозаїки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:791
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
 msgid "A keyboard-driven mode to manage your tiled windows"
 msgstr "Керування вікнами мозаїки за допомогою клавіатури"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:645
 msgid "Auto-Tile"
 msgstr "Укласти автоматично"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:797
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:646
 msgid "Un/tile the current window based on the visible tiles"
 msgstr "Укласти/відокремити поточне вікно з урахуванням видимих вікон мозаїки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:802
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Toggle 'Always on Top'"
 msgstr "Завжди зверху"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:811
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:660
 msgid "Toggle Maximization"
 msgstr "Розгортання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:816
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:665
 msgid "Toggle Vertical Maximization"
 msgstr "Вертикальне розгортання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:825
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:674
 msgid "Toggle Horizontal Maximization"
 msgstr "Горизонтальне розгортання"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:834
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:683
 msgid "Restore Window Size"
 msgstr "Відновити розмір вікна"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:839
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:688
 msgid "Move Window to Center"
 msgstr "Перемістити вікно до центру"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:852
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:912
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:701
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:761
 msgid "Tile to top"
 msgstr "Укласти згори"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:857
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:917
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:706
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:766
 msgid "Tile to bottom"
 msgstr "Укласти знизу"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:862
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:922
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:711
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:771
 msgid "Tile to left"
 msgstr "Укласти ліворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:867
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:927
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:716
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:776
 msgid "Tile to right"
 msgstr "Укласти праворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:877
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:726
 msgid "Corner Tiling"
 msgstr "Укладання від кута"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:880
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:944
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:729
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:793
 msgid "Tile to top-left"
 msgstr "Укласти згори ліворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:885
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:949
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:734
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:798
 msgid "Tile to top-right"
 msgstr "Укласти згори праворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:890
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:954
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:739
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:803
 msgid "Tile to bottom-left"
 msgstr "Укласти знизу ліворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:959
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:744
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:808
 msgid "Tile to bottom-right"
 msgstr "Укласти знизу праворуч"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:905
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:754
 msgid "Edge Tiling without Tiling Assistant"
 msgstr "Укладання від краю без використання Tiling Assistant"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:937
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:786
 msgid "Corner Tiling without Tiling Assistant"
 msgstr "Укладання від кута без використання Tiling Assistant"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:969
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:818
 msgid "Debugging"
 msgstr "Зневадження"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:976
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:825
 msgid "Show Tiled Rects"
 msgstr "Показати прямокутники мозаїки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:981
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:830
 msgid "Show Free Screen Rects"
 msgstr "Показати незайняті прямокутники мозаїки"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:992
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1028
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:841
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:871
 msgid "Layouts"
 msgstr "Макети"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1006
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:855
 msgid "Panel Indicator"
 msgstr "Індикатор на панелі"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1017
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:860
 msgid "Search for a Layout"
 msgstr "Пошук макета"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1018
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:861
 msgid "Open a popup listing all the available layouts"
 msgstr "Викликати спливаюче вікно з переліком доступних макетів"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1052
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
 msgid "Add a new Layout."
 msgstr "Додати новий макет"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1059
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:902
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
 msgstr "Зберегти макети на диск. Некоректні зміни будуть втрачені!"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1066
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:909
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr "Перезавантажити макети з диска, відкидаючи всі незбережені зміни."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:966
 msgid "Advanced / Experimental Settings"
 msgstr "Розширені / Експериментальні налаштування"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1124
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:967
 msgid "Show more settings in the main preference window"
 msgstr "Додати налаштування в основне вікно параметрів"
 
@@ -638,3 +617,20 @@ msgstr "'Режим редагування мозаїки' недоступни�
 #: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
 msgstr "Довідка"
+
+#~ msgid "Restore Window Size on"
+#~ msgstr "Відновлювати розмір під час"
+
+#~ msgid ""
+#~ "Tiled windows may not properly restore their size on Wayland. If that's "
+#~ "the case, use 'Restore Window Size on Grab End'"
+#~ msgstr ""
+#~ "Вікна, укладені як плитки, можуть неправильно відновлювати свої розміри "
+#~ "на Wayland. В такому разі використовуйте опцію 'Відновлювати розмір під "
+#~ "час відпускання'"
+
+#~ msgid "Grab Start"
+#~ msgstr "захоплення"
+
+#~ msgid "Grab End"
+#~ msgstr "відпускання"
