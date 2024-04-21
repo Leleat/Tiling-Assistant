@@ -1,5 +1,19 @@
 # Changelog
 
+## [47] - 2024-04-21
+
+### Fixed
+
+- Don't untile a window on a single click by taoky (#328)
+
+### Changed
+
+- Use native AdwSwitchRow and AdwSpinRow (#334)
+
+### Removed
+
+- Removed restore-window-size-on-grab-start/end setting since it should be no longer needed (#334)
+
 ## [46] - 2024-03-24
 
 ### Added

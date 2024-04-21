@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-03-13 03:42+0100\n"
+"POT-Creation-Date: 2024-04-21 14:58+0200\n"
 "PO-Revision-Date: 2022-04-24 12:06+0100\n"
 "Last-Translator: \n"
 "Language-Team: \n"
@@ -39,8 +39,8 @@ msgid "Advanced..."
 msgstr "Fortgeschrittene..."
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:782
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1003
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:852
 msgid "General"
 msgstr "Allgemein"
 
@@ -52,19 +52,19 @@ msgstr "Kachel-Popup"
 msgid "Open after tiling a window"
 msgstr "Nach dem Zuordnen eines Fensters öffnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:62
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:56
 msgid "Include apps from all workspaces"
 msgstr "Anwendungen aus allen Arbeitsbereichen einbeziehen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:83
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:71
 msgid "Tile Groups"
 msgstr "Kachelgruppen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:86
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:74
 msgid "Disable Tile Groups"
 msgstr "Kachelgruppen deaktivieren"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:87
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:75
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
@@ -75,11 +75,11 @@ msgstr ""
 "Tastenbindung 'Fensterfokus' und das Kachel-Popup funktionieren dann "
 "ebenfalls nicht mehr."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:102
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:84
 msgid "Raise together"
 msgstr "Gemeinsam anheben"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:85
 msgid ""
 "A tile group is created when a window gets tiled. If a tiled window is "
 "raised, raise the other windows of its tile group as well"
@@ -88,11 +88,11 @@ msgstr ""
 "zugeordnetes Fenster geöffnet wird, werden auch die anderen Fenster der "
 "Kachelgruppe geöffnet."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:114
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:90
 msgid "App Switcher and Tiling Popup"
 msgstr "App Switcher und Kachel-Popup"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:115
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:91
 msgid ""
 "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
 "may need to re-enable this or the other extension after toggling this setting"
@@ -101,43 +101,43 @@ msgstr ""
 "führen. Diese müssen möglicherweise erneut aktiviert werden, wenn diese "
 "Einstellung angeschaltet wurde."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:105
 msgid "Gaps"
 msgstr "Zwischenraum"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:108
 msgid "Windows"
 msgstr "Fenster"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:156
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:121
 msgid "Screen Edges"
 msgstr "Bildschirmränder"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
 msgid "Screen Edge Top"
 msgstr "Bildschirmrand oben"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:200
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:155
 msgid "Screen Edge Left"
 msgstr "Bildschirmrand links"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:222
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:172
 msgid "Screen Edge Right"
 msgstr "Bildschirmrand rechts"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:244
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:189
 msgid "Screen Edge Bottom"
 msgstr "Bildschirmrand unten"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:206
 msgid "Maximized Windows"
 msgstr "Maximierte Fenster"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:216
 msgid "Dynamic Keybinding Behavior"
 msgstr "Dynamisches Tastenbelegungsverhalten"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:283
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:217
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
@@ -145,34 +145,34 @@ msgstr ""
 "Die Tastenkombinationen zum Maximieren und Kacheln nach oben/unten/links/"
 "rechts können ihr Verhalten je nach Kachelzustand des Fensters ändern"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:286
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:356
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:620
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:220
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:290
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:514
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
 msgid "Disabled"
 msgstr "Deaktiviert"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:221
 msgid "Don't change the keybindings' behavior"
 msgstr "Das Verhalten der Tastenkombinationen nicht ändern"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:230
 msgid "Window Focus"
 msgstr "Fenster-Fokus"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:297
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:231
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
 "Fokus auf das gekachelte Fenster in Richtung des angeklickten Shortcuts "
 "umschalten"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:242
 msgid "Tiling State"
 msgstr "Kachelzustand"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:309
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:243
 msgid ""
 "Adapt the tiling state to the pressed shortcut. For instance, a window tiled "
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
@@ -182,11 +182,11 @@ msgstr ""
 "wird ein zur rechten Hälfte gekacheltes Fenster zum rechten unteren Viertel "
 "gekachelt, wenn die Option 'Nach unten zuordnen' aktiviert ist. "
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:320
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:254
 msgid "Tiling State (Windows)"
 msgstr "Kachelzustand (Windows)"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:321
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:255
 msgid ""
 "Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
 "bottom and the 'tile to bottom' shortcut is activated, minimize the window"
@@ -195,28 +195,28 @@ msgstr ""
 "am unteren Rand angeordnet ist und die Tastenkombination 'Zum unteren Rand "
 "zuordnen' aktiviert ist, wird das Fenster minimiert."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Favorite Layout"
 msgstr "Favorisiertes Layout"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:267
 msgid "Move the window along your favorite Layout"
 msgstr "Verschiebt das Fenster entlang des favorisierten Layouts"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Active Window Hint"
 msgstr "Aktiver Fensterhinweis"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:357
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:291
 msgid "Don't indicate the focused window"
 msgstr "Das fokussierte Fenster nicht anzeigen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:366
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:300
 msgid "Minimal"
 msgstr "Minimal"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:367
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:301
 msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
@@ -224,11 +224,11 @@ msgstr ""
 "Vorübergehendes Anzeigen des fokussierten Fensters beim Wechsel zu einem "
 "Arbeitsbereich mit mehreren sich nicht überlappenden Fenstern"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:312
 msgid "Always"
 msgstr "Immer"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:379
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:313
 msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
@@ -236,19 +236,19 @@ msgstr ""
 "Zeigt immer das fokussierte Fenster an, es sei denn, es ist maximiert oder "
 "im Vollbildmodus. Es gibt Probleme unter Wayland mit GTK4 Popups"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:398
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
 msgid "Hint Color"
 msgstr "Hinweisfarbe"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
 msgid "The color of the frame indicating the focused window"
 msgstr "Die Farbe des Rahmens, der das fokussierte Fenster anzeigt"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:410
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:344
 msgid "Border Size"
 msgstr "Rahmengröße"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:411
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:345
 msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
@@ -256,11 +256,11 @@ msgstr ""
 "Die Größe des Rahmens, der das fokussierte Fenster für den immer aktiven "
 "Hinweis anzeigt"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:358
 msgid "Inner Border Size"
 msgstr "Innere Rahmengröße"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:359
 msgid ""
 "The border for the always active hint reaching inside the window frame. This "
 "is meant to cover rounded corners. However, GTK4 popups on Wayland will put "
@@ -270,32 +270,32 @@ msgstr ""
 "Dies ist dazu gedacht, abgerundete Ecken abzudecken. Allerdings werden GTK4-"
 "Popups unter Wayland das Fenster aus irgendeinem Grund dahinter setzen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:453
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:377
 msgid "Animations"
 msgstr "Animationen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:460
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:384
 msgid "Tiling"
 msgstr "Kacheln"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:471
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:389
 msgid "Untiling"
 msgstr "Entkacheln"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "Default Window Movement Mode"
 msgstr "Standard-Fensterbewegungsmodus"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:488
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:400
 msgid "The movement mode that is activated when no modifier key is pressed"
 msgstr ""
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:849
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:407
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
 msgid "Edge Tiling"
 msgstr "An den Rand zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:496
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:408
 msgid ""
 "Moving the window to the screen edges or corners will open the default tile "
 "preview"
@@ -303,11 +303,11 @@ msgstr ""
 "Durch Verschieben des Fensters zu den Bildschirmrändern oder -ecken wird die "
 "Standardkachelvorschau geöffnet"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:505
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:417
 msgid "Adaptive Tiling"
 msgstr "Dynamisches Zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:506
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:418
 msgid ""
 "Releasing the grab on a window while hovering over a tile will push the "
 "overlapped window(s) aside"
@@ -315,30 +315,30 @@ msgstr ""
 "Das Loslassen eines Fensters, während der Mauszeiger über einer Kachel "
 "schwebt, schiebt das überlappende Fenster zur Seite"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:518
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
 "Die Kachelvorschau bleibt bei Ihrem bevorzugten Layout von der Seite "
 "'Layouts'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:529
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:441
 msgid "Ignore Tiling Assistant"
 msgstr "Kachelassistent ignorieren"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:530
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:442
 msgid "Use Edge Tiling without Tiling Assistant's features"
 msgstr "Verwendung von Kantenkachelung ohne die Funktionen vom Kachelassistent"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:546
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:458
 msgid "Other"
 msgstr "Andere"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:549
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:461
 msgid "Monitor Switch Grace Period"
 msgstr "Monitorwechsel Wartezeit"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:550
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:462
 msgid ""
 "When a window is dragged to a new monitor the tile preview will stick to the "
 "old monitor for a very short time. This way you can tile windows by "
@@ -350,11 +350,11 @@ msgstr ""
 "diese Weise können Sie Fenster kacheln, indem Sie sie auf eine beliebige "
 "Bildschirmkanten 'werfen', selbst wenn ein Monitor an diese Kante angrenzt."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:561
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:467
 msgid "Low Performance Movement Mode"
 msgstr "Bewegungsmodus mit geringer Leistung"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:562
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:468
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
@@ -363,237 +363,216 @@ msgstr ""
 "Verzögerungen kommt. Allerdings wird dadurch die Genauigkeit der "
 "Kachelvorschauaktualisierungen verringert."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:577
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:477
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
 msgstr "'An den Rand zuordnen' an Ihr bevorzugtes Layout anpassen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:592
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:486
 msgid "'Adaptive Tiling' Move Mode Activator"
 msgstr "Aktivator für den Verschiebemodus 'Dynamisches Zuordnen'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:621
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:515
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:535
 msgid "Ctrl"
 msgstr "Strg"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:602
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:622
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:642
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:496
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:536
 msgid "Alt"
 msgstr "Alt"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:603
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:623
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:643
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:497
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:537
 msgid "RMB"
 msgstr "RMB"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:604
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:644
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:498
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:518
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:538
 msgid "Super"
 msgstr "Super"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:612
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:506
 msgid "'Favorite Layout' Move Mode Activator"
 msgstr "Aktivator für den Verschiebemodus 'Favorisiertes Layout'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:632
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:526
 msgid "'Ignore Tiling Assistant' Mode Activator"
 msgstr "'Ignoriere Kachel-Assistent' Modus Schalter "
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:652
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:546
 msgid "Vertical Edge Preview Trigger Area"
 msgstr "Vertikale Randvorschau Auslösebereich"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:675
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:564
 msgid "Horizontal Edge Preview Trigger Area"
 msgstr "Horizontale Randvorschau Auslösebereich"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:582
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "Umgekehrter Timer für die Aktion am oberen Bildschirmrand"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:721
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
 msgid "Inverse Top Screen Edge Action for Landscape Displays"
 msgstr "Umgekehrter Timer für die Aktion eines querformatigen Displays"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:736
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:609
 msgid "Inverse Top Screen Edge Action for Portrait Displays"
 msgstr "Umgekehrter Timer für die Aktion eines hochformatigen Displays"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:751
-msgid "Restore Window Size on"
-msgstr "Fenstergrösse wiederherstellen auf"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:752
-msgid ""
-"Tiled windows may not properly restore their size on Wayland. If that's the "
-"case, use 'Restore Window Size on Grab End'"
-msgstr ""
-"Bei zugeordneten Fenstern kann es vorkommen, dass die Grösse auf Wayland "
-"nicht korrekt wiederhergestellt wird. Wenn das der Fall ist, muss die "
-"Funktion 'Fenstergrösse am Greifende wiederherstellen' genutzt werden."
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:760
-msgid "Grab Start"
-msgstr "Greifen Start"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:761
-msgid "Grab End"
-msgstr "Greifen Ende"
-
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:775
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
 msgid "Keybindings"
 msgstr "Tastenbelegung"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:785
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:634
 msgid "Toggle 'Tiling Popup'"
 msgstr "Umschalten 'Kacheln Popup'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:790
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:639
 msgid "Tile Editing Mode"
 msgstr "Kachelbearbeitungsmodus"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:791
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
 msgid "A keyboard-driven mode to manage your tiled windows"
 msgstr "Ein tastaturbasierter Modus zur Verwaltung der gekachelten Fenster"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:796
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:645
 msgid "Auto-Tile"
 msgstr "Auto-Zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:797
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:646
 msgid "Un/tile the current window based on the visible tiles"
 msgstr ""
 "Zuordnen oder Trennen des aktuellen Fensters anhand der sichtbaren Kacheln"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:802
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Toggle 'Always on Top'"
 msgstr "Umschalten 'Immer oben'"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:811
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:660
 msgid "Toggle Maximization"
 msgstr "Umschalten Maximierung"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:816
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:665
 msgid "Toggle Vertical Maximization"
 msgstr "Umschalten vertikale Maximierung"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:825
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:674
 msgid "Toggle Horizontal Maximization"
 msgstr "Umschalten horizontale Maximierung"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:834
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:683
 msgid "Restore Window Size"
 msgstr "Fenstergrösse wiederherstellen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:839
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:688
 msgid "Move Window to Center"
 msgstr "Fenster in die Mitte verschieben"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:852
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:912
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:701
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:761
 msgid "Tile to top"
 msgstr "Nach oben zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:857
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:917
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:706
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:766
 msgid "Tile to bottom"
 msgstr "Nach unten zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:862
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:922
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:711
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:771
 msgid "Tile to left"
 msgstr "Nach links zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:867
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:927
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:716
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:776
 msgid "Tile to right"
 msgstr "Nach rechts zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:877
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:726
 msgid "Corner Tiling"
 msgstr "In die Ecke zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:880
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:944
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:729
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:793
 msgid "Tile to top-left"
 msgstr "Nach oben links zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:885
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:949
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:734
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:798
 msgid "Tile to top-right"
 msgstr "Nach oben rechts zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:890
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:954
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:739
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:803
 msgid "Tile to bottom-left"
 msgstr "Nach unten links zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:959
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:744
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:808
 msgid "Tile to bottom-right"
 msgstr "Nach unten rechts zuordnen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:905
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:754
 msgid "Edge Tiling without Tiling Assistant"
 msgstr "Kantenkachelung ohne Assistent"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:937
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:786
 msgid "Corner Tiling without Tiling Assistant"
 msgstr "Eckenkachelung ohne Assistenz"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:969
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:818
 msgid "Debugging"
 msgstr "Debugging"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:976
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:825
 msgid "Show Tiled Rects"
 msgstr "Gekachelte Rechtecke anzeigen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:981
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:830
 msgid "Show Free Screen Rects"
 msgstr "Freie Rechtecke anzeigen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:992
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1028
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:841
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:871
 msgid "Layouts"
 msgstr "Layouts"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1006
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:855
 msgid "Panel Indicator"
 msgstr "Panel Anzeige"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1017
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:860
 msgid "Search for a Layout"
 msgstr "Suche nach einem Layout"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1018
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:861
 msgid "Open a popup listing all the available layouts"
 msgstr "Öffnet ein Popup mit allen verfügbaren Layouts"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1052
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
 msgid "Add a new Layout."
 msgstr "Ein neues Layout hinzufügen."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1059
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:902
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
 msgstr ""
 "Das Layout auf der Festplatte speichern. Ungültige Änderungen gehen verloren!"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1066
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:909
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr ""
 "Die Layouts werden von der Festplatte neu geladen, wobei alle nicht "
 "gespeicherten Änderungen verworfen werden."
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1123
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:966
 msgid "Advanced / Experimental Settings"
 msgstr "Erweiterte / Experimentelle Einstellungen"
 
-#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:1124
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:967
 msgid "Show more settings in the main preference window"
 msgstr "Weitere Einstellungen in den Hauptmenü anzeigen"
 
@@ -644,6 +623,23 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
 msgid "'User Guide' for help..."
 msgstr "'Benutzerhandbuch' für Hilfe..."
+
+#~ msgid "Restore Window Size on"
+#~ msgstr "Fenstergrösse wiederherstellen auf"
+
+#~ msgid ""
+#~ "Tiled windows may not properly restore their size on Wayland. If that's "
+#~ "the case, use 'Restore Window Size on Grab End'"
+#~ msgstr ""
+#~ "Bei zugeordneten Fenstern kann es vorkommen, dass die Grösse auf Wayland "
+#~ "nicht korrekt wiederhergestellt wird. Wenn das der Fall ist, muss die "
+#~ "Funktion 'Fenstergrösse am Greifende wiederherstellen' genutzt werden."
+
+#~ msgid "Grab Start"
+#~ msgstr "Greifen Start"
+
+#~ msgid "Grab End"
+#~ msgstr "Greifen Ende"
 
 #~ msgid ""
 #~ "The keyboard shortcuts to maximize and tile to the top, bottom, left, and "
