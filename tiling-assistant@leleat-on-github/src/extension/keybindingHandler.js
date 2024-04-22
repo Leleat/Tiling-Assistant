@@ -1,8 +1,9 @@
 import { Clutter, Meta, Shell, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
-import { Direction, DynamicKeybindings, Settings } from '../common.js';
+import { Direction, DynamicKeybindings } from '../common.js';
 import { Rect, Util } from './utility.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
@@ -14,7 +15,7 @@ export default class TilingKeybindingHandler {
     constructor() {
         const allowInOverview = ['toggle-tiling-popup'];
 
-        this._keyBindings = [
+        [
             'toggle-tiling-popup',
             'tile-edit-mode',
             'auto-tile',
@@ -42,21 +43,17 @@ export default class TilingKeybindingHandler {
             'tile-bottomright-quarter-ignore-ta',
             'debugging-show-tiled-rects',
             'debugging-free-rects'
-        ];
-
-        this._keyBindings.forEach(key => {
-            Main.wm.addKeybinding(
+        ].forEach(key => {
+            Settings.registerShortcut({
                 key,
-                Settings.getGioObject(),
-                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                Shell.ActionMode.NORMAL | (allowInOverview.includes(key) && Shell.ActionMode.OVERVIEW),
-                this._onCustomKeybindingPressed.bind(this, key)
-            );
+                handler: this._onCustomKeybindingPressed.bind(this, key),
+                modes: Shell.ActionMode.NORMAL |
+                    (allowInOverview.includes(key) && Shell.ActionMode.OVERVIEW)
+            });
         });
     }
 
     destroy() {
-        this._keyBindings.forEach(key => Main.wm.removeKeybinding(key));
         this._debuggingIndicators?.forEach(i => i.destroy());
     }
 
@@ -80,8 +77,8 @@ export default class TilingKeybindingHandler {
 
         // Toggle the Tiling Popup
         } else if (shortcutName === 'toggle-tiling-popup') {
-            const toggleTo = !Settings.getBoolean('enable-tiling-popup');
-            Settings.setBoolean('enable-tiling-popup', toggleTo);
+            const toggleTo = !Settings.getEnableTilingPopup();
+            Settings.setEnableTilingPopup(toggleTo);
             Main.notify('Tiling Assistant', toggleTo
                 // Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
                 ? _('Tiling popup enabled')
@@ -217,7 +214,7 @@ export default class TilingKeybindingHandler {
             Twm.toggleTiling(window, rect, { ignoreTA: true });
         // Tile a window
         } else {
-            const dynamicSetting = Settings.getInt('dynamic-keybinding-behavior');
+            const dynamicSetting = Settings.getDynamicKeybindings();
             const windowsStyle = DynamicKeybindings.TILING_STATE_WINDOWS;
             const isWindowsStyle = dynamicSetting === windowsStyle;
             const workArea = new Rect(window.get_work_area_current_monitor());

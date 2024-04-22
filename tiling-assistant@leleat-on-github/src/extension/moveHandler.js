@@ -2,8 +2,9 @@ import { Clutter, GLib, GObject, Gio, Meta, Mtk } from '../dependencies/gi.js';
 import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
-import { Orientation, MoveModes, Settings } from '../common.js';
+import { Orientation, MoveModes } from '../common.js';
 import { Rect, Util } from './utility.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import { Timeouts } from './timeouts.js';
 
@@ -60,15 +61,15 @@ export default class TilingMoveHandler {
 
             if (currMod === '<Alt>') {
                 for (const key of modKeys) {
-                    const mod = Settings.getInt(key);
+                    const mod = Settings.getGioObject().get_int(key);
                     if (mod === 2) // Alt
-                        Settings.setInt(key, 0);
+                        Settings.getGioObject().set_int(key, 0);
                 }
             } else if (currMod === '<Super>') {
                 for (const key of modKeys) {
-                    const mod = Settings.getInt(key);
+                    const mod = Settings.getGioObject().get_int(key);
                     if (mod === 4) // Super
-                        Settings.setInt(key, 0);
+                        Settings.getGioObject().set_int(key, 0);
                 }
             }
         };
@@ -160,7 +161,7 @@ export default class TilingMoveHandler {
             // When low performance mode is enabled we use a timer to periodically
             // update the tile previews so that we don't update the tile preview
             // as often when compared to the position-changed signal.
-            if (Settings.getBoolean('low-performance-move-mode')) {
+            if (Settings.getLowPerformanceMoveMode()) {
                 this._movingTimerId = GLib.timeout_add(
                     GLib.PRIORITY_IDLE,
                     this._movingTimerDuration,
@@ -313,10 +314,10 @@ export default class TilingMoveHandler {
             Util.isModPressed(meta)
         ];
 
-        const defaultMode = Settings.getInt('default-move-mode');
-        const adaptiveMod = Settings.getInt('move-adaptive-tiling-mod');
-        const favMod = Settings.getInt('move-favorite-layout-mod');
-        const ignoreTAMod = Settings.getInt('ignore-ta-mod');
+        const defaultMode = Settings.getDefaultMoveMode();
+        const adaptiveMod = Settings.getAdaptiveTilingMod();
+        const favMod = Settings.getFavoriteLayoutMod();
+        const ignoreTAMod = Settings.getIgnoreTaMod();
         const noMod = !pressed[adaptiveMod] && !pressed[ignoreTAMod] && !pressed[ignoreTAMod];
 
         const useAdaptiveTiling = defaultMode !== MoveModes.ADAPTIVE_TILING && pressed[adaptiveMod] ||
@@ -428,7 +429,7 @@ export default class TilingMoveHandler {
         // the user doesn't have to slowly inch the mouse to the monitor edge
         // just because there is another monitor at that edge.
         const currMonitorNr = global.display.get_current_monitor();
-        const useGracePeriod = Settings.getBoolean('monitor-switch-grace-period');
+        const useGracePeriod = Settings.getMonitorSwitchGracePeriod();
         if (useGracePeriod) {
             if (this._lastMonitorNr !== currMonitorNr) {
                 this._monitorNr = this._lastMonitorNr;
@@ -455,10 +456,10 @@ export default class TilingMoveHandler {
         const wRect = window.get_frame_rect();
         const workArea = new Rect(window.get_work_area_for_monitor(this._monitorNr));
 
-        const vDetectionSize = Settings.getInt('vertical-preview-area');
+        const vDetectionSize = Settings.getVerticalPreviewArea();
         const pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize;
         const pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - vDetectionSize;
-        const hDetectionSize = Settings.getInt('horizontal-preview-area');
+        const hDetectionSize = Settings.getHorizontalPreviewArea();
         const pointerAtLeftEdge = this._lastPointerPos.x <= workArea.x + hDetectionSize;
         const pointerAtRightEdge = this._lastPointerPos.x >= workArea.x2 - hDetectionSize;
         // Also use window's pos for top and bottom area detection for quarters
@@ -490,8 +491,8 @@ export default class TilingMoveHandler {
             const monitorRect = global.display.get_monitor_geometry(this._monitorNr);
             const isLandscape = monitorRect.width >= monitorRect.height;
             const shouldMaximize =
-                    isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-landscape') ||
-                    !isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-portrait');
+                    isLandscape && !Settings.getEnableHoldInverseLandscape() ||
+                    !isLandscape && !Settings.getEnableHoldInversePortrait();
             const tileRect = shouldMaximize
                 ? workArea
                 : Twm.getTileFor('tile-top-half', workArea, this._monitorNr);
@@ -509,7 +510,7 @@ export default class TilingMoveHandler {
 
             Timeouts.add({
                 name: 'moveHandler-_edgeTilingPreview-topEdgePreviewTimer',
-                interval: Settings.getInt('toggle-maximize-tophalf-timer'),
+                interval: Settings.getToggleMaximizeTophalfTimer(),
                 fn: () => {
                     if (
                         this._tilePreview._showing &&

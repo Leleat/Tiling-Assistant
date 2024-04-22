@@ -18,8 +18,8 @@ import {
     baseIconSizes,
     APP_ICON_HOVER_TIMEOUT
 } from '../dependencies/unexported/altTab.js';
+import { Settings } from './settings.js';
 
-import { Settings } from '../common.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 /**
@@ -27,19 +27,23 @@ import { TilingWindowManager as Twm } from './tilingWindowManager.js';
  */
 export default class AltTabOverride {
     constructor() {
-        if (Settings.getBoolean('tilegroups-in-app-switcher'))
-            this._overrideNativeAppSwitcher();
-
-        this._settingsId = Settings.changed('tilegroups-in-app-switcher', () => {
-            if (Settings.getBoolean('tilegroups-in-app-switcher'))
-                this._overrideNativeAppSwitcher();
-            else
-                this._restoreNativeAppSwitcher();
-        });
+        Settings.watch(
+            'tilegroups-in-app-switcher',
+            () => {
+                if (Settings.getTilegroupsInAppSwitcher())
+                    this._overrideNativeAppSwitcher();
+                else
+                    this._restoreNativeAppSwitcher();
+            },
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
     }
 
     destroy() {
-        Settings.disconnect(this._settingsId);
+        Settings.unwatch(this);
         this._restoreNativeAppSwitcher();
     }
 
@@ -138,7 +142,7 @@ class TilingAppSwitcher extends SwitcherPopup.SwitcherList {
 
         // Group windows based on their tileGroup, if tileGroup.length > 1.
         // Otherwise group them based on their respective apps.
-        if (Settings.getBoolean('tilegroups-in-app-switcher')) {
+        if (Settings.getTilegroupsInAppSwitcher()) {
             groupedWindows = windows.reduce((allGroups, w) => {
                 for (const group of allGroups) {
                     if (w.isTiled && Twm.getTileGroupFor(w).length > 1) {

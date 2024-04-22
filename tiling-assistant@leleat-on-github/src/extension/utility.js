@@ -1,7 +1,8 @@
 import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 
-import { Direction, Orientation, Settings } from '../common.js';
+import { Direction, Orientation } from '../common.js';
+import { Settings } from './settings.js';
 
 /**
  * Library of commonly used functions for the extension.js' files
@@ -96,7 +97,7 @@ export class Util {
      *      will be divided by 2.
      */
     static getScaledGap(settingsKey, monitor) {
-        const gap = Settings.getInt(settingsKey);
+        const gap = Settings.getGioObject().get_int(settingsKey);
         const scaledGap = gap * global.display.get_monitor_scale(monitor);
         return scaledGap % 2 === 0 ? scaledGap : scaledGap + 1;
     }
@@ -148,7 +149,7 @@ export class Util {
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const favoriteLayout = [];
         const layouts = this.getLayouts();
-        const layout = layouts?.[Settings.getStrv('favorite-layouts')[monitor]];
+        const layout = layouts?.[Settings.getFavoriteLayouts()[monitor]];
 
         if (!layout)
             return [];

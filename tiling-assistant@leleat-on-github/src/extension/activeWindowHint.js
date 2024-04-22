@@ -1,42 +1,45 @@
 import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 
-import { Settings } from '../common.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 export default class ActiveWindowHintHandler {
     constructor() {
         // On a fresh install no color is set for the hint yet. Use the bg color
         // from the tile preview style by using a temporary widget.
-        if (Settings.getString('active-window-hint-color') === '') {
+        if (Settings.getActiveWindowHintColor() === '') {
             const widget = new St.Widget({ style_class: 'tile-preview' });
             global.stage.add_child(widget);
 
             const color = widget.get_theme_node().get_background_color();
             const { red, green, blue } = color;
 
-            Settings.setString('active-window-hint-color', `rgb(${red},${green},${blue})`);
+            Settings.setActiveWindowHintColor(`rgb(${red},${green},${blue})`);
 
             widget.destroy();
         }
 
         this._hint = null;
-        this._settingsId = 0;
 
-        this._setupHint();
-
-        this._settingsId = Settings.changed('active-window-hint',
-            () => this._setupHint());
+        Settings.watch(
+            'active-window-hint',
+            () => this._setupHint(),
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
     }
 
     destroy() {
-        Settings.disconnect(this._settingsId);
+        Settings.unwatch(this);
         this._hint?.destroy();
         this._hint = null;
     }
 
     _setupHint() {
-        switch (Settings.getInt('active-window-hint')) {
+        switch (Settings.getActiveWindowHint()) {
             case 0: // Disabled
                 this._hint?.destroy();
                 this._hint = null;
@@ -57,26 +60,36 @@ class ActiveWindowHint extends St.Widget {
     _init() {
         super._init();
 
-        this._color = Settings.getString('active-window-hint-color');
-        this._borderSize = Settings.getInt('active-window-hint-border-size');
-        this._innerBorderSize = Settings.getInt('active-window-hint-inner-border-size'); // 'Inner border' to cover rounded corners
-        this._settingsIds = [];
-
-        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
-            this._color = Settings.getString('active-window-hint-color');
-        }));
-        this._settingsIds.push(Settings.changed('active-window-hint-border-size', () => {
-            this._borderSize = Settings.getInt('active-window-hint-border-size');
-        }));
-        this._settingsIds.push(Settings.changed('active-window-hint-inner-border-size', () => {
-            this._innerBorderSize = Settings.getInt('active-window-hint-inner-border-size');
-        }));
+        Settings.watch(
+            'active-window-hint-color',
+            () => (this._color = Settings.getActiveWindowHintColor()),
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
+        Settings.watch(
+            'active-window-hint-border-size',
+            () => (this._borderSize = Settings.getActiveWindowHintBorderSize()),
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
+        Settings.watch(
+            'active-window-hint-inner-border-size',
+            () => (this._innerBorderSize = Settings.getActiveWindowHintInnerBorderSize()),
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
 
         global.window_group.add_child(this);
     }
 
     destroy() {
-        this._settingsIds.forEach(id => Settings.disconnect(id));
+        Settings.unwatch(this);
         super.destroy();
     }
 });
@@ -88,11 +101,14 @@ class MinimalActiveWindowHint extends Hint {
 
         this._windowClone = null;
 
-        this._updateStyle();
-
-        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
-            this._updateStyle();
-        }));
+        Settings.watch(
+            'active-window-hint-color',
+            () => this._updateStyle(),
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
 
         global.workspace_manager.connectObject('workspace-switched',
             () => this._onWsSwitched(), this);
@@ -238,24 +254,36 @@ class AlwaysActiveWindowHint extends Hint {
 
         this._window = null;
 
-        this._updateGeometry();
-        this._updateStyle();
-
         global.display.connectObject('notify::focus-window',
             () => this._updateGeometry(), this);
 
-        this._settingsIds.push(Settings.changed('active-window-hint-color', () => {
-            this._updateStyle();
-            this._updateGeometry();
-        }));
-        this._settingsIds.push(Settings.changed('active-window-hint-border-size', () => {
-            this._updateStyle();
-            this._updateGeometry();
-        }));
-        this._settingsIds.push(Settings.changed('active-window-hint-inner-border-size', () => {
-            this._updateStyle();
-            this._updateGeometry();
-        }));
+        Settings.watch(
+            'active-window-hint-color',
+            () => {
+                this._updateStyle();
+                this._updateGeometry();
+            },
+            { tracker: this }
+        );
+        Settings.watch(
+            'active-window-hint-border-size',
+            () => {
+                this._updateStyle();
+                this._updateGeometry();
+            },
+            { tracker: this }
+        );
+        Settings.watch(
+            'active-window-hint-inner-border-size',
+            () => {
+                this._updateStyle();
+                this._updateGeometry();
+            },
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
     }
 
     destroy() {

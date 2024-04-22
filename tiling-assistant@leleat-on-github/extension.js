@@ -26,6 +26,11 @@ import LayoutsManager from './src/extension/layoutsManager.js';
 import ActiveWindowHint from './src/extension/activeWindowHint.js';
 import AltTabOverride from './src/extension/altTab.js';
 import {
+    disable as disableSettings,
+    enable as enableSettings,
+    Settings
+} from './src/extension/settings.js';
+import {
     disable as disableTimeouts,
     enable as enableTimeouts
 } from './src/extension/timeouts.js';
@@ -153,10 +158,7 @@ export default class TilingAssistantExtension extends Extension {
     async enable() {
         // (utility) singletons
         enableTimeouts();
-
-        this.settings = (await import('./src/common.js')).Settings;
-        this.settings.initialize(this.getSettings());
-        this._settingsOverrider = new SettingsOverrider(this.settings);
+        enableSettings();
 
         const twmModule = await import('./src/extension/tilingWindowManager.js');
 
@@ -171,9 +173,11 @@ export default class TilingAssistantExtension extends Extension {
         this._altTabOverride = new AltTabOverride();
 
         // Disable native tiling.
-        this._settingsOverrider.add(new Gio.Settings({
-            schema_id: 'org.gnome.mutter'
-        }), 'edge-tiling', new GLib.Variant('b', false));
+        Settings.override(
+            new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
+            'edge-tiling',
+            new GLib.Variant('b', false)
+        );
 
         // Disable native keybindings for Super+Up/Down/Left/Right
         const gnomeMutterKeybindings = new Gio.Settings({
@@ -184,25 +188,48 @@ export default class TilingAssistantExtension extends Extension {
         });
         const emptyStrvVariant = new GLib.Variant('as', []);
 
-        if (gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
-                this.settings.getStrv('tile-maximize').includes('<Super>Up')) {
-            this._settingsOverrider.add(gnomeDesktopKeybindings,
-                'maximize', emptyStrvVariant);
+        if (
+            gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
+            Settings.getGioObject().get_strv('tile-maximize').includes('<Super>Up')
+        ) {
+            Settings.override(
+                gnomeDesktopKeybindings,
+                'maximize',
+                emptyStrvVariant
+            );
         }
-        if (gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
-                this.settings.getStrv('restore-window').includes('<Super>Down')) {
-            this._settingsOverrider.add(gnomeDesktopKeybindings,
-                'unmaximize', emptyStrvVariant);
+
+        if (
+            gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
+            Settings.getGioObject().get_strv('restore-window').includes('<Super>Down')
+        ) {
+            Settings.override(
+                gnomeDesktopKeybindings,
+                'unmaximize',
+                emptyStrvVariant
+            );
         }
-        if (gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
-                this.settings.getStrv('tile-left-half').includes('<Super>Left')) {
-            this._settingsOverrider.add(gnomeMutterKeybindings,
-                'toggle-tiled-left', emptyStrvVariant);
+
+        if (
+            gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
+            Settings.getGioObject().get_strv('tile-left-half').includes('<Super>Left')
+        ) {
+            Settings.override(
+                gnomeMutterKeybindings,
+                'toggle-tiled-left',
+                emptyStrvVariant
+            );
         }
-        if (gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
-                this.settings.getStrv('tile-right-half').includes('<Super>Right')) {
-            this._settingsOverrider.add(gnomeMutterKeybindings,
-                'toggle-tiled-right', emptyStrvVariant);
+
+        if (
+            gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
+            Settings.getGioObject().get_strv('tile-right-half').includes('<Super>Right')
+        ) {
+            Settings.override(
+                gnomeMutterKeybindings,
+                'toggle-tiled-right',
+                emptyStrvVariant
+            );
         }
 
         // Include tiled windows when dragging from the top panel.
@@ -228,7 +255,7 @@ export default class TilingAssistantExtension extends Extension {
 
         // Setting used for detection of a fresh install and do compatibility
         // changes if necessary...
-        this.settings.setInt('last-version-installed', this.metadata.version);
+        Settings.setLastVersionInstalled(this.metadata.version);
     }
 
     disable() {
@@ -236,8 +263,6 @@ export default class TilingAssistantExtension extends Extension {
         // them after the session is unlocked again.
         this._saveBeforeSessionLock();
 
-        this._settingsOverrider.destroy();
-        this._settingsOverrider = null;
         this._moveHandler.destroy();
         this._moveHandler = null;
         this._resizeHandler.destroy();
@@ -255,9 +280,7 @@ export default class TilingAssistantExtension extends Extension {
         this._twm.destroy();
         this._twm = null;
 
-        this.settings.destroy();
-        this.settings = null;
-
+        disableSettings();
         disableTimeouts();
 
         // Restore old functions.

@@ -2,8 +2,9 @@ import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js'
 import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
-import { Orientation, Settings } from '../common.js';
+import { Orientation } from '../common.js';
 import { Rect, Util } from './utility.js';
+import { Settings } from './settings.js';
 import { Timeouts } from './timeouts.js';
 
 /**
@@ -154,7 +155,7 @@ export class TilingWindowManager {
         if (!window.untiledRect)
             window.untiledRect = oldRect;
 
-        if (maximize && !Settings.getBoolean('maximize-with-gap')) {
+        if (maximize && !Settings.getMaximizeWithGaps()) {
             window.tiledRect = null;
             // It's possible for a window to maximize() to the wrong monitor.
             // This is very easy to reproduce when dragging a window on the
@@ -173,7 +174,7 @@ export class TilingWindowManager {
 
         // Animations
         const wActor = window.get_compositor_private();
-        if (Settings.getBoolean('enable-tile-animations') && wActor && !skipAnim) {
+        if (Settings.getEnableTileAnimations() && wActor && !skipAnim) {
             wActor.remove_all_transitions();
             // HACK => journalctl: 'error in size change accounting'...?
             // TODO: no animation if going from maximized -> tiled and back to back multiple times?
@@ -211,7 +212,7 @@ export class TilingWindowManager {
         } else if (!fakeTile) {
             // Make the tile group only consist of the window itself to stop
             // resizing or raising together. Also don't call the Tiling Popup.
-            if (Settings.getBoolean('disable-tile-groups') || ignoreTA) {
+            if (Settings.getDisableTileGroups() || ignoreTA) {
                 this.updateTileGroup([window]);
                 return;
             }
@@ -258,7 +259,7 @@ export class TilingWindowManager {
             window.raise_and_make_recent();
 
         // Animation
-        const untileAnim = Settings.getBoolean('enable-untile-animations');
+        const untileAnim = Settings.getEnableUntileAnimations();
         const wActor = window.get_compositor_private();
         if (untileAnim && !wasMaximized && wActor && !skipAnim) {
             wActor.remove_all_transitions();
@@ -416,7 +417,7 @@ export class TilingWindowManager {
 
             const raiseId = window.connect('raised', raisedWindow => {
                 const raisedWindowId = raisedWindow.get_id();
-                if (Settings.getBoolean('enable-raise-tile-group')) {
+                if (Settings.getEnableRaiseTileGroups()) {
                     const raisedWindowsTileGroup = this._tileGroups.get(raisedWindowId);
                     raisedWindowsTileGroup.forEach(wId => {
                         const w = this._getWindow(wId);
@@ -533,8 +534,8 @@ export class TilingWindowManager {
         // tile group. Same thing for the setting 'Disable Tile Groups' because
         // it's implemented by just making the tile groups consist of single
         // windows (the tiled window itself).
-        if (Settings.getBoolean('enable-raise-tile-group') ||
-            Settings.getBoolean('disable-tile-groups')
+        if (Settings.getEnableRaiseTileGroups() ||
+            Settings.getDisableTileGroups()
         ) {
             const openWindows = this.getWindows();
             if (!openWindows.length)
@@ -801,7 +802,7 @@ export class TilingWindowManager {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         // Don't try to adapt a tile rect
-        if (Settings.getBoolean('disable-tile-groups'))
+        if (Settings.getDisableTileGroups())
             return this.getDefaultTileFor(shortcut, workArea);
 
         const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
@@ -815,7 +816,7 @@ export class TilingWindowManager {
         const idx = topTileGroup.indexOf(global.display.focus_window);
         idx !== -1 && topTileGroup.splice(idx, 1);
         const favLayout = Util.getFavoriteLayout(monitor);
-        const useFavLayout = favLayout.length && Settings.getBoolean('adapt-edge-tiling-to-favorite-layout');
+        const useFavLayout = favLayout.length && Settings.getAdaptEdgeTilingToFavoriteLayout();
         const twRects = useFavLayout && favLayout || topTileGroup.map(w => w.tiledRect);
 
         if (!twRects.length)
@@ -929,10 +930,10 @@ export class TilingWindowManager {
      * and offer to tile an open window to that spot.
      */
     static async tryOpeningTilingPopup() {
-        if (!Settings.getBoolean('enable-tiling-popup'))
+        if (!Settings.getEnableTilingPopup())
             return;
 
-        const allWs = Settings.getBoolean('tiling-popup-all-workspace');
+        const allWs = Settings.getTilingPopupAllWorkspaces();
         const openWindows = this.getWindows(allWs);
         const topTileGroup = this.getTopTileGroup();
         topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));

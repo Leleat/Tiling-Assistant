@@ -1,8 +1,9 @@
 import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
-import { Direction, Orientation, Settings } from '../common.js';
+import { Direction, Orientation } from '../common.js';
 import { Rect, Util } from './utility.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const SCALE_SIZE = 100;
@@ -345,7 +346,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
 
         // [Space] to activate the Tiling Popup
         } else if (keyVal === Clutter.KEY_space) {
-            const allWs = Settings.getBoolean('tiling-popup-all-workspace');
+            const allWs = Settings.getTilingPopupAllWorkspaces();
             const openWindows = Twm.getWindows(allWs).filter(w => !this._windows.includes(w));
             const TilingPopup = await import('./tilingPopup.js');
             const tilingPopup = new TilingPopup.TilingSwitcherPopup(
