@@ -5,6 +5,7 @@ import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.
 import { Orientation, MoveModes, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import { Timeouts } from './timeouts.js';
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
@@ -91,21 +92,6 @@ export default class TilingMoveHandler {
 
         this._tilePreview.destroy();
 
-        if (this._latestMonitorLockTimerId) {
-            GLib.Source.remove(this._latestMonitorLockTimerId);
-            this._latestMonitorLockTimerId = null;
-        }
-
-        if (this._latestPreviewTimerId) {
-            GLib.Source.remove(this._latestPreviewTimerId);
-            this._latestPreviewTimerId = null;
-        }
-
-        if (this._restoreSizeTimerId) {
-            GLib.Source.remove(this._restoreSizeTimerId);
-            this._restoreSizeTimerId = null;
-        }
-
         if (this._movingTimerId) {
             GLib.Source.remove(this._movingTimerId);
             this._movingTimerId = null;
@@ -129,33 +115,37 @@ export default class TilingMoveHandler {
         // Try to restore the window size
         if (window.tiledRect || this._wasMaximizedOnStart) {
             let counter = 0;
-            this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
-            this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
-                if (!global.display.is_grabbed()) {
-                    this._restoreSizeTimerId = null;
-                    return GLib.SOURCE_REMOVE;
-                }
 
-                counter += 10;
-                if (counter >= 400) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
-                    this._restoreSizeTimerId = null;
-                    return GLib.SOURCE_REMOVE;
-                }
+            Timeouts.add({
+                name: 'moveHandler-_onMoveStarted',
+                interval: 10,
+                priority: GLib.PRIORITY_HIGH_IDLE,
+                fn: () => {
+                    if (!global.display.is_grabbed())
+                        return GLib.SOURCE_REMOVE;
 
-                const [currX, currY] = global.get_pointer();
-                const currPoint = { x: currX, y: currY };
-                const oldPoint = { x, y };
-                const moveDist = Util.getDistance(currPoint, oldPoint);
-                if (moveDist > 10) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
-                    this._restoreSizeTimerId = null;
-                    return GLib.SOURCE_REMOVE;
-                }
+                    counter += 10;
 
-                return GLib.SOURCE_CONTINUE;
+                    if (counter >= 400) {
+                        this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+
+                        return GLib.SOURCE_REMOVE;
+                    }
+
+                    const [currX, currY] = global.get_pointer();
+                    const currPoint = { x: currX, y: currY };
+                    const oldPoint = { x, y };
+                    const moveDist = Util.getDistance(currPoint, oldPoint);
+
+                    if (moveDist > 10) {
+                        this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+
+                        return GLib.SOURCE_REMOVE;
+                    }
+
+                    return GLib.SOURCE_CONTINUE;
+                }
             });
-
         // Tile preview
         } else {
             this._isGrabOp = true;
@@ -442,20 +432,19 @@ export default class TilingMoveHandler {
         if (useGracePeriod) {
             if (this._lastMonitorNr !== currMonitorNr) {
                 this._monitorNr = this._lastMonitorNr;
-                let timerId = 0;
-                this._latestMonitorLockTimerId && GLib.Source.remove(this._latestMonitorLockTimerId);
-                this._latestMonitorLockTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 150, () => {
-                    // Only update the monitorNr, if the latest timer timed out.
-                    if (timerId === this._latestMonitorLockTimerId) {
-                        this._monitorNr = global.display.get_current_monitor();
-                        if (global.display.is_grabbed())
-                            this._edgeTilingPreview(window, grabOp);
-                    }
 
-                    this._latestMonitorLockTimerId = null;
-                    return GLib.SOURCE_REMOVE;
+                Timeouts.add({
+                    name: 'moveHandler-_edgeTilingPreview-gracePeriod',
+                    interval: 150,
+                    fn: () => {
+                        if (global.display.is_grabbed()) {
+                            this._monitorNr = global.display.get_current_monitor();
+                            this._edgeTilingPreview(window, grabOp);
+                        }
+
+                        return GLib.SOURCE_REMOVE;
+                    }
                 });
-                timerId = this._latestMonitorLockTimerId;
             }
         } else {
             this._monitorNr = global.display.get_current_monitor();
@@ -518,23 +507,21 @@ export default class TilingMoveHandler {
             this._tileRect = tileRect;
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
 
-            let timerId = 0;
-            this._latestPreviewTimerId && GLib.Source.remove(this._latestPreviewTimerId);
-            this._latestPreviewTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT,
-                Settings.getInt('toggle-maximize-tophalf-timer'), () => {
-                // Only open the alternative preview, if the timeout-ed timer
-                // is the same as the one which started last
-                    if (timerId === this._latestPreviewTimerId &&
+            Timeouts.add({
+                name: 'moveHandler-_edgeTilingPreview-topEdgePreviewTimer',
+                interval: Settings.getInt('toggle-maximize-tophalf-timer'),
+                fn: () => {
+                    if (
                         this._tilePreview._showing &&
-                        this._tilePreview._rect.equal(tileRect.meta)) {
+                        this._tilePreview._rect.equal(tileRect.meta)
+                    ) {
                         this._tileRect = holdTileRect;
                         this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
                     }
 
-                    this._latestPreviewTimerId = null;
                     return GLib.SOURCE_REMOVE;
-                });
-            timerId = this._latestPreviewTimerId;
+                }
+            });
         } else if (pointerAtBottomEdge) {
             this._tileRect = Twm.getTileFor('tile-bottom-half', workArea, this._monitorNr);
             this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);

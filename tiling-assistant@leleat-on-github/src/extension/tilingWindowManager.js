@@ -4,6 +4,7 @@ import { getWindows } from '../dependencies/unexported/altTab.js';
 
 import { Orientation, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
+import { Timeouts } from './timeouts.js';
 
 /**
  * Singleton responsible for tiling. Implement the signals in a separate Clutter
@@ -39,21 +40,6 @@ export class TilingWindowManager {
 
         this._tileGroups.clear();
         this._unmanagingWindows = [];
-
-        if (this._openAppTiledTimerId) {
-            GLib.Source.remove(this._openAppTiledTimerId);
-            this._openAppTiledTimerId = null;
-        }
-
-        if (this._wsAddedTimer) {
-            GLib.Source.remove(this._wsAddedTimer);
-            this._wsAddedTimer = null;
-        }
-
-        if (this._wsRemovedTimer) {
-            GLib.Source.remove(this._wsRemovedTimer);
-            this._wsRemovedTimer = null;
-        }
     }
 
     static connect(signal, func) {
@@ -1018,14 +1004,17 @@ export class TilingWindowManager {
             // window doesn't match the original app. It may be a loading screen
             // or the user started an app in between etc... but in case the checks/
             // signals above fail disconnect the signals after 1 min at the latest
-            this._openAppTiledTimerId && GLib.Source.remove(this._openAppTiledTimerId);
-            this._openAppTiledTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
-                createId && global.display.disconnect(createId);
-                createId = 0;
-                firstFrameId && wActor.disconnect(firstFrameId);
-                firstFrameId = 0;
-                this._openAppTiledTimerId = null;
-                return GLib.SOURCE_REMOVE;
+            Timeouts.add({
+                name: 'tilingWindowManager-openAppTiled',
+                interval: 60000,
+                fn: () => {
+                    createId && global.display.disconnect(createId);
+                    createId = 0;
+                    firstFrameId && wActor.disconnect(firstFrameId);
+                    firstFrameId = 0;
+
+                    return GLib.SOURCE_REMOVE;
+                }
             });
         });
 
@@ -1233,11 +1222,15 @@ export class TilingWindowManager {
      */
     static _onWorkspaceAdded() {
         this._ignoreWsChange = true;
-        this._wsAddedTimer && GLib.Source.remove(this._wsAddedTimer);
-        this._wsAddedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            this._ignoreWsChange = false;
-            this._wsAddedTimer = null;
-            return GLib.SOURCE_REMOVE;
+
+        Timeouts.add({
+            name: 'tilingWindowmanager-_onWorkspaceAdded',
+            interval: 50,
+            fn: () => {
+                this._ignoreWsChange = false;
+
+                return GLib.SOURCE_REMOVE;
+            }
         });
     }
 
@@ -1251,11 +1244,15 @@ export class TilingWindowManager {
      */
     static _onWorkspaceRemoved() {
         this._ignoreWsChange = true;
-        this._wsRemovedTimer && GLib.Source.remove(this._wsRemovedTimer);
-        this._wsRemovedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            this._ignoreWsChange = false;
-            this._wsRemovedTimer = null;
-            return GLib.SOURCE_REMOVE;
+
+        Timeouts.add({
+            name: 'tilingWindowManager-_onWorkspaceRemoved',
+            interval: 50,
+            fn: () => {
+                this._ignoreWsChange = false;
+
+                return GLib.SOURCE_REMOVE;
+            }
         });
     }
 
