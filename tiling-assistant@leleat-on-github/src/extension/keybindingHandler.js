@@ -53,7 +53,9 @@ export default class TilingKeybindingHandler {
             const toggleTo = !Settings.getBoolean('enable-tiling-popup');
             Settings.setBoolean('enable-tiling-popup', toggleTo);
             Main.notify('Tiling Assistant', toggleTo
+                // Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
                 ? _('Tiling popup enabled')
+                // Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
                 : _('Tiling popup was disabled'));
             return;
         }

@@ -101,6 +101,7 @@ export default class TilingLayoutsManager {
     openPopupSearch() {
         const layouts = Util.getLayouts();
         if (!layouts.length) {
+            // Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
             Main.notify('Tiling Assistant', _('No valid layouts defined.'));
             return;
         }
@@ -192,6 +193,7 @@ export default class TilingLayoutsManager {
     _openAppTiled(appId) {
         const app = Shell.AppSystem.get_default().lookup_app(appId);
         if (!app) {
+            // Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated and the user attached an app to a tile so that a new instance of that app will automatically open in the tile. But that app seems to have been uninstalled since the definition of the layout.
             Main.notify('Tiling Assistant', _('Popup Layouts: App not found.'));
             this._finishLayouting();
             return;
@@ -334,7 +336,7 @@ const LayoutSearch = GObject.registerClass({
             style: `font-size: ${fontSize}px;\
                     border-radius: 16px;
                     margin-bottom: 12px;`,
-            // The cursor overlaps the text, so add some spaces at the beginning
+            // Translators: This is the placeholder text for a search field.
             hint_text: ` ${_('Type to search...')}`
         });
         const entryClutterText = entry.get_clutter_text();
@@ -439,8 +441,7 @@ const SearchItem = GObject.registerClass(
 class TilingLayoutsSearchItem extends St.Label {
     _init(text, fontSize) {
         super._init({
-            // Add some spaces to the beginning to align it better
-            // with the rounded corners
+            // Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
             text: `   ${text || _('Nameless layout...')}`,
             style: `font-size: ${fontSize}px;\
                 text-align: left;\
@@ -491,6 +492,7 @@ const PanelIndicator = GObject.registerClass({
 
         const layouts = Util.getLayouts();
         if (!layouts.length) {
+            // Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
             const item = new PopupMenu.PopupMenuItem(_('No valid layouts defined.'));
             item.setSensitive(false);
             this.menu.addMenuItem(item);

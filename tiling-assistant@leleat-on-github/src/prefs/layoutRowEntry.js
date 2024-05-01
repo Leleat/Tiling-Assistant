@@ -34,6 +34,7 @@ export const LayoutRowEntry = GObject.registerClass({
         // Show a placeholder on the first entry, if it's empty
         if (!text) {
             if (idx === 0) {
+                // Translators: This is a placeholder text of an entry in the prefs when defining a tiling layout.
                 const placeholder = _("'User Guide' for help...");
                 this._rectEntry.set_placeholder_text(placeholder);
             } else {
