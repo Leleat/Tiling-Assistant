@@ -18,7 +18,7 @@ jobs:
         run: >
           git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
           grep -E "\.js$" |
-          xargs -r eslint
+          xargs -r npx eslint
       - name: Run ShellCheck (*.sh)
         if: success() || failure()
         run: >
