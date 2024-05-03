@@ -115,8 +115,6 @@ export default class TilingMoveHandler {
 
         // Try to restore the window size
         if (window.tiledRect || this._wasMaximizedOnStart) {
-            let counter = 0;
-
             Timeouts.add({
                 name: 'moveHandler-_onMoveStarted',
                 interval: 10,
@@ -124,14 +122,6 @@ export default class TilingMoveHandler {
                 fn: () => {
                     if (!global.display.is_grabbed())
                         return GLib.SOURCE_REMOVE;
-
-                    counter += 10;
-
-                    if (counter >= 400) {
-                        this._restoreSizeAndRestartGrab(window, x, y, grabOp);
-
-                        return GLib.SOURCE_REMOVE;
-                    }
 
                     const [currX, currY] = global.get_pointer();
                     const currPoint = { x: currX, y: currY };
