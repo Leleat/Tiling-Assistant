@@ -7,13 +7,13 @@ import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const SCALE_SIZE = 100;
-const Modes = {
+const Modes = Object.freeze({
     DEFAULT: 1,
     SWAP: 2,
     RESIZE: 4,
     MOVE: 8,
     CLOSE: 16
-};
+});
 
 /**
  * Classes for the 'Tile Editing Mode'. A mode to manage your tiled windows

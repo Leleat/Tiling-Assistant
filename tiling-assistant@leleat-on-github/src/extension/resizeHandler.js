@@ -9,13 +9,13 @@ import {
 } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
-const Side = {
+const Side = Object.freeze({
     NONE: 0,
     SAME_H: 1,
     OPPOSING_H: 2,
     SAME_V: 4,
     OPPOSING_V: 8
-};
+});
 
 /**
  * This class gets to handle the resize events of windows (whether they are

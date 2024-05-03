@@ -3,36 +3,48 @@
  * *and* prefs files
  */
 
-export class DynamicKeybindings {
-    // Order comes from prefs
-    static DISABLED = 0;
-    static FOCUS = 1;
-    static TILING_STATE = 2;
-    static TILING_STATE_WINDOWS = 3;
-    static FAVORITE_LAYOUT = 4;
-}
+export const ActiveWindowHint = Object.freeze({
+    DISABLED: 0,
+    MINIMAL: 1,
+    ALWAYS: 2
+});
 
-export class MoveModes {
-    // Order comes from prefs
-    static EDGE_TILING = 0;
-    static ADAPTIVE_TILING = 1;
-    static FAVORITE_LAYOUT = 2;
-    static IGNORE_TA = 3;
-}
+export const DynamicKeybindings = Object.freeze({
+    DISABLED: 0,
+    FOCUS: 1,
+    TILING_STATE: 2,
+    TILING_STATE_WINDOWS: 3,
+    FAVORITE_LAYOUT: 4
+});
 
-export class Orientation {
-    static H = 1;
-    static V = 2;
-}
+export const MoveModeMods = Object.freeze({
+    DISABLED: 0,
+    CTRL: 1,
+    ALT: 2,
+    RMB: 3,
+    META: 4
+});
 
-export class Direction {
-    static N = 1;
-    static E = 2;
-    static S = 4;
-    static W = 8;
+export const MoveModes = Object.freeze({
+    EDGE_TILING: 0,
+    ADAPTIVE_TILING: 1,
+    FAVORITE_LAYOUT: 2,
+    IGNORE_TA: 3
+});
 
-    static opposite(dir) {
+export const Orientation = Object.freeze({
+    H: 1,
+    V: 2
+});
+
+export const Direction = Object.freeze({
+    N: 1,
+    E: 2,
+    S: 4,
+    W: 8,
+    opposite(dir) {
         let opposite = 0;
+
         if (dir & this.N)
             opposite |= this.S;
         if (dir & this.S)
@@ -44,7 +56,7 @@ export class Direction {
 
         return opposite;
     }
-}
+});
 
 // Classes for the layouts:
 // See src/prefs/layoutsPrefs.js for details on layouts.

@@ -1,6 +1,7 @@
 import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 
+import { ActiveWindowHint } from '../common.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -40,15 +41,15 @@ export default class ActiveWindowHintHandler {
 
     _setupHint() {
         switch (Settings.getActiveWindowHint()) {
-            case 0: // Disabled
+            case ActiveWindowHint.DISABLED:
                 this._hint?.destroy();
                 this._hint = null;
                 break;
-            case 1: // Minimal
+            case ActiveWindowHint.MINIMAL:
                 this._hint?.destroy();
                 this._hint = new MinimalHint();
                 break;
-            case 2: // Always
+            case ActiveWindowHint.ALWAYS:
                 this._hint?.destroy();
                 this._hint = new AlwaysHint();
         }
@@ -56,7 +57,7 @@ export default class ActiveWindowHintHandler {
 }
 
 const Hint = GObject.registerClass(
-class ActiveWindowHint extends St.Widget {
+class TaActiveWindowHint extends St.Widget {
     _init() {
         super._init();
 
