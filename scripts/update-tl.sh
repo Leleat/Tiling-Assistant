@@ -12,7 +12,11 @@ echo -n Updating \'translations/main.pot\'
 xgettext \
     --from-code=UTF-8 \
     --output=translations/main.pot \
-    ./*/*/*/*.ui ./*/*.js ./*/*/*.js ./*/*/*/*.js
+    --add-comments='Translators:' \
+    ./tiling-assistant@leleat-on-github/*/*/*.ui \
+    ./tiling-assistant@leleat-on-github/*.js \
+    ./tiling-assistant@leleat-on-github/*/*.js \
+    ./tiling-assistant@leleat-on-github/*/*/*.js
 echo \ ......... done.
 
 # update .po files
