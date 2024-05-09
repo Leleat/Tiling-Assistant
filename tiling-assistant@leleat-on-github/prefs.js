@@ -169,14 +169,6 @@ export default class Prefs extends ExtensionPreferences {
                 ]
             },
             {
-                key: 'active-window-hint',
-                rowNames: [
-                    'active_window_hint_disabled_row',
-                    'active_window_hint_minimal_row',
-                    'active_window_hint_always_row'
-                ]
-            },
-            {
                 key: 'focus-hint',
                 rowNames: [
                     'disabled_focus_hint_row',
