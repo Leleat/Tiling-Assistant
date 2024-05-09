@@ -26,6 +26,10 @@ import LayoutsManager from './src/extension/layoutsManager.js';
 import ActiveWindowHint from './src/extension/activeWindowHint.js';
 import AltTabOverride from './src/extension/altTab.js';
 import {
+    disable as disableInjections,
+    enable as enableInjections
+} from './src/extension/injections.js';
+import {
     disable as disableSettings,
     enable as enableSettings,
     Settings
@@ -50,6 +54,7 @@ export default class TilingAssistantExtension extends Extension {
         // (utility) singletons
         enableTimeouts();
         enableSettings();
+        enableInjections();
 
         const twmModule = await import('./src/extension/tilingWindowManager.js');
 
@@ -171,6 +176,7 @@ export default class TilingAssistantExtension extends Extension {
         this._twm.destroy();
         this._twm = null;
 
+        disableInjections();
         disableSettings();
         disableTimeouts();
 

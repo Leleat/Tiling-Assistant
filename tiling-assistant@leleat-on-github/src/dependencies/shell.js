@@ -1,6 +1,7 @@
 export {
     Extension,
-    gettext as _
+    gettext as _,
+    InjectionManager
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export * as AltTab from 'resource:///org/gnome/shell/ui/altTab.js';
