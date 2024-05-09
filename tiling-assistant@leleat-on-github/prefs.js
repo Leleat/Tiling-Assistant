@@ -100,8 +100,7 @@ export default class Prefs extends ExtensionPreferences {
             'screen-left-gap',
             'screen-right-gap',
             'screen-bottom-gap',
-            'active-window-hint-border-size',
-            'active-window-hint-inner-border-size',
+            'focus-hint-outline-size',
             'toggle-maximize-tophalf-timer',
             'vertical-preview-area',
             'horizontal-preview-area'
@@ -135,7 +134,7 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindColorButtons(settings, builder) {
         const switches = [
-            'active-window-hint-color'
+            'focus-hint-color'
         ];
 
         switches.forEach(key => {
@@ -175,6 +174,15 @@ export default class Prefs extends ExtensionPreferences {
                     'active_window_hint_disabled_row',
                     'active_window_hint_minimal_row',
                     'active_window_hint_always_row'
+                ]
+            },
+            {
+                key: 'focus-hint',
+                rowNames: [
+                    'disabled_focus_hint_row',
+                    'animated_outline_focus_hint_row',
+                    'animated_upscale_focus_hint_row',
+                    'static_outline_focus_hint_row'
                 ]
             },
             {
