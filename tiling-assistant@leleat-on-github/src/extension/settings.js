@@ -39,6 +39,10 @@ class Settings {
      * overridden key and the settings old value.
      */
     _runtimeOverriddes = new Map();
+    /** @type {number[]} */
+    _watchIds = [];
+    /** @type {WeakMap<object, number[]>} */
+    _watchTrackers = new WeakMap();
 
     constructor() {
         this._didntRevertPreviously =
@@ -50,6 +54,9 @@ class Settings {
         this._registeredShortcuts = [];
 
         this._clearOverriddenSettings();
+
+        this._watchIds.forEach(id => this._gioObject.disconnect(id));
+        this._watchIds = [];
 
         this._gioObject = null;
     }
@@ -107,6 +114,73 @@ class Settings {
         if (idx !== -1) {
             Main.wm.removeKeybinding(key);
             this._registeredShortcuts.splice(idx, 1);
+        }
+    }
+
+    /**
+     * @param {string} key
+     * @param {Function} fn
+     * @param {object} param
+     * @param {object} [param.tracker]
+     * @param {boolean} [param.immediate]
+     *
+     * @returns {number}
+     */
+    watch(key, fn, { tracker = null, immediate = false } = {}) {
+        const id = this._gioObject.connect(`changed::${key}`, () =>
+            fn(this, key)
+        );
+
+        if (immediate)
+            fn(this, key);
+
+        this._watchIds.push(id);
+
+        if (tracker) {
+            const trackedIds = this._watchTrackers.get(tracker) ?? [];
+
+            trackedIds.push(id);
+            this._watchTrackers.set(tracker, trackedIds);
+        }
+
+        return id;
+    }
+
+    /**
+     * @param {number|object} idOrTracker - if a number, disconnect only that
+     *      signal. If it's an object, disconnect all signals associated with
+     *      that object.
+     */
+    unwatch(idOrTracker) {
+        if (typeof idOrTracker === 'number') {
+            const id = idOrTracker;
+
+            if (!this._watchIds.includes(id))
+                return;
+
+            this._gioObject.disconnect(id);
+            this._watchIds = this._watchIds.filter(i => i !== id);
+        } else {
+            const tracker = idOrTracker;
+            const trackedIds = this._watchTrackers.get(tracker);
+
+            if (!trackedIds)
+                return;
+
+            // TODO: It's possible that we track ids in the WeakMap that have
+            // been disconnected via `unwatch(id)`. Since we can't iterate over
+            // the WeakMap, we can't remove the ids from the tracked arrays.
+            // It's not a big deal, since disconnecting an already disconnected
+            // signal only logs a warning... not ideal, but better than having
+            // a strong reference to an object that may have been destroyed or
+            // where the Settings singleton keeps the tracker obj from being
+            // gc'd cause you forgot to call `unwatch` on it.
+            trackedIds.forEach(id => this._gioObject.disconnect(id));
+
+            this._watchTrackers.delete(tracker);
+            this._watchIds = this._watchIds.filter(
+                id => !trackedIds.includes(id)
+            );
         }
     }
 
