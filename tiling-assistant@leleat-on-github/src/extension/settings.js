@@ -1,5 +1,5 @@
-import { Gio, GLib } from '../dependencies/gi.js';
-import { Extension } from '../dependencies/shell.js';
+import { Gio, GLib, Meta, Shell } from '../dependencies/gi.js';
+import { Extension, Main } from '../dependencies/shell.js';
 
 /** @type {Settings} */
 let SINGLETON = null;
@@ -30,6 +30,8 @@ class Settings {
     _didntRevertPreviously;
     /** @type {Gio.Settings} */
     _gioObject = Extension.lookupByURL(import.meta.url).getSettings();
+    /** @type {string[]} */
+    _registeredShortcuts = [];
     /**
      * @type {Map<string, Map<string, GLib.Variant>>} saves the native settings
      * that have been overridden in the extensions `enable` call. The key is the
@@ -44,6 +46,9 @@ class Settings {
     }
 
     destroy() {
+        this._registeredShortcuts.forEach(shortcut => Main.wm.removeKeybinding(shortcut));
+        this._registeredShortcuts = [];
+
         this._clearOverriddenSettings();
 
         this._gioObject = null;
@@ -68,6 +73,41 @@ class Settings {
 
         this._updateBackupOverrides(schemaId, key, userValue);
         settings.set_value(key, newValue);
+    }
+
+    /**
+     * @param {object} param
+     * @param {string} param.key
+     * @param {Function} param.handler
+     * @param {Meta.KeyBindingFlags} [param.flags]
+     * @param {Shell.ActionMode} [param.modes]
+     */
+    registerShortcut({
+        key,
+        handler,
+        flags = Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
+        modes = Shell.ActionMode.NORMAL
+    }) {
+        if (Main.wm.addKeybinding(
+            key,
+            this._gioObject,
+            flags,
+            modes,
+            handler
+        ))
+            this._registeredShortcuts.push(key);
+    }
+
+    /**
+     * @param {string} key
+     */
+    unregisterShortcut(key) {
+        const idx = this._registeredShortcuts.indexOf(key);
+
+        if (idx !== -1) {
+            Main.wm.removeKeybinding(key);
+            this._registeredShortcuts.splice(idx, 1);
+        }
     }
 
     _clearOverriddenSettings() {
