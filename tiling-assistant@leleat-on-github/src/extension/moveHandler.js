@@ -215,12 +215,12 @@ export default class TilingMoveHandler {
             const ctrlReplacedTileGroup = [];
             const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
             const pointerPos = { x: global.get_pointer()[0], y: global.get_pointer()[1] };
-            const twHovered = topTileGroup.some(w => w.tiledRect.containsPoint(pointerPos));
+            const twHovered = topTileGroup.some(w => w.tiledRect.contains_point(pointerPos));
             if (this._currPreviewMode === MoveModes.ADAPTIVE_TILING && !this._splitRects.size && twHovered) {
                 isCtrlReplacement = true;
                 ctrlReplacedTileGroup.push(window);
                 topTileGroup.forEach(w => {
-                    if (!this._tileRect.containsRect(w.tiledRect))
+                    if (!this._tileRect.contains_rect(w.tiledRect))
                         ctrlReplacedTileGroup.push(w);
                 });
             }
@@ -365,7 +365,7 @@ export default class TilingMoveHandler {
 
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = activeWs.get_work_area_for_monitor(monitor);
         const tRects = this._topTileGroup.map(w => w.tiledRect);
         this._freeScreenRects = workArea.minus(tRects);
 
@@ -454,7 +454,7 @@ export default class TilingMoveHandler {
         this._lastMonitorNr = currMonitorNr;
 
         const wRect = window.get_frame_rect();
-        const workArea = new Rect(window.get_work_area_for_monitor(this._monitorNr));
+        const workArea = window.get_work_area_for_monitor(this._monitorNr);
 
         const vDetectionSize = Settings.getVerticalPreviewArea();
         const pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize;
@@ -476,16 +476,16 @@ export default class TilingMoveHandler {
 
         if (tileTopLeftQuarter) {
             this._tileRect = Twm.getTileFor('tile-topleft-quarter', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (tileTopRightQuarter) {
             this._tileRect = Twm.getTileFor('tile-topright-quarter', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (tileBottomLeftQuarter) {
             this._tileRect = Twm.getTileFor('tile-bottomleft-quarter', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (tileBottomRightQuarter) {
             this._tileRect = Twm.getTileFor('tile-bottomright-quarter', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (pointerAtTopEdge) {
             // Switch between maximize & top tiling when keeping the mouse at the top edge.
             const monitorRect = global.display.get_monitor_geometry(this._monitorNr);
@@ -502,11 +502,11 @@ export default class TilingMoveHandler {
             // Dont open preview / start new timer if preview was already one for the top
             if (this._tilePreview._rect &&
                         (holdTileRect.equal(this._tilePreview._rect) ||
-                                this._tilePreview._rect.equal(tileRect.meta)))
+                                this._tilePreview._rect.equal(tileRect)))
                 return;
 
             this._tileRect = tileRect;
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
 
             Timeouts.add({
                 name: 'moveHandler-_edgeTilingPreview-topEdgePreviewTimer',
@@ -514,10 +514,10 @@ export default class TilingMoveHandler {
                 fn: () => {
                     if (
                         this._tilePreview._showing &&
-                        this._tilePreview._rect.equal(tileRect.meta)
+                        this._tilePreview._rect.equal(tileRect)
                     ) {
                         this._tileRect = holdTileRect;
-                        this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+                        this._tilePreview.open(window, this._tileRect, this._monitorNr);
                     }
 
                     return GLib.SOURCE_REMOVE;
@@ -525,13 +525,13 @@ export default class TilingMoveHandler {
             });
         } else if (pointerAtBottomEdge) {
             this._tileRect = Twm.getTileFor('tile-bottom-half', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (pointerAtLeftEdge) {
             this._tileRect = Twm.getTileFor('tile-left-half', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else if (pointerAtRightEdge) {
             this._tileRect = Twm.getTileFor('tile-right-half', workArea, this._monitorNr);
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr);
+            this._tilePreview.open(window, this._tileRect, this._monitorNr);
         } else {
             this._tileRect = null;
             this._tilePreview.close();
@@ -557,7 +557,7 @@ export default class TilingMoveHandler {
         const screenRects = this._topTileGroup
             .map(w => w.tiledRect)
             .concat(this._freeScreenRects);
-        const hoveredRect = screenRects.find(r => r.containsPoint(this._lastPointerPos));
+        const hoveredRect = screenRects.find(r => r.contains_point(this._lastPointerPos));
         if (!hoveredRect) {
             this._tilePreview.close();
             this._tileRect = null;
@@ -570,7 +570,7 @@ export default class TilingMoveHandler {
             this._tileRect = hoveredRect.union(this._anchorRect);
             this._splitRects.clear();
 
-            this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
+            this._tilePreview.open(window, this._tileRect, this._monitorNr, {
                 x: this._tileRect.x,
                 y: this._tileRect.y,
                 width: this._tileRect.width,
@@ -602,7 +602,7 @@ export default class TilingMoveHandler {
      * tiled window, will make space for the grabbed window by halving its size.
      *
      * @param {Meta.Window} window
-     * @param {Rect} hoveredRect
+     * @param {Mtk.Rectangle} hoveredRect
      */
     _adaptiveTilingPreviewSingle(window, hoveredRect) {
         const atTop = this._lastPointerPos.y < hoveredRect.y + hoveredRect.height * .25;
@@ -616,7 +616,7 @@ export default class TilingMoveHandler {
             const idx = atTop && !atRight || atLeft ? 0 : 1;
             const size = splitHorizontally ? hoveredRect.width : hoveredRect.height;
             const orientation = splitHorizontally ? Orientation.V : Orientation.H;
-            this._tileRect = hoveredRect.getUnitAt(idx, size / 2, orientation);
+            this._tileRect = hoveredRect.get_unit_at(idx, size / 2, orientation);
         } else {
             this._tileRect = hoveredRect.copy();
         }
@@ -625,11 +625,11 @@ export default class TilingMoveHandler {
             return;
 
         const monitor = global.display.get_current_monitor();
-        this._tilePreview.open(window, this._tileRect.meta, monitor);
+        this._tilePreview.open(window, this._tileRect, monitor);
         this._splitRects.clear();
 
         const hoveredWindow = this._topTileGroup.find(w => {
-            return w.tiledRect.containsPoint(this._lastPointerPos);
+            return w.tiledRect.contains_point(this._lastPointerPos);
         });
 
         if (!hoveredWindow)
@@ -652,7 +652,7 @@ export default class TilingMoveHandler {
      * to understand, if you see it in action first rather than reading about it.
      *
      * @param {Meta.Window} window
-     * @param {Rect} hoveredRect
+     * @param {Mtk.Rectangle} hoveredRect
      * @param {object} hovered contains booleans at which position the
      *      `hoveredRect` is hovered.
      */
@@ -679,7 +679,7 @@ export default class TilingMoveHandler {
         });
 
         const monitor = global.display.get_current_monitor();
-        const workArea = new Rect(window.get_work_area_for_monitor(monitor));
+        const workArea = window.get_work_area_for_monitor(monitor);
         // This factor is used in combination with the smallestWindow to
         // determine the final size of the grabbed window. Use half of the size
         // factor, if we are at the screen edges. The cases for the bottom and
@@ -721,7 +721,12 @@ export default class TilingMoveHandler {
             ));
             const height = Math.min(size, workArea.y2 - y);
 
-            this._tileRect = new Rect(x1, y, x2 - x1, height);
+            this._tileRect = new Mtk.Rectangle({
+                x: x1,
+                y,
+                width: x2 - x1,
+                height
+            });
 
         // The grabbed window will be vertical. The vertical size (y1 - y2) is
         // determined by the furthest top- and bottom-reaching windows that align
@@ -755,15 +760,20 @@ export default class TilingMoveHandler {
             ));
             const width = Math.min(size, workArea.x2 - x);
 
-            this._tileRect = new Rect(x, y1, width, y2 - y1);
+            this._tileRect = new Mtk.Rectangle({
+                x,
+                y: y1,
+                width,
+                height: y2 - y1
+            });
         }
 
-        this._tileRect.tryAlignWith(workArea);
+        this._tileRect.try_align_with(workArea);
 
         if (!this._tilePreview.needsUpdate(this._tileRect))
             return;
 
-        this._tilePreview.open(window, this._tileRect.meta, monitor);
+        this._tilePreview.open(window, this._tileRect, monitor);
         this._splitRects.clear();
 
         this._topTileGroup.forEach(w => {
@@ -782,7 +792,7 @@ export default class TilingMoveHandler {
         // layout starting from the rect, which the user starting holding Super in.
         const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
         for (const rect of this._favoriteLayout) {
-            if (rect.containsPoint(this._lastPointerPos)) {
+            if (rect.contains_point(this._lastPointerPos)) {
                 if (isSuperPressed) {
                     this._anchorRect = this._anchorRect ?? rect;
                     this._tileRect = rect.union(this._anchorRect);
@@ -791,7 +801,7 @@ export default class TilingMoveHandler {
                     this._anchorRect = null;
                 }
 
-                this._tilePreview.open(window, this._tileRect.meta, this._monitorNr, {
+                this._tilePreview.open(window, this._tileRect, this._monitorNr, {
                     x: this._tileRect.x,
                     y: this._tileRect.y,
                     width: this._tileRect.width,

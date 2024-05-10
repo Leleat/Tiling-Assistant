@@ -1,4 +1,4 @@
-import { Clutter, Gio, GObject, Shell, St } from '../dependencies/gi.js';
+import { Clutter, Gio, GObject, Mtk, Shell, St } from '../dependencies/gi.js';
 import {
     _,
     Extension,
@@ -165,20 +165,20 @@ export default class TilingLayoutsManager {
             // Scale the item's rect to the workArea
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
-            const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+            const workArea = activeWs.get_work_area_for_monitor(monitor);
             const rectRatios = this._currItem.rect;
-            this._currRect = new Rect(
-                workArea.x + Math.floor(rectRatios.x * workArea.width),
-                workArea.y + Math.floor(rectRatios.y * workArea.height),
-                Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
-            );
+            this._currRect = new Mtk.Rectangle({
+                x: workArea.x + Math.floor(rectRatios.x * workArea.width),
+                y: workArea.y + Math.floor(rectRatios.y * workArea.height),
+                width: Math.ceil(rectRatios.width * workArea.width),
+                height: Math.ceil(rectRatios.height * workArea.height)
+            });
 
             // Try to compensate possible rounding errors when scaling up the
             // rect by aligning it with the rects, which were already tiled
             // using this layout and the workArea.
-            this._tiledWithLayout.forEach(w => this._currRect.tryAlignWith(w.tiledRect));
-            this._currRect.tryAlignWith(workArea);
+            this._tiledWithLayout.forEach(w => this._currRect.try_align_with(w.tiledRect));
+            this._currRect.try_align_with(workArea);
         }
 
         const appId = this._currItem.appId;

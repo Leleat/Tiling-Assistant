@@ -85,7 +85,7 @@ export class TilingWindowManager {
 
     /**
      * @param {Meta.Window} window a Meta.Window.
-     * @param {Meta.WorkArea|Rect|null} workArea useful for the grace period
+     * @param {Meta.WorkArea|Mtk.Rectangle|null} workArea useful for the grace period
      * @returns whether the window is maximized. Be it using GNOME's native
      *      maximization or the maximization by this extension when using gaps.
      */
@@ -99,7 +99,7 @@ export class TilingWindowManager {
      * Tiles a window to a specific spot and setup all tiling properties.
      *
      * @param {Meta.Window} window a Meta.Window to tile.
-     * @param {Rect} newRect the Rect the `window` will be tiled to.
+     * @param {Mtk.Rectangle} newRect the Rect the `window` will be tiled to.
      * @param {boolean} [openTilingPopup=true] decides, if we open a Tiling
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
@@ -146,9 +146,9 @@ export class TilingWindowManager {
         else
             window.raise_and_make_recent();
 
-        const oldRect = new Rect(window.get_frame_rect());
+        const oldRect = window.get_frame_rect();
         const monitor = monitorNr ?? window.get_monitor();
-        const workArea = new Rect(window.get_work_area_for_monitor(monitor));
+        const workArea = window.get_work_area_for_monitor(monitor);
         const maximize = newRect.equal(workArea);
 
         window.isTiled = !maximize;
@@ -170,7 +170,7 @@ export class TilingWindowManager {
         // For ex. which only resize in full rows/columns like gnome-terminal
         window.tiledRect = newRect.copy();
 
-        const { x, y, width, height } = newRect.addGaps(workArea, monitor);
+        const { x, y, width, height } = newRect.add_gaps(workArea, monitor);
 
         // Animations
         const wActor = window.get_compositor_private();
@@ -181,7 +181,7 @@ export class TilingWindowManager {
             Main.wm._prepareAnimationInfo(
                 global.window_manager,
                 wActor,
-                oldRect.meta,
+                oldRect,
                 Meta.SizeChange.MAXIMIZE
             );
         }
@@ -279,7 +279,7 @@ export class TilingWindowManager {
             window.move_resize_frame(userOp, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
         } else {
             // Resize the window while keeping the relative x pos (of the pointer)
-            const currWindowFrame = new Rect(window.get_frame_rect());
+            const currWindowFrame = window.get_frame_rect();
             xAnchor = xAnchor ?? global.get_pointer()[0];
             const relativeMouseX = (xAnchor - currWindowFrame.x) / currWindowFrame.width;
             const newPosX = xAnchor - oldRect.width * relativeMouseX;
@@ -321,8 +321,8 @@ export class TilingWindowManager {
      */
     static moveGroupToMonitor(tileGroup, oldMon, newMon) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const oldWorkArea = new Rect(activeWs.get_work_area_for_monitor(oldMon));
-        const newWorkArea = new Rect(activeWs.get_work_area_for_monitor(newMon));
+        const oldWorkArea = activeWs.get_work_area_for_monitor(oldMon);
+        const newWorkArea = activeWs.get_work_area_for_monitor(newMon);
 
         const hScale = oldWorkArea.width / newWorkArea.width;
         const vScale = oldWorkArea.height / newWorkArea.height;
@@ -336,9 +336,9 @@ export class TilingWindowManager {
 
             // Try to align with all previously scaled tiles and the workspace to prevent gaps
             for (let i = 0; i < idx; i++)
-                newTile.tryAlignWith(tileGroup[i].tiledRect);
+                newTile.try_align_with(tileGroup[i].tiledRect);
 
-            newTile.tryAlignWith(newWorkArea, 10);
+            newTile.try_align_with(newWorkArea, 10);
 
             this.tile(w, newTile, {
                 skipAnim: true,
@@ -565,7 +565,7 @@ export class TilingWindowManager {
                 // Find the first not overlapped tile group, if it exists
                 if (window.isTiled) {
                     const overlapsIgnoredWindow = ignoredWindows.some(w => {
-                        const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
+                        const rect = w.tiledRect ?? w.get_frame_rect();
                         return rect.overlap(window.tiledRect);
                     });
 
@@ -592,15 +592,15 @@ export class TilingWindowManager {
      * is ambiguous that means it consists of multiple (unaligned) rectangles
      * (for ex.: 2 diagonally opposing quarters). In that case we return null.
      *
-     * @param {Rect[]} rectList an array of Rects, which occupy the screen.
+     * @param {Mtk.Rectangle[]} rectList an array of Rects, which occupy the screen.
      * @param {number|null} [monitorNr] useful for the grace period during dnd.
      *      Defaults to pointer monitor.
-     * @returns {Rect|null} a Rect, which represent the free screen space.
+     * @returns {Mtk.Rectangle|null} a Rect, which represent the free screen space.
      */
     static getFreeScreen(rectList, monitorNr = null) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = monitorNr ?? global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = activeWs.get_work_area_for_monitor(monitor);
         const freeScreenRects = workArea.minus(rectList);
         if (!freeScreenRects.length)
             return null;
@@ -608,14 +608,19 @@ export class TilingWindowManager {
         // Create the union of all freeScreenRects and calculate the sum
         // of their areas. If the area of the union-rect equals the area
         // of the individual rects, the individual rects align properly.
-        const startRect = new Rect(freeScreenRects[0].x, freeScreenRects[0].y, 0, 0);
+        const startRect = new Mtk.Rectangle({
+            x: freeScreenRects[0].x,
+            y: freeScreenRects[0].y,
+            width: 0,
+            height: 0
+        });
         const { checkSum, combinedRect } = freeScreenRects.reduce((result, rect) => {
-            result.checkSum += rect.area;
+            result.checkSum += rect.area();
             result.combinedRect = result.combinedRect.union(rect);
             return result;
         }, { checkSum: 0, combinedRect: startRect });
 
-        if (combinedRect.area !== checkSum)
+        if (combinedRect.area() !== checkSum)
             return null;
 
         // Random min. size requirement
@@ -630,21 +635,21 @@ export class TilingWindowManager {
      * instead this will return an expanded copy of that rect filling all
      * the available space around it.
      *
-     * @param {Rect[]} rectList an array of Rects, which occupy the screen.
+     * @param {Mtk.Rectangle[]} rectList an array of Rects, which occupy the screen.
      *      Like usual, they shouldn't overlap each other.
-     * @param {Rect} [currRect=null] a Rect, which may be expanded.
+     * @param {Mtk.Rectangle} [currRect=null] a Rect, which may be expanded.
      * @param {Orientation} [orientation=null] The orientation we want to expand
      *      `currRect` into. If `null`, expand in both orientations.
-     * @param {Rect} [monitor=null] defaults to pointer monitor.
-     * @returns {Rect} a new Rect.
+     * @param {Mtk.Rectangle} [monitor=null] defaults to pointer monitor.
+     * @returns {Mtk.Rectangle} a new Rect.
      */
     static getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = monitorNr ?? global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = activeWs.get_work_area_for_monitor(monitor);
         const freeRects = workArea.minus(rectList);
         if (!freeRects.length)
-            return currRect ?? new Rect(workArea);
+            return currRect ?? workArea;
 
         // Try to expand the currRect to fill the rest of the space
         // that is available around it.
@@ -659,7 +664,7 @@ export class TilingWindowManager {
             // below for the reasoning.
             const borderingRects = freeRects.filter(r => {
                 const axis1 = currRect[xpndPos1] === r[xpndPos2] || currRect[xpndPos2] === r[xpndPos1];
-                const axis2 = isVert ? currRect.horizOverlap(r) : currRect.vertOverlap(r);
+                const axis2 = isVert ? currRect.horiz_overlap(r) : currRect.vert_overlap(r);
                 return axis1 && axis2;
             }).sort((a, b) => a[unxpndPos1] - b[unxpndPos1]);
 
@@ -749,7 +754,7 @@ export class TilingWindowManager {
         // it should be good enough.
         } else {
             const biggestSingle = freeRects.reduce((currBiggest, rect) => {
-                return currBiggest.area >= rect.area ? currBiggest : rect;
+                return currBiggest.area() >= rect.area() ? currBiggest : rect;
             });
             rectList.push(biggestSingle);
 
@@ -771,9 +776,9 @@ export class TilingWindowManager {
      * @returns {Meta.Window|null} the nearest Meta.Window.
      */
     static getNearestWindow(currWindow, windows, dir, wrap = true) {
-        const getRect = w => w.tiledRect ?? new Rect(w.get_frame_rect());
+        const getRect = w => w.tiledRect ?? w.get_frame_rect();
         const rects = windows.map(w => getRect(w));
-        const nearestRect = getRect(currWindow).getNeighbor(dir, rects, wrap);
+        const nearestRect = getRect(currWindow).get_neighbor(dir, rects, wrap);
         if (!nearestRect)
             return null;
 
@@ -792,7 +797,7 @@ export class TilingWindowManager {
      * we default to half the workArea.
      *
      * @param {string} shortcut the side / quarter to get the tile rect for.
-     * @param {Rect} workArea the workArea.
+     * @param {Mtk.Rectangle} workArea the workArea.
      * @param {number} [monitor=null] the monitor number we want to get the
      *      rect for. This may not always be the current monitor. It is only
      *      used to implement the 'grace period' to enable quickly tiling a
@@ -839,51 +844,91 @@ export class TilingWindowManager {
                 return workArea.copy();
             } case 'tile-left-half': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-                const result = new Rect(workArea.x, workArea.y, width, workArea.height);
+                const { width } = left ?? workArea.get_unit_at(0, workArea.width / 2, Orientation.V);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x,
+                    y: workArea.y,
+                    width,
+                    height: workArea.height
+                });
                 return getTile(result);
             } case 'tile-right-half': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-                const result = new Rect(workArea.x2 - width, workArea.y, width, workArea.height);
+                const { width } = right ?? workArea.get_unit_at(1, workArea.width / 2, Orientation.V);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x2 - width,
+                    y: workArea.y,
+                    width,
+                    height: workArea.height
+                });
                 return getTile(result);
             } case 'tile-top-half': {
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y, workArea.width, height);
+                const { height } = top ?? workArea.get_unit_at(0, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x,
+                    y: workArea.y,
+                    width: workArea.width,
+                    height
+                });
                 return getTile(result);
             } case 'tile-bottom-half': {
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y2 - height, workArea.width, height);
+                const { height } = bottom ?? workArea.get_unit_at(1, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x,
+                    y: workArea.y2 - height,
+                    width: workArea.width,
+                    height
+                });
                 return getTile(result);
             } case 'tile-topleft-quarter': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const { width } = left ?? workArea.get_unit_at(0, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y, width, height);
+                const { height } = top ?? workArea.get_unit_at(0, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x,
+                    y: workArea.y,
+                    width,
+                    height
+                });
                 return getTile(result);
             } case 'tile-topright-quarter': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const { width } = right ?? workArea.get_unit_at(1, workArea.width / 2, Orientation.V);
                 const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x2 - width, workArea.y, width, height);
+                const { height } = top ?? workArea.get_unit_at(0, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x2 - width,
+                    y: workArea.y,
+                    width,
+                    height
+                });
                 return getTile(result);
             } case 'tile-bottomleft-quarter': {
                 const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const { width } = left ?? workArea.get_unit_at(0, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y2 - height, width, height);
+                const { height } = bottom ?? workArea.get_unit_at(1, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x,
+                    y: workArea.y2 - height,
+                    width,
+                    height
+                });
                 return getTile(result);
             } case 'tile-bottomright-quarter': {
                 const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const { width } = right ?? workArea.get_unit_at(1, workArea.width / 2, Orientation.V);
                 const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x2 - width, workArea.y2 - height, width, height);
+                const { height } = bottom ?? workArea.get_unit_at(1, workArea.height / 2, Orientation.H);
+                const result = new Mtk.Rectangle({
+                    x: workArea.x2 - width,
+                    y: workArea.y2 - height,
+                    width,
+                    height
+                });
                 return getTile(result);
             }
         }
@@ -891,7 +936,7 @@ export class TilingWindowManager {
 
     /**
      * @param {string} shortcut determines, which half/quarter to get the tile for
-     * @param {Rect} workArea
+     * @param {Mtk.Rectangle} workArea
      * @returns
      */
     static getDefaultTileFor(shortcut, workArea) {
@@ -900,28 +945,28 @@ export class TilingWindowManager {
                 return workArea.copy();
             case 'tile-left-half':
             case 'tile-left-half-ignore-ta':
-                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                return workArea.get_unit_at(0, workArea.width / 2, Orientation.V);
             case 'tile-right-half':
             case 'tile-right-half-ignore-ta':
-                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                return workArea.get_unit_at(1, workArea.width / 2, Orientation.V);
             case 'tile-top-half':
             case 'tile-top-half-ignore-ta':
-                return workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(0, workArea.height / 2, Orientation.H);
             case 'tile-bottom-half':
             case 'tile-bottom-half-ignore-ta':
-                return workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(1, workArea.height / 2, Orientation.H);
             case 'tile-topleft-quarter':
             case 'tile-topleft-quarter-ignore-ta':
-                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(0, workArea.width / 2, Orientation.V).get_unit_at(0, workArea.height / 2, Orientation.H);
             case 'tile-topright-quarter':
             case 'tile-topright-quarter-ignore-ta':
-                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(1, workArea.width / 2, Orientation.V).get_unit_at(0, workArea.height / 2, Orientation.H);
             case 'tile-bottomleft-quarter':
             case 'tile-bottomleft-quarter-ignore-ta':
-                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(0, workArea.width / 2, Orientation.V).get_unit_at(1, workArea.height / 2, Orientation.H);
             case 'tile-bottomright-quarter':
             case 'tile-bottomright-quarter-ignore-ta':
-                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea.get_unit_at(1, workArea.width / 2, Orientation.V).get_unit_at(1, workArea.height / 2, Orientation.H);
         }
     }
 
@@ -956,7 +1001,7 @@ export class TilingWindowManager {
      * Tiles or untiles a window based on its current tiling state.
      *
      * @param {Meta.Window} window a Meta.Window.
-     * @param {Rect} rect the Rect the `window` tiles to or untiles from.
+     * @param {Mtk.Rectangle} rect the Rect the `window` tiles to or untiles from.
      */
     static toggleTiling(window, rect, params = {}) {
         const workArea = window.get_work_area_current_monitor();
@@ -972,7 +1017,7 @@ export class TilingWindowManager {
      * Tries to open an app on a tiling state (in a very dumb way...).
      *
      * @param {Shell.App} app the Shell.App to open and tile.
-     * @param {Rect} rect the Rect to tile to.
+     * @param {Mtk.Rectangle} rect the Rect to tile to.
      * @param {boolean} [openTilingPopup=false] allow the Tiling Popup to
      *      appear, if there is free screen space after the `app` was tiled.
      */
@@ -1064,7 +1109,7 @@ export class TilingWindowManager {
 
                 const tileGroupOverlaps = tileGroup.some(w =>
                     result.some(r => r.tiledRect.overlap(w.tiledRect)) ||
-                    ignoredWindows.some(r => (r.tiledRect ?? new Rect(r.get_frame_rect())).overlap(w.tiledRect)));
+                    ignoredWindows.some(r => (r.tiledRect ?? r.get_frame_rect()).overlap(w.tiledRect)));
 
                 tileGroupOverlaps
                     ? tileGroup.forEach(w => ignoredWindows.push(w))
@@ -1120,7 +1165,7 @@ export class TilingWindowManager {
                 // currently tested tiled window, the currently tested tiled
                 // window isn't part of the top tile group.
                 const overlapsIgnoredWindow = ignoredWindows.some(w => {
-                    const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
+                    const rect = w.tiledRect ?? w.get_frame_rect();
                     return rect.overlap(wRect);
                 });
                 // Same applies for already grouped windows
@@ -1286,8 +1331,7 @@ export class TilingWindowManager {
             return;
 
         if (this.isMaximized(window)) {
-            const wA = window.get_work_area_for_monitor(window.get_monitor());
-            const workArea = new Rect(wA);
+            const workArea = window.get_work_area_for_monitor(window.get_monitor());
             if (workArea.equal(window.tiledRect))
                 return;
 

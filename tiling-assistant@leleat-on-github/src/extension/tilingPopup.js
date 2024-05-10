@@ -22,7 +22,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
     /**
      * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
-     * @param {Rect} freeScreenRect the Rect, which the popup will tile a window
+     * @param {Mtk.Rectangle} freeScreenRect the Rect, which the popup will tile a window
      *      to. The popup will be centered in this rect.
      * @param {boolean} allowConsecutivePopup allow the popup to create another
      *      Tiling Popup, if there is still unambiguous free screen space after
@@ -286,7 +286,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
             const size = vertical ? 'width' : 'height';
             const orientation = vertical ? Orientation.V : Orientation.H;
             const idx = isShiftPressed ? 0 : 1;
-            rect = rect.getUnitAt(idx, rect[size] / 2, orientation);
+            rect = rect.get_unit_at(idx, rect[size] / 2, orientation);
         }
 
         this.tiledWindow = window;

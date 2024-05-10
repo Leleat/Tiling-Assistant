@@ -297,9 +297,12 @@ export default class TilingAssistantExtension extends Extension {
             if (!window)
                 return;
 
-            const jsToRect = jsRect => jsRect && new Rect(
-                jsRect.x, jsRect.y, jsRect.width, jsRect.height
-            );
+            const jsToRect = jsRect => jsRect && new Mtk.Rectangle({
+                x: jsRect.x,
+                y: jsRect.y,
+                width: jsRect.width,
+                height: jsRect.height
+            });
 
             window.isTiled = isTiled;
             window.tiledRect = jsToRect(tiledRect);

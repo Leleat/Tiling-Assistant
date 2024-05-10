@@ -141,7 +141,7 @@ export class Util {
      * @param {number|null} monitorNr determines which monitor the layout scales
      *      to. Sometimes we want the monitor of the pointer (when using dnd) and
      *      sometimes not (when using layouts with the keyboard shortcuts).
-     * @returns {Rect[]}
+     * @returns {Mtk.Rectangle[]}
      */
     static getFavoriteLayout(monitorNr = null) {
         // I don't know when the layout may have changed on the disk(?),
@@ -155,25 +155,25 @@ export class Util {
             return [];
 
         const activeWs = global.workspace_manager.get_active_workspace();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = activeWs.get_work_area_for_monitor(monitor);
 
         // Scale the rect's ratios to the workArea. Try to align the rects to
         // each other and the workArea to workaround possible rounding errors
         // due to the scaling.
         layout._items.forEach(({ rect: rectRatios }, idx) => {
-            const rect = new Rect(
-                workArea.x + Math.floor(rectRatios.x * workArea.width),
-                workArea.y + Math.floor(rectRatios.y * workArea.height),
-                Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
-            );
+            const rect = new Mtk.Rectangle({
+                x: workArea.x + Math.floor(rectRatios.x * workArea.width),
+                y: workArea.y + Math.floor(rectRatios.y * workArea.height),
+                width: Math.ceil(rectRatios.width * workArea.width),
+                height: Math.ceil(rectRatios.height * workArea.height)
+            });
             favoriteLayout.push(rect);
 
             for (let i = 0; i < idx; i++)
-                rect.tryAlignWith(favoriteLayout[i]);
+                rect.try_align_with(favoriteLayout[i]);
         });
 
-        favoriteLayout.forEach(rect => rect.tryAlignWith(workArea));
+        favoriteLayout.forEach(rect => rect.try_align_with(workArea));
         return favoriteLayout;
     }
 
@@ -216,7 +216,7 @@ export class Util {
     static async ___debugShowFreeScreenRects() {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+        const workArea = activeWs.get_work_area_for_monitor(monitor);
         const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         const tRects = topTileGroup.map(w => w.tiledRect);

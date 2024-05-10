@@ -1,4 +1,4 @@
-import { Clutter, Meta } from '../dependencies/gi.js';
+import { Clutter, Meta, Mtk } from '../dependencies/gi.js';
 
 import { Orientation } from '../common.js';
 import { Rect, Util } from './utility.js';
@@ -79,7 +79,7 @@ export default class TilingResizeHandler {
         const margin = 5;
         let topTileGroup = Twm.getTopTileGroup();
         topTileGroup.forEach(w => {
-            this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
+            this._preGrabRects.set(w, w.get_frame_rect());
 
             if (w !== window)
                 // There is no snapping for tiled windows, if the user set a window
@@ -87,7 +87,7 @@ export default class TilingResizeHandler {
                 // to manually resize them to be edge to edge. In that case, assume
                 // that windows that are within a certain margin distance to each
                 // other are meant to align and resize them together.
-                w.tiledRect.tryAlignWith(window.tiledRect, margin);
+                w.tiledRect.try_align_with(window.tiledRect, margin);
         });
 
         // Windows can be part of multiple tile groups. We however only resize
@@ -314,7 +314,7 @@ export default class TilingResizeHandler {
         // The new x / y coord for the window's tiledRect can be calculated by
         // a simple difference because resizing on the E / S side won't change
         // x / y and resizing on the N or W side will translate into a 1:1 shift
-        const grabbedsNewRect = new Rect(window.get_frame_rect());
+        const grabbedsNewRect = window.get_frame_rect();
         const grabbedsOldRect = this._preGrabRects.get(window);
 
         const isResizingW = (grabOp & Meta.GrabOp.RESIZING_W) > 1;
@@ -345,12 +345,12 @@ export default class TilingResizeHandler {
             : window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
-        window.tiledRect = new Rect(
-            newGrabbedTiledRectX,
-            newGrabbedTiledRectY,
-            newGrabbedTiledRectWidth,
-            newGrabbedTiledRectHeight
-        );
+        window.tiledRect = new Mtk.Rectangle({
+            x: newGrabbedTiledRectX,
+            y: newGrabbedTiledRectY,
+            width: newGrabbedTiledRectWidth,
+            height: newGrabbedTiledRectHeight
+        });
 
         // Now calculate the new tiledRects for the windows, which were resized
         // along the window based on the diff of the window's tiledRect pre
@@ -413,8 +413,8 @@ export default class TilingResizeHandler {
         if (!resizeOnSameSide && !resizeOnOpposingSide)
             return null;
 
-        const resizedRect = new Rect(resizedWindow.get_frame_rect());
-        const wRect = new Rect(window.get_frame_rect());
+        const resizedRect = resizedWindow.get_frame_rect();
+        const wRect = window.get_frame_rect();
         const preGrabRect = this._preGrabRects.get(window);
         const windowGap = Util.getScaledGap('window-gap', window.get_monitor());
 
@@ -464,7 +464,7 @@ export default class TilingResizeHandler {
         // Checks if the w1 and w2 border each other at a certain edge.
         const borders = (w1, w2, w1IsAfterW2) => {
             const [start, end] = orientation === Orientation.H ? ['x', 'x2'] : ['y', 'y2'];
-            const overlap = orientation === Orientation.H ? 'vertOverlap' : 'horizOverlap';
+            const overlap = orientation === Orientation.H ? 'vert_overlap' : 'horiz_overlap';
             if (w1IsAfterW2) {
                 return w1.tiledRect[start] === w2.tiledRect[end] &&
                         w1.tiledRect[overlap](w2.tiledRect);
