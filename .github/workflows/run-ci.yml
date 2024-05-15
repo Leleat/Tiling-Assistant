@@ -11,7 +11,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: "*"
+          node-version: '*'
       - name: Prepare Linters
         run: npm i
       - name: Run ESLint (*.js)
@@ -19,6 +19,11 @@ jobs:
           git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
           grep -E "\.js$" |
           xargs -r npx eslint
+      - name: Run Prettier
+        if: success() || failure()
+        run: >
+          git diff --name-only --diff-filter=ACMTUXB origin/${{ github.base_ref }} HEAD |
+          xargs -r npx prettier -c --ignore-unknown
       - name: Run ShellCheck (*.sh)
         if: success() || failure()
         run: >
@@ -35,7 +40,7 @@ jobs:
           fetch-depth: 0
       - uses: actions/setup-node@v3
         with:
-          node-version: "*"
+          node-version: '*'
       - run: pip install codespell
       # The case sensitivity of codespeller for ignore-words seems to be buggy. See
       # issue tracker. According to the help page it should be case sensitive but
