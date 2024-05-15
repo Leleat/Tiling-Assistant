@@ -327,13 +327,13 @@ export default class TilingMoveHandler {
         const adaptiveMod = Settings.getInt('move-adaptive-tiling-mod');
         const favMod = Settings.getInt('move-favorite-layout-mod');
         const ignoreTAMod = Settings.getInt('ignore-ta-mod');
-        const noMod = pressed.every(modPressed => !modPressed);
+        const noMod = !pressed[adaptiveMod] && !pressed[ignoreTAMod] && !pressed[ignoreTAMod];
 
-        const useAdaptiveTiling = defaultMode !== MoveModes.ADAPTIVE_TILING && adaptiveMod && pressed[adaptiveMod] ||
+        const useAdaptiveTiling = defaultMode !== MoveModes.ADAPTIVE_TILING && pressed[adaptiveMod] ||
             noMod && defaultMode === MoveModes.ADAPTIVE_TILING;
-        const usefavLayout = defaultMode !== MoveModes.FAVORITE_LAYOUT && favMod && pressed[favMod] ||
+        const usefavLayout = defaultMode !== MoveModes.FAVORITE_LAYOUT && pressed[favMod] ||
             noMod && defaultMode === MoveModes.FAVORITE_LAYOUT;
-        const useIgnoreTa = defaultMode !== MoveModes.IGNORE_TA && ignoreTAMod && pressed[ignoreTAMod] ||
+        const useIgnoreTa = defaultMode !== MoveModes.IGNORE_TA && pressed[ignoreTAMod] ||
             noMod && defaultMode === MoveModes.IGNORE_TA;
 
         let newMode = '';
