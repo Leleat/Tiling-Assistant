@@ -4,7 +4,6 @@ about: Suggest a new feature
 title: ''
 labels: enhancement
 assignees: ''
-
 ---
 
 <!-- Before you suggest a feature, please consider whether your idea would benefit
@@ -14,8 +13,4 @@ behavior is very unlikely to be implemented. Please explain your rationale below
 
 **Briefly describe how the feature should work**
 
-
-
 **Explain why this feature should be added**
-
-

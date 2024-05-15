@@ -1,6 +1,6 @@
-import { Gio, GLib } from '../dependencies/prefs/gi.js';
+import {Gio, GLib} from '../dependencies/prefs/gi.js';
 
-import { LayoutRow } from './layoutRow.js';
+import {LayoutRow} from './layoutRow.js';
 
 /**
  * This class takes care of everything related to layouts (at least on the
@@ -62,7 +62,7 @@ export default class {
         });
 
         // Bind the general layouts keyboard shortcuts.
-        ['search-popup-layout'].forEach(key => {
+        ['search-popup-layout'].forEach((key) => {
             const shortcut = builder.get_object(key.replaceAll('-', '_'));
             shortcut.initialize(key, this._settings);
         });
@@ -74,14 +74,15 @@ export default class {
     _loadLayouts(path) {
         this._applySaveButtonStyle('');
 
-        this._forEachLayoutRow(row => row.destroy());
+        this._forEachLayoutRow((row) => row.destroy());
         LayoutRow.resetInstanceCount();
 
         // Try to load layouts file.
         const saveFile = this._makeFile();
         const [success, contents] = saveFile.load_contents(null);
-        if (!success)
+        if (!success) {
             return;
+        }
 
         let layouts = [];
 
@@ -90,25 +91,36 @@ export default class {
             layouts = JSON.parse(new TextDecoder().decode(contents));
             // Ensure at least 1 empty row otherwise the listbox won't have
             // a height but a weird looking shadow only.
-            layouts.length
-                ? layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout))
-                : this._createLayoutRow(0);
+            if (layouts.length) {
+                layouts.forEach((layout, idx) =>
+                    this._createLayoutRow(idx, layout),
+                );
+            } else {
+                this._createLayoutRow(0);
+            }
 
-        // Otherwise import the examples... but only do it once!
-        // Use a setting as a flag.
+            // Otherwise import the examples... but only do it once!
+            // Use a setting as a flag.
         } else {
             const importExamples = 'import-layout-examples';
-            if (!this._settings.get_boolean(importExamples))
+            if (!this._settings.get_boolean(importExamples)) {
                 return;
+            }
 
             this._settings.set_boolean(importExamples, false);
-            const exampleFile = this._makeFile(`${path}/src`, 'layouts_example.json');
+            const exampleFile = this._makeFile(
+                `${path}/src`,
+                'layouts_example.json',
+            );
             const [succ, c] = exampleFile.load_contents(null);
-            if (!succ)
+            if (!succ) {
                 return;
+            }
 
             layouts = c.length ? JSON.parse(new TextDecoder().decode(c)) : [];
-            layouts.forEach((layout, idx) => this._createLayoutRow(idx, layout));
+            layouts.forEach((layout, idx) =>
+                this._createLayoutRow(idx, layout),
+            );
             this._saveLayouts();
         }
     }
@@ -117,7 +129,7 @@ export default class {
         this._applySaveButtonStyle('');
 
         const layouts = [];
-        this._forEachLayoutRow(layoutRow => {
+        this._forEachLayoutRow((layoutRow) => {
             const lay = layoutRow.getLayout();
             if (lay) {
                 layouts.push(lay);
@@ -125,22 +137,34 @@ export default class {
                 // Check, if all layoutRows were valid so far. Use getIdx()
                 // instead of forEach's idx because a layoutRow may have been
                 // deleted by the user.
-                if (layoutRow.getIdx() === layouts.length - 1)
+                if (layoutRow.getIdx() === layouts.length - 1) {
                     return;
+                }
 
                 // Invalid or empty layouts are ignored. For example, the user
                 // defined a valid layout with a keybinding on row idx 3 but left
                 // the row at idx 2 empty. When saving, the layout at idx 2 gets
                 // removed and layout at idx 3 takes its place (i. e. becomes
                 // idx 2). We need to update the keybindings to reflect that.
-                const keys = this._settings.get_strv(`activate-layout${layoutRow.getIdx()}`);
-                this._settings.set_strv(`activate-layout${layouts.length - 1}`, keys);
-                this._settings.set_strv(`activate-layout${layoutRow.getIdx()}`, []);
+                const keys = this._settings.get_strv(
+                    `activate-layout${layoutRow.getIdx()}`,
+                );
+                this._settings.set_strv(
+                    `activate-layout${layouts.length - 1}`,
+                    keys,
+                );
+                this._settings.set_strv(
+                    `activate-layout${layoutRow.getIdx()}`,
+                    [],
+                );
             } else {
                 // Remove keyboard shortcuts, if they aren't assigned to a
                 // valid layout, because they won't be visible to the user
                 // since invalid layouts get removed
-                this._settings.set_strv(`activate-layout${layoutRow.getIdx()}`, []);
+                this._settings.set_strv(
+                    `activate-layout${layoutRow.getIdx()}`,
+                    [],
+                );
             }
         });
 
@@ -150,7 +174,7 @@ export default class {
             null,
             false,
             Gio.FileCreateFlags.REPLACE_DESTINATION,
-            null
+            null,
         );
     }
 
@@ -162,8 +186,9 @@ export default class {
     _makeFile(parentPath = '', fileName = '') {
         // Create directory structure, if it doesn't exist.
         const userConfigDir = GLib.get_user_config_dir();
-        const dirLocation = parentPath ||
-                GLib.build_filenamev([userConfigDir, '/tiling-assistant']);
+        const dirLocation =
+            parentPath ||
+            GLib.build_filenamev([userConfigDir, '/tiling-assistant']);
         const parentDir = Gio.File.new_for_path(dirLocation);
 
         try {
@@ -196,9 +221,9 @@ export default class {
         // (e. g. when changes were invalid)
         const actions = ['suggested-action', 'destructive-action'];
         const context = this._saveLayoutsButton.get_style_context();
-        actions.forEach(a => a === actionName
-            ? context.add_class(a)
-            : context.remove_class(a));
+        actions.forEach((a) =>
+            a === actionName ? context.add_class(a) : context.remove_class(a),
+        );
     }
 
     /**
@@ -208,20 +233,27 @@ export default class {
     _createLayoutRow(index, layout = null) {
         // Layouts are limited to 20 since there are only
         // that many keybindings in the schemas.xml file
-        if (index >= 20)
-            return;
+        if (index >= 20) {
+            return null;
+        }
 
         const layoutRow = new LayoutRow(layout, this._settings);
         layoutRow.connect('changed', (row, ok) => {
             // Un / Highlight the save button, if the user made in / valid changes.
-            this._applySaveButtonStyle(ok ? 'suggested-action' : 'destructive-action');
+            this._applySaveButtonStyle(
+                ok ? 'suggested-action' : 'destructive-action',
+            );
         });
         this._layoutsListBox.append(layoutRow);
         return layoutRow;
     }
 
     _forEachLayoutRow(callback) {
-        for (let i = 0, child = this._layoutsListBox.get_first_child(); !!child; i++) {
+        for (
+            let i = 0, child = this._layoutsListBox.get_first_child();
+            child;
+            i++
+        ) {
             // Get a ref to the next widget in case the curr widget
             // gets destroyed during the function call.
             const nxtSibling = child.get_next_sibling();

@@ -13,15 +13,15 @@ The [metadata](https://github.com/Leleat/Tiling-Assistant/blob/main/tiling-assis
 Here is a table showing the GNOME Shell releases and the latest extension version supporting them.
 
 | GNOME Shell | Tiling Assistant |
-|:-------------:|:-----------:|
-| 45 | 44 |
-| 44 | 43 |
-| 43 | 43 |
-| 42 | 36 |
-| 41 | 32 |
-| 40 | 32 |
-| 3.38 | 23 |
-| 3.36 | 23 |
+| :---------: | :--------------: |
+|     45      |        44        |
+|     44      |        43        |
+|     43      |        43        |
+|     42      |        36        |
+|     41      |        32        |
+|     40      |        32        |
+|    3.38     |        23        |
+|    3.36     |        23        |
 
 ## Installation
 

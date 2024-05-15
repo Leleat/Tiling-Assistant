@@ -1,10 +1,10 @@
-import { Gdk, Gio, GLib, Gtk } from './src/dependencies/prefs/gi.js';
-import { ExtensionPreferences } from './src/dependencies/prefs.js';
+import {Gdk, Gio, GLib, Gtk} from './src/dependencies/prefs/gi.js';
+import {ExtensionPreferences} from './src/dependencies/prefs.js';
 
 import LayoutPrefs from './src/prefs/layoutsPrefs.js';
-import { Shortcuts } from './src/common.js';
+import {Shortcuts} from './src/common.js';
 // eslint-disable-next-line no-unused-vars
-import { ShortcutListener } from './src/prefs/shortcutListener.js';
+import {ShortcutListener} from './src/prefs/shortcutListener.js';
 
 export default class Prefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -15,7 +15,7 @@ export default class Prefs extends ExtensionPreferences {
         Gtk.StyleContext.add_provider_for_display(
             Gdk.Display.get_default(),
             provider,
-            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION
+            Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION,
         );
 
         window.set_can_navigate_back(true);
@@ -33,14 +33,24 @@ export default class Prefs extends ExtensionPreferences {
 
         // Add layouts preference page on condition of advanced setting
         const layoutsPage = builder.get_object('layouts');
-        settings.connect('changed::enable-advanced-experimental-features', () => {
-            settings.get_boolean('enable-advanced-experimental-features')
-                ? window.add(layoutsPage)
-                : window.remove(layoutsPage);
-        });
+        settings.connect(
+            'changed::enable-advanced-experimental-features',
+            () => {
+                if (
+                    settings.get_boolean(
+                        'enable-advanced-experimental-features',
+                    )
+                ) {
+                    window.add(layoutsPage);
+                } else {
+                    window.remove(layoutsPage);
+                }
+            },
+        );
 
-        if (settings.get_boolean('enable-advanced-experimental-features'))
+        if (settings.get_boolean('enable-advanced-experimental-features')) {
             window.add(layoutsPage);
+        }
 
         // Bind settings to GUI
         this._bindSwitches(settings, builder);
@@ -62,8 +72,8 @@ export default class Prefs extends ExtensionPreferences {
     }
 
     /*
-    * Bind GUI switches to settings.
-    */
+     * Bind GUI switches to settings.
+     */
     _bindSwitches(settings, builder) {
         const switches = [
             'enable-tiling-popup',
@@ -80,18 +90,18 @@ export default class Prefs extends ExtensionPreferences {
             'enable-tile-animations',
             'enable-untile-animations',
             'enable-hold-maximize-inverse-landscape',
-            'enable-hold-maximize-inverse-portrait'
+            'enable-hold-maximize-inverse-portrait',
         ];
 
-        switches.forEach(key => {
+        switches.forEach((key) => {
             const widget = builder.get_object(key.replaceAll('-', '_'));
             settings.bind(key, widget, 'active', Gio.SettingsBindFlags.DEFAULT);
         });
     }
 
     /*
-    * Bind GUI spinbuttons to settings.
-    */
+     * Bind GUI spinbuttons to settings.
+     */
     _bindSpinbuttons(settings, builder) {
         const spinButtons = [
             'window-gap',
@@ -104,42 +114,47 @@ export default class Prefs extends ExtensionPreferences {
             'active-window-hint-inner-border-size',
             'toggle-maximize-tophalf-timer',
             'vertical-preview-area',
-            'horizontal-preview-area'
+            'horizontal-preview-area',
         ];
 
-        spinButtons.forEach(key => {
+        spinButtons.forEach((key) => {
             const widget = builder.get_object(key.replaceAll('-', '_'));
             settings.bind(key, widget, 'value', Gio.SettingsBindFlags.DEFAULT);
         });
     }
 
     /*
-    * Bind GUI AdwComboRows to settings.
-    */
+     * Bind GUI AdwComboRows to settings.
+     */
     _bindComboRows(settings, builder) {
         const comboRows = [
             'move-adaptive-tiling-mod',
             'move-favorite-layout-mod',
-            'ignore-ta-mod'
+            'ignore-ta-mod',
         ];
 
-        comboRows.forEach(key => {
+        comboRows.forEach((key) => {
             const widget = builder.get_object(key.replaceAll('-', '_'));
-            settings.bind(key, widget, 'selected', Gio.SettingsBindFlags.DEFAULT);
+            settings.bind(
+                key,
+                widget,
+                'selected',
+                Gio.SettingsBindFlags.DEFAULT,
+            );
             widget.set_selected(settings.get_int(key));
         });
     }
 
     /*
-    * Bind GUI color buttons to settings.
-    */
+     * Bind GUI color buttons to settings.
+     */
     _bindColorButtons(settings, builder) {
-        const switches = [
-            'active-window-hint-color'
-        ];
+        const switches = ['active-window-hint-color'];
 
-        switches.forEach(key => {
-            const widget = builder.get_object(`${key.replaceAll('-', '_')}_button`);
+        switches.forEach((key) => {
+            const widget = builder.get_object(
+                `${key.replaceAll('-', '_')}_button`,
+            );
             widget.connect('color-set', () => {
                 settings.set_string(key, widget.get_rgba().to_string());
             });
@@ -152,8 +167,8 @@ export default class Prefs extends ExtensionPreferences {
     }
 
     /*
-    * Bind radioButtons to settings.
-    */
+     * Bind radioButtons to settings.
+     */
     _bindRadioButtons(settings, builder) {
         // These 'radioButtons' are basically just used as a 'fake ComboBox' with
         // explanations for the different options. So there is just *one* gsetting
@@ -166,16 +181,16 @@ export default class Prefs extends ExtensionPreferences {
                     'dynamic_keybinding_window_focus_row',
                     'dynamic_keybinding_tiling_state_row',
                     'dynamic_keybinding_tiling_state_windows_row',
-                    'dynamic_keybinding_favorite_layout_row'
-                ]
+                    'dynamic_keybinding_favorite_layout_row',
+                ],
             },
             {
                 key: 'active-window-hint',
                 rowNames: [
                     'active_window_hint_disabled_row',
                     'active_window_hint_minimal_row',
-                    'active_window_hint_always_row'
-                ]
+                    'active_window_hint_always_row',
+                ],
             },
             {
                 key: 'default-move-mode',
@@ -183,32 +198,35 @@ export default class Prefs extends ExtensionPreferences {
                     'edge_tiling_row',
                     'adaptive_tiling_row',
                     'favorite_layout_row',
-                    'ignore_ta_row'
-                ]
-            }
+                    'ignore_ta_row',
+                ],
+            },
         ];
 
-        radioButtons.forEach(({ key, rowNames }) => {
+        radioButtons.forEach(({key, rowNames}) => {
             const currActive = settings.get_int(key);
 
             rowNames.forEach((name, idx) => {
                 const row = builder.get_object(name.replaceAll('-', '_'));
                 const checkButton = row.activatable_widget;
-                checkButton.connect('toggled', () => settings.set_int(key, idx));
+                checkButton.connect('toggled', () =>
+                    settings.set_int(key, idx),
+                );
 
                 // Set initial state
-                if (idx === currActive)
+                if (idx === currActive) {
                     checkButton.activate();
+                }
             });
         });
     }
 
     /*
-    * Bind keybinding widgets to settings.
-    */
+     * Bind keybinding widgets to settings.
+     */
     _bindKeybindings(settings, builder) {
         const shortcuts = Shortcuts.getAllKeys();
-        shortcuts.forEach(key => {
+        shortcuts.forEach((key) => {
             const shortcut = builder.get_object(key.replaceAll('-', '_'));
             shortcut.initialize(key, settings);
         });
@@ -220,18 +238,29 @@ export default class Prefs extends ExtensionPreferences {
      * discoverable through the GUI and need to first be set with the gsetting.
      * The normal rows should have the id of: GSETTING_WITH_UNDERSCORES_row.
      * ShortcutListeners have the format of GSETTING_WITH_UNDERSCORES.
+     *
+     * @param {Gio.Settings} settings -
+     * @param {Gtk.Builder} builder -
      */
     _setDeprecatedSettings(settings, builder) {
         // Keybindings
-        ['toggle-tiling-popup', 'auto-tile'].forEach(s => {
-            const isNonDefault = settings.get_strv(s)[0] !== settings.get_default_value(s).get_strv()[0];
-            builder.get_object(s.replaceAll('-', '_')).set_visible(isNonDefault);
+        ['toggle-tiling-popup', 'auto-tile'].forEach((s) => {
+            const isNonDefault =
+                settings.get_strv(s)[0] !==
+                settings.get_default_value(s).get_strv()[0];
+            builder
+                .get_object(s.replaceAll('-', '_'))
+                .set_visible(isNonDefault);
         });
 
         // Switches
-        ['tilegroups-in-app-switcher'].forEach(s => {
-            const isNonDefault = settings.get_boolean(s) !== settings.get_default_value(s).get_boolean();
-            builder.get_object(s.replaceAll('-', '_')).set_visible(isNonDefault);
+        ['tilegroups-in-app-switcher'].forEach((s) => {
+            const isNonDefault =
+                settings.get_boolean(s) !==
+                settings.get_default_value(s).get_boolean();
+            builder
+                .get_object(s.replaceAll('-', '_'))
+                .set_visible(isNonDefault);
         });
     }
 
@@ -239,10 +268,7 @@ export default class Prefs extends ExtensionPreferences {
         // Add headerBar button for menu
         // TODO: is this a 'reliable' method to access the headerbar?
         const page = builder.get_object('general');
-        const gtkStack = page
-            .get_parent()
-            .get_parent()
-            .get_parent();
+        const gtkStack = page.get_parent().get_parent().get_parent();
         const adwHeaderBar = gtkStack
             .get_next_sibling()
             .get_first_child()
@@ -255,45 +281,77 @@ export default class Prefs extends ExtensionPreferences {
         const actionGroup = new Gio.SimpleActionGroup();
         window.insert_action_group('prefs', actionGroup);
 
-        const bugReportAction = new Gio.SimpleAction({ name: 'open-bug-report' });
-        bugReportAction.connect('activate', this._openBugReport.bind(this, window));
+        const bugReportAction = new Gio.SimpleAction({name: 'open-bug-report'});
+        bugReportAction.connect(
+            'activate',
+            this._openBugReport.bind(this, window),
+        );
         actionGroup.add_action(bugReportAction);
 
-        const userGuideAction = new Gio.SimpleAction({ name: 'open-user-guide' });
-        userGuideAction.connect('activate', this._openUserGuide.bind(this, window));
+        const userGuideAction = new Gio.SimpleAction({name: 'open-user-guide'});
+        userGuideAction.connect(
+            'activate',
+            this._openUserGuide.bind(this, window),
+        );
         actionGroup.add_action(userGuideAction);
 
-        const changelogAction = new Gio.SimpleAction({ name: 'open-changelog' });
-        changelogAction.connect('activate', this._openChangelog.bind(this, window));
+        const changelogAction = new Gio.SimpleAction({name: 'open-changelog'});
+        changelogAction.connect(
+            'activate',
+            this._openChangelog.bind(this, window),
+        );
         actionGroup.add_action(changelogAction);
 
-        const licenseAction = new Gio.SimpleAction({ name: 'open-license' });
+        const licenseAction = new Gio.SimpleAction({name: 'open-license'});
         licenseAction.connect('activate', this._openLicense.bind(this, window));
         actionGroup.add_action(licenseAction);
 
-        const hiddenSettingsAction = new Gio.SimpleAction({ name: 'open-hidden-settings' });
-        hiddenSettingsAction.connect('activate', this._openHiddenSettings.bind(this, window, builder));
+        const hiddenSettingsAction = new Gio.SimpleAction({
+            name: 'open-hidden-settings',
+        });
+        hiddenSettingsAction.connect(
+            'activate',
+            this._openHiddenSettings.bind(this, window, builder),
+        );
         actionGroup.add_action(hiddenSettingsAction);
 
         // Button to return to main settings page
-        const returnButton = builder.get_object('hidden_settings_return_button');
+        const returnButton = builder.get_object(
+            'hidden_settings_return_button',
+        );
         returnButton.connect('clicked', () => window.close_subpage());
     }
 
     _openBugReport(window) {
-        Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/issues', Gdk.CURRENT_TIME);
+        Gtk.show_uri(
+            window,
+            'https://github.com/Leleat/Tiling-Assistant/issues',
+            Gdk.CURRENT_TIME,
+        );
     }
 
     _openUserGuide(window) {
-        Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/wiki', Gdk.CURRENT_TIME);
+        Gtk.show_uri(
+            window,
+            'https://github.com/Leleat/Tiling-Assistant/wiki',
+            Gdk.CURRENT_TIME,
+        );
     }
 
     _openChangelog(window) {
-        Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md', Gdk.CURRENT_TIME);
+        Gtk.show_uri(
+            window,
+            'https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md',
+            Gdk.CURRENT_TIME,
+        );
     }
 
     _openLicense(window) {
-        Gtk.show_uri(window, 'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE', Gdk.CURRENT_TIME);
+        Gtk.show_uri(
+            window,
+            'https://github.com/Leleat/Tiling-Assistant/blob/main/LICENSE',
+            Gdk.CURRENT_TIME,
+        );
     }
 
     _openHiddenSettings(window, builder) {

@@ -1,7 +1,7 @@
-import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
-import { Main } from '../dependencies/shell.js';
+import {Clutter, Gio, GLib, Mtk, St} from '../dependencies/gi.js';
+import {Main} from '../dependencies/shell.js';
 
-import { Direction, Orientation, Settings } from '../common.js';
+import {Direction, Orientation, Settings} from '../common.js';
 
 /**
  * Library of commonly used functions for the extension.js' files
@@ -47,24 +47,40 @@ export class Util {
     static isDirection(keyVal, direction) {
         switch (direction) {
             case Direction.N:
-                return keyVal === Clutter.KEY_Up ||
-                        keyVal === Clutter.KEY_w || keyVal === Clutter.KEY_W ||
-                        keyVal === Clutter.KEY_k || keyVal === Clutter.KEY_K;
+                return (
+                    keyVal === Clutter.KEY_Up ||
+                    keyVal === Clutter.KEY_w ||
+                    keyVal === Clutter.KEY_W ||
+                    keyVal === Clutter.KEY_k ||
+                    keyVal === Clutter.KEY_K
+                );
 
             case Direction.S:
-                return keyVal === Clutter.KEY_Down ||
-                        keyVal === Clutter.KEY_s || keyVal === Clutter.KEY_S ||
-                        keyVal === Clutter.KEY_j || keyVal === Clutter.KEY_J;
+                return (
+                    keyVal === Clutter.KEY_Down ||
+                    keyVal === Clutter.KEY_s ||
+                    keyVal === Clutter.KEY_S ||
+                    keyVal === Clutter.KEY_j ||
+                    keyVal === Clutter.KEY_J
+                );
 
             case Direction.W:
-                return keyVal === Clutter.KEY_Left ||
-                        keyVal === Clutter.KEY_a || keyVal === Clutter.KEY_A ||
-                        keyVal === Clutter.KEY_h || keyVal === Clutter.KEY_H;
+                return (
+                    keyVal === Clutter.KEY_Left ||
+                    keyVal === Clutter.KEY_a ||
+                    keyVal === Clutter.KEY_A ||
+                    keyVal === Clutter.KEY_h ||
+                    keyVal === Clutter.KEY_H
+                );
 
             case Direction.E:
-                return keyVal === Clutter.KEY_Right ||
-                        keyVal === Clutter.KEY_d || keyVal === Clutter.KEY_D ||
-                        keyVal === Clutter.KEY_l || keyVal === Clutter.KEY_L;
+                return (
+                    keyVal === Clutter.KEY_Right ||
+                    keyVal === Clutter.KEY_d ||
+                    keyVal === Clutter.KEY_D ||
+                    keyVal === Clutter.KEY_l ||
+                    keyVal === Clutter.KEY_L
+                );
         }
 
         return false;
@@ -75,22 +91,23 @@ export class Util {
      * @returns {Direction}
      */
     static getDirection(keyVal) {
-        if (this.isDirection(keyVal, Direction.N))
+        if (this.isDirection(keyVal, Direction.N)) {
             return Direction.N;
-        else if (this.isDirection(keyVal, Direction.S))
+        } else if (this.isDirection(keyVal, Direction.S)) {
             return Direction.S;
-        else if (this.isDirection(keyVal, Direction.W))
+        } else if (this.isDirection(keyVal, Direction.W)) {
             return Direction.W;
-        else if (this.isDirection(keyVal, Direction.E))
+        } else if (this.isDirection(keyVal, Direction.E)) {
             return Direction.E;
-        else
+        } else {
             return null;
+        }
     }
 
     /**
      * Get the window or screen gaps scaled to the monitor scale.
      *
-     * @param {String} settingsKey the key for the gap
+     * @param {string} settingsKey the key for the gap
      * @param {number} monitor the number of the monitor to scale the gap to
      * @returns {number} the scaled gap as a even number since the window gap
      *      will be divided by 2.
@@ -107,7 +124,9 @@ export class Util {
         const screenLeftGap = this.getScaledGap('screen-left-gap', monitor);
         const screenRightGap = this.getScaledGap('screen-right-gap', monitor);
         const screenBottomGap = this.getScaledGap('screen-bottom-gap', monitor);
-        return screenTopGap || screenLeftGap || screenRightGap || screenBottomGap;
+        return (
+            screenTopGap || screenLeftGap || screenRightGap || screenBottomGap
+        );
     }
 
     /**
@@ -126,12 +145,14 @@ export class Util {
         const pathArr = [userDir, '/tiling-assistant/layouts.json'];
         const path = GLib.build_filenamev(pathArr);
         const file = Gio.File.new_for_path(path);
-        if (!file.query_exists(null))
+        if (!file.query_exists(null)) {
             return [];
+        }
 
         const [success, contents] = file.load_contents(null);
-        if (!success || !contents.length)
+        if (!success || !contents.length) {
             return [];
+        }
 
         return JSON.parse(new TextDecoder().decode(contents));
     }
@@ -150,8 +171,9 @@ export class Util {
         const layouts = this.getLayouts();
         const layout = layouts?.[Settings.getStrv('favorite-layouts')[monitor]];
 
-        if (!layout)
+        if (!layout) {
             return [];
+        }
 
         const activeWs = global.workspace_manager.get_active_workspace();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
@@ -159,20 +181,21 @@ export class Util {
         // Scale the rect's ratios to the workArea. Try to align the rects to
         // each other and the workArea to workaround possible rounding errors
         // due to the scaling.
-        layout._items.forEach(({ rect: rectRatios }, idx) => {
+        layout._items.forEach(({rect: rectRatios}, idx) => {
             const rect = new Rect(
                 workArea.x + Math.floor(rectRatios.x * workArea.width),
                 workArea.y + Math.floor(rectRatios.y * workArea.height),
                 Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
+                Math.ceil(rectRatios.height * workArea.height),
             );
             favoriteLayout.push(rect);
 
-            for (let i = 0; i < idx; i++)
+            for (let i = 0; i < idx; i++) {
                 rect.tryAlignWith(favoriteLayout[i]);
+            }
         });
 
-        favoriteLayout.forEach(rect => rect.tryAlignWith(workArea));
+        favoriteLayout.forEach((rect) => rect.tryAlignWith(workArea));
         return favoriteLayout;
     }
 
@@ -182,7 +205,8 @@ export class Util {
      * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.
      */
     static async ___debugShowTiledRects() {
-        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
+        const twm = (await import('./tilingWindowManager.js'))
+            .TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
         if (!topTileGroup.length) {
             Main.notify('Tiling Assistant', 'No tiled windows / tiled rects.');
@@ -190,14 +214,14 @@ export class Util {
         }
 
         const indicators = [];
-        topTileGroup.forEach(w => {
+        topTileGroup.forEach((w) => {
             const indicator = new St.Widget({
                 style_class: 'tile-preview',
                 opacity: 160,
                 x: w.tiledRect.x,
                 y: w.tiledRect.y,
                 width: w.tiledRect.width,
-                height: w.tiledRect.height
+                height: w.tiledRect.height,
             });
             Main.uiGroup.add_child(indicator);
             indicators.push(indicator);
@@ -216,24 +240,26 @@ export class Util {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
-        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
+        const twm = (await import('./tilingWindowManager.js'))
+            .TilingWindowManager;
         const topTileGroup = twm.getTopTileGroup();
-        const tRects = topTileGroup.map(w => w.tiledRect);
+        const tRects = topTileGroup.map((w) => w.tiledRect);
         const freeScreenSpace = twm.getFreeScreen(tRects);
-        const rects = freeScreenSpace ? [freeScreenSpace] : workArea.minus(tRects);
+        const rects =
+            freeScreenSpace ? [freeScreenSpace] : workArea.minus(tRects);
         if (!rects.length) {
             Main.notify('Tiling Assistant', 'No free screen rects to show.');
             return null;
         }
 
         const indicators = [];
-        rects.forEach(rect => {
+        rects.forEach((rect) => {
             const indicator = new St.Widget({
                 style_class: 'tile-preview',
                 x: rect.x,
                 y: rect.y,
                 width: rect.width,
-                height: rect.height
+                height: rect.height,
             });
             Main.uiGroup.add_child(indicator);
             indicators.push(indicator);
@@ -249,13 +275,14 @@ export class Util {
         log('--- Tiling Assistant: Start ---');
         const twm = await import('./tilingWindowManager.js');
         const openWindows = twm.getWindows();
-        openWindows.forEach(w => {
-            if (!w.isTiled)
+        openWindows.forEach((w) => {
+            if (!w.isTiled) {
                 return;
+            }
 
             log(`Tile group for: ${w.get_wm_class()}`);
             const tileGroup = twm.getTileGroupFor(w);
-            tileGroup.forEach(tw => log(tw.get_wm_class()));
+            tileGroup.forEach((tw) => log(tw.get_wm_class()));
             log('---');
         });
         log('--- Tiling Assistant: End ---');
@@ -292,7 +319,9 @@ export class Rect {
                 break;
 
             default:
-                log('Tiling Assistant: Invalid param count for Rect constructor!');
+                log(
+                    'Tiling Assistant: Invalid param count for Rect constructor!',
+                );
         }
     }
 
@@ -300,7 +329,7 @@ export class Rect {
      * Gets a new rectangle where the screen and window gaps were
      * added/subbed to/from `this`.
      *
-     * @param {Rect} rect a tiled Rect
+     * @param {Rect} workArea
      * @param {number} monitor the number of the monitor to scale the gap to
      * @returns {Rect} the rectangle after the gaps were taken into account
      */
@@ -315,9 +344,10 @@ export class Rect {
 
         // Prefer individual gaps
         if (Util.useIndividualGaps(monitor)) {
-            [['x', 'width', screenLeftGap, screenRightGap],
-                ['y', 'height', screenTopGap, screenBottomGap]]
-            .forEach(([pos, dim, posGap, dimGap]) => {
+            [
+                ['x', 'width', screenLeftGap, screenRightGap],
+                ['y', 'height', screenTopGap, screenBottomGap],
+            ].forEach(([pos, dim, posGap, dimGap]) => {
                 if (this[pos] === workArea[pos]) {
                     r[pos] = this[pos] + posGap;
                     r[dim] -= posGap;
@@ -326,14 +356,18 @@ export class Rect {
                     r[dim] -= windowGap / 2;
                 }
 
-                if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
+                if (this[pos] + this[dim] === workArea[pos] + workArea[dim]) {
                     r[dim] -= dimGap;
-                else
+                } else {
                     r[dim] -= windowGap / 2;
+                }
             });
-        // Use the single screen gap
+            // Use the single screen gap
         } else {
-            [['x', 'width'], ['y', 'height']].forEach(([pos, dim]) => {
+            [
+                ['x', 'width'],
+                ['y', 'height'],
+            ].forEach(([pos, dim]) => {
                 if (this[pos] === workArea[pos]) {
                     r[pos] = this[pos] + singleScreenGap;
                     r[dim] -= singleScreenGap;
@@ -342,10 +376,11 @@ export class Rect {
                     r[dim] -= windowGap / 2;
                 }
 
-                if (this[pos] + this[dim] === workArea[pos] + workArea[dim])
+                if (this[pos] + this[dim] === workArea[pos] + workArea[dim]) {
                     r[dim] -= singleScreenGap;
-                else
+                } else {
                     r[dim] -= windowGap / 2;
+                }
             });
         }
 
@@ -377,8 +412,12 @@ export class Rect {
      * @returns {boolean}
      */
     containsPoint(point) {
-        return point.x >= this.x && point.x <= this.x2 &&
-                point.y >= this.y && point.y <= this.y2;
+        return (
+            point.x >= this.x &&
+            point.x <= this.x2 &&
+            point.y >= this.y &&
+            point.y <= this.y2
+        );
     }
 
     /**
@@ -440,24 +479,27 @@ export class Rect {
         // nearest on the non-compared axis ('nonCmprProp'). The x property
         // in the this example.
         let startProp, cmprProp, nonCmprProp;
-        if (dir === Direction.N)
+        if (dir === Direction.N) {
             [startProp, cmprProp, nonCmprProp] = ['y', 'y2', 'x'];
-        else if (dir === Direction.S)
+        } else if (dir === Direction.S) {
             [startProp, cmprProp, nonCmprProp] = ['y2', 'y', 'x'];
-        else if (dir === Direction.W)
+        } else if (dir === Direction.W) {
             [startProp, cmprProp, nonCmprProp] = ['x', 'x2', 'y'];
-        else if (dir === Direction.E)
+        } else if (dir === Direction.E) {
             [startProp, cmprProp, nonCmprProp] = ['x2', 'x', 'y'];
+        }
 
         // Put rects into a Map with their relevenat pos'es as the keys and
         // filter out `this`.
         const posMap = rects.reduce((map, rect) => {
-            if (rect.equal(this))
+            if (rect.equal(this)) {
                 return map;
+            }
 
             const pos = rect[cmprProp];
-            if (!map.has(pos))
+            if (!map.has(pos)) {
                 map.set(pos, []);
+            }
 
             map.get(pos).push(rect);
             return map;
@@ -466,24 +508,29 @@ export class Rect {
         // Sort the pos'es in an ascending / descending order.
         const goForward = [Direction.S, Direction.E].includes(dir);
         const sortedPoses = [...posMap.keys()].sort((a, b) =>
-            goForward ? a - b : b - a);
+            goForward ? a - b : b - a,
+        );
 
-        const neighborPos = goForward
-            ? sortedPoses.find(pos => pos >= this[startProp])
-            : sortedPoses.find(pos => pos <= this[startProp]);
+        const neighborPos =
+            goForward ?
+                sortedPoses.find((pos) => pos >= this[startProp])
+            :   sortedPoses.find((pos) => pos <= this[startProp]);
 
-        if (!neighborPos && !wrap)
+        if (!neighborPos && !wrap) {
             return null;
+        }
 
         // Since the sortedPoses array is in descending order when 'going
         // backwards', we always wrap by getting the 0-th item, if there
         // is no actual neighbor.
         const neighbors = posMap.get(neighborPos ?? sortedPoses[0]);
         return neighbors.reduce((currNearest, rect) => {
-            return Math.abs(currNearest[nonCmprProp] - this[nonCmprProp]) <=
-                    Math.abs(rect[nonCmprProp] - this[nonCmprProp])
-                ? currNearest
-                : rect;
+            return (
+                    Math.abs(currNearest[nonCmprProp] - this[nonCmprProp]) <=
+                        Math.abs(rect[nonCmprProp] - this[nonCmprProp])
+                ) ?
+                    currNearest
+                :   rect;
         });
     }
 
@@ -506,7 +553,8 @@ export class Rect {
         unitSize = Math.floor(unitSize);
 
         const isVertical = orientation === Orientation.V;
-        const lastIndex = Math.round(this[isVertical ? 'width' : 'height'] / unitSize) - 1;
+        const lastIndex =
+            Math.round(this[isVertical ? 'width' : 'height'] / unitSize) - 1;
 
         const getLastRect = () => {
             const margin = unitSize * index;
@@ -514,7 +562,7 @@ export class Rect {
                 isVertical ? this.x + margin : this.x,
                 isVertical ? this.y : this.y + margin,
                 isVertical ? this.width - margin : this.width,
-                isVertical ? this.height : this.height - margin
+                isVertical ? this.height : this.height - margin,
             );
         };
         const getNonLastRect = (remainingRect, idx) => {
@@ -522,7 +570,7 @@ export class Rect {
                 remainingRect.x,
                 remainingRect.y,
                 isVertical ? unitSize : remainingRect.width,
-                isVertical ? remainingRect.height : unitSize
+                isVertical ? remainingRect.height : unitSize,
             );
 
             if (idx <= 0) {
@@ -533,10 +581,11 @@ export class Rect {
             }
         };
 
-        if (index === lastIndex)
+        if (index === lastIndex) {
             return getLastRect();
-        else
+        } else {
             return getNonLastRect(this, index);
+        }
     }
 
     /**
@@ -586,24 +635,32 @@ export class Rect {
      */
     _minusRect(rect) {
         rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
-        if (rect.containsRect(this))
+        if (rect.containsRect(this)) {
             return [];
+        }
 
         const [intersect] = this.intersect(rect);
-        if (!intersect)
+        if (!intersect) {
             return [this.copy()];
+        }
 
         const resultRects = [];
 
         // Left rect
         const leftRectWidth = rect.x - this.x;
-        if (leftRectWidth > 0 && this.height > 0)
-            resultRects.push(new Rect(this.x, this.y, leftRectWidth, this.height));
+        if (leftRectWidth > 0 && this.height > 0) {
+            resultRects.push(
+                new Rect(this.x, this.y, leftRectWidth, this.height),
+            );
+        }
 
         // Right rect
         const rightRectWidth = this.x2 - rect.x2;
-        if (rightRectWidth > 0 && this.height > 0)
-            resultRects.push(new Rect(rect.x2, this.y, rightRectWidth, this.height));
+        if (rightRectWidth > 0 && this.height > 0) {
+            resultRects.push(
+                new Rect(rect.x2, this.y, rightRectWidth, this.height),
+            );
+        }
 
         const vertRectsX1 = rect.x > this.x ? rect.x : this.x;
         const vertRectsX2 = rect.x2 < this.x2 ? rect.x2 : this.x2;
@@ -611,13 +668,24 @@ export class Rect {
 
         // Top rect
         const topRectHeight = rect.y - this.y;
-        if (topRectHeight > 0 && vertRectsWidth > 0)
-            resultRects.push(new Rect(vertRectsX1, this.y, vertRectsWidth, topRectHeight));
+        if (topRectHeight > 0 && vertRectsWidth > 0) {
+            resultRects.push(
+                new Rect(vertRectsX1, this.y, vertRectsWidth, topRectHeight),
+            );
+        }
 
         // Bottom rect
         const bottomRectHeight = this.y2 - rect.y2;
-        if (bottomRectHeight > 0 && vertRectsWidth > 0)
-            resultRects.push(new Rect(vertRectsX1, rect.y2, vertRectsWidth, bottomRectHeight));
+        if (bottomRectHeight > 0 && vertRectsWidth > 0) {
+            resultRects.push(
+                new Rect(
+                    vertRectsX1,
+                    rect.y2,
+                    vertRectsWidth,
+                    bottomRectHeight,
+                ),
+            );
+        }
 
         return resultRects;
     }
@@ -630,12 +698,13 @@ export class Rect {
      * @returns {Rect[]} an array of the remaining Rects.
      */
     _minusRectArray(rects) {
-        if (!rects.length)
+        if (!rects.length) {
             return [this.copy()];
+        }
 
         // First cut off all rects individually from `this`. The result is an
         // array of leftover rects (which are arrays themselves) from `this`.
-        const individualLeftOvers = rects.map(r => this.minus(r));
+        const individualLeftOvers = rects.map((r) => this.minus(r));
 
         // Get the final result by intersecting all leftover rects.
         return individualLeftOvers.reduce((result, currLeftOvers) => {
@@ -644,7 +713,9 @@ export class Rect {
             for (const leftOver of currLeftOvers) {
                 for (const currFreeRect of result) {
                     const [ok, inters] = currFreeRect.intersect(leftOver);
-                    ok && intersections.push(new Rect(inters));
+                    if (ok) {
+                        intersections.push(new Rect(inters));
+                    }
                 }
             }
 
@@ -673,27 +744,32 @@ export class Rect {
      */
     tryAlignWith(rect, margin = 4) {
         rect = rect instanceof Mtk.Rectangle ? new Rect(rect) : rect;
-        const equalApprox = (value1, value2) => Math.abs(value1 - value2) <= margin;
+        const equalApprox = (value1, value2) =>
+            Math.abs(value1 - value2) <= margin;
 
-        if (equalApprox(rect.x, this.x))
+        if (equalApprox(rect.x, this.x)) {
             this.x = rect.x;
-        else if (equalApprox(rect.x2, this.x))
+        } else if (equalApprox(rect.x2, this.x)) {
             this.x = rect.x2;
+        }
 
-        if (equalApprox(rect.y, this.y))
+        if (equalApprox(rect.y, this.y)) {
             this.y = rect.y;
-        else if (equalApprox(rect.y2, this.y))
+        } else if (equalApprox(rect.y2, this.y)) {
             this.y = rect.y2;
+        }
 
-        if (equalApprox(rect.x, this.x2))
+        if (equalApprox(rect.x, this.x2)) {
             this.width = rect.x - this.x;
-        else if (equalApprox(rect.x2, this.x2))
+        } else if (equalApprox(rect.x2, this.x2)) {
             this.width = rect.x2 - this.x;
+        }
 
-        if (equalApprox(rect.y, this.y2))
+        if (equalApprox(rect.y, this.y2)) {
             this.height = rect.y - this.y;
-        else if (equalApprox(rect.y2, this.y2))
+        } else if (equalApprox(rect.y2, this.y2)) {
             this.height = rect.y2 - this.y;
+        }
 
         return this;
     }
@@ -747,7 +823,7 @@ export class Rect {
     get center() {
         return {
             x: this.x + Math.floor(this.width / 2),
-            y: this.y + Math.floor(this.height / 2)
+            y: this.y + Math.floor(this.height / 2),
         };
     }
 

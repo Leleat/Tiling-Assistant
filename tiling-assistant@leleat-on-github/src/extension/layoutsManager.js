@@ -1,15 +1,15 @@
-import { Clutter, Gio, GObject, Meta, Shell, St } from '../dependencies/gi.js';
+import {Clutter, Gio, GObject, Meta, Shell, St} from '../dependencies/gi.js';
 import {
     _,
     Extension,
     Main,
     PanelMenu,
-    PopupMenu
+    PopupMenu,
 } from '../dependencies/shell.js';
 
-import { Layout, Settings } from '../common.js';
-import { Rect, Util } from './utility.js';
-import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import {Layout, Settings} from '../common.js';
+import {Rect, Util} from './utility.js';
+import {TilingWindowManager as Twm} from './tilingWindowManager.js';
 
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
@@ -61,7 +61,7 @@ export default class TilingLayoutsManager {
                 Settings.getGioObject(),
                 Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
                 Shell.ActionMode.NORMAL,
-                this.startLayouting.bind(this, i)
+                this.startLayouting.bind(this, i),
             );
         }
 
@@ -71,25 +71,35 @@ export default class TilingLayoutsManager {
             Settings.getGioObject(),
             Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
             Shell.ActionMode.NORMAL,
-            this.openPopupSearch.bind(this)
+            this.openPopupSearch.bind(this),
         );
 
         // Add panel indicator
         this._panelIndicator = new PanelIndicator();
         Main.panel.addToStatusArea(
             'tiling-assistant@leleat-on-github',
-            this._panelIndicator);
-        this._settingsId = Settings.changed('show-layout-panel-indicator', () => {
-            this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
-        });
-        this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
-        this._panelIndicator.connect('layout-activated', (src, idx) => this.startLayouting(idx));
+            this._panelIndicator,
+        );
+        this._settingsId = Settings.changed(
+            'show-layout-panel-indicator',
+            () => {
+                this._panelIndicator.visible = Settings.getBoolean(
+                    'show-layout-panel-indicator',
+                );
+            },
+        );
+        this._panelIndicator.visible = Settings.getBoolean(
+            'show-layout-panel-indicator',
+        );
+        this._panelIndicator.connect('layout-activated', (src, idx) =>
+            this.startLayouting(idx),
+        );
     }
 
     destroy() {
         Settings.disconnect(this._settingsId);
         this._finishLayouting();
-        this._keyBindings.forEach(key => Main.wm.removeKeybinding(key));
+        this._keyBindings.forEach((key) => Main.wm.removeKeybinding(key));
         this._panelIndicator.destroy();
         this._panelIndicator = null;
     }
@@ -107,7 +117,9 @@ export default class TilingLayoutsManager {
         }
 
         const search = new LayoutSearch(layouts);
-        search.connect('item-activated', (s, index) => this.startLayouting(index));
+        search.connect('item-activated', (s, index) =>
+            this.startLayouting(index),
+        );
     }
 
     /**
@@ -117,8 +129,9 @@ export default class TilingLayoutsManager {
      */
     startLayouting(index) {
         const layout = Util.getLayouts()?.[index];
-        if (!layout)
+        if (!layout) {
             return;
+        }
 
         const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         this._remainingWindows = Twm.getWindows(allWs);
@@ -133,7 +146,7 @@ export default class TilingLayoutsManager {
             style_class: 'tile-preview',
             opacity: 0,
             x: workArea.x + workArea.width / 2,
-            y: workArea.y + workArea.height / 2
+            y: workArea.y + workArea.height / 2,
         });
         Main.layoutManager.addChrome(this._rectPreview);
 
@@ -170,24 +183,33 @@ export default class TilingLayoutsManager {
             // Scale the item's rect to the workArea
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
-            const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+            const workArea = new Rect(
+                activeWs.get_work_area_for_monitor(monitor),
+            );
             const rectRatios = this._currItem.rect;
             this._currRect = new Rect(
                 workArea.x + Math.floor(rectRatios.x * workArea.width),
                 workArea.y + Math.floor(rectRatios.y * workArea.height),
                 Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
+                Math.ceil(rectRatios.height * workArea.height),
             );
 
             // Try to compensate possible rounding errors when scaling up the
             // rect by aligning it with the rects, which were already tiled
             // using this layout and the workArea.
-            this._tiledWithLayout.forEach(w => this._currRect.tryAlignWith(w.tiledRect));
+            this._tiledWithLayout.forEach((w) =>
+                this._currRect.tryAlignWith(w.tiledRect),
+            );
             this._currRect.tryAlignWith(workArea);
         }
 
         const appId = this._currItem.appId;
-        appId ? this._openAppTiled(appId) : this._openTilingPopup();
+
+        if (appId) {
+            this._openAppTiled(appId);
+        } else {
+            this._openTilingPopup();
+        }
     }
 
     _openAppTiled(appId) {
@@ -200,14 +222,19 @@ export default class TilingLayoutsManager {
         }
 
         const winTracker = Shell.WindowTracker.get_default();
-        const idx = this._remainingWindows.findIndex(w => winTracker.get_window_app(w) === app);
+        const idx = this._remainingWindows.findIndex(
+            (w) => winTracker.get_window_app(w) === app,
+        );
         const window = this._remainingWindows[idx];
-        idx !== -1 && this._remainingWindows.splice(idx, 1);
+
+        if (idx !== -1) {
+            this._remainingWindows.splice(idx, 1);
+        }
 
         if (window) {
             Twm.tile(window, this._currRect, {
                 openTilingPopup: false,
-                skipAnim: true
+                skipAnim: true,
             });
         } else if (app.can_open_new_window()) {
             Twm.openAppTiled(app, this._currRect);
@@ -233,7 +260,7 @@ export default class TilingLayoutsManager {
             height: this._currRect.height,
             opacity: 255,
             duration: 200,
-            mode: Clutter.AnimationMode.EASE_OUT_QUAD
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
         });
 
         // Create the Tiling Popup
@@ -245,9 +272,11 @@ export default class TilingLayoutsManager {
             // allow the Tiling Popup itself to spawn another instance of
             // a Tiling Popup, if there is free screen space.
             this._currItem === this._items.at(-1) && !this._currItem.loopType,
-            true
+            true,
         );
-        const stacked = global.display.sort_windows_by_stacking(this._tiledWithLayout);
+        const stacked = global.display.sort_windows_by_stacking(
+            this._tiledWithLayout,
+        );
         const tileGroup = stacked.reverse();
         if (!popup.show(tileGroup)) {
             popup.destroy();
@@ -279,12 +308,13 @@ export default class TilingLayoutsManager {
                 this._tiledWithLoop.push(tiledWindow);
                 this._tiledWithLoop.forEach((w, idx) => {
                     const rect = this._currRect.copy();
-                    const [pos, dimension] = this._currItem.loopType === 'h'
-                        ? ['y', 'height']
-                        : ['x', 'width'];
+                    const [pos, dimension] =
+                        this._currItem.loopType === 'h' ?
+                            ['y', 'height']
+                        :   ['x', 'width'];
                     rect[dimension] /= this._tiledWithLoop.length;
                     rect[pos] += idx * rect[dimension];
-                    Twm.tile(w, rect, { openTilingPopup: false, skipAnim: true });
+                    Twm.tile(w, rect, {openTilingPopup: false, skipAnim: true});
                 });
             }
 
@@ -296,271 +326,330 @@ export default class TilingLayoutsManager {
 /**
  * The GUI class for the Layout search.
  */
-const LayoutSearch = GObject.registerClass({
-    Signals: { 'item-activated': { param_types: [GObject.TYPE_INT] } }
-}, class TilingLayoutsSearch extends St.Widget {
-    _init(layouts) {
-        const activeWs = global.workspace_manager.get_active_workspace();
-        super._init({
-            reactive: true,
-            x: Main.uiGroup.x,
-            y: Main.uiGroup.y,
-            width: Main.uiGroup.width,
-            height: Main.uiGroup.height
-        });
-        Main.uiGroup.add_child(this);
+const LayoutSearch = GObject.registerClass(
+    {
+        Signals: {'item-activated': {param_types: [GObject.TYPE_INT]}},
+    },
+    class TilingLayoutsSearch extends St.Widget {
+        _init(layouts) {
+            const activeWs = global.workspace_manager.get_active_workspace();
+            super._init({
+                reactive: true,
+                x: Main.uiGroup.x,
+                y: Main.uiGroup.y,
+                width: Main.uiGroup.width,
+                height: Main.uiGroup.height,
+            });
+            Main.uiGroup.add_child(this);
 
-        const grab = Main.pushModal(this);
-        // We expect at least a keyboard grab here
-        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
-            Main.popModal(grab);
-            return false;
-        }
+            const grab = Main.pushModal(this);
+            // We expect at least a keyboard grab here
+            if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+                Main.popModal(grab);
+                return;
+            }
 
-        this._grab = grab;
-        this._haveModal = true;
-        this._focused = -1;
-        this._items = [];
+            this._grab = grab;
+            this._haveModal = true;
+            this._focused = -1;
+            this._items = [];
 
-        this.connect('button-press-event', () => this.destroy());
+            this.connect('button-press-event', () => this.destroy());
 
-        const popup = new St.BoxLayout({
-            style_class: 'switcher-list',
-            vertical: true,
-            width: 500
-        });
-        this.add_child(popup);
+            const popup = new St.BoxLayout({
+                style_class: 'switcher-list',
+                vertical: true,
+                width: 500,
+            });
+            this.add_child(popup);
 
-        const fontSize = 16;
-        const entry = new St.Entry({
-            style: `font-size: ${fontSize}px;\
+            const fontSize = 16;
+            const entry = new St.Entry({
+                style: `font-size: ${fontSize}px;\
                     border-radius: 16px;
                     margin-bottom: 12px;`,
-            // Translators: This is the placeholder text for a search field.
-            hint_text: ` ${_('Type to search...')}`
-        });
-        const entryClutterText = entry.get_clutter_text();
-        entryClutterText.connect('key-press-event', this._onKeyPressed.bind(this));
-        entryClutterText.connect('text-changed', this._onTextChanged.bind(this));
-        popup.add_child(entry);
+                // Translators: This is the placeholder text for a search field.
+                hint_text: ` ${_('Type to search...')}`,
+            });
+            const entryClutterText = entry.get_clutter_text();
+            entryClutterText.connect(
+                'key-press-event',
+                this._onKeyPressed.bind(this),
+            );
+            entryClutterText.connect(
+                'text-changed',
+                this._onTextChanged.bind(this),
+            );
+            popup.add_child(entry);
 
-        this._items = layouts.map(layout => {
-            const item = new SearchItem(layout._name, fontSize);
-            item.connect('button-press-event', this._onItemClicked.bind(this));
-            popup.add_child(item);
-            return item;
-        });
+            this._items = layouts.map((layout) => {
+                const item = new SearchItem(layout._name, fontSize);
+                item.connect(
+                    'button-press-event',
+                    this._onItemClicked.bind(this),
+                );
+                popup.add_child(item);
+                return item;
+            });
 
-        if (!this._items.length) {
-            this.destroy();
-            return;
+            if (!this._items.length) {
+                this.destroy();
+                return;
+            }
+
+            const monitor = global.display.get_current_monitor();
+            const workArea = activeWs.get_work_area_for_monitor(monitor);
+            popup.set_position(
+                workArea.x + workArea.width / 2 - popup.width / 2,
+                workArea.y + workArea.height / 2 - popup.height / 2,
+            );
+
+            entry.grab_key_focus();
+            this._focus(0);
         }
 
-        const monitor = global.display.get_current_monitor();
-        const workArea = activeWs.get_work_area_for_monitor(monitor);
-        popup.set_position(workArea.x + workArea.width / 2 - popup.width / 2,
-            workArea.y + workArea.height / 2 - popup.height / 2);
+        destroy() {
+            if (this._haveModal) {
+                Main.popModal(this._grab);
+                this._haveModal = false;
+            }
 
-        entry.grab_key_focus();
-        this._focus(0);
-    }
-
-    destroy() {
-        if (this._haveModal) {
-            Main.popModal(this._grab);
-            this._haveModal = false;
+            super.destroy();
         }
 
-        super.destroy();
-    }
-
-    _onKeyPressed(clutterText, event) {
-        const keySym = event.get_key_symbol();
-        if (keySym === Clutter.KEY_Escape) {
-            this.destroy();
-            return Clutter.EVENT_STOP;
-        } else if (keySym === Clutter.KEY_Return ||
+        _onKeyPressed(clutterText, event) {
+            const keySym = event.get_key_symbol();
+            if (keySym === Clutter.KEY_Escape) {
+                this.destroy();
+                return Clutter.EVENT_STOP;
+            } else if (
+                keySym === Clutter.KEY_Return ||
                 keySym === Clutter.KEY_KP_Enter ||
-                keySym === Clutter.KEY_ISO_Enter) {
-            this._activate();
-            return Clutter.EVENT_STOP;
-        } else if (keySym === Clutter.KEY_Down) {
-            this._focusNext();
-            return Clutter.EVENT_STOP;
-        } else if (keySym === Clutter.KEY_Up) {
-            this._focusPrev();
-            return Clutter.EVENT_STOP;
+                keySym === Clutter.KEY_ISO_Enter
+            ) {
+                this._activate();
+                return Clutter.EVENT_STOP;
+            } else if (keySym === Clutter.KEY_Down) {
+                this._focusNext();
+                return Clutter.EVENT_STOP;
+            } else if (keySym === Clutter.KEY_Up) {
+                this._focusPrev();
+                return Clutter.EVENT_STOP;
+            }
+
+            return Clutter.EVENT_PROPAGATE;
         }
 
-        return Clutter.EVENT_PROPAGATE;
-    }
+        _onTextChanged(clutterText) {
+            const filterText = clutterText.get_text();
+            this._items.forEach((item) => {
+                if (
+                    item.text.toLowerCase().includes(filterText.toLowerCase())
+                ) {
+                    item.show();
+                } else {
+                    item.hide();
+                }
+            });
+            const nextVisibleIdx = this._items.findIndex(
+                (item) => item.visible,
+            );
+            this._focus(nextVisibleIdx);
+        }
 
-    _onTextChanged(clutterText) {
-        const filterText = clutterText.get_text();
-        this._items.forEach(item => {
-            item.text.toLowerCase().includes(filterText.toLowerCase())
-                ? item.show()
-                : item.hide();
-        });
-        const nextVisibleIdx = this._items.findIndex(item => item.visible);
-        this._focus(nextVisibleIdx);
-    }
+        _onItemClicked(item) {
+            this._focused = this._items.indexOf(item);
+            this._activate();
+        }
 
-    _onItemClicked(item) {
-        this._focused = this._items.indexOf(item);
-        this._activate();
-    }
+        _focusPrev() {
+            this._focus(
+                (this._focused + this._items.length - 1) % this._items.length,
+            );
+        }
 
-    _focusPrev() {
-        this._focus((this._focused + this._items.length - 1) % this._items.length);
-    }
+        _focusNext() {
+            this._focus((this._focused + 1) % this._items.length);
+        }
 
-    _focusNext() {
-        this._focus((this._focused + 1) % this._items.length);
-    }
+        _focus(newIdx) {
+            const prevItem = this._items[this._focused];
+            const newItem = this._items[newIdx];
+            this._focused = newIdx;
 
-    _focus(newIdx) {
-        const prevItem = this._items[this._focused];
-        const newItem = this._items[newIdx];
-        this._focused = newIdx;
+            prevItem?.remove_style_class_name('tiling-layout-search-highlight');
+            newItem?.add_style_class_name('tiling-layout-search-highlight');
+        }
 
-        prevItem?.remove_style_class_name('tiling-layout-search-highlight');
-        newItem?.add_style_class_name('tiling-layout-search-highlight');
-    }
-
-    _activate() {
-        this._focused !== -1 && this.emit('item-activated', this._focused);
-        this.destroy();
-    }
-});
+        _activate() {
+            if (this._focused !== -1) {
+                this.emit('item-activated', this._focused);
+            }
+            this.destroy();
+        }
+    },
+);
 
 /**
  * An Item representing a Layout within the Popup Layout search.
  */
 const SearchItem = GObject.registerClass(
-class TilingLayoutsSearchItem extends St.Label {
-    _init(text, fontSize) {
-        super._init({
-            // Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
-            text: `   ${text || _('Nameless layout...')}`,
-            style: `font-size: ${fontSize}px;\
+    class TilingLayoutsSearchItem extends St.Label {
+        _init(text, fontSize) {
+            super._init({
+                // Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
+                text: `   ${text || _('Nameless layout...')}`,
+                style: `font-size: ${fontSize}px;\
                 text-align: left;\
                 padding: 8px\
                 margin-bottom: 2px`,
-            reactive: true
-        });
-    }
-});
+                reactive: true,
+            });
+        }
+    },
+);
 
 /**
  * A panel indicator to activate and favoritize a layout.
  */
-const PanelIndicator = GObject.registerClass({
-    Signals: { 'layout-activated': { param_types: [GObject.TYPE_INT] } }
-}, class PanelIndicator extends PanelMenu.Button {
-    _init() {
-        super._init(0.0, 'Layout Indicator (Tiling Assistant)');
+const PanelIndicator = GObject.registerClass(
+    {
+        Signals: {'layout-activated': {param_types: [GObject.TYPE_INT]}},
+    },
+    class PanelIndicator extends PanelMenu.Button {
+        _init() {
+            super._init(0.0, 'Layout Indicator (Tiling Assistant)');
 
-        const path = Extension.lookupByURL(import.meta.url)
-            .dir
-            .get_child('media/preferences-desktop-apps-symbolic.svg')
-            .get_path();
-        const gicon = new Gio.FileIcon({ file: Gio.File.new_for_path(path) });
-        this.add_child(new St.Icon({
-            gicon,
-            style_class: 'system-status-icon'
-        }));
+            const path = Extension.lookupByURL(import.meta.url)
+                .dir.get_child('media/preferences-desktop-apps-symbolic.svg')
+                .get_path();
+            const gicon = new Gio.FileIcon({file: Gio.File.new_for_path(path)});
+            this.add_child(
+                new St.Icon({
+                    gicon,
+                    style_class: 'system-status-icon',
+                }),
+            );
 
-        const menuAlignment = 0.0;
-        this.setMenu(new PopupMenu.PopupMenu(this, menuAlignment, St.Side.TOP));
-    }
-
-    vfunc_event(event) {
-        if (this.menu &&
-            (event.type() === Clutter.EventType.TOUCH_BEGIN ||
-             event.type() === Clutter.EventType.BUTTON_PRESS)
-        ) {
-            this._updateItems();
-            this.menu.toggle();
+            const menuAlignment = 0.0;
+            this.setMenu(
+                new PopupMenu.PopupMenu(this, menuAlignment, St.Side.TOP),
+            );
         }
 
-        return Clutter.EVENT_PROPAGATE;
-    }
+        vfunc_event(event) {
+            if (
+                this.menu &&
+                (event.type() === Clutter.EventType.TOUCH_BEGIN ||
+                    event.type() === Clutter.EventType.BUTTON_PRESS)
+            ) {
+                this._updateItems();
+                this.menu.toggle();
+            }
 
-    _updateItems() {
-        this.menu.removeAll();
+            return Clutter.EVENT_PROPAGATE;
+        }
 
-        const layouts = Util.getLayouts();
-        if (!layouts.length) {
-            // Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
-            const item = new PopupMenu.PopupMenuItem(_('No valid layouts defined.'));
-            item.setSensitive(false);
-            this.menu.addMenuItem(item);
-        } else {
-            // Update favorites with monitor count and fill with '-1', if necessary
-            const tmp = Settings.getStrv('favorite-layouts');
-            const count = Math.max(Main.layoutManager.monitors.length, tmp.length);
-            const favorites = [...new Array(count)].map((m, monitorIndex) => {
-                return tmp[monitorIndex] ?? '-1';
-            });
-            Settings.setStrv('favorite-layouts', favorites);
+        _updateItems() {
+            this.menu.removeAll();
 
-            // Create popup menu items
-            layouts.forEach((layout, idx) => {
-                const name = layout._name || `Layout ${idx + 1}`;
-                const item = new PopupFavoriteMenuItem(name, idx);
-                item.connect('activate', () => {
-                    Main.overview.hide();
-                    this.emit('layout-activated', idx);
-                });
-                item.connect('favorite-changed', this._updateItems.bind(this));
+            const layouts = Util.getLayouts();
+            if (!layouts.length) {
+                // Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
+                const item = new PopupMenu.PopupMenuItem(
+                    _('No valid layouts defined.'),
+                );
+                item.setSensitive(false);
                 this.menu.addMenuItem(item);
-            });
+            } else {
+                // Update favorites with monitor count and fill with '-1', if necessary
+                const tmp = Settings.getStrv('favorite-layouts');
+                const count = Math.max(
+                    Main.layoutManager.monitors.length,
+                    tmp.length,
+                );
+                const favorites = [...new Array(count)].map(
+                    (m, monitorIndex) => {
+                        return tmp[monitorIndex] ?? '-1';
+                    },
+                );
+                Settings.setStrv('favorite-layouts', favorites);
+
+                // Create popup menu items
+                layouts.forEach((layout, idx) => {
+                    const name = layout._name || `Layout ${idx + 1}`;
+                    const item = new PopupFavoriteMenuItem(name, idx);
+                    item.connect('activate', () => {
+                        Main.overview.hide();
+                        this.emit('layout-activated', idx);
+                    });
+                    item.connect(
+                        'favorite-changed',
+                        this._updateItems.bind(this),
+                    );
+                    this.menu.addMenuItem(item);
+                });
+            }
+
+            this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
+
+            const settingsButton = new PopupMenu.PopupImageMenuItem(
+                'Preferences',
+                'emblem-system-symbolic',
+            );
+            // Center button without changing the size (for the hover highlight)
+            settingsButton._icon.set_x_expand(true);
+            settingsButton.label.set_x_expand(true);
+            settingsButton.connect('activate', () =>
+                Extension.lookupByURL(import.meta.url).openPreferences(),
+            );
+            this.menu.addMenuItem(settingsButton);
         }
-
-        this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
-
-        const settingsButton = new PopupMenu.PopupImageMenuItem('Preferences', 'emblem-system-symbolic');
-        // Center button without changing the size (for the hover highlight)
-        settingsButton._icon.set_x_expand(true);
-        settingsButton.label.set_x_expand(true);
-        settingsButton.connect('activate',
-            () => Extension.lookupByURL(import.meta.url).openPreferences());
-        this.menu.addMenuItem(settingsButton);
-    }
-});
+    },
+);
 
 /**
  * A PopupMenuItem for the PopupMenu of the PanelIndicator.
  */
-const PopupFavoriteMenuItem = GObject.registerClass({
-    Signals: { 'favorite-changed': { param_types: [GObject.TYPE_INT] } }
-}, class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
-    _init(text, layoutIndex) {
-        super._init();
+const PopupFavoriteMenuItem = GObject.registerClass(
+    {
+        Signals: {'favorite-changed': {param_types: [GObject.TYPE_INT]}},
+    },
+    class PopupFavoriteMenuItem extends PopupMenu.PopupBaseMenuItem {
+        _init(text, layoutIndex) {
+            super._init();
 
-        this.add_child(new St.Label({
-            text,
-            x_expand: true
-        }));
+            this.add_child(
+                new St.Label({
+                    text,
+                    x_expand: true,
+                }),
+            );
 
-        const favorites = Settings.getStrv('favorite-layouts');
-        Main.layoutManager.monitors.forEach((m, monitorIndex) => {
-            const favoriteButton = new St.Button({
-                child: new St.Icon({
-                    icon_name: favorites[monitorIndex] === `${layoutIndex}` ? 'starred-symbolic' : 'non-starred-symbolic',
-                    style_class: 'popup-menu-icon'
-                })
+            const favorites = Settings.getStrv('favorite-layouts');
+            Main.layoutManager.monitors.forEach((m, monitorIndex) => {
+                const favoriteButton = new St.Button({
+                    child: new St.Icon({
+                        icon_name:
+                            favorites[monitorIndex] === `${layoutIndex}` ?
+                                'starred-symbolic'
+                            :   'non-starred-symbolic',
+                        style_class: 'popup-menu-icon',
+                    }),
+                });
+                this.add_child(favoriteButton);
+
+                // Update gSetting with new Favorite (act as a toggle button)
+                favoriteButton.connect('clicked', () => {
+                    const currFavorites = Settings.getStrv('favorite-layouts');
+                    currFavorites[monitorIndex] =
+                        currFavorites[monitorIndex] === `${layoutIndex}` ?
+                            '-1'
+                        :   `${layoutIndex}`;
+                    Settings.setStrv('favorite-layouts', currFavorites);
+                    this.emit('favorite-changed', monitorIndex);
+                });
             });
-            this.add_child(favoriteButton);
-
-            // Update gSetting with new Favorite (act as a toggle button)
-            favoriteButton.connect('clicked', () => {
-                const currFavorites = Settings.getStrv('favorite-layouts');
-                currFavorites[monitorIndex] = currFavorites[monitorIndex] === `${layoutIndex}` ? '-1' : `${layoutIndex}`;
-                Settings.setStrv('favorite-layouts', currFavorites);
-                this.emit('favorite-changed', monitorIndex);
-            });
-        });
-    }
-});
+        }
+    },
+);

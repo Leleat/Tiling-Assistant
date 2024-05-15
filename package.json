@@ -5,12 +5,18 @@
     "private": true,
     "homepage": "https://github.com/Leleat/Tiling-Assistant",
     "main": "tiling-assistant@leleat-on-github/extension.js",
-    "scripts": {},
+    "scripts": {
+        "lint": "npx eslint",
+        "format": "npx prettier -c ."
+    },
     "author": "Leleat",
     "license": "GPL-2.0-or-later",
     "type": "module",
     "devDependencies": {
         "@eslint/js": "^9.0.0",
-        "eslint": "^9.0.0"
+        "eslint": "^9.0.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-jsdoc": "^48.2.4",
+        "prettier": "^3.2.5"
     }
 }

@@ -140,7 +140,7 @@ export class Shortcuts {
             'tile-bottomleft-quarter-ignore-ta',
             'tile-bottomright-quarter-ignore-ta',
             'debugging-show-tiled-rects',
-            'debugging-free-rects'
+            'debugging-free-rects',
         ];
     }
 }
@@ -175,14 +175,18 @@ export class Direction {
 
     static opposite(dir) {
         let opposite = 0;
-        if (dir & this.N)
+        if (dir & this.N) {
             opposite |= this.S;
-        if (dir & this.S)
+        }
+        if (dir & this.S) {
             opposite |= this.N;
-        if (dir & this.W)
+        }
+        if (dir & this.W) {
             opposite |= this.E;
-        if (dir & this.E)
+        }
+        if (dir & this.E) {
             opposite |= this.W;
+        }
 
         return opposite;
     }
@@ -244,9 +248,9 @@ export class Layout {
      * @returns {LayoutItem[]}
      */
     getItems(filterOutEmptyRects = true) {
-        return filterOutEmptyRects
-            ? this._items.filter(i => Object.keys(i.rect).length === 4)
-            : this._items;
+        return filterOutEmptyRects ?
+                this._items.filter((i) => Object.keys(i.rect).length === 4)
+            :   this._items;
     }
 
     /**
@@ -261,9 +265,9 @@ export class Layout {
      * @returns {number}
      */
     getItemCount(filterOutEmptyRects = false) {
-        return filterOutEmptyRects
-            ? this.getItems().length
-            : this._items.length;
+        return filterOutEmptyRects ?
+                this.getItems().length
+            :   this._items.length;
     }
 
     /**
@@ -271,30 +275,50 @@ export class Layout {
      *      a potential error message.
      */
     validate() {
-        const rects = this.getItems().map(i => i.rect);
-        if (!rects.length)
+        const rects = this.getItems().map((i) => i.rect);
+        if (!rects.length) {
             return [false, 'No valid rectangles defined.', -1];
+        }
 
         const getOverlapArea = (r1, r2) => {
-            return Math.max(0, Math.min(r1.x + r1.width, r2.x + r2.width) - Math.max(r1.x, r2.x)) *
-                    Math.max(0, Math.min(r1.y + r1.height, r2.y + r2.height) - Math.max(r1.y, r2.y));
+            return (
+                Math.max(
+                    0,
+                    Math.min(r1.x + r1.width, r2.x + r2.width) -
+                        Math.max(r1.x, r2.x),
+                ) *
+                Math.max(
+                    0,
+                    Math.min(r1.y + r1.height, r2.y + r2.height) -
+                        Math.max(r1.y, r2.y),
+                )
+            );
         };
 
         for (let i = 0; i < rects.length; i++) {
             const rect = rects[i];
 
-            if (rect.width <= 0 || rect.width > 1)
+            if (rect.width <= 0 || rect.width > 1) {
                 return [false, `Rectangle ${i} has an invalid width.`, i];
+            }
 
-            if (rect.height <= 0 || rect.height > 1)
+            if (rect.height <= 0 || rect.height > 1) {
                 return [false, `Rectangle ${i} has an invalid height.`, i];
+            }
 
-            if (rect.x < 0 || rect.y < 0 || rect.x + rect.width > 1 || rect.y + rect.height > 1)
+            if (
+                rect.x < 0 ||
+                rect.y < 0 ||
+                rect.x + rect.width > 1 ||
+                rect.y + rect.height > 1
+            ) {
                 return [false, `Rectangle ${i} extends beyond the screen.`, i];
+            }
 
             for (let j = i + 1; j < rects.length; j++) {
-                if (getOverlapArea(rect, rects[j]) !== 0)
+                if (getOverlapArea(rect, rects[j]) !== 0) {
                     return [false, `Rectangles ${i} and ${j} overlap.`, j];
+                }
             }
         }
 

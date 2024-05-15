@@ -3,7 +3,7 @@ run-name: Create Release
 on:
   push:
     tags:
-      - "v*"
+      - 'v*'
 jobs:
   release:
     name: Create release
@@ -17,4 +17,4 @@ jobs:
           file: tiling-assistant@leleat-on-github.shell-extension.zip
           overwrite: true
           release_name: Tiling Assistant ${{ github.ref_name }}
-          body: "Read about all the changes [here](https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md#${{ github.ref_name }})."
+          body: 'Read about all the changes [here](https://github.com/Leleat/Tiling-Assistant/blob/main/CHANGELOG.md#${{ github.ref_name }}).'

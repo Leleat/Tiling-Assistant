@@ -1,9 +1,9 @@
-import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js';
-import { Main } from '../dependencies/shell.js';
-import { getWindows } from '../dependencies/unexported/altTab.js';
+import {Clutter, GLib, GObject, Meta, Mtk, Shell} from '../dependencies/gi.js';
+import {Main} from '../dependencies/shell.js';
+import {getWindows} from '../dependencies/unexported/altTab.js';
 
-import { Orientation, Settings } from '../common.js';
-import { Rect, Util } from './utility.js';
+import {Orientation, Settings} from '../common.js';
+import {Rect, Util} from './utility.js';
 
 /**
  * Singleton responsible for tiling. Implement the signals in a separate Clutter
@@ -22,12 +22,12 @@ export class TilingWindowManager {
         global.workspace_manager.connectObject(
             'workspace-added',
             this._onWorkspaceAdded.bind(this),
-            this
+            this,
         );
         global.workspace_manager.connectObject(
             'workspace-removed',
             this._onWorkspaceRemoved.bind(this),
-            this
+            this,
         );
     }
 
@@ -82,16 +82,18 @@ export class TilingWindowManager {
         // The open windows are not sorted properly when tiling with the Tiling
         // Popup because altTab sorts by focus.
         const sorted = global.display.sort_windows_by_stacking(openWindows);
-        return sorted.reverse().filter(w => {
+        return sorted.reverse().filter((w) => {
             // I don't think this should normally happen but if it does, this
             // extension can crash GNOME Shell.. so guard against it. A way to
             // have a window's monitor be -1, for example, is explained here:
             // https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/4713
-            if (w.get_monitor() === -1)
+            if (w.get_monitor() === -1) {
                 return false;
+            }
 
             // Assumption: a maximized window can also resize (once unmaximized)
-            const canResize = w.allows_move() && w.allows_resize() || this.isMaximized(w);
+            const canResize =
+                (w.allows_move() && w.allows_resize()) || this.isMaximized(w);
             return canResize;
         });
     }
@@ -104,8 +106,10 @@ export class TilingWindowManager {
      */
     static isMaximized(window, workArea = null) {
         const area = workArea ?? window.get_work_area_current_monitor();
-        return window.get_maximized() === Meta.MaximizeFlags.BOTH ||
-                window.tiledRect?.equal(area);
+        return (
+            window.get_maximized() === Meta.MaximizeFlags.BOTH ||
+            window.tiledRect?.equal(area)
+        );
     }
 
     /**
@@ -113,38 +117,46 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window to tile.
      * @param {Rect} newRect the Rect the `window` will be tiled to.
-     * @param {boolean} [openTilingPopup=true] decides, if we open a Tiling
+     * @param {object} param
+     * @param {boolean} [param.openTilingPopup=true] decides, if we open a Tiling
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
-     * @param {number} [number=null] is used to get the workArea in which the
+     * @param {number} [param.ignoreTA=false]
+     * @param {number} [param.monitorNr=null] is used to get the workArea in which the
      *      window tiles on. It's used for gap calculation. We can't always rely on
      *      window.get_monitor with its monitor or global.display.get_current_monitor
      *      (the pointer monitor) because of the 'grace period' during a quick dnd
      *      towards a screen border since the pointer and the window will be on the
      *      'wrong' monitor.
-     * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
-     * @param {boolean} [tileGroup=null] forces the creation of this tile group.
-     * @param {boolean} [fakeTile=false] don't create a new tile group, don't
+     * @param {boolean} [param.skipAnim=false] decides, if we skip the tile animation.
+     * @param {boolean} [param.fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static async tile(window, newRect, {
-        openTilingPopup = true,
-        ignoreTA = false,
-        monitorNr = null,
-        skipAnim = false,
-        fakeTile = false
-    } = {}) {
-        if (!window || window.is_skip_taskbar())
+    static async tile(
+        window,
+        newRect,
+        {
+            openTilingPopup = true,
+            ignoreTA = false,
+            monitorNr = null,
+            skipAnim = false,
+            fakeTile = false,
+        } = {},
+    ) {
+        if (!window || window.is_skip_taskbar()) {
             return;
+        }
 
         const wasMaximized = window.get_maximized();
-        if (wasMaximized)
+        if (wasMaximized) {
             window.unmaximize(wasMaximized);
+        }
 
         window.unmake_fullscreen();
 
-        if (!window.allows_resize() || !window.allows_move())
+        if (!window.allows_resize() || !window.allows_move()) {
             return;
+        }
 
         // Remove window from the other windows' tileGroups so it
         // doesn't falsely get raised with them.
@@ -154,10 +166,13 @@ export class TilingWindowManager {
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
-        if (window.raise_and_make_recent_on_workspace)
-            window.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
-        else
+        if (window.raise_and_make_recent_on_workspace) {
+            window.raise_and_make_recent_on_workspace(
+                global.workspace_manager.get_active_workspace(),
+            );
+        } else {
             window.raise_and_make_recent();
+        }
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = monitorNr ?? window.get_monitor();
@@ -165,8 +180,9 @@ export class TilingWindowManager {
         const maximize = newRect.equal(workArea);
 
         window.isTiled = !maximize;
-        if (!window.untiledRect)
+        if (!window.untiledRect) {
             window.untiledRect = oldRect;
+        }
 
         if (maximize && !Settings.getBoolean('maximize-with-gap')) {
             window.tiledRect = null;
@@ -183,11 +199,15 @@ export class TilingWindowManager {
         // For ex. which only resize in full rows/columns like gnome-terminal
         window.tiledRect = newRect.copy();
 
-        const { x, y, width, height } = newRect.addGaps(workArea, monitor);
+        const {x, y, width, height} = newRect.addGaps(workArea, monitor);
 
         // Animations
         const wActor = window.get_compositor_private();
-        if (Settings.getBoolean('enable-tile-animations') && wActor && !skipAnim) {
+        if (
+            Settings.getBoolean('enable-tile-animations') &&
+            wActor &&
+            !skipAnim
+        ) {
             wActor.remove_all_transitions();
             // HACK => journalctl: 'error in size change accounting'...?
             // TODO: no animation if going from maximized -> tiled and back to back multiple times?
@@ -195,7 +215,7 @@ export class TilingWindowManager {
                 global.window_manager,
                 wActor,
                 oldRect.meta,
-                Meta.SizeChange.MAXIMIZE
+                Meta.SizeChange.MAXIMIZE,
             );
         }
 
@@ -221,7 +241,7 @@ export class TilingWindowManager {
         if (maximize) {
             this._updateGappedMaxWindowSignals(window);
 
-        // Tiled window
+            // Tiled window
         } else if (!fakeTile) {
             // Make the tile group only consist of the window itself to stop
             // resizing or raising together. Also don't call the Tiling Popup.
@@ -236,8 +256,9 @@ export class TilingWindowManager {
 
             this.emit('window-tiled', window);
 
-            if (openTilingPopup)
+            if (openTilingPopup) {
                 await this.tryOpeningTilingPopup();
+            }
         }
     }
 
@@ -245,31 +266,50 @@ export class TilingWindowManager {
      * Untiles a tiled window and delete all tiling properties.
      *
      * @param {Meta.Window} window a Meta.Window to untile.
-     * @param {boolean} [restoreFullPos=true] decides, if we restore the
+     * @param {object} param
+     * @param {boolean} [param.restoreFullPos=true] decides, if we restore the
      *      pre-tile position or whether the size while keeping the titlebar
      *      at the relative same position.
-     * @param {number} [xAnchor=undefined] used when wanting to restore the
+     * @param {number} [param.xAnchor=undefined] used when wanting to restore the
      *      size while keeping titlebar at the relative x position. By default,
      *      we use the pointer position.
-     * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
+     * @param {boolean} [param.skipAnim=false] decides, if we skip the until animation.
+     * @param {boolean} [param.clampToWorkspace=false]
      */
-    static untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false, clampToWorkspace = false } = {}) {
+    static untile(
+        window,
+        {
+            restoreFullPos = true,
+            xAnchor = undefined,
+            skipAnim = false,
+            clampToWorkspace = false,
+        } = {},
+    ) {
         const wasMaximized = window.get_maximized();
-        if (wasMaximized)
+        if (wasMaximized) {
             window.unmaximize(wasMaximized);
+        }
 
-        if (!window.untiledRect || !window.allows_resize() || !window.allows_move())
+        if (
+            !window.untiledRect ||
+            !window.allows_resize() ||
+            !window.allows_move()
+        ) {
             return;
+        }
 
         // If you tiled a window and then used the popup to tile more
         // windows, the consecutive windows will be raised above the first
         // one. So untiling the initial window after tiling more windows with
         // the popup (without re-focusing the initial window), means the
         // untiled window will be below the others.
-        if (window.raise_and_make_recent_on_workspace)
-            window.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
-        else
+        if (window.raise_and_make_recent_on_workspace) {
+            window.raise_and_make_recent_on_workspace(
+                global.workspace_manager.get_active_workspace(),
+            );
+        } else {
             window.raise_and_make_recent();
+        }
 
         // Animation
         const untileAnim = Settings.getBoolean('enable-untile-animations');
@@ -280,7 +320,7 @@ export class TilingWindowManager {
                 global.window_manager,
                 wActor,
                 window.get_frame_rect(),
-                Meta.SizeChange.UNMAXIMIZE
+                Meta.SizeChange.UNMAXIMIZE,
             );
         }
 
@@ -289,18 +329,33 @@ export class TilingWindowManager {
         const userOp = !clampToWorkspace;
         const oldRect = window.untiledRect;
         if (restoreFullPos) {
-            window.move_resize_frame(userOp, oldRect.x, oldRect.y, oldRect.width, oldRect.height);
+            window.move_resize_frame(
+                userOp,
+                oldRect.x,
+                oldRect.y,
+                oldRect.width,
+                oldRect.height,
+            );
         } else {
             // Resize the window while keeping the relative x pos (of the pointer)
             const currWindowFrame = new Rect(window.get_frame_rect());
             xAnchor = xAnchor ?? global.get_pointer()[0];
-            const relativeMouseX = (xAnchor - currWindowFrame.x) / currWindowFrame.width;
+            const relativeMouseX =
+                (xAnchor - currWindowFrame.x) / currWindowFrame.width;
             const newPosX = xAnchor - oldRect.width * relativeMouseX;
 
             // Wayland workaround for DND / restore position
-            Meta.is_wayland_compositor() && window.move_frame(true, newPosX, currWindowFrame.y);
+            if (Meta.is_wayland_compositor()) {
+                window.move_frame(true, newPosX, currWindowFrame.y);
+            }
 
-            window.move_resize_frame(userOp, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
+            window.move_resize_frame(
+                userOp,
+                newPosX,
+                currWindowFrame.y,
+                oldRect.width,
+                oldRect.height,
+            );
         }
 
         this.clearTilingProps(window.get_id());
@@ -318,7 +373,7 @@ export class TilingWindowManager {
      * @param {Meta.Workspace} workspace
      */
     static moveGroupToWorkspace(tileGroup, workspace) {
-        tileGroup.forEach(w => {
+        tileGroup.forEach((w) => {
             this._blockTilingSignalsFor(w);
             w.change_workspace(workspace);
             this._unblockTilingSignalsFor(w);
@@ -334,28 +389,43 @@ export class TilingWindowManager {
      */
     static moveGroupToMonitor(tileGroup, oldMon, newMon) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const oldWorkArea = new Rect(activeWs.get_work_area_for_monitor(oldMon));
-        const newWorkArea = new Rect(activeWs.get_work_area_for_monitor(newMon));
+        const oldWorkArea = new Rect(
+            activeWs.get_work_area_for_monitor(oldMon),
+        );
+        const newWorkArea = new Rect(
+            activeWs.get_work_area_for_monitor(newMon),
+        );
 
         const hScale = oldWorkArea.width / newWorkArea.width;
         const vScale = oldWorkArea.height / newWorkArea.height;
 
         tileGroup.forEach((w, idx) => {
             const newTile = w.tiledRect.copy();
-            newTile.x = newWorkArea.x + Math.floor(newWorkArea.width * ((w.tiledRect.x - oldWorkArea.x) / oldWorkArea.width));
-            newTile.y = newWorkArea.y + Math.floor(newWorkArea.height * ((w.tiledRect.y - oldWorkArea.y) / oldWorkArea.height));
+            newTile.x =
+                newWorkArea.x +
+                Math.floor(
+                    newWorkArea.width *
+                        ((w.tiledRect.x - oldWorkArea.x) / oldWorkArea.width),
+                );
+            newTile.y =
+                newWorkArea.y +
+                Math.floor(
+                    newWorkArea.height *
+                        ((w.tiledRect.y - oldWorkArea.y) / oldWorkArea.height),
+                );
             newTile.width = Math.floor(w.tiledRect.width * (1 / hScale));
             newTile.height = Math.floor(w.tiledRect.height * (1 / vScale));
 
             // Try to align with all previously scaled tiles and the workspace to prevent gaps
-            for (let i = 0; i < idx; i++)
+            for (let i = 0; i < idx; i++) {
                 newTile.tryAlignWith(tileGroup[i].tiledRect);
+            }
 
             newTile.tryAlignWith(newWorkArea, 10);
 
             this.tile(w, newTile, {
                 skipAnim: true,
-                fakeTile: true
+                fakeTile: true,
             });
         });
 
@@ -395,11 +465,14 @@ export class TilingWindowManager {
      *      together.
      */
     static updateTileGroup(tileGroup) {
-        tileGroup.forEach(window => {
+        tileGroup.forEach((window) => {
             const windowId = window.get_id();
             const signals = this._signals.getSignalsFor(windowId);
 
-            this._tileGroups.set(windowId, tileGroup.map(w => w.get_id()));
+            this._tileGroups.set(
+                windowId,
+                tileGroup.map((w) => w.get_id()),
+            );
 
             /**
              * clearTilingProps may have been called before this function,
@@ -409,9 +482,12 @@ export class TilingWindowManager {
 
             // Reconnect unmanaging signal
             const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
-            unmanagingSignal && window.disconnect(unmanagingSignal);
 
-            const umId = window.connect('unmanaging', w => {
+            if (unmanagingSignal) {
+                window.disconnect(unmanagingSignal);
+            }
+
+            const umId = window.connect('unmanaging', (w) => {
                 this.clearTilingProps(windowId);
                 this._unmanagingWindows.push(w.get_stable_sequence());
             });
@@ -419,22 +495,33 @@ export class TilingWindowManager {
 
             // Reconnect ws-changed signal
             const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
-            wsChangeSignal && window.disconnect(wsChangeSignal);
 
-            const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
+            if (wsChangeSignal) {
+                window.disconnect(wsChangeSignal);
+            }
+
+            const wsId = window.connect('workspace-changed', () =>
+                this._onWindowWorkspaceChanged(window),
+            );
             signals.set(TilingSignals.WS_CHANGED, wsId);
 
             // Reconnect raise signal
             const raiseSignal = signals.get(TilingSignals.RAISE);
-            raiseSignal && window.disconnect(raiseSignal);
 
-            const raiseId = window.connect('raised', raisedWindow => {
+            if (raiseSignal) {
+                window.disconnect(raiseSignal);
+            }
+
+            const raiseId = window.connect('raised', (raisedWindow) => {
                 const raisedWindowId = raisedWindow.get_id();
                 if (Settings.getBoolean('enable-raise-tile-group')) {
-                    const raisedWindowsTileGroup = this._tileGroups.get(raisedWindowId);
-                    raisedWindowsTileGroup.forEach(wId => {
+                    const raisedWindowsTileGroup =
+                        this._tileGroups.get(raisedWindowId);
+                    raisedWindowsTileGroup.forEach((wId) => {
                         const w = this._getWindow(wId);
-                        const otherRaiseId = this._signals.getSignalsFor(wId).get(TilingSignals.RAISE);
+                        const otherRaiseId = this._signals
+                            .getSignalsFor(wId)
+                            .get(TilingSignals.RAISE);
                         // May be undefined, if w was just closed. This would
                         // automatically call clearTilingProps() with the signal
                         // but in case I missed / don't know about other cases where
@@ -446,22 +533,30 @@ export class TilingWindowManager {
 
                         // Prevent an infinite loop of windows raising each other
                         w.block_signal_handler(otherRaiseId);
-                        if (w.raise_and_make_recent_on_workspace)
-                            w.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
-                        else
+                        if (w.raise_and_make_recent_on_workspace) {
+                            w.raise_and_make_recent_on_workspace(
+                                global.workspace_manager.get_active_workspace(),
+                            );
+                        } else {
                             w.raise_and_make_recent();
+                        }
                         w.unblock_signal_handler(otherRaiseId);
                     });
 
                     // Re-raise the just raised window so it may not be below
                     // other tiled windows otherwise when untiling via keyboard
                     // it may be below other tiled windows.
-                    const signalId = this._signals.getSignalsFor(raisedWindowId).get(TilingSignals.RAISE);
+                    const signalId = this._signals
+                        .getSignalsFor(raisedWindowId)
+                        .get(TilingSignals.RAISE);
                     raisedWindow.block_signal_handler(signalId);
-                    if (raisedWindow.raise_and_make_recent_on_workspace)
-                        raisedWindow.raise_and_make_recent_on_workspace(global.workspace_manager.get_active_workspace());
-                    else
+                    if (raisedWindow.raise_and_make_recent_on_workspace) {
+                        raisedWindow.raise_and_make_recent_on_workspace(
+                            global.workspace_manager.get_active_workspace(),
+                        );
+                    } else {
                         raisedWindow.raise_and_make_recent();
+                    }
                     raisedWindow.unblock_signal_handler(signalId);
                 }
 
@@ -489,29 +584,32 @@ export class TilingWindowManager {
         const signals = this._signals.getSignalsFor(windowId);
 
         if (signals.get(TilingSignals.RAISE)) {
-            window && window.disconnect(signals.get(TilingSignals.RAISE));
+            window?.disconnect(signals.get(TilingSignals.RAISE));
             signals.set(TilingSignals.RAISE, 0);
         }
 
         if (signals.get(TilingSignals.WS_CHANGED)) {
-            window && window.disconnect(signals.get(TilingSignals.WS_CHANGED));
+            window?.disconnect(signals.get(TilingSignals.WS_CHANGED));
             signals.set(TilingSignals.WS_CHANGED, 0);
         }
 
         if (signals.get(TilingSignals.UNMANAGING)) {
-            window && window.disconnect(signals.get(TilingSignals.UNMANAGING));
+            window?.disconnect(signals.get(TilingSignals.UNMANAGING));
             signals.set(TilingSignals.UNMANAGING, 0);
         }
 
-        if (!this._tileGroups.has(windowId))
+        if (!this._tileGroups.has(windowId)) {
             return;
+        }
 
         // Delete window's tileGroup
         this._tileGroups.delete(windowId);
         // Delete window from other windows' tileGroup
-        this._tileGroups.forEach(tileGroup => {
+        this._tileGroups.forEach((tileGroup) => {
             const idx = tileGroup.indexOf(windowId);
-            idx !== -1 && tileGroup.splice(idx, 1);
+            if (idx !== -1) {
+                tileGroup.splice(idx, 1);
+            }
         });
     }
 
@@ -522,10 +620,13 @@ export class TilingWindowManager {
      */
     static getTileGroupFor(window) {
         const tileGroup = this._tileGroups.get(window.get_id());
-        if (!tileGroup)
+        if (!tileGroup) {
             return [];
+        }
 
-        return this._getAllWindows().filter(w => tileGroup.includes(w.get_id()));
+        return this._getAllWindows().filter((w) =>
+            tileGroup.includes(w.get_id()),
+        );
     }
 
     /**
@@ -534,58 +635,68 @@ export class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [skipTopWindow=true] whether we ignore the focused window
+     * @param {object} param
+     * @param {boolean} [param.skipTopWindow=true] whether we ignore the focused window
      *      in the active search for the top tile group. The focused window may
      *      still be part of the returned array if it is part of another high-
      *      stacked window's tile group. This is mainly only useful, if the
      *      focused window isn't tiled (for example when dnd-ing a window).
-     * @param {number} [monitor=null] get the group for the monitor number.
+     * @param {number} [param.monitor=null] get the group for the monitor number.
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
-    static getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
+    static getTopTileGroup({skipTopWindow = false, monitor = null} = {}) {
         // 'Raise Tile Group' setting is enabled so we just return the tracked
         // tile group. Same thing for the setting 'Disable Tile Groups' because
         // it's implemented by just making the tile groups consist of single
         // windows (the tiled window itself).
-        if (Settings.getBoolean('enable-raise-tile-group') ||
+        if (
+            Settings.getBoolean('enable-raise-tile-group') ||
             Settings.getBoolean('disable-tile-groups')
         ) {
             const openWindows = this.getWindows();
-            if (!openWindows.length)
+            if (!openWindows.length) {
                 return [];
+            }
 
             if (skipTopWindow) {
                 // the focused window isn't necessarily the top window due to always
                 // on top windows.
                 const idx = openWindows.indexOf(global.display.focus_window);
-                idx !== -1 && openWindows.splice(idx, 1);
+                if (idx !== -1) {
+                    openWindows.splice(idx, 1);
+                }
             }
 
             const ignoredWindows = [];
-            const mon = monitor ??
+            const mon =
+                monitor ??
                 global.display.focus_window?.get_monitor() ??
                 openWindows[0].get_monitor();
 
             for (const window of openWindows) {
-                if (window.get_monitor() !== mon)
+                if (window.get_monitor() !== mon) {
                     continue;
+                }
 
                 // Ignore non-tiled windows, which are always-on-top, for the
                 // calculation since they are probably some utility apps etc.
-                if (window.is_above() && !window.isTiled)
+                if (window.is_above() && !window.isTiled) {
                     continue;
+                }
 
                 // Find the first not overlapped tile group, if it exists
                 if (window.isTiled) {
-                    const overlapsIgnoredWindow = ignoredWindows.some(w => {
-                        const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
+                    const overlapsIgnoredWindow = ignoredWindows.some((w) => {
+                        const rect =
+                            w.tiledRect ?? new Rect(w.get_frame_rect());
                         return rect.overlap(window.tiledRect);
                     });
 
-                    if (overlapsIgnoredWindow)
+                    if (overlapsIgnoredWindow) {
                         ignoredWindows.push(window);
-                    else
+                    } else {
                         return this.getTileGroupFor(window);
+                    }
                 } else {
                     ignoredWindows.push(window);
                 }
@@ -593,10 +704,10 @@ export class TilingWindowManager {
 
             return [];
 
-        // 'Raise Tile Group' setting is disabled so we get thetop most
-        // non-overlapped/ing tiled windows ignoring the tile groups.
+            // 'Raise Tile Group' setting is disabled so we get thetop most
+            // non-overlapped/ing tiled windows ignoring the tile groups.
         } else {
-            return this._getTopTiledWindows({ skipTopWindow, monitor });
+            return this._getTopTiledWindows({skipTopWindow, monitor});
         }
     }
 
@@ -615,25 +726,36 @@ export class TilingWindowManager {
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeScreenRects = workArea.minus(rectList);
-        if (!freeScreenRects.length)
+        if (!freeScreenRects.length) {
             return null;
+        }
 
         // Create the union of all freeScreenRects and calculate the sum
         // of their areas. If the area of the union-rect equals the area
         // of the individual rects, the individual rects align properly.
-        const startRect = new Rect(freeScreenRects[0].x, freeScreenRects[0].y, 0, 0);
-        const { checkSum, combinedRect } = freeScreenRects.reduce((result, rect) => {
-            result.checkSum += rect.area;
-            result.combinedRect = result.combinedRect.union(rect);
-            return result;
-        }, { checkSum: 0, combinedRect: startRect });
+        const startRect = new Rect(
+            freeScreenRects[0].x,
+            freeScreenRects[0].y,
+            0,
+            0,
+        );
+        const {checkSum, combinedRect} = freeScreenRects.reduce(
+            (result, rect) => {
+                result.checkSum += rect.area;
+                result.combinedRect = result.combinedRect.union(rect);
+                return result;
+            },
+            {checkSum: 0, combinedRect: startRect},
+        );
 
-        if (combinedRect.area !== checkSum)
+        if (combinedRect.area !== checkSum) {
             return null;
+        }
 
         // Random min. size requirement
-        if (combinedRect.width < 250 || combinedRect.height < 250)
+        if (combinedRect.width < 250 || combinedRect.height < 250) {
             return null;
+        }
 
         return combinedRect;
     }
@@ -645,19 +767,24 @@ export class TilingWindowManager {
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
      *      Like usual, they shouldn't overlap each other.
-     * @param {Rect} [currRect=null] a Rect, which may be expanded.
-     * @param {Orientation} [orientation=null] The orientation we want to expand
+     * @param {object} param
+     * @param {Rect} [param.currRect=null] a Rect, which may be expanded.
+     * @param {Orientation} [param.orientation=null] The orientation we want to expand
      *      `currRect` into. If `null`, expand in both orientations.
-     * @param {Rect} [monitor=null] defaults to pointer monitor.
+     * @param {Rect} [param.monitorNr=null] defaults to pointer monitor.
      * @returns {Rect} a new Rect.
      */
-    static getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
+    static getBestFreeRect(
+        rectList,
+        {currRect = null, orientation = null, monitorNr = null} = {},
+    ) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeRects = workArea.minus(rectList);
-        if (!freeRects.length)
+        if (!freeRects.length) {
             return currRect ?? new Rect(workArea);
+        }
 
         // Try to expand the currRect to fill the rest of the space
         // that is available around it.
@@ -670,22 +797,33 @@ export class TilingWindowManager {
             // currRect and sort the array so that the free rects are ordered
             // from the left to the right or from the top to the bottom. See
             // below for the reasoning.
-            const borderingRects = freeRects.filter(r => {
-                const axis1 = currRect[xpndPos1] === r[xpndPos2] || currRect[xpndPos2] === r[xpndPos1];
-                const axis2 = isVert ? currRect.horizOverlap(r) : currRect.vertOverlap(r);
-                return axis1 && axis2;
-            }).sort((a, b) => a[unxpndPos1] - b[unxpndPos1]);
+            const borderingRects = freeRects
+                .filter((r) => {
+                    const axis1 =
+                        currRect[xpndPos1] === r[xpndPos2] ||
+                        currRect[xpndPos2] === r[xpndPos1];
+                    const axis2 =
+                        isVert ?
+                            currRect.horizOverlap(r)
+                        :   currRect.vertOverlap(r);
+                    return axis1 && axis2;
+                })
+                .sort((a, b) => a[unxpndPos1] - b[unxpndPos1]);
 
             // Separate the rects into the ones that come before (left / top)
             // or after (right / bottom) the current rect.
-            const { before, after } = borderingRects.reduce((result, r) => {
-                if (currRect[xpndPos1] === r[xpndPos2])
-                    result.before.push(r);
-                else if (currRect[xpndPos2] === r[xpndPos1])
-                    result.after.push(r);
+            const {before, after} = borderingRects.reduce(
+                (result, r) => {
+                    if (currRect[xpndPos1] === r[xpndPos2]) {
+                        result.before.push(r);
+                    } else if (currRect[xpndPos2] === r[xpndPos1]) {
+                        result.after.push(r);
+                    }
 
-                return result;
-            }, { before: [], after: [] });
+                    return result;
+                },
+                {before: [], after: []},
+            );
 
             // If we want to check whether the current rect can expand on a certain
             // side (let's say we expand the height), we need to check the *other*
@@ -699,17 +837,26 @@ export class TilingWindowManager {
 
             // Orientation doesn't matter here since we are always comparing sides
             // of the same orientation. So just make the side always horizontal.
-            const makeSide = (startPoint, endPoint) => new Mtk.Rectangle({
-                x: startPoint,
-                width: endPoint - startPoint,
-                height: 1
-            });
-            const freeRectsContainCurrRectSide = rects => {
-                const currRectSide = makeSide(currRect[unxpndPos1], currRect[unxpndPos2]);
-                const linkedSides = rects.reduce((linked, r) => {
-                    const side = makeSide(r[unxpndPos1], r[unxpndPos2]);
-                    return linked.overlap(side) ? linked.union(side) : linked;
-                }, makeSide(rects[0][unxpndPos1], rects[0][unxpndPos2]));
+            const makeSide = (startPoint, endPoint) =>
+                new Mtk.Rectangle({
+                    x: startPoint,
+                    width: endPoint - startPoint,
+                    height: 1,
+                });
+            const freeRectsContainCurrRectSide = (rects) => {
+                const currRectSide = makeSide(
+                    currRect[unxpndPos1],
+                    currRect[unxpndPos2],
+                );
+                const linkedSides = rects.reduce(
+                    (linked, r) => {
+                        const side = makeSide(r[unxpndPos1], r[unxpndPos2]);
+                        return linked.overlap(side) ?
+                                linked.union(side)
+                            :   linked;
+                    },
+                    makeSide(rects[0][unxpndPos1], rects[0][unxpndPos2]),
+                );
 
                 return linkedSides.contains_rect(currRectSide);
             };
@@ -743,30 +890,33 @@ export class TilingWindowManager {
                 // if orientation is null, we expanded vertically. Now we want
                 // to expand horizontally as well.
                 rectList = [...rectList];
-                const currRectIdx = rectList.findIndex(r => r.equal(currRect));
+                const currRectIdx = rectList.findIndex((r) =>
+                    r.equal(currRect),
+                );
                 rectList.splice(currRectIdx, 1);
                 rectList.push(newRect);
                 return newRect.union(
                     this.getBestFreeRect(rectList, {
                         currRect: newRect,
                         orientation: Orientation.H,
-                        monitorNr: monitor
-                    }));
+                        monitorNr: monitor,
+                    }),
+                );
             } else {
                 return newRect;
             }
 
-        // No currRect was passed, so we just choose the single biggest free rect
-        // and expand it using this function. This is a naive approach and doesn't
-        // guarantee that we get the best combination of free screen rects... but
-        // it should be good enough.
+            // No currRect was passed, so we just choose the single biggest free rect
+            // and expand it using this function. This is a naive approach and doesn't
+            // guarantee that we get the best combination of free screen rects... but
+            // it should be good enough.
         } else {
             const biggestSingle = freeRects.reduce((currBiggest, rect) => {
                 return currBiggest.area >= rect.area ? currBiggest : rect;
             });
             rectList.push(biggestSingle);
 
-            return this.getBestFreeRect(rectList, { currRect: biggestSingle });
+            return this.getBestFreeRect(rectList, {currRect: biggestSingle});
         }
     }
 
@@ -784,13 +934,14 @@ export class TilingWindowManager {
      * @returns {Meta.Window|null} the nearest Meta.Window.
      */
     static getNearestWindow(currWindow, windows, dir, wrap = true) {
-        const getRect = w => w.tiledRect ?? new Rect(w.get_frame_rect());
-        const rects = windows.map(w => getRect(w));
+        const getRect = (w) => w.tiledRect ?? new Rect(w.get_frame_rect());
+        const rects = windows.map((w) => getRect(w));
         const nearestRect = getRect(currWindow).getNeighbor(dir, rects, wrap);
-        if (!nearestRect)
+        if (!nearestRect) {
             return null;
+        }
 
-        return windows.find(w => getRect(w).equal(nearestRect));
+        return windows.find((w) => getRect(w).equal(nearestRect));
     }
 
     /**
@@ -815,10 +966,14 @@ export class TilingWindowManager {
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         // Don't try to adapt a tile rect
-        if (Settings.getBoolean('disable-tile-groups'))
+        if (Settings.getBoolean('disable-tile-groups')) {
             return this.getDefaultTileFor(shortcut, workArea);
+        }
 
-        const topTileGroup = this.getTopTileGroup({ skipTopWindow: true, monitor });
+        const topTileGroup = this.getTopTileGroup({
+            skipTopWindow: true,
+            monitor,
+        });
         // getTileFor is used to get the adaptive tiles for dnd & tiling keyboard
         // shortcuts. That's why the top most window needs to be ignored when
         // calculating the new tile rect. The top most window is already ignored
@@ -827,79 +982,183 @@ export class TilingWindowManager {
         // part of the returned array if it's part of another high-stackeing
         // window's tile group.
         const idx = topTileGroup.indexOf(global.display.focus_window);
-        idx !== -1 && topTileGroup.splice(idx, 1);
-        const favLayout = Util.getFavoriteLayout(monitor);
-        const useFavLayout = favLayout.length && Settings.getBoolean('adapt-edge-tiling-to-favorite-layout');
-        const twRects = useFavLayout && favLayout || topTileGroup.map(w => w.tiledRect);
 
-        if (!twRects.length)
+        if (idx !== -1) {
+            topTileGroup.splice(idx, 1);
+        }
+
+        const favLayout = Util.getFavoriteLayout(monitor);
+        const useFavLayout =
+            favLayout.length &&
+            Settings.getBoolean('adapt-edge-tiling-to-favorite-layout');
+        const twRects =
+            (useFavLayout && favLayout) || topTileGroup.map((w) => w.tiledRect);
+
+        if (!twRects.length) {
             return this.getDefaultTileFor(shortcut, workArea);
+        }
 
         // Return the adapted rect only if it doesn't overlap an existing tile.
         // Ignore an overlap, if a fav layout is used since we always prefer the
         // user set layout in that case.
-        const getTile = rect => {
-            if (useFavLayout)
+        const getTile = (rect) => {
+            if (useFavLayout) {
                 return rect;
+            }
 
-            const overlapsTiles = twRects.some(r => r.overlap(rect));
-            return overlapsTiles ? this.getDefaultTileFor(shortcut, workArea) : rect;
+            const overlapsTiles = twRects.some((r) => r.overlap(rect));
+            return overlapsTiles ?
+                    this.getDefaultTileFor(shortcut, workArea)
+                :   rect;
         };
 
         const screenRects = twRects.concat(workArea.minus(twRects));
         switch (shortcut) {
             case 'tile-maximize': {
                 return workArea.copy();
-            } case 'tile-left-half': {
-                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-                const result = new Rect(workArea.x, workArea.y, width, workArea.height);
+            }
+            case 'tile-left-half': {
+                const left = screenRects.find(
+                    (r) => r.x === workArea.x && r.width !== workArea.width,
+                );
+                const {width} =
+                    left ??
+                    workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const result = new Rect(
+                    workArea.x,
+                    workArea.y,
+                    width,
+                    workArea.height,
+                );
                 return getTile(result);
-            } case 'tile-right-half': {
-                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-                const result = new Rect(workArea.x2 - width, workArea.y, width, workArea.height);
+            }
+            case 'tile-right-half': {
+                const right = screenRects.find(
+                    (r) => r.x2 === workArea.x2 && r.width !== workArea.width,
+                );
+                const {width} =
+                    right ??
+                    workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const result = new Rect(
+                    workArea.x2 - width,
+                    workArea.y,
+                    width,
+                    workArea.height,
+                );
                 return getTile(result);
-            } case 'tile-top-half': {
-                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y, workArea.width, height);
+            }
+            case 'tile-top-half': {
+                const top = screenRects.find(
+                    (r) => r.y === workArea.y && r.height !== workArea.height,
+                );
+                const {height} =
+                    top ??
+                    workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                const result = new Rect(
+                    workArea.x,
+                    workArea.y,
+                    workArea.width,
+                    height,
+                );
                 return getTile(result);
-            } case 'tile-bottom-half': {
-                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y2 - height, workArea.width, height);
+            }
+            case 'tile-bottom-half': {
+                const bottom = screenRects.find(
+                    (r) => r.y2 === workArea.y2 && r.height !== workArea.height,
+                );
+                const {height} =
+                    bottom ??
+                    workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                const result = new Rect(
+                    workArea.x,
+                    workArea.y2 - height,
+                    workArea.width,
+                    height,
+                );
                 return getTile(result);
-            } case 'tile-topleft-quarter': {
-                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+            }
+            case 'tile-topleft-quarter': {
+                const left = screenRects.find(
+                    (r) => r.x === workArea.x && r.width !== workArea.width,
+                );
+                const {width} =
+                    left ??
+                    workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const top = screenRects.find(
+                    (r) => r.y === workArea.y && r.height !== workArea.height,
+                );
+                const {height} =
+                    top ??
+                    workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
                 const result = new Rect(workArea.x, workArea.y, width, height);
                 return getTile(result);
-            } case 'tile-topright-quarter': {
-                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-                const top = screenRects.find(r => r.y === workArea.y && r.height !== workArea.height);
-                const { height } = top ?? workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x2 - width, workArea.y, width, height);
+            }
+            case 'tile-topright-quarter': {
+                const right = screenRects.find(
+                    (r) => r.x2 === workArea.x2 && r.width !== workArea.width,
+                );
+                const {width} =
+                    right ??
+                    workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const top = screenRects.find(
+                    (r) => r.y === workArea.y && r.height !== workArea.height,
+                );
+                const {height} =
+                    top ??
+                    workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                const result = new Rect(
+                    workArea.x2 - width,
+                    workArea.y,
+                    width,
+                    height,
+                );
                 return getTile(result);
-            } case 'tile-bottomleft-quarter': {
-                const left = screenRects.find(r => r.x === workArea.x && r.width !== workArea.width);
-                const { width } = left ?? workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
-                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x, workArea.y2 - height, width, height);
+            }
+            case 'tile-bottomleft-quarter': {
+                const left = screenRects.find(
+                    (r) => r.x === workArea.x && r.width !== workArea.width,
+                );
+                const {width} =
+                    left ??
+                    workArea.getUnitAt(0, workArea.width / 2, Orientation.V);
+                const bottom = screenRects.find(
+                    (r) => r.y2 === workArea.y2 && r.height !== workArea.height,
+                );
+                const {height} =
+                    bottom ??
+                    workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                const result = new Rect(
+                    workArea.x,
+                    workArea.y2 - height,
+                    width,
+                    height,
+                );
                 return getTile(result);
-            } case 'tile-bottomright-quarter': {
-                const right = screenRects.find(r => r.x2 === workArea.x2 && r.width !== workArea.width);
-                const { width } = right ?? workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
-                const bottom = screenRects.find(r => r.y2 === workArea.y2 && r.height !== workArea.height);
-                const { height } = bottom ?? workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
-                const result = new Rect(workArea.x2 - width, workArea.y2 - height, width, height);
+            }
+            case 'tile-bottomright-quarter': {
+                const right = screenRects.find(
+                    (r) => r.x2 === workArea.x2 && r.width !== workArea.width,
+                );
+                const {width} =
+                    right ??
+                    workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
+                const bottom = screenRects.find(
+                    (r) => r.y2 === workArea.y2 && r.height !== workArea.height,
+                );
+                const {height} =
+                    bottom ??
+                    workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                const result = new Rect(
+                    workArea.x2 - width,
+                    workArea.y2 - height,
+                    width,
+                    height,
+                );
                 return getTile(result);
             }
         }
+
+        throw new Error('Invalid shortcut');
     }
 
     /**
@@ -919,23 +1178,41 @@ export class TilingWindowManager {
                 return workArea.getUnitAt(1, workArea.width / 2, Orientation.V);
             case 'tile-top-half':
             case 'tile-top-half-ignore-ta':
-                return workArea.getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea.getUnitAt(
+                    0,
+                    workArea.height / 2,
+                    Orientation.H,
+                );
             case 'tile-bottom-half':
             case 'tile-bottom-half-ignore-ta':
-                return workArea.getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea.getUnitAt(
+                    1,
+                    workArea.height / 2,
+                    Orientation.H,
+                );
             case 'tile-topleft-quarter':
             case 'tile-topleft-quarter-ignore-ta':
-                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea
+                    .getUnitAt(0, workArea.width / 2, Orientation.V)
+                    .getUnitAt(0, workArea.height / 2, Orientation.H);
             case 'tile-topright-quarter':
             case 'tile-topright-quarter-ignore-ta':
-                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(0, workArea.height / 2, Orientation.H);
+                return workArea
+                    .getUnitAt(1, workArea.width / 2, Orientation.V)
+                    .getUnitAt(0, workArea.height / 2, Orientation.H);
             case 'tile-bottomleft-quarter':
             case 'tile-bottomleft-quarter-ignore-ta':
-                return workArea.getUnitAt(0, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea
+                    .getUnitAt(0, workArea.width / 2, Orientation.V)
+                    .getUnitAt(1, workArea.height / 2, Orientation.H);
             case 'tile-bottomright-quarter':
             case 'tile-bottomright-quarter-ignore-ta':
-                return workArea.getUnitAt(1, workArea.width / 2, Orientation.V).getUnitAt(1, workArea.height / 2, Orientation.H);
+                return workArea
+                    .getUnitAt(1, workArea.width / 2, Orientation.V)
+                    .getUnitAt(1, workArea.height / 2, Orientation.H);
         }
+
+        throw new Error('Invalid shortcut');
     }
 
     /**
@@ -943,26 +1220,35 @@ export class TilingWindowManager {
      * and offer to tile an open window to that spot.
      */
     static async tryOpeningTilingPopup() {
-        if (!Settings.getBoolean('enable-tiling-popup'))
+        if (!Settings.getBoolean('enable-tiling-popup')) {
             return;
+        }
 
         const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         const openWindows = this.getWindows(allWs);
         const topTileGroup = this.getTopTileGroup();
-        topTileGroup.forEach(w => openWindows.splice(openWindows.indexOf(w), 1));
-        if (!openWindows.length)
+        topTileGroup.forEach((w) =>
+            openWindows.splice(openWindows.indexOf(w), 1),
+        );
+        if (!openWindows.length) {
             return;
+        }
 
-        const tRects = topTileGroup.map(w => w.tiledRect);
+        const tRects = topTileGroup.map((w) => w.tiledRect);
         const monitor = topTileGroup[0]?.get_monitor(); // for the grace period
         const freeSpace = this.getFreeScreen(tRects, monitor);
-        if (!freeSpace)
+        if (!freeSpace) {
             return;
+        }
 
         const TilingPopup = await import('./tilingPopup.js');
-        const popup = new TilingPopup.TilingSwitcherPopup(openWindows, freeSpace);
-        if (!popup.show(topTileGroup))
+        const popup = new TilingPopup.TilingSwitcherPopup(
+            openWindows,
+            freeSpace,
+        );
+        if (!popup.show(topTileGroup)) {
             popup.destroy();
+        }
     }
 
     /**
@@ -970,15 +1256,20 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window.
      * @param {Rect} rect the Rect the `window` tiles to or untiles from.
+     * @param {object} params
      */
     static toggleTiling(window, rect, params = {}) {
         const workArea = window.get_work_area_current_monitor();
         const equalsWA = rect.equal(workArea);
         const equalsTile = window.tiledRect && rect.equal(window.tiledRect);
-        if (window.isTiled && equalsTile || this.isMaximized(window) && equalsWA)
+        if (
+            (window.isTiled && equalsTile) ||
+            (this.isMaximized(window) && equalsWA)
+        ) {
             this.untile(window, params);
-        else
+        } else {
             this.tile(window, rect, params);
+        }
     }
 
     /**
@@ -990,44 +1281,68 @@ export class TilingWindowManager {
      *      appear, if there is free screen space after the `app` was tiled.
      */
     static openAppTiled(app, rect, openTilingPopup = false) {
-        if (!app?.can_open_new_window())
+        if (!app?.can_open_new_window()) {
             return;
+        }
 
-        let createId = global.display.connect('window-created', (src, window) => {
-            const wActor = window.get_compositor_private();
-            let firstFrameId = wActor?.connect('first-frame', () => {
-                wActor.disconnect(firstFrameId);
-                firstFrameId = 0;
+        let createId = global.display.connect(
+            'window-created',
+            (src, window) => {
+                const wActor = window.get_compositor_private();
+                let firstFrameId = wActor?.connect('first-frame', () => {
+                    wActor.disconnect(firstFrameId);
+                    firstFrameId = 0;
 
-                const winTracker = Shell.WindowTracker.get_default();
-                const openedWindowApp = winTracker.get_window_app(window);
-                // Check, if the created window is from the app and if it allows
-                // to be moved and resized because, for example, Steam uses a
-                // WindowType.Normal window for their loading screen, which we
-                // don't want to trigger the tiling for.
-                if (createId && openedWindowApp && openedWindowApp === app &&
-                        (window.allows_resize() && window.allows_move() || window.get_maximized())
-                ) {
-                    global.display.disconnect(createId);
-                    createId = 0;
-                    this.tile(window, rect, { openTilingPopup, skipAnim: true });
+                    const winTracker = Shell.WindowTracker.get_default();
+                    const openedWindowApp = winTracker.get_window_app(window);
+                    // Check, if the created window is from the app and if it allows
+                    // to be moved and resized because, for example, Steam uses a
+                    // WindowType.Normal window for their loading screen, which we
+                    // don't want to trigger the tiling for.
+                    if (
+                        createId &&
+                        openedWindowApp &&
+                        openedWindowApp === app &&
+                        ((window.allows_resize() && window.allows_move()) ||
+                            window.get_maximized())
+                    ) {
+                        global.display.disconnect(createId);
+                        createId = 0;
+                        this.tile(window, rect, {
+                            openTilingPopup,
+                            skipAnim: true,
+                        });
+                    }
+                });
+
+                // Don't immediately disconnect the signal in case the launched
+                // window doesn't match the original app. It may be a loading screen
+                // or the user started an app in between etc... but in case the checks/
+                // signals above fail disconnect the signals after 1 min at the latest
+                if (this._openAppTiledTimerId) {
+                    GLib.Source.remove(this._openAppTiledTimerId);
                 }
-            });
 
-            // Don't immediately disconnect the signal in case the launched
-            // window doesn't match the original app. It may be a loading screen
-            // or the user started an app in between etc... but in case the checks/
-            // signals above fail disconnect the signals after 1 min at the latest
-            this._openAppTiledTimerId && GLib.Source.remove(this._openAppTiledTimerId);
-            this._openAppTiledTimerId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 60000, () => {
-                createId && global.display.disconnect(createId);
-                createId = 0;
-                firstFrameId && wActor.disconnect(firstFrameId);
-                firstFrameId = 0;
-                this._openAppTiledTimerId = null;
-                return GLib.SOURCE_REMOVE;
-            });
-        });
+                this._openAppTiledTimerId = GLib.timeout_add(
+                    GLib.PRIORITY_DEFAULT,
+                    60000,
+                    () => {
+                        if (createId) {
+                            global.display.disconnect(createId);
+                        }
+                        createId = 0;
+
+                        if (firstFrameId) {
+                            wActor.disconnect(firstFrameId);
+                        }
+                        firstFrameId = 0;
+
+                        this._openAppTiledTimerId = null;
+                        return GLib.SOURCE_REMOVE;
+                    },
+                );
+            },
+        );
 
         app.open_new_window(-1);
     }
@@ -1035,29 +1350,39 @@ export class TilingWindowManager {
     /**
      * Gets the top windows, which are supposed to be in a tile group. That
      * means windows, which are tiled, and don't overlap each other.
+     *
+     * @param {number?} monitor
      */
     static _getWindowsForBuildingTileGroup(monitor = null) {
         const openWindows = this.getWindows();
-        if (!openWindows.length)
+        if (!openWindows.length) {
             return [];
+        }
 
         const ignoredWindows = [];
         const result = [];
-        const mon = monitor ??
+        const mon =
+            monitor ??
             global.display.focus_window?.get_monitor() ??
             openWindows[0].get_monitor();
 
         for (const window of openWindows) {
-            if (window.get_monitor() !== mon)
+            if (window.get_monitor() !== mon) {
                 continue;
+            }
 
-            if (window.is_above() && !window.isTiled)
+            if (window.is_above() && !window.isTiled) {
                 continue;
+            }
 
             if (window.isTiled) {
                 // Window was already checked as part of another's tileGroup.
-                if (ignoredWindows.includes(window) || result.includes(window))
+                if (
+                    ignoredWindows.includes(window) ||
+                    result.includes(window)
+                ) {
                     continue;
+                }
 
                 // Check for the other windows in the tile group as well regardless
                 // of the 'raise tile group' setting so that once the setting is
@@ -1072,18 +1397,27 @@ export class TilingWindowManager {
                     continue;
                 }
 
-                const tileGroupOverlaps = tileGroup.some(w =>
-                    result.some(r => r.tiledRect.overlap(w.tiledRect)) ||
-                    ignoredWindows.some(r => (r.tiledRect ?? new Rect(r.get_frame_rect())).overlap(w.tiledRect)));
+                const tileGroupOverlaps = tileGroup.some(
+                    (w) =>
+                        result.some((r) => r.tiledRect.overlap(w.tiledRect)) ||
+                        ignoredWindows.some((r) =>
+                            (
+                                r.tiledRect ?? new Rect(r.get_frame_rect())
+                            ).overlap(w.tiledRect),
+                        ),
+                );
 
-                tileGroupOverlaps
-                    ? tileGroup.forEach(w => ignoredWindows.push(w))
-                    : tileGroup.forEach(w => result.push(w));
+                if (tileGroupOverlaps) {
+                    tileGroup.forEach((w) => ignoredWindows.push(w));
+                } else {
+                    tileGroup.forEach((w) => result.push(w));
+                }
             } else {
                 // The window is maximized, so all windows below it can't belong
                 // to this group anymore.
-                if (this.isMaximized(window))
+                if (this.isMaximized(window)) {
                     break;
+                }
 
                 ignoredWindows.push(window);
             }
@@ -1098,30 +1432,37 @@ export class TilingWindowManager {
      *
      * @param {{boolean, number}} param1
      */
-    static _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
+    static _getTopTiledWindows({skipTopWindow = false, monitor = null} = {}) {
         const openWindows = this.getWindows();
-        if (!openWindows.length)
+        if (!openWindows.length) {
             return [];
+        }
 
         if (skipTopWindow) {
             // the focused window isn't necessarily the top window due to always
             // on top windows.
             const idx = openWindows.indexOf(global.display.focus_window);
-            idx !== -1 && openWindows.splice(idx, 1);
+
+            if (idx !== -1) {
+                openWindows.splice(idx, 1);
+            }
         }
 
         const topTiledWindows = [];
         const ignoredWindows = [];
-        const mon = monitor ??
+        const mon =
+            monitor ??
             global.display.focus_window?.get_monitor() ??
             openWindows[0].get_monitor();
 
         for (const window of openWindows) {
-            if (window.get_monitor() !== mon)
+            if (window.get_monitor() !== mon) {
                 continue;
+            }
 
-            if (window.is_above() && !window.isTiled)
+            if (window.is_above() && !window.isTiled) {
                 continue;
+            }
 
             if (window.isTiled) {
                 const wRect = window.tiledRect;
@@ -1129,21 +1470,26 @@ export class TilingWindowManager {
                 // If a ignored window in a higher stack order overlaps the
                 // currently tested tiled window, the currently tested tiled
                 // window isn't part of the top tile group.
-                const overlapsIgnoredWindow = ignoredWindows.some(w => {
+                const overlapsIgnoredWindow = ignoredWindows.some((w) => {
                     const rect = w.tiledRect ?? new Rect(w.get_frame_rect());
                     return rect.overlap(wRect);
                 });
                 // Same applies for already grouped windows
-                const overlapsTopTiledWindows = topTiledWindows.some(w => w.tiledRect.overlap(wRect));
+                const overlapsTopTiledWindows = topTiledWindows.some((w) =>
+                    w.tiledRect.overlap(wRect),
+                );
 
-                overlapsIgnoredWindow || overlapsTopTiledWindows
-                    ? ignoredWindows.push(window)
-                    : topTiledWindows.push(window);
+                if (overlapsIgnoredWindow || overlapsTopTiledWindows) {
+                    ignoredWindows.push(window);
+                } else {
+                    topTiledWindows.push(window);
+                }
             } else {
                 // The window is maximized, so all windows below it can't belong
                 // to this group anymore.
-                if (this.isMaximized(window))
+                if (this.isMaximized(window)) {
                     break;
+                }
 
                 ignoredWindows.push(window);
             }
@@ -1159,10 +1505,16 @@ export class TilingWindowManager {
      */
     static _blockTilingSignalsFor(window) {
         const signals = this._signals.getSignalsFor(window.get_id());
-        const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
-        blockedSignals.forEach(s => {
+        const blockedSignals = [
+            TilingSignals.RAISE,
+            TilingSignals.WS_CHANGED,
+            TilingSignals.UNMANAGING,
+        ];
+        blockedSignals.forEach((s) => {
             const id = signals.get(s);
-            id && window.block_signal_handler(id);
+            if (id) {
+                window.block_signal_handler(id);
+            }
         });
     }
 
@@ -1174,10 +1526,17 @@ export class TilingWindowManager {
      */
     static _unblockTilingSignalsFor(window) {
         const signals = this._signals.getSignalsFor(window.get_id());
-        const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
-        blockedSignals.forEach(s => {
+        const blockedSignals = [
+            TilingSignals.RAISE,
+            TilingSignals.WS_CHANGED,
+            TilingSignals.UNMANAGING,
+        ];
+        blockedSignals.forEach((s) => {
             const id = signals.get(s);
-            id && window.unblock_signal_handler(id);
+
+            if (id) {
+                window.unblock_signal_handler(id);
+            }
         });
     }
 
@@ -1192,16 +1551,21 @@ export class TilingWindowManager {
 
         // Refresh 'unmanaging' signal
         const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
-        unmanagingSignal && window.disconnect(unmanagingSignal);
 
-        const umId = window.connect('unmanaging', w => {
+        if (unmanagingSignal) {
+            window.disconnect(unmanagingSignal);
+        }
+
+        const umId = window.connect('unmanaging', (w) => {
             this.clearTilingProps(window.get_id());
             this._unmanagingWindows.push(w.get_stable_sequence());
         });
         signals.set(TilingSignals.UNMANAGING, umId);
 
         // Refresh 'workspace-changed' signal
-        const wsId = window.connect('workspace-changed', () => this._onWindowWorkspaceChanged(window));
+        const wsId = window.connect('workspace-changed', () =>
+            this._onWindowWorkspaceChanged(window),
+        );
         this._signals.getSignalsFor(wId).set(TilingSignals.WS_CHANGED, wsId);
     }
 
@@ -1220,7 +1584,7 @@ export class TilingWindowManager {
      * @returns {Meta.Window}
      */
     static _getWindow(id) {
-        return this._getAllWindows().find(w => w.get_id() === id);
+        return this._getAllWindows().find((w) => w.get_id() === id);
     }
 
     /**
@@ -1233,7 +1597,11 @@ export class TilingWindowManager {
      */
     static _onWorkspaceAdded() {
         this._ignoreWsChange = true;
-        this._wsAddedTimer && GLib.Source.remove(this._wsAddedTimer);
+
+        if (this._wsAddedTimer) {
+            GLib.Source.remove(this._wsAddedTimer);
+        }
+
         this._wsAddedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
             this._ignoreWsChange = false;
             this._wsAddedTimer = null;
@@ -1251,12 +1619,20 @@ export class TilingWindowManager {
      */
     static _onWorkspaceRemoved() {
         this._ignoreWsChange = true;
-        this._wsRemovedTimer && GLib.Source.remove(this._wsRemovedTimer);
-        this._wsRemovedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
-            this._ignoreWsChange = false;
-            this._wsRemovedTimer = null;
-            return GLib.SOURCE_REMOVE;
-        });
+
+        if (this._wsRemovedTimer) {
+            GLib.Source.remove(this._wsRemovedTimer);
+        }
+
+        this._wsRemovedTimer = GLib.timeout_add(
+            GLib.PRIORITY_DEFAULT,
+            50,
+            () => {
+                this._ignoreWsChange = false;
+                this._wsRemovedTimer = null;
+                return GLib.SOURCE_REMOVE;
+            },
+        );
     }
 
     /**
@@ -1281,21 +1657,31 @@ export class TilingWindowManager {
         // crash, if we try to operate on it any further. So we listen to the
         // 'unmanaging'-signal to see, if there is a 'true  workspace change'
         // or whether the window was just closed
-        if (this._unmanagingWindows.includes(window.get_stable_sequence()))
+        if (this._unmanagingWindows.includes(window.get_stable_sequence())) {
             return;
+        }
 
-        if (this._ignoreWsChange)
+        if (this._ignoreWsChange) {
             return;
+        }
 
         if (this.isMaximized(window)) {
             const wA = window.get_work_area_for_monitor(window.get_monitor());
             const workArea = new Rect(wA);
-            if (workArea.equal(window.tiledRect))
+            if (workArea.equal(window.tiledRect)) {
                 return;
+            }
 
-            this.tile(window, workArea, { openTilingPopup: false, skipAnim: true });
+            this.tile(window, workArea, {
+                openTilingPopup: false,
+                skipAnim: true,
+            });
         } else if (window.isTiled) {
-            this.untile(window, { restoreFullPos: false, clampToWorkspace: true, skipAnim: Main.overview.visible });
+            this.untile(window, {
+                restoreFullPos: false,
+                clampToWorkspace: true,
+                skipAnim: Main.overview.visible,
+            });
         }
     }
 }
@@ -1307,52 +1693,61 @@ export class TilingWindowManager {
  * Ws-changed: for untiling a tiled window after its ws changed.
  * Unmanaging: to remove unmanaging tiled windows from the other tileGroups.
  */
-const TilingSignals = GObject.registerClass({
-    Signals: {
-        'window-tiled': { param_types: [Meta.Window.$gtype] },
-        'window-untiled': { param_types: [Meta.Window.$gtype] }
-    }
-}, class TilingSignals extends Clutter.Actor {
-    // Relevant 'signal types' (sorta used as an enum / key for the signal map).
-    // Tiled windows use all 3 signals; maximized-with-gaps windows only use the
-    // workspace-changed and unmanaging signal.
-    static RAISE = 'RAISE';
-    static WS_CHANGED = 'WS_CHANGED';
-    static UNMANAGING = 'UNMANAGING';
+const TilingSignals = GObject.registerClass(
+    {
+        Signals: {
+            'window-tiled': {param_types: [Meta.Window.$gtype]},
+            'window-untiled': {param_types: [Meta.Window.$gtype]},
+        },
+    },
+    class TilingSignals extends Clutter.Actor {
+        // Relevant 'signal types' (sorta used as an enum / key for the signal map).
+        // Tiled windows use all 3 signals; maximized-with-gaps windows only use the
+        // workspace-changed and unmanaging signal.
+        static RAISE = 'RAISE';
+        static WS_CHANGED = 'WS_CHANGED';
+        static UNMANAGING = 'UNMANAGING';
 
-    _init() {
-        super._init();
+        _init() {
+            super._init();
 
-        // { windowId1: { RAISE: signalId1, WS_CHANGED: signalId2, UNMANAGING: signalId3 }, ... }
-        this._ids = new Map();
-    }
-
-    destroy() {
-        // Disconnect remaining signals
-        const allWindows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
-        this._ids.forEach((signals, windowId) => {
-            const window = allWindows.find(w => w.get_id() === windowId);
-            window && signals.forEach(s => s && window.disconnect(s));
-        });
-
-        super.destroy();
-    }
-
-    /**
-     * Gets the signal ids for the raise, ws-changed and unmanaging signals
-     * for a specific window
-     *
-     * @param {number} windowId Meta.Window's id
-     * @returns {Map<string, number>} the tiling signal ids for the window (id)
-     *      with a 'signal type' as the keys
-     */
-    getSignalsFor(windowId) {
-        let ret = this._ids.get(windowId);
-        if (!ret) {
-            ret = new Map();
-            this._ids.set(windowId, ret);
+            // { windowId1: { RAISE: signalId1, WS_CHANGED: signalId2, UNMANAGING: signalId3 }, ... }
+            this._ids = new Map();
         }
 
-        return ret;
-    }
-});
+        destroy() {
+            // Disconnect remaining signals
+            const allWindows = global.display.get_tab_list(
+                Meta.TabList.NORMAL_ALL,
+                null,
+            );
+            this._ids.forEach((signals, windowId) => {
+                const window = allWindows.find((w) => w.get_id() === windowId);
+
+                if (window) {
+                    signals.forEach((s) => s && window.disconnect(s));
+                }
+            });
+
+            super.destroy();
+        }
+
+        /**
+         * Gets the signal ids for the raise, ws-changed and unmanaging signals
+         * for a specific window
+         *
+         * @param {number} windowId Meta.Window's id
+         * @returns {Map<string, number>} the tiling signal ids for the window (id)
+         *      with a 'signal type' as the keys
+         */
+        getSignalsFor(windowId) {
+            let ret = this._ids.get(windowId);
+            if (!ret) {
+                ret = new Map();
+                this._ids.set(windowId, ret);
+            }
+
+            return ret;
+        }
+    },
+);

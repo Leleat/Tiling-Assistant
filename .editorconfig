@@ -1,0 +1,26 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+
+indent_style = space
+trim_trailing_whitespace = true
+
+[*.js]
+indent_size = 4
+
+[*.[ch]]
+indent_size = 2
+
+[*.gresource.xml]
+indent_size = 2
+
+[*.ui]
+indent_size = 2
+
+[*.{yml,yaml}]
+indent_size = 2
+
+[meson.build]
+indent_size = 2
