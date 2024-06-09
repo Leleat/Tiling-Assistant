@@ -2,14 +2,14 @@
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
 # Andrea Brandi <git@andreabrandi.com>, 2022.
-# Albano Battistella <albano_battistella@hotmail.com>, 2023.
+# Albano Battistella <albano_battistella@gmail.com>, 2023,2024.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Tiling-Assistant\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-04-21 14:58+0200\n"
-"PO-Revision-Date: 2023-11-26 17:11+0100\n"
+"PO-Revision-Date: 2024-06-08 19:11+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -291,7 +291,7 @@ msgstr "Modalità di movimento della finestra predefinita"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:400
 msgid "The movement mode that is activated when no modifier key is pressed"
-msgstr ""
+msgstr "La modalità di movimento che viene attivata quando non viene premuto alcun tasto modificatore"
 
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:407
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
