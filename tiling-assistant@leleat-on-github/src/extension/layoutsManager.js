@@ -520,7 +520,7 @@ const PanelIndicator = GObject.registerClass({
 
         this.menu.addMenuItem(new PopupMenu.PopupSeparatorMenuItem());
 
-        const settingsButton = new PopupMenu.PopupImageMenuItem('Preferences', 'emblem-system-symbolic');
+        const settingsButton = new PopupMenu.PopupImageMenuItem(_('Preferences'), 'emblem-system-symbolic');
         // Center button without changing the size (for the hover highlight)
         settingsButton._icon.set_x_expand(true);
         settingsButton.label.set_x_expand(true);
