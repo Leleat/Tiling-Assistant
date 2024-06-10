@@ -170,9 +170,8 @@ export default class TilingAssistantExtension extends Extension {
         try {
             parent.make_directory_with_parents(null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+            if (e.code !== Gio.IOErrorEnum.EXISTS)
                 throw e;
-            }
         }
 
         const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore.json']);
@@ -181,9 +180,8 @@ export default class TilingAssistantExtension extends Extension {
         try {
             file.create(Gio.FileCreateFlags.NONE, null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+            if (e.code !== Gio.IOErrorEnum.EXISTS)
                 throw e;
-            }
         }
 
         file.replace_contents(JSON.stringify(saveObj), null, false,
@@ -209,9 +207,8 @@ export default class TilingAssistantExtension extends Extension {
         try {
             file.create(Gio.FileCreateFlags.NONE, null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+            if (e.code !== Gio.IOErrorEnum.EXISTS)
                 throw e;
-            }
         }
 
         const [success, contents] = file.load_contents(null);

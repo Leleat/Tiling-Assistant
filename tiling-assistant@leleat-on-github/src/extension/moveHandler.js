@@ -164,7 +164,7 @@ class MoveHandler {
             // as often when compared to the position-changed signal.
             if (Settings.getLowPerformanceMoveMode()) {
                 this._movingTimerId = GLib.timeout_add(
-                    GLib.PRIORITY_IDLE,
+                    GLib.PRIORITY_DEFAULT_IDLE,
                     this._movingTimerDuration,
                     this._onMoving.bind(
                         this,
@@ -328,7 +328,7 @@ class MoveHandler {
         const useIgnoreTa = defaultMode !== MoveModes.IGNORE_TA && pressed[ignoreTAMod] ||
             noMod && defaultMode === MoveModes.IGNORE_TA;
 
-        let newMode = '';
+        let newMode;
 
         if (useAdaptiveTiling)
             newMode = MoveModes.ADAPTIVE_TILING;

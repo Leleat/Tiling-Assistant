@@ -20,7 +20,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
     }
 }, class TilingSwitcherPopup extends AltTab.TilingAppSwitcherPopup {
     /**
-     * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
+     * @param {Meta.Window[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
      * @param {Mtk.Rectangle} freeScreenRect the Rect, which the popup will tile a window
      *      to. The popup will be centered in this rect.

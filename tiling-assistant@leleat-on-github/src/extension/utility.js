@@ -174,7 +174,7 @@ export function getFavoriteLayout(monitorNr = null) {
 /**
  * Shows the tiled rects of the top tile group.
  *
- * @returns {St.Widget[]} an array of St.Widgets to indicate the tiled rects.
+ * @returns {Promise<St.Widget[]>} an array of St.Widgets to indicate the tiled rects.
  */
 export async function debugShowTiledRects() {
     const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
@@ -204,7 +204,7 @@ export async function debugShowTiledRects() {
 /**
  * Shows the free screen rects based on the top tile group.
  *
- * @returns {St.Widget[]} an array of St.Widgets to indicate the free
+ * @returns {Promise<St.Widget[]>} an array of St.Widgets to indicate the free
  *      screen rects.
  */
 export async function debugShowFreeScreenRects() {
