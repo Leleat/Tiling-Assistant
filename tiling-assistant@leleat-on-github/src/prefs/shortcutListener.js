@@ -1,4 +1,5 @@
 import { Adw, Gdk, GObject, Gtk } from '../dependencies/prefs/gi.js';
+import { _ } from '../dependencies/prefs.js';
 
 /**
  * A Widget to implement the shortcuts in the preference window.
@@ -98,7 +99,7 @@ export const ShortcutListener = GObject.registerClass({
             return l ? `${label} / ${l}` : label;
         }, '');
 
-        return kbLabel || 'Disabled';
+        return kbLabel || _('Disabled');
     }
 
     _onActivated() {

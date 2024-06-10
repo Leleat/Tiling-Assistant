@@ -11,7 +11,7 @@
     <property name="tooltip-text" translatable="yes">Replace the keyboard shortcuts. Press 'space' or 'return' when listening for a shortcut to append a new one to the existing shortcuts instead.</property>
     <child>
       <object class="GtkLabel" id="keybindingLabel">
-        <property name="label">Disabled</property>
+        <property name="label" translatable="yes">Disabled</property>
       </object>
     </child>
     <child>
