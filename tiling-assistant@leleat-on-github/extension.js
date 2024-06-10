@@ -60,6 +60,7 @@ export default class TilingAssistantExtension extends Extension {
 
         // injections/overrides
         injectMtkRectangle();
+        overrideTopPanelDrag();
 
         const twmModule = await import('./src/extension/tilingWindowManager.js');
 
@@ -133,24 +134,6 @@ export default class TilingAssistantExtension extends Extension {
             );
         }
 
-        // Include tiled windows when dragging from the top panel.
-        this._getDraggableWindowForPosition = Main.panel._getDraggableWindowForPosition;
-        Main.panel._getDraggableWindowForPosition = function (stageX) {
-            const workspaceManager = global.workspace_manager;
-            const windows = workspaceManager.get_active_workspace().list_windows();
-            const allWindowsByStacking = global.display.sort_windows_by_stacking(windows).reverse();
-
-            return allWindowsByStacking.find(w => {
-                const rect = w.get_frame_rect();
-                const workArea = w.get_work_area_current_monitor();
-                return w.is_on_primary_monitor() &&
-                        w.showing_on_its_workspace() &&
-                        w.get_window_type() !== Meta.WindowType.DESKTOP &&
-                        (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
-                        stageX > rect.x && stageX < rect.x + rect.width;
-            });
-        };
-
         // Restore tiled window properties after session was unlocked.
         this._loadAfterSessionLock();
 
@@ -184,10 +167,6 @@ export default class TilingAssistantExtension extends Extension {
         disableInjections();
         disableSettings();
         disableTimeouts();
-
-        // Restore old functions.
-        Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
-        this._getDraggableWindowForPosition = null;
 
         // Delete custom tiling properties.
         const openWindows = global.display.get_tab_list(Meta.TabList.NORMAL, null);
@@ -693,6 +672,29 @@ function injectMtkRectangle() {
                 }
 
                 return intersections;
+            });
+        };
+    });
+}
+
+function overrideTopPanelDrag() {
+    Injections.overrideMethod(Main.panel, '_getDraggableWindowForPosition', () => {
+        return function (stageX) {
+            const workspaceManager = global.workspace_manager;
+            const windows = workspaceManager.get_active_workspace()
+                .list_windows();
+            const allWindowsByStacking = global.display
+                .sort_windows_by_stacking(windows)
+                .reverse();
+
+            return allWindowsByStacking.find(w => {
+                const rect = w.get_frame_rect();
+                const workArea = w.get_work_area_current_monitor();
+                return w.is_on_primary_monitor() &&
+                        w.showing_on_its_workspace() &&
+                        w.get_window_type() !== Meta.WindowType.DESKTOP &&
+                        (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
+                        stageX > rect.x && stageX < rect.x + rect.width;
             });
         };
     });
