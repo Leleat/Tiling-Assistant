@@ -163,7 +163,7 @@ export const ShortcutListener = GObject.registerClass({
      * @returns {boolean} `true` if the key combo is a valid binding.
      */
     _isBindingValid({ mask, keycode, keyval }) {
-        if ((mask === 0 || mask === Gdk.SHIFT_MASK) && keycode !== 0) {
+        if ((mask === 0 || mask === Gdk.ModifierType.SHIFT_MASK) && keycode !== 0) {
             if (
                 (keyval >= Gdk.KEY_a && keyval <= Gdk.KEY_z) ||
                 (keyval >= Gdk.KEY_A && keyval <= Gdk.KEY_Z) ||

@@ -2,7 +2,7 @@ import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { Main, SwitcherPopup } from '../dependencies/shell.js';
 
 import { Direction, Orientation } from '../common.js';
-import { Util } from './utility.js';
+import { isDirection, isModPressed } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import * as AltTab from './altTab.js';
 
@@ -20,9 +20,9 @@ export const TilingSwitcherPopup = GObject.registerClass({
     }
 }, class TilingSwitcherPopup extends AltTab.TilingAppSwitcherPopup {
     /**
-     * @param {Meta.Windows[]} openWindows an array of Meta.Windows, which this
+     * @param {Meta.Window[]} openWindows an array of Meta.Windows, which this
      *      popup offers to tile.
-     * @param {Rect} freeScreenRect the Rect, which the popup will tile a window
+     * @param {Mtk.Rectangle} freeScreenRect the Rect, which the popup will tile a window
      *      to. The popup will be centered in this rect.
      * @param {boolean} allowConsecutivePopup allow the popup to create another
      *      Tiling Popup, if there is still unambiguous free screen space after
@@ -217,10 +217,10 @@ export const TilingSwitcherPopup = GObject.registerClass({
     }
 
     _keyPressHandler(keysym) {
-        const moveUp = Util.isDirection(keysym, Direction.N);
-        const moveDown = Util.isDirection(keysym, Direction.S);
-        const moveLeft = Util.isDirection(keysym, Direction.W);
-        const moveRight = Util.isDirection(keysym, Direction.E);
+        const moveUp = isDirection(keysym, Direction.N);
+        const moveDown = isDirection(keysym, Direction.S);
+        const moveLeft = isDirection(keysym, Direction.W);
+        const moveRight = isDirection(keysym, Direction.E);
 
         if (this._thumbnailsFocused) {
             if (moveLeft)
@@ -278,15 +278,15 @@ export const TilingSwitcherPopup = GObject.registerClass({
         // If isShiftPressed, then put the window at the top / left side;
         // if isAltPressed, then put it at the bottom / right side.
         // The orientation depends on the available screen space.
-        const isShiftPressed = Util.isModPressed(Clutter.ModifierType.SHIFT_MASK);
-        const isAltPressed = Util.isModPressed(Clutter.ModifierType.MOD1_MASK);
+        const isShiftPressed = isModPressed(Clutter.ModifierType.SHIFT_MASK);
+        const isAltPressed = isModPressed(Clutter.ModifierType.MOD1_MASK);
         if (isShiftPressed || isAltPressed) {
             // Prefer vertical a bit more (because screens are usually horizontal)
             const vertical = rect.width >= rect.height * 1.25;
             const size = vertical ? 'width' : 'height';
             const orientation = vertical ? Orientation.V : Orientation.H;
             const idx = isShiftPressed ? 0 : 1;
-            rect = rect.getUnitAt(idx, rect[size] / 2, orientation);
+            rect = rect.get_unit_at(idx, rect[size] / 2, orientation);
         }
 
         this.tiledWindow = window;

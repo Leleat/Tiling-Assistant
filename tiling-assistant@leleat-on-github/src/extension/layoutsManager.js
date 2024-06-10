@@ -1,4 +1,4 @@
-import { Clutter, Gio, GObject, Meta, Shell, St } from '../dependencies/gi.js';
+import { Clutter, Gio, GObject, Mtk, Shell, St } from '../dependencies/gi.js';
 import {
     _,
     Extension,
@@ -7,9 +7,22 @@ import {
     PopupMenu
 } from '../dependencies/shell.js';
 
-import { Layout, Settings } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Layout } from '../common.js';
+import { getLayouts } from './utility.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+
+/** @type {LayoutsManager} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new LayoutsManager();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
 
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
@@ -28,8 +41,7 @@ import { TilingWindowManager as Twm } from './tilingWindowManager.js';
  * PopupLayouts. That layout will then be used as an fixed alternative mode to
  * the Edge Tiling.
  */
-
-export default class TilingLayoutsManager {
+class LayoutsManager {
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios
@@ -51,45 +63,39 @@ export default class TilingLayoutsManager {
         this._tiledWithLoop = [];
         this._remainingWindows = [];
 
-        // Bind the keyboard shortcuts for each layout and the layout searchers
-        this._keyBindings = [];
-
         for (let i = 0; i < 20; i++) {
-            this._keyBindings.push(`activate-layout${i}`);
-            Main.wm.addKeybinding(
-                `activate-layout${i}`,
-                Settings.getGioObject(),
-                Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                Shell.ActionMode.NORMAL,
-                this.startLayouting.bind(this, i)
-            );
+            Settings.registerShortcut({
+                key: `activate-layout${i}`,
+                handler: this.startLayouting.bind(this, i)
+            });
         }
 
-        this._keyBindings.push('search-popup-layout');
-        Main.wm.addKeybinding(
-            'search-popup-layout',
-            Settings.getGioObject(),
-            Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-            Shell.ActionMode.NORMAL,
-            this.openPopupSearch.bind(this)
-        );
+        Settings.registerShortcut({
+            key: 'search-popup-layout',
+            handler: this.openPopupSearch.bind(this)
+        });
 
         // Add panel indicator
         this._panelIndicator = new PanelIndicator();
-        Main.panel.addToStatusArea(
-            'tiling-assistant@leleat-on-github',
-            this._panelIndicator);
-        this._settingsId = Settings.changed('show-layout-panel-indicator', () => {
-            this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
-        });
-        this._panelIndicator.visible = Settings.getBoolean('show-layout-panel-indicator');
+        Main.panel.addToStatusArea('tiling-assistant@leleat-on-github', this._panelIndicator);
+
+        Settings.watch(
+            'show-layout-panel-indicator',
+            () => {
+                this._panelIndicator.visible = Settings.getShowLayoutIndicator();
+            },
+            {
+                tracker: this,
+                immediate: true
+            }
+        );
+
         this._panelIndicator.connect('layout-activated', (src, idx) => this.startLayouting(idx));
     }
 
     destroy() {
-        Settings.disconnect(this._settingsId);
+        Settings.unwatch(this);
         this._finishLayouting();
-        this._keyBindings.forEach(key => Main.wm.removeKeybinding(key));
         this._panelIndicator.destroy();
         this._panelIndicator = null;
     }
@@ -99,7 +105,7 @@ export default class TilingLayoutsManager {
      * instead of the keyboard shortcut.
      */
     openPopupSearch() {
-        const layouts = Util.getLayouts();
+        const layouts = getLayouts();
         if (!layouts.length) {
             // Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
             Main.notify('Tiling Assistant', _('No valid layouts defined.'));
@@ -116,11 +122,11 @@ export default class TilingLayoutsManager {
      * @param {number} index the index of the layout we start tiling to.
      */
     startLayouting(index) {
-        const layout = Util.getLayouts()?.[index];
+        const layout = getLayouts()?.[index];
         if (!layout)
             return;
 
-        const allWs = Settings.getBoolean('tiling-popup-all-workspace');
+        const allWs = Settings.getTilingPopupAllWorkspaces();
         this._remainingWindows = Twm.getWindows(allWs);
         this._items = new Layout(layout).getItems();
         this._currItem = null;
@@ -170,20 +176,20 @@ export default class TilingLayoutsManager {
             // Scale the item's rect to the workArea
             const activeWs = global.workspace_manager.get_active_workspace();
             const monitor = global.display.get_current_monitor();
-            const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
+            const workArea = activeWs.get_work_area_for_monitor(monitor);
             const rectRatios = this._currItem.rect;
-            this._currRect = new Rect(
-                workArea.x + Math.floor(rectRatios.x * workArea.width),
-                workArea.y + Math.floor(rectRatios.y * workArea.height),
-                Math.ceil(rectRatios.width * workArea.width),
-                Math.ceil(rectRatios.height * workArea.height)
-            );
+            this._currRect = new Mtk.Rectangle({
+                x: workArea.x + Math.floor(rectRatios.x * workArea.width),
+                y: workArea.y + Math.floor(rectRatios.y * workArea.height),
+                width: Math.ceil(rectRatios.width * workArea.width),
+                height: Math.ceil(rectRatios.height * workArea.height)
+            });
 
             // Try to compensate possible rounding errors when scaling up the
             // rect by aligning it with the rects, which were already tiled
             // using this layout and the workArea.
-            this._tiledWithLayout.forEach(w => this._currRect.tryAlignWith(w.tiledRect));
-            this._currRect.tryAlignWith(workArea);
+            this._tiledWithLayout.forEach(w => this._currRect.try_align_with(w.tiledRect));
+            this._currRect.try_align_with(workArea);
         }
 
         const appId = this._currItem.appId;
@@ -490,7 +496,7 @@ const PanelIndicator = GObject.registerClass({
     _updateItems() {
         this.menu.removeAll();
 
-        const layouts = Util.getLayouts();
+        const layouts = getLayouts();
         if (!layouts.length) {
             // Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
             const item = new PopupMenu.PopupMenuItem(_('No valid layouts defined.'));
@@ -498,12 +504,12 @@ const PanelIndicator = GObject.registerClass({
             this.menu.addMenuItem(item);
         } else {
             // Update favorites with monitor count and fill with '-1', if necessary
-            const tmp = Settings.getStrv('favorite-layouts');
+            const tmp = Settings.getFavoriteLayouts();
             const count = Math.max(Main.layoutManager.monitors.length, tmp.length);
             const favorites = [...new Array(count)].map((m, monitorIndex) => {
                 return tmp[monitorIndex] ?? '-1';
             });
-            Settings.setStrv('favorite-layouts', favorites);
+            Settings.setFavoriteLayouts(favorites);
 
             // Create popup menu items
             layouts.forEach((layout, idx) => {
@@ -544,7 +550,7 @@ const PopupFavoriteMenuItem = GObject.registerClass({
             x_expand: true
         }));
 
-        const favorites = Settings.getStrv('favorite-layouts');
+        const favorites = Settings.getFavoriteLayouts();
         Main.layoutManager.monitors.forEach((m, monitorIndex) => {
             const favoriteButton = new St.Button({
                 child: new St.Icon({
@@ -556,11 +562,13 @@ const PopupFavoriteMenuItem = GObject.registerClass({
 
             // Update gSetting with new Favorite (act as a toggle button)
             favoriteButton.connect('clicked', () => {
-                const currFavorites = Settings.getStrv('favorite-layouts');
+                const currFavorites = Settings.getFavoriteLayouts();
                 currFavorites[monitorIndex] = currFavorites[monitorIndex] === `${layoutIndex}` ? '-1' : `${layoutIndex}`;
-                Settings.setStrv('favorite-layouts', currFavorites);
+                Settings.setFavoriteLayouts(currFavorites);
                 this.emit('favorite-changed', monitorIndex);
             });
         });
     }
 });
+
+export { disable, enable };

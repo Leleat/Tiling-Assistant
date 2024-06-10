@@ -1,18 +1,19 @@
 import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
-import { Direction, Orientation, Settings } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Direction, Orientation } from '../common.js';
+import { getDirection } from './utility.js';
+import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const SCALE_SIZE = 100;
-const Modes = {
+const Modes = Object.freeze({
     DEFAULT: 1,
     SWAP: 2,
     RESIZE: 4,
     MOVE: 8,
     CLOSE: 16
-};
+});
 
 /**
  * Classes for the 'Tile Editing Mode'. A mode to manage your tiled windows
@@ -186,7 +187,7 @@ class TileEditingMode extends St.Widget {
 const Indicator = GObject.registerClass(class TileEditingModeIndicator extends St.Widget {
     /**
      * @param {string} widgetParams
-     * @param {Rect} rect the final rect / pos of the indicator
+     * @param {Mtk.Rectangle} rect the final rect / pos of the indicator
      * @param {number} monitor
      */
     _init(rect, monitor, widgetParams = {}) {
@@ -208,16 +209,16 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
     /**
      * Animate the indicator to a specific position.
      *
-     * @param {Rect} rect the position the indicator will animate to.
+     * @param {Mtk.Rectangle} rect the position the indicator will animate to.
      * @param {Meta.Window|null} window the window at `rect`'s position.
      */
     focus(rect, window = null) {
         const display = global.display.get_monitor_geometry(this._monitor);
         const activeWs = global.workspace_manager.get_active_workspace();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(this._monitor));
+        const workArea = activeWs.get_work_area_for_monitor(this._monitor);
 
         // Adjusted for window / screen gaps
-        const { x, y, width, height } = rect.addGaps(workArea);
+        const { x, y, width, height } = rect.add_gaps(workArea);
 
         this.ease({
             x: x - display.x,
@@ -260,7 +261,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
         const keyVal = keyEvent.get_key_symbol();
 
         // [Directions] to move focus with WASD, hjkl or arrow keys
-        const dir = Util.getDirection(keyVal);
+        const dir = getDirection(keyVal);
         if (dir) {
             this._focusInDir(dir);
 
@@ -295,10 +296,10 @@ const DefaultKeyHandler = class DefaultKeyHandler {
 
             const tiledRects = this._windows.map(w => w.tiledRect);
             const fullRect = Twm.getBestFreeRect(tiledRects, { currRect: window.tiledRect });
-            const topHalf = fullRect.getUnitAt(0, fullRect.height / 2, Orientation.H);
-            const rightHalf = fullRect.getUnitAt(1, fullRect.width / 2, Orientation.V);
-            const bottomHalf = fullRect.getUnitAt(1, fullRect.height / 2, Orientation.H);
-            const leftHalf = fullRect.getUnitAt(0, fullRect.width / 2, Orientation.V);
+            const topHalf = fullRect.get_unit_at(0, fullRect.height / 2, Orientation.H);
+            const rightHalf = fullRect.get_unit_at(1, fullRect.width / 2, Orientation.V);
+            const bottomHalf = fullRect.get_unit_at(1, fullRect.height / 2, Orientation.H);
+            const leftHalf = fullRect.get_unit_at(0, fullRect.width / 2, Orientation.V);
             const rects = [topHalf, rightHalf, bottomHalf, leftHalf];
             const currIdx = rects.findIndex(r => r.equal(window.tiledRect));
             const newIndex = (currIdx + 1) % 4;
@@ -345,7 +346,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
 
         // [Space] to activate the Tiling Popup
         } else if (keyVal === Clutter.KEY_space) {
-            const allWs = Settings.getBoolean('tiling-popup-all-workspace');
+            const allWs = Settings.getTilingPopupAllWorkspaces();
             const openWindows = Twm.getWindows(allWs).filter(w => !this._windows.includes(w));
             const TilingPopup = await import('./tilingPopup.js');
             const tilingPopup = new TilingPopup.TilingSwitcherPopup(
@@ -395,10 +396,10 @@ const DefaultKeyHandler = class DefaultKeyHandler {
      */
     _focusInDir(dir) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const workArea = new Rect(activeWs.get_work_area_for_monitor(this._tileEditor.monitor));
+        const workArea = activeWs.get_work_area_for_monitor(this._tileEditor.monitor);
         const tiledRects = this._windows.map(w => w.tiledRect);
         const screenRects = tiledRects.concat(workArea.minus(tiledRects));
-        const nearestRect = this._selectIndicator.rect.getNeighbor(dir, screenRects);
+        const nearestRect = this._selectIndicator.rect.get_neighbor(dir, screenRects);
         if (!nearestRect)
             return;
 
@@ -440,7 +441,7 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
     }
 
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
 
         // [Directions] to choose a window to swap with WASD, hjkl or arrow keys
         if (direction)
@@ -488,7 +489,7 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
  */
 const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
         const moveWorkspace = keyEvent.get_state() & Clutter.ModifierType.MOD1_MASK;
 
         // [Directions] to move the tile group
@@ -564,7 +565,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
 
     handleKeyPress(keyEvent) {
         // [Directions] to resize with WASD, hjkl or arrow keys
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
         if (direction) {
             const window = this._selectIndicator.window;
             if (!window)
@@ -619,7 +620,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         // Rect, which is being resized by the user. But it still has
         // its original / pre-resize dimensions
         const resizedRect = window.tiledRect;
-        const workArea = new Rect(window.get_work_area_current_monitor());
+        const workArea = window.get_work_area_current_monitor();
         let resizeAmount = 50;
 
         // Limit resizeAmount to the workArea

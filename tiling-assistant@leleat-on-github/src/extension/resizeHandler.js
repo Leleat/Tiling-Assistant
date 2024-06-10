@@ -1,16 +1,33 @@
-import { Clutter, Meta } from '../dependencies/gi.js';
+import { Clutter, Meta, Mtk } from '../dependencies/gi.js';
 
 import { Orientation } from '../common.js';
-import { Rect, Util } from './utility.js';
+import {
+    equal,
+    getScaledGap,
+    isModPressed,
+    useIndividualGaps
+} from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
-const Side = {
+const Side = Object.freeze({
     NONE: 0,
     SAME_H: 1,
     OPPOSING_H: 2,
     SAME_V: 4,
     OPPOSING_V: 8
-};
+});
+
+/** @type {ResizeHandler} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new ResizeHandler();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
 
 /**
  * This class gets to handle the resize events of windows (whether they are
@@ -19,7 +36,7 @@ const Side = {
  * resizing is split into its [H]orizontal and [V]ertical components.
  */
 
-export default class TilingResizeHandler {
+class ResizeHandler {
     constructor() {
         const isResizing = grabOp => {
             switch (grabOp) {
@@ -79,7 +96,7 @@ export default class TilingResizeHandler {
         const margin = 5;
         let topTileGroup = Twm.getTopTileGroup();
         topTileGroup.forEach(w => {
-            this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
+            this._preGrabRects.set(w, w.get_frame_rect());
 
             if (w !== window)
                 // There is no snapping for tiled windows, if the user set a window
@@ -87,7 +104,7 @@ export default class TilingResizeHandler {
                 // to manually resize them to be edge to edge. In that case, assume
                 // that windows that are within a certain margin distance to each
                 // other are meant to align and resize them together.
-                w.tiledRect.tryAlignWith(window.tiledRect, margin);
+                w.tiledRect.try_align_with(window.tiledRect, margin);
         });
 
         // Windows can be part of multiple tile groups. We however only resize
@@ -127,7 +144,7 @@ export default class TilingResizeHandler {
 
         // Holding Ctrl allows resizing windows which only directly (or transitively)
         // border the window being actively resized (instead of the entire tileGroup)
-        const isCtrlPressed = Util.isModPressed(Clutter.ModifierType.CONTROL_MASK);
+        const isCtrlPressed = isModPressed(Clutter.ModifierType.CONTROL_MASK);
         const singleEdgeResizeOp = [
             Meta.GrabOp.RESIZING_N,
             Meta.GrabOp.RESIZING_S,
@@ -143,8 +160,8 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y, otherRect.y, margin),
-                        Util.equal(grabbedRect.y, otherRect.y2, margin),
+                        equal(grabbedRect.y, otherRect.y, margin),
+                        equal(grabbedRect.y, otherRect.y2, margin),
                         false,
                         false
                     );
@@ -162,8 +179,8 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y2, otherRect.y2, margin),
-                        Util.equal(grabbedRect.y2, otherRect.y, margin),
+                        equal(grabbedRect.y2, otherRect.y2, margin),
+                        equal(grabbedRect.y2, otherRect.y, margin),
                         false,
                         false
                     );
@@ -183,8 +200,8 @@ export default class TilingResizeHandler {
                     const resizeOp = ResizeOp.createResizeOp(
                         false,
                         false,
-                        Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        equal(grabbedRect.x2, otherRect.x2, margin),
+                        equal(grabbedRect.x2, otherRect.x, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -202,8 +219,8 @@ export default class TilingResizeHandler {
                     const resizeOp = ResizeOp.createResizeOp(
                         false,
                         false,
-                        Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        equal(grabbedRect.x, otherRect.x, margin),
+                        equal(grabbedRect.x, otherRect.x2, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -220,10 +237,10 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y, otherRect.y, margin),
-                        Util.equal(grabbedRect.y, otherRect.y2, margin),
-                        Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        equal(grabbedRect.y, otherRect.y, margin),
+                        equal(grabbedRect.y, otherRect.y2, margin),
+                        equal(grabbedRect.x, otherRect.x, margin),
+                        equal(grabbedRect.x, otherRect.x2, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -239,10 +256,10 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y, otherRect.y, margin),
-                        Util.equal(grabbedRect.y, otherRect.y2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        equal(grabbedRect.y, otherRect.y, margin),
+                        equal(grabbedRect.y, otherRect.y2, margin),
+                        equal(grabbedRect.x2, otherRect.x2, margin),
+                        equal(grabbedRect.x2, otherRect.x, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -258,10 +275,10 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y2, otherRect.y2, margin),
-                        Util.equal(grabbedRect.y2, otherRect.y, margin),
-                        Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        equal(grabbedRect.y2, otherRect.y2, margin),
+                        equal(grabbedRect.y2, otherRect.y, margin),
+                        equal(grabbedRect.x, otherRect.x, margin),
+                        equal(grabbedRect.x, otherRect.x2, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -277,10 +294,10 @@ export default class TilingResizeHandler {
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
                     const resizeOp = ResizeOp.createResizeOp(
-                        Util.equal(grabbedRect.y2, otherRect.y2, margin),
-                        Util.equal(grabbedRect.y2, otherRect.y, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        equal(grabbedRect.y2, otherRect.y2, margin),
+                        equal(grabbedRect.y2, otherRect.y, margin),
+                        equal(grabbedRect.x2, otherRect.x2, margin),
+                        equal(grabbedRect.x2, otherRect.x, margin)
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -301,20 +318,20 @@ export default class TilingResizeHandler {
             return;
 
         const monitor = window.get_monitor();
-        const screenTopGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap('screen-top-gap', monitor)
-            : Util.getScaledGap('single-screen-gap', monitor);
-        const screenLeftGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap('screen-left-gap', monitor)
-            : Util.getScaledGap('single-screen-gap', monitor);
-        const windowGap = Util.getScaledGap('window-gap', monitor);
+        const screenTopGap = useIndividualGaps(monitor)
+            ? getScaledGap('screen-top-gap', monitor)
+            : getScaledGap('single-screen-gap', monitor);
+        const screenLeftGap = useIndividualGaps(monitor)
+            ? getScaledGap('screen-left-gap', monitor)
+            : getScaledGap('single-screen-gap', monitor);
+        const windowGap = getScaledGap('window-gap', monitor);
         const workArea = window.get_work_area_for_monitor(monitor);
 
         // First calculate the new tiledRect for window:
         // The new x / y coord for the window's tiledRect can be calculated by
         // a simple difference because resizing on the E / S side won't change
         // x / y and resizing on the N or W side will translate into a 1:1 shift
-        const grabbedsNewRect = new Rect(window.get_frame_rect());
+        const grabbedsNewRect = window.get_frame_rect();
         const grabbedsOldRect = this._preGrabRects.get(window);
 
         const isResizingW = (grabOp & Meta.GrabOp.RESIZING_W) > 1;
@@ -345,12 +362,12 @@ export default class TilingResizeHandler {
             : window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
-        window.tiledRect = new Rect(
-            newGrabbedTiledRectX,
-            newGrabbedTiledRectY,
-            newGrabbedTiledRectWidth,
-            newGrabbedTiledRectHeight
-        );
+        window.tiledRect = new Mtk.Rectangle({
+            x: newGrabbedTiledRectX,
+            y: newGrabbedTiledRectY,
+            width: newGrabbedTiledRectWidth,
+            height: newGrabbedTiledRectHeight
+        });
 
         // Now calculate the new tiledRects for the windows, which were resized
         // along the window based on the diff of the window's tiledRect pre
@@ -413,10 +430,10 @@ export default class TilingResizeHandler {
         if (!resizeOnSameSide && !resizeOnOpposingSide)
             return null;
 
-        const resizedRect = new Rect(resizedWindow.get_frame_rect());
-        const wRect = new Rect(window.get_frame_rect());
+        const resizedRect = resizedWindow.get_frame_rect();
+        const wRect = window.get_frame_rect();
         const preGrabRect = this._preGrabRects.get(window);
-        const windowGap = Util.getScaledGap('window-gap', window.get_monitor());
+        const windowGap = getScaledGap('window-gap', window.get_monitor());
 
         switch (grabOp) {
             case Meta.GrabOp.RESIZING_N:
@@ -464,7 +481,7 @@ export default class TilingResizeHandler {
         // Checks if the w1 and w2 border each other at a certain edge.
         const borders = (w1, w2, w1IsAfterW2) => {
             const [start, end] = orientation === Orientation.H ? ['x', 'x2'] : ['y', 'y2'];
-            const overlap = orientation === Orientation.H ? 'vertOverlap' : 'horizOverlap';
+            const overlap = orientation === Orientation.H ? 'vert_overlap' : 'horiz_overlap';
             if (w1IsAfterW2) {
                 return w1.tiledRect[start] === w2.tiledRect[end] &&
                         w1.tiledRect[overlap](w2.tiledRect);
@@ -557,3 +574,5 @@ const ResizeOp = class ResizeOp {
         return resizeSide ? new ResizeOp(resizeSide) : null;
     }
 };
+
+export { disable, enable };
