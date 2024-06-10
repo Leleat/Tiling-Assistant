@@ -20,22 +20,45 @@ import { Gio, GLib, Meta, Mtk } from './src/dependencies/gi.js';
 import { Extension, Main } from './src/dependencies/shell.js';
 
 import { Direction, Orientation } from './src/common.js';
-import MoveHandler from './src/extension/moveHandler.js';
-import ResizeHandler from './src/extension/resizeHandler.js';
-import KeybindingHandler from './src/extension/keybindingHandler.js';
-import LayoutsManager from './src/extension/layoutsManager.js';
-import ActiveWindowHint from './src/extension/activeWindowHint.js';
-import AltTabOverride from './src/extension/altTab.js';
+import {
+    disable as disableActiveWindowHint,
+    enable as enableActiveWindowHint
+} from './src/extension/activeWindowHint.js';
+import {
+    disable as disableAltTabOverride,
+    enable as enableAltTabOverride
+} from './src/extension/altTab.js';
 import {
     disable as disableInjections,
     enable as enableInjections,
     Injections
 } from './src/extension/injections.js';
 import {
+    disable as disableKeybindingHandler,
+    enable as enableKeybindingHandler
+} from './src/extension/keybindingHandler.js';
+import {
+    disable as disableLayoutsManager,
+    enable as enableLayoutsManager
+} from './src/extension/layoutsManager.js';
+import {
+    disable as disableMoveHandler,
+    enable as enableMoveHandler
+} from './src/extension/moveHandler.js';
+import {
+    disable as disableResizeHandler,
+    enable as enableResizeHandler
+} from './src/extension/resizeHandler.js';
+import {
     disable as disableSettings,
     enable as enableSettings,
     Settings
 } from './src/extension/settings.js';
+import {
+    disable as disableTilingWindowManager,
+    enable as enableTilingWindowManager,
+    TilingWindowManager as Twm
+} from './src/extension/tilingWindowManager.js';
 import {
     disable as disableTimeouts,
     enable as enableTimeouts
@@ -52,7 +75,7 @@ import { getScaledGap, useIndividualGaps } from './src/extension/utility.js';
  */
 
 export default class TilingAssistantExtension extends Extension {
-    async enable() {
+    enable() {
         // (utility) singletons
         enableTimeouts();
         enableSettings();
@@ -63,17 +86,14 @@ export default class TilingAssistantExtension extends Extension {
         overrideNativeSettings();
         overrideTopPanelDrag();
 
-        const twmModule = await import('./src/extension/tilingWindowManager.js');
-
-        this._twm = twmModule.TilingWindowManager;
-        this._twm.initialize();
-
-        this._moveHandler = new MoveHandler();
-        this._resizeHandler = new ResizeHandler();
-        this._keybindingHandler = new KeybindingHandler();
-        this._layoutsManager = new LayoutsManager();
-        this._activeWindowHintHandler = new ActiveWindowHint();
-        this._altTabOverride = new AltTabOverride();
+        // features/modules
+        enableTilingWindowManager();
+        enableMoveHandler();
+        enableResizeHandler();
+        enableKeybindingHandler();
+        enableLayoutsManager();
+        enableActiveWindowHint();
+        enableAltTabOverride();
 
         // Restore tiled window properties after session was unlocked.
         this._loadAfterSessionLock();
@@ -88,22 +108,13 @@ export default class TilingAssistantExtension extends Extension {
         // them after the session is unlocked again.
         this._saveBeforeSessionLock();
 
-        this._moveHandler.destroy();
-        this._moveHandler = null;
-        this._resizeHandler.destroy();
-        this._resizeHandler = null;
-        this._keybindingHandler.destroy();
-        this._keybindingHandler = null;
-        this._layoutsManager.destroy();
-        this._layoutsManager = null;
-        this._activeWindowHintHandler.destroy();
-        this._activeWindowHintHandler = null;
-
-        this._altTabOverride.destroy();
-        this._altTabOverride = null;
-
-        this._twm.destroy();
-        this._twm = null;
+        disableAltTabOverride();
+        disableActiveWindowHint();
+        disableLayoutsManager();
+        disableKeybindingHandler();
+        disableResizeHandler();
+        disableMoveHandler();
+        disableTilingWindowManager();
 
         disableInjections();
         disableSettings();
@@ -137,7 +148,7 @@ export default class TilingAssistantExtension extends Extension {
 
         // can't just check for isTiled because maximized windows may
         // have an untiledRect as well in case window gaps are used
-        const openWindows = this._twm.getWindows(true);
+        const openWindows = Twm.getWindows(true);
         const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
             return {
                 windowId: w.get_stable_sequence(),
@@ -149,7 +160,7 @@ export default class TilingAssistantExtension extends Extension {
 
         const saveObj = {
             'windows': savedWindows,
-            'tileGroups': Array.from(this._twm.getTileGroups())
+            'tileGroups': Array.from(Twm.getTileGroups())
         };
 
         const userPath = GLib.get_user_config_dir();
@@ -207,7 +218,7 @@ export default class TilingAssistantExtension extends Extension {
         if (!success || !contents.length)
             return;
 
-        const openWindows = this._twm.getWindows(true);
+        const openWindows = Twm.getWindows(true);
         const saveObj = JSON.parse(new TextDecoder().decode(contents));
 
         const windowObjects = saveObj['windows'];
@@ -230,11 +241,11 @@ export default class TilingAssistantExtension extends Extension {
         });
 
         const tileGroups = new Map(saveObj['tileGroups']);
-        this._twm.setTileGroups(tileGroups);
+        Twm.setTileGroups(tileGroups);
         openWindows.forEach(w => {
             if (tileGroups.has(w.get_id())) {
-                const group = this._twm.getTileGroupFor(w);
-                this._twm.updateTileGroup(group);
+                const group = Twm.getTileGroupFor(w);
+                Twm.updateTileGroup(group);
             }
         });
     }

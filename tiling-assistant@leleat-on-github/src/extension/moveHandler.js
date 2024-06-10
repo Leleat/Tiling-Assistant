@@ -8,6 +8,18 @@ import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import { Timeouts } from './timeouts.js';
 
+/** @type {MoveHandler} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new MoveHandler();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
  * If the moved window is tiled at the start of the grab, untile it. This is
@@ -15,8 +27,7 @@ import { Timeouts } from './timeouts.js';
  * the grab via code. On Wayland this may not be reliable. As a workaround there
  * is a setting to restore a tiled window's size on the actual grab end.
  */
-
-export default class TilingMoveHandler {
+class MoveHandler {
     constructor() {
         const moveOps = [Meta.GrabOp.MOVING, Meta.GrabOp.KEYBOARD_MOVING];
 
@@ -876,3 +887,5 @@ class TilePreview extends WindowManager.TilePreview {
         this.ease(animateTo);
     }
 });
+
+export { disable, enable };

@@ -10,12 +10,23 @@ import {
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+/** @type {KeybindingHandler} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new KeybindingHandler();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
 /**
  * Class to handle the keyboard shortcuts (on the extension side) except the
  * ones related to the Layouts. For those, see layoutsManager.js.
  */
-
-export default class TilingKeybindingHandler {
+class KeybindingHandler {
     constructor() {
         const allowInOverview = ['toggle-tiling-popup'];
 
@@ -603,3 +614,5 @@ export default class TilingKeybindingHandler {
         }
     }
 }
+
+export { disable, enable };

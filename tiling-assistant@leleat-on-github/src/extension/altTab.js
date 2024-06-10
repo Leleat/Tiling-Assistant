@@ -22,10 +22,22 @@ import { Settings } from './settings.js';
 
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+/** @type {AltTabOverride} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new AltTabOverride();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
 /**
  * Optionally, override GNOME's altTab / appSwitcher to group tileGroups
  */
-export default class AltTabOverride {
+class AltTabOverride {
     constructor() {
         Settings.watch(
             'tilegroups-in-app-switcher',
@@ -488,3 +500,5 @@ class AppIcon extends AltTab.AppIcon {
         return this.get_preferred_height(-1);
     }
 });
+
+export { disable, enable };

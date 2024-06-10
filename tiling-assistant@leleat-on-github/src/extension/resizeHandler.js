@@ -17,6 +17,18 @@ const Side = Object.freeze({
     OPPOSING_V: 8
 });
 
+/** @type {ResizeHandler} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new ResizeHandler();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
 /**
  * This class gets to handle the resize events of windows (whether they are
  * tiled or not). If a window isn't tiled, nothing happens. If the resized
@@ -24,7 +36,7 @@ const Side = Object.freeze({
  * resizing is split into its [H]orizontal and [V]ertical components.
  */
 
-export default class TilingResizeHandler {
+class ResizeHandler {
     constructor() {
         const isResizing = grabOp => {
             switch (grabOp) {
@@ -562,3 +574,5 @@ const ResizeOp = class ResizeOp {
         return resizeSide ? new ResizeOp(resizeSide) : null;
     }
 };
+
+export { disable, enable };

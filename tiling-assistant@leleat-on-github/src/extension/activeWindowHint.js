@@ -5,7 +5,19 @@ import { ActiveWindowHint } from '../common.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
-export default class ActiveWindowHintHandler {
+/** @type {ActiveWindowHintHandler} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new ActiveWindowHintHandler();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
+class ActiveWindowHintHandler {
     constructor() {
         // On a fresh install no color is set for the hint yet. Use the bg color
         // from the tile preview style by using a temporary widget.
@@ -367,3 +379,5 @@ class AlwaysActiveWindowHint extends Hint {
         `);
     }
 });
+
+export { disable, enable };

@@ -7,12 +7,20 @@ import { getFavoriteLayout } from './utility.js';
 import { Settings } from './settings.js';
 import { Timeouts } from './timeouts.js';
 
-/**
- * Singleton responsible for tiling. Implement the signals in a separate Clutter
- * class so this doesn't need to be instanced.
- */
-export class TilingWindowManager {
-    static initialize() {
+/** @type {TilingWindowManager} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new TilingWindowManager();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
+class TilingWindowManager {
+    constructor() {
         this._signals = new TilingSignals();
 
         // { windowId1: [windowIdX, windowIdY, ...], windowId2: [...], ... }
@@ -33,9 +41,17 @@ export class TilingWindowManager {
         );
     }
 
-    static destroy() {
+    destroy() {
         this._signals.destroy();
         this._signals = null;
+
+        // Disconnect window signals
+        const allWindows = global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
+        allWindows.forEach(w => {
+            w.taRaiseSignal && w.disconnect(w.taRaiseSignal);
+            w.taWsChangedSignal && w.disconnect(w.taWsChangedSignal);
+            w.taUnmanagingSignal && w.disconnect(w.taUnmanagingSignal);
+        });
 
         global.workspace_manager.disconnectObject(this);
 
@@ -51,7 +67,7 @@ export class TilingWindowManager {
      * @returns {Meta.Windows[]} an array of of the open Meta.Windows in
      *      stacking order.
      */
-    static getWindows(allWorkspaces = false) {
+    getWindows(allWorkspaces = false) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const openWindows = getWindows(allWorkspaces ? null : activeWs);
         // The open windows are not sorted properly when tiling with the Tiling
@@ -77,7 +93,7 @@ export class TilingWindowManager {
      * @returns whether the window is maximized. Be it using GNOME's native
      *      maximization or the maximization by this extension when using gaps.
      */
-    static isMaximized(window, workArea = null) {
+    isMaximized(window, workArea = null) {
         const area = workArea ?? window.get_work_area_current_monitor();
         return window.get_maximized() === Meta.MaximizeFlags.BOTH ||
                 window.tiledRect?.equal(area);
@@ -102,7 +118,7 @@ export class TilingWindowManager {
      * @param {boolean} [fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
-    static async tile(window, newRect, {
+    async tile(window, newRect, {
         openTilingPopup = true,
         ignoreTA = false,
         monitorNr = null,
@@ -226,7 +242,7 @@ export class TilingWindowManager {
      *      we use the pointer position.
      * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
      */
-    static untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false, clampToWorkspace = false } = {}) {
+    untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false, clampToWorkspace = false } = {}) {
         const wasMaximized = window.get_maximized();
         if (wasMaximized)
             window.unmaximize(wasMaximized);
@@ -288,7 +304,7 @@ export class TilingWindowManager {
      * @param {Meta.Window[]} tileGroup
      * @param {Meta.Workspace} workspace
      */
-    static moveGroupToWorkspace(tileGroup, workspace) {
+    moveGroupToWorkspace(tileGroup, workspace) {
         tileGroup.forEach(w => {
             this._blockTilingSignalsFor(w);
             w.change_workspace(workspace);
@@ -303,7 +319,7 @@ export class TilingWindowManager {
      * @param {number} oldMon
      * @param {number} newMon
      */
-    static moveGroupToMonitor(tileGroup, oldMon, newMon) {
+    moveGroupToMonitor(tileGroup, oldMon, newMon) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const oldWorkArea = activeWs.get_work_area_for_monitor(oldMon);
         const newWorkArea = activeWs.get_work_area_for_monitor(newMon);
@@ -341,7 +357,7 @@ export class TilingWindowManager {
      * @returns {Map<number,number>}
      *      For ex: { windowId1: [windowIdX, windowIdY, ...], windowId2: ... }
      */
-    static getTileGroups() {
+    getTileGroups() {
         return this._tileGroups;
     }
 
@@ -349,7 +365,7 @@ export class TilingWindowManager {
      * @param {Map<number, number>} tileGroups
      *      For ex: { windowId1: [windowIdX, windowIdY, ...], windowId2: ... }
      */
-    static setTileGroups(tileGroups) {
+    setTileGroups(tileGroups) {
         this._tileGroups = tileGroups;
     }
 
@@ -365,7 +381,7 @@ export class TilingWindowManager {
      * @param {Meta.Windows[]} tileGroup an array of Meta.Windows to group
      *      together.
      */
-    static updateTileGroup(tileGroup) {
+    updateTileGroup(tileGroup) {
         tileGroup.forEach(window => {
             const windowId = window.get_id();
             const signals = this._signals.getSignalsFor(windowId);
@@ -455,7 +471,7 @@ export class TilingWindowManager {
      *
      * @param {number} windowId the id of a Meta.Window.
      */
-    static clearTilingProps(windowId) {
+    clearTilingProps(windowId) {
         const window = this._getWindow(windowId);
         const signals = this._signals.getSignalsFor(windowId);
 
@@ -491,7 +507,7 @@ export class TilingWindowManager {
      * @returns {Meta.Window[]} an array of Meta.Windows, which are in `window`'s
      *      tile group (including the `window` itself).
      */
-    static getTileGroupFor(window) {
+    getTileGroupFor(window) {
         const tileGroup = this._tileGroups.get(window.get_id());
         if (!tileGroup)
             return [];
@@ -513,7 +529,7 @@ export class TilingWindowManager {
      * @param {number} [monitor=null] get the group for the monitor number.
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
-    static getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
+    getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
         // 'Raise Tile Group' setting is enabled so we just return the tracked
         // tile group. Same thing for the setting 'Disable Tile Groups' because
         // it's implemented by just making the tile groups consist of single
@@ -581,7 +597,7 @@ export class TilingWindowManager {
      *      Defaults to pointer monitor.
      * @returns {Mtk.Rectangle|null} a Rect, which represent the free screen space.
      */
-    static getFreeScreen(rectList, monitorNr = null) {
+    getFreeScreen(rectList, monitorNr = null) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = activeWs.get_work_area_for_monitor(monitor);
@@ -627,7 +643,7 @@ export class TilingWindowManager {
      * @param {Mtk.Rectangle} [monitor=null] defaults to pointer monitor.
      * @returns {Mtk.Rectangle} a new Rect.
      */
-    static getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
+    getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
         const activeWs = global.workspace_manager.get_active_workspace();
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = activeWs.get_work_area_for_monitor(monitor);
@@ -759,7 +775,7 @@ export class TilingWindowManager {
      *      if there is no Meta.Window in the direction of `dir`.
      * @returns {Meta.Window|null} the nearest Meta.Window.
      */
-    static getNearestWindow(currWindow, windows, dir, wrap = true) {
+    getNearestWindow(currWindow, windows, dir, wrap = true) {
         const getRect = w => w.tiledRect ?? w.get_frame_rect();
         const rects = windows.map(w => getRect(w));
         const nearestRect = getRect(currWindow).get_neighbor(dir, rects, wrap);
@@ -789,7 +805,7 @@ export class TilingWindowManager {
      *      at that edge.
      * @returns a Rect.
      */
-    static getTileFor(shortcut, workArea, monitor = null) {
+    getTileFor(shortcut, workArea, monitor = null) {
         // Don't try to adapt a tile rect
         if (Settings.getDisableTileGroups())
             return this.getDefaultTileFor(shortcut, workArea);
@@ -923,7 +939,7 @@ export class TilingWindowManager {
      * @param {Mtk.Rectangle} workArea
      * @returns
      */
-    static getDefaultTileFor(shortcut, workArea) {
+    getDefaultTileFor(shortcut, workArea) {
         switch (shortcut) {
             case 'tile-maximize':
                 return workArea.copy();
@@ -958,7 +974,7 @@ export class TilingWindowManager {
      * Opens the Tiling Popup, if there is unambiguous free screen space,
      * and offer to tile an open window to that spot.
      */
-    static async tryOpeningTilingPopup() {
+    async tryOpeningTilingPopup() {
         if (!Settings.getEnableTilingPopup())
             return;
 
@@ -987,7 +1003,7 @@ export class TilingWindowManager {
      * @param {Meta.Window} window a Meta.Window.
      * @param {Mtk.Rectangle} rect the Rect the `window` tiles to or untiles from.
      */
-    static toggleTiling(window, rect, params = {}) {
+    toggleTiling(window, rect, params = {}) {
         const workArea = window.get_work_area_current_monitor();
         const equalsWA = rect.equal(workArea);
         const equalsTile = window.tiledRect && rect.equal(window.tiledRect);
@@ -1005,7 +1021,7 @@ export class TilingWindowManager {
      * @param {boolean} [openTilingPopup=false] allow the Tiling Popup to
      *      appear, if there is free screen space after the `app` was tiled.
      */
-    static openAppTiled(app, rect, openTilingPopup = false) {
+    openAppTiled(app, rect, openTilingPopup = false) {
         if (!app?.can_open_new_window())
             return;
 
@@ -1055,7 +1071,7 @@ export class TilingWindowManager {
      * Gets the top windows, which are supposed to be in a tile group. That
      * means windows, which are tiled, and don't overlap each other.
      */
-    static _getWindowsForBuildingTileGroup(monitor = null) {
+    _getWindowsForBuildingTileGroup(monitor = null) {
         const openWindows = this.getWindows();
         if (!openWindows.length)
             return [];
@@ -1117,7 +1133,7 @@ export class TilingWindowManager {
      *
      * @param {{boolean, number}} param1
      */
-    static _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
+    _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
         const openWindows = this.getWindows();
         if (!openWindows.length)
             return [];
@@ -1176,7 +1192,7 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window
      */
-    static _blockTilingSignalsFor(window) {
+    _blockTilingSignalsFor(window) {
         const signals = this._signals.getSignalsFor(window.get_id());
         const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
         blockedSignals.forEach(s => {
@@ -1191,7 +1207,7 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window
      */
-    static _unblockTilingSignalsFor(window) {
+    _unblockTilingSignalsFor(window) {
         const signals = this._signals.getSignalsFor(window.get_id());
         const blockedSignals = [TilingSignals.RAISE, TilingSignals.WS_CHANGED, TilingSignals.UNMANAGING];
         blockedSignals.forEach(s => {
@@ -1205,7 +1221,7 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window
      */
-    static _updateGappedMaxWindowSignals(window) {
+    _updateGappedMaxWindowSignals(window) {
         const wId = window.get_id();
         const signals = this._signals.getSignalsFor(wId);
 
@@ -1228,7 +1244,7 @@ export class TilingWindowManager {
      * @returns {Meta.Window[]} an array of *all* windows
      * (and not just the ones relevant to altTab)
      */
-    static _getAllWindows() {
+    _getAllWindows() {
         return global.display.get_tab_list(Meta.TabList.NORMAL_ALL, null);
     }
 
@@ -1238,7 +1254,7 @@ export class TilingWindowManager {
      * @param {number} id
      * @returns {Meta.Window}
      */
-    static _getWindow(id) {
+    _getWindow(id) {
         return this._getAllWindows().find(w => w.get_id() === id);
     }
 
@@ -1250,7 +1266,7 @@ export class TilingWindowManager {
      * a ws-changed signal (e. g. the workspace is at the end), so reset after
      * a short timer.
      */
-    static _onWorkspaceAdded() {
+    _onWorkspaceAdded() {
         this._ignoreWsChange = true;
 
         Timeouts.add({
@@ -1272,7 +1288,7 @@ export class TilingWindowManager {
      * a ws-changed signal (e. g. the workspace is at the end), so reset after
      * a short timer.
      */
-    static _onWorkspaceRemoved() {
+    _onWorkspaceRemoved() {
         this._ignoreWsChange = true;
 
         Timeouts.add({
@@ -1303,7 +1319,7 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window
      */
-    static _onWindowWorkspaceChanged(window) {
+    _onWindowWorkspaceChanged(window) {
         // Closing a window triggers a ws-changed signal, which may lead to a
         // crash, if we try to operate on it any further. So we listen to the
         // 'unmanaging'-signal to see, if there is a 'true  workspace change'
@@ -1373,3 +1389,5 @@ class TilingSignals {
         return ret;
     }
 };
+
+export { disable, enable, MODULE as TilingWindowManager };

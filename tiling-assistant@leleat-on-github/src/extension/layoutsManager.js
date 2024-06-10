@@ -12,6 +12,18 @@ import { getLayouts } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+/** @type {LayoutsManager} */
+let MODULE = null;
+
+function enable() {
+    MODULE = new LayoutsManager();
+}
+
+function disable() {
+    MODULE.destroy();
+    MODULE = null;
+}
+
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
  * See src/prefs/layoutsPrefs.js for more details and general info about layouts.
@@ -29,8 +41,7 @@ import { TilingWindowManager as Twm } from './tilingWindowManager.js';
  * PopupLayouts. That layout will then be used as an fixed alternative mode to
  * the Edge Tiling.
  */
-
-export default class TilingLayoutsManager {
+class LayoutsManager {
     constructor() {
         // this._items is an array of LayoutItems (see explanation above).
         // this._currItem is 1 LayoutItem. A LayoutItem's rect only hold ratios
@@ -559,3 +570,5 @@ const PopupFavoriteMenuItem = GObject.registerClass({
         });
     }
 });
+
+export { disable, enable };
