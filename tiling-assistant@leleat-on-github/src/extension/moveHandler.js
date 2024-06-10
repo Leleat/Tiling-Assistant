@@ -140,7 +140,7 @@ class MoveHandler {
                     const moveDist = getDistance(currPoint, oldPoint);
 
                     if (moveDist > 10) {
-                        this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+                        this._restoreSizeAndRestartGrab(window, grabOp);
 
                         return GLib.SOURCE_REMOVE;
                     }
@@ -407,12 +407,8 @@ class MoveHandler {
         }
     }
 
-    _restoreSizeAndRestartGrab(window, px, py, grabOp) {
-        Twm.untile(window, {
-            restoreFullPos: false,
-            xAnchor: px,
-            skipAnim: this._wasMaximizedOnStart
-        });
+    _restoreSizeAndRestartGrab(window, grabOp) {
+        Twm.untile(window, { skipAnim: this._wasMaximizedOnStart });
 
         this._onMoveStarted(window, grabOp);
     }
