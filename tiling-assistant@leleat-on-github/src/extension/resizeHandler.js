@@ -1,7 +1,7 @@
 import { Clutter, Meta, Mtk } from '../dependencies/gi.js';
 
 import { Orientation } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
 const Side = {

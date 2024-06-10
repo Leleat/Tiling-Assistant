@@ -3,7 +3,7 @@ import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
 import { Orientation, MoveModes } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Util } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import { Timeouts } from './timeouts.js';

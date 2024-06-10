@@ -8,7 +8,7 @@ import {
 } from '../dependencies/shell.js';
 
 import { Layout } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Util } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 

@@ -40,7 +40,7 @@ import {
     disable as disableTimeouts,
     enable as enableTimeouts
 } from './src/extension/timeouts.js';
-import { Rect, Util } from './src/extension/utility.js';
+import { Util } from './src/extension/utility.js';
 
 /**
  * 2 entry points:

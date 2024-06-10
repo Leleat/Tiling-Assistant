@@ -3,7 +3,7 @@ import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
 import { Orientation } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Util } from './utility.js';
 import { Settings } from './settings.js';
 import { Timeouts } from './timeouts.js';
 

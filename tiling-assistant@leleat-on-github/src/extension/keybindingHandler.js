@@ -2,7 +2,7 @@ import { Clutter, Meta, Mtk, Shell, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
 import { Direction, DynamicKeybindings } from '../common.js';
-import { Rect, Util } from './utility.js';
+import { Util } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
