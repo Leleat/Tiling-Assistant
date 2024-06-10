@@ -1,9 +1,9 @@
-import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js';
+import { GLib, Meta, Mtk, Shell } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
 import { Orientation } from '../common.js';
-import { Util } from './utility.js';
+import { getFavoriteLayout } from './utility.js';
 import { Settings } from './settings.js';
 import { Timeouts } from './timeouts.js';
 
@@ -804,7 +804,7 @@ export class TilingWindowManager {
         // window's tile group.
         const idx = topTileGroup.indexOf(global.display.focus_window);
         idx !== -1 && topTileGroup.splice(idx, 1);
-        const favLayout = Util.getFavoriteLayout(monitor);
+        const favLayout = getFavoriteLayout(monitor);
         const useFavLayout = favLayout.length && Settings.getAdaptEdgeTilingToFavoriteLayout();
         const twRects = useFavLayout && favLayout || topTileGroup.map(w => w.tiledRect);
 

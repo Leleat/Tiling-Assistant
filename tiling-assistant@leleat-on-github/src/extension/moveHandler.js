@@ -3,7 +3,7 @@ import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
 import { Orientation, MoveModes } from '../common.js';
-import { Util } from './utility.js';
+import { getDistance, getFavoriteLayout, isModPressed } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import { Timeouts } from './timeouts.js';
@@ -136,7 +136,7 @@ export default class TilingMoveHandler {
                     const [currX, currY] = global.get_pointer();
                     const currPoint = { x: currX, y: currY };
                     const oldPoint = { x, y };
-                    const moveDist = Util.getDistance(currPoint, oldPoint);
+                    const moveDist = getDistance(currPoint, oldPoint);
 
                     if (moveDist > 10) {
                         this._restoreSizeAndRestartGrab(window, x, y, grabOp);
@@ -270,7 +270,7 @@ export default class TilingMoveHandler {
                 return GLib.SOURCE_REMOVE;
             }
 
-            const movementDist = Util.getDistance(this._lastPointerPos, currPointerPos);
+            const movementDist = getDistance(this._lastPointerPos, currPointerPos);
             const movementDetectionThreshold = 10;
             let forceMoveUpdate = false;
             this._movingTimeoutsSinceUpdate++;
@@ -308,10 +308,10 @@ export default class TilingMoveHandler {
             : Clutter.ModifierType.BUTTON3_MASK;
         const pressed = [ // idxs come from settings
             false, // Dummy for disabled state so that we can use the correct idxs
-            Util.isModPressed(ctrl),
-            Util.isModPressed(altL) || Util.isModPressed(altGr),
-            Util.isModPressed(rmb),
-            Util.isModPressed(meta)
+            isModPressed(ctrl),
+            isModPressed(altL) || isModPressed(altGr),
+            isModPressed(rmb),
+            isModPressed(meta)
         ];
 
         const defaultMode = Settings.getDefaultMoveMode();
@@ -394,7 +394,7 @@ export default class TilingMoveHandler {
                 this._ignoreTA = true;
                 break;
             case MoveModes.FAVORITE_LAYOUT:
-                this._favoriteLayout = Util.getFavoriteLayout();
+                this._favoriteLayout = getFavoriteLayout();
                 this._favoriteLayout.forEach(rect => {
                     const tilePreview = new TilePreview();
                     tilePreview.open(window, rect, this._monitorNr, {
@@ -564,7 +564,7 @@ export default class TilingMoveHandler {
             return;
         }
 
-        const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
+        const isSuperPressed = isModPressed(Clutter.ModifierType.MOD4_MASK);
         if (isSuperPressed) {
             this._anchorRect = this._anchorRect ?? hoveredRect;
             this._tileRect = hoveredRect.union(this._anchorRect);
@@ -790,7 +790,7 @@ export default class TilingMoveHandler {
     _favoriteLayoutTilingPreview(window) {
         // Holding Super will make the window span multiple rects of the favorite
         // layout starting from the rect, which the user starting holding Super in.
-        const isSuperPressed = Util.isModPressed(Clutter.ModifierType.MOD4_MASK);
+        const isSuperPressed = isModPressed(Clutter.ModifierType.MOD4_MASK);
         for (const rect of this._favoriteLayout) {
             if (rect.contains_point(this._lastPointerPos)) {
                 if (isSuperPressed) {

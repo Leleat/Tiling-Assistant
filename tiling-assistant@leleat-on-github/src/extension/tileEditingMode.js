@@ -2,7 +2,7 @@ import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
 import { Direction, Orientation } from '../common.js';
-import { Util } from './utility.js';
+import { getDirection } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -261,7 +261,7 @@ const DefaultKeyHandler = class DefaultKeyHandler {
         const keyVal = keyEvent.get_key_symbol();
 
         // [Directions] to move focus with WASD, hjkl or arrow keys
-        const dir = Util.getDirection(keyVal);
+        const dir = getDirection(keyVal);
         if (dir) {
             this._focusInDir(dir);
 
@@ -441,7 +441,7 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
     }
 
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
 
         // [Directions] to choose a window to swap with WASD, hjkl or arrow keys
         if (direction)
@@ -489,7 +489,7 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
  */
 const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
     handleKeyPress(keyEvent) {
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
         const moveWorkspace = keyEvent.get_state() & Clutter.ModifierType.MOD1_MASK;
 
         // [Directions] to move the tile group
@@ -565,7 +565,7 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
 
     handleKeyPress(keyEvent) {
         // [Directions] to resize with WASD, hjkl or arrow keys
-        const direction = Util.getDirection(keyEvent.get_key_symbol());
+        const direction = getDirection(keyEvent.get_key_symbol());
         if (direction) {
             const window = this._selectIndicator.window;
             if (!window)

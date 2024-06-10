@@ -2,7 +2,11 @@ import { Clutter, Meta, Mtk, Shell, St } from '../dependencies/gi.js';
 import { _, Main } from '../dependencies/shell.js';
 
 import { Direction, DynamicKeybindings } from '../common.js';
-import { Util } from './utility.js';
+import {
+    debugShowTiledRects,
+    debugShowFreeScreenRects,
+    getFavoriteLayout
+} from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -69,9 +73,9 @@ export default class TilingKeybindingHandler {
                 this._debuggingIndicators = null;
             } else {
                 const createIndicators = shortcutName === 'debugging-show-tiled-rects'
-                    ? Util.___debugShowTiledRects
-                    : Util.___debugShowFreeScreenRects;
-                this._debuggingIndicators = await createIndicators.call(Util);
+                    ? debugShowTiledRects
+                    : debugShowFreeScreenRects;
+                this._debuggingIndicators = await createIndicators();
             }
             return;
 
@@ -569,7 +573,7 @@ export default class TilingKeybindingHandler {
             return;
         }
 
-        const favoriteLayout = Util.getFavoriteLayout(window.get_monitor());
+        const favoriteLayout = getFavoriteLayout(window.get_monitor());
         if (favoriteLayout.length <= 1) {
             toggleTiling();
             return;

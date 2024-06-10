@@ -8,7 +8,7 @@ import {
 } from '../dependencies/shell.js';
 
 import { Layout } from '../common.js';
-import { Util } from './utility.js';
+import { getLayouts } from './utility.js';
 import { Settings } from './settings.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -94,7 +94,7 @@ export default class TilingLayoutsManager {
      * instead of the keyboard shortcut.
      */
     openPopupSearch() {
-        const layouts = Util.getLayouts();
+        const layouts = getLayouts();
         if (!layouts.length) {
             // Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
             Main.notify('Tiling Assistant', _('No valid layouts defined.'));
@@ -111,7 +111,7 @@ export default class TilingLayoutsManager {
      * @param {number} index the index of the layout we start tiling to.
      */
     startLayouting(index) {
-        const layout = Util.getLayouts()?.[index];
+        const layout = getLayouts()?.[index];
         if (!layout)
             return;
 
@@ -485,7 +485,7 @@ const PanelIndicator = GObject.registerClass({
     _updateItems() {
         this.menu.removeAll();
 
-        const layouts = Util.getLayouts();
+        const layouts = getLayouts();
         if (!layouts.length) {
             // Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
             const item = new PopupMenu.PopupMenuItem(_('No valid layouts defined.'));

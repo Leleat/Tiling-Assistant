@@ -40,7 +40,7 @@ import {
     disable as disableTimeouts,
     enable as enableTimeouts
 } from './src/extension/timeouts.js';
-import { Util } from './src/extension/utility.js';
+import { getScaledGap, useIndividualGaps } from './src/extension/utility.js';
 
 /**
  * 2 entry points:
@@ -337,16 +337,16 @@ function injectMtkRectangle() {
          * @returns {Mtk.Rectangle} the rectangle after the gaps were taken into account
          */
         return function (workArea, monitor) {
-            const screenTopGap = Util.getScaledGap('screen-top-gap', monitor);
-            const screenLeftGap = Util.getScaledGap('screen-left-gap', monitor);
-            const screenRightGap = Util.getScaledGap('screen-right-gap', monitor);
-            const screenBottomGap = Util.getScaledGap('screen-bottom-gap', monitor);
-            const singleScreenGap = Util.getScaledGap('single-screen-gap', monitor);
-            const windowGap = Util.getScaledGap('window-gap', monitor);
+            const screenTopGap = getScaledGap('screen-top-gap', monitor);
+            const screenLeftGap = getScaledGap('screen-left-gap', monitor);
+            const screenRightGap = getScaledGap('screen-right-gap', monitor);
+            const screenBottomGap = getScaledGap('screen-bottom-gap', monitor);
+            const singleScreenGap = getScaledGap('single-screen-gap', monitor);
+            const windowGap = getScaledGap('window-gap', monitor);
             const r = this.copy();
 
             // Prefer individual gaps
-            if (Util.useIndividualGaps(monitor)) {
+            if (useIndividualGaps(monitor)) {
                 [
                     ['x', 'width', screenLeftGap, screenRightGap],
                     ['y', 'height', screenTopGap, screenBottomGap]
