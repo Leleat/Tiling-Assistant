@@ -25,6 +25,10 @@ import KeybindingHandler from './src/extension/keybindingHandler.js';
 import LayoutsManager from './src/extension/layoutsManager.js';
 import ActiveWindowHint from './src/extension/activeWindowHint.js';
 import AltTabOverride from './src/extension/altTab.js';
+import {
+    disable as disableTimeouts,
+    enable as enableTimeouts
+} from './src/extension/timeouts.js';
 import { Rect } from './src/extension/utility.js';
 
 /**
@@ -147,6 +151,9 @@ class SettingsOverrider {
 
 export default class TilingAssistantExtension extends Extension {
     async enable() {
+        // (utility) singletons
+        enableTimeouts();
+
         this.settings = (await import('./src/common.js')).Settings;
         this.settings.initialize(this.getSettings());
         this._settingsOverrider = new SettingsOverrider(this.settings);
@@ -250,6 +257,8 @@ export default class TilingAssistantExtension extends Extension {
 
         this.settings.destroy();
         this.settings = null;
+
+        disableTimeouts();
 
         // Restore old functions.
         Main.panel._getDraggableWindowForPosition = this._getDraggableWindowForPosition;
