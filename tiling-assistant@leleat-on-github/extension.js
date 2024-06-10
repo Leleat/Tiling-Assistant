@@ -60,6 +60,7 @@ export default class TilingAssistantExtension extends Extension {
 
         // injections/overrides
         injectMtkRectangle();
+        overrideNativeSettings();
         overrideTopPanelDrag();
 
         const twmModule = await import('./src/extension/tilingWindowManager.js');
@@ -73,66 +74,6 @@ export default class TilingAssistantExtension extends Extension {
         this._layoutsManager = new LayoutsManager();
         this._activeWindowHintHandler = new ActiveWindowHint();
         this._altTabOverride = new AltTabOverride();
-
-        // Disable native tiling.
-        Settings.override(
-            new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
-            'edge-tiling',
-            new GLib.Variant('b', false)
-        );
-
-        // Disable native keybindings for Super+Up/Down/Left/Right
-        const gnomeMutterKeybindings = new Gio.Settings({
-            schema_id: 'org.gnome.mutter.keybindings'
-        });
-        const gnomeDesktopKeybindings = new Gio.Settings({
-            schema_id: 'org.gnome.desktop.wm.keybindings'
-        });
-        const emptyStrvVariant = new GLib.Variant('as', []);
-
-        if (
-            gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
-            Settings.getGioObject().get_strv('tile-maximize').includes('<Super>Up')
-        ) {
-            Settings.override(
-                gnomeDesktopKeybindings,
-                'maximize',
-                emptyStrvVariant
-            );
-        }
-
-        if (
-            gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
-            Settings.getGioObject().get_strv('restore-window').includes('<Super>Down')
-        ) {
-            Settings.override(
-                gnomeDesktopKeybindings,
-                'unmaximize',
-                emptyStrvVariant
-            );
-        }
-
-        if (
-            gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
-            Settings.getGioObject().get_strv('tile-left-half').includes('<Super>Left')
-        ) {
-            Settings.override(
-                gnomeMutterKeybindings,
-                'toggle-tiled-left',
-                emptyStrvVariant
-            );
-        }
-
-        if (
-            gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
-            Settings.getGioObject().get_strv('tile-right-half').includes('<Super>Right')
-        ) {
-            Settings.override(
-                gnomeMutterKeybindings,
-                'toggle-tiled-right',
-                emptyStrvVariant
-            );
-        }
 
         // Restore tiled window properties after session was unlocked.
         this._loadAfterSessionLock();
@@ -691,11 +632,73 @@ function overrideTopPanelDrag() {
                 const rect = w.get_frame_rect();
                 const workArea = w.get_work_area_current_monitor();
                 return w.is_on_primary_monitor() &&
-                        w.showing_on_its_workspace() &&
-                        w.get_window_type() !== Meta.WindowType.DESKTOP &&
-                        (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
-                        stageX > rect.x && stageX < rect.x + rect.width;
+                    w.showing_on_its_workspace() &&
+                    w.get_window_type() !== Meta.WindowType.DESKTOP &&
+                    (w.maximized_vertically || w.tiledRect?.y === workArea.y) &&
+                    stageX > rect.x && stageX < rect.x + rect.width;
             });
         };
     });
+}
+
+function overrideNativeSettings() {
+    // Disable native tiling.
+    Settings.override(
+        new Gio.Settings({ schema_id: 'org.gnome.mutter' }),
+        'edge-tiling',
+        new GLib.Variant('b', false)
+    );
+
+    // Disable native keybindings for Super+Up/Down/Left/Right
+    const gnomeMutterKeybindings = new Gio.Settings({
+        schema_id: 'org.gnome.mutter.keybindings'
+    });
+    const gnomeDesktopKeybindings = new Gio.Settings({
+        schema_id: 'org.gnome.desktop.wm.keybindings'
+    });
+    const emptyStrvVariant = new GLib.Variant('as', []);
+
+    if (
+        gnomeDesktopKeybindings.get_strv('maximize').includes('<Super>Up') &&
+        Settings.getGioObject().get_strv('tile-maximize').includes('<Super>Up')
+    ) {
+        Settings.override(
+            gnomeDesktopKeybindings,
+            'maximize',
+            emptyStrvVariant
+        );
+    }
+
+    if (
+        gnomeDesktopKeybindings.get_strv('unmaximize').includes('<Super>Down') &&
+        Settings.getGioObject().get_strv('restore-window').includes('<Super>Down')
+    ) {
+        Settings.override(
+            gnomeDesktopKeybindings,
+            'unmaximize',
+            emptyStrvVariant
+        );
+    }
+
+    if (
+        gnomeMutterKeybindings.get_strv('toggle-tiled-left').includes('<Super>Left') &&
+        Settings.getGioObject().get_strv('tile-left-half').includes('<Super>Left')
+    ) {
+        Settings.override(
+            gnomeMutterKeybindings,
+            'toggle-tiled-left',
+            emptyStrvVariant
+        );
+    }
+
+    if (
+        gnomeMutterKeybindings.get_strv('toggle-tiled-right').includes('<Super>Right') &&
+        Settings.getGioObject().get_strv('tile-right-half').includes('<Super>Right')
+    ) {
+        Settings.override(
+            gnomeMutterKeybindings,
+            'toggle-tiled-right',
+            emptyStrvVariant
+        );
+    }
 }
