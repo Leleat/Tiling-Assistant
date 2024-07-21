@@ -212,52 +212,56 @@ export default class TilingMoveHandler {
     }
 
     _onMoveFinished(window) {
-        if (this._posChangedId) {
-            window.disconnect(this._posChangedId);
-            this._posChangedId = 0;
-        }
+        try {
+            window.assertExistence();
 
-        if (this._tileRect) {
-            // Ctrl-drag to replace some windows in a tile group / create a new tile group
-            // with at least 1 window being part of multiple tile groups.
-            let isCtrlReplacement = false;
-            const ctrlReplacedTileGroup = [];
-            const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
-            const pointerPos = { x: global.get_pointer()[0], y: global.get_pointer()[1] };
-            const twHovered = topTileGroup.some(w => w.tiledRect.containsPoint(pointerPos));
-            if (this._currPreviewMode === MoveModes.ADAPTIVE_TILING && !this._splitRects.size && twHovered) {
-                isCtrlReplacement = true;
-                ctrlReplacedTileGroup.push(window);
-                topTileGroup.forEach(w => {
-                    if (!this._tileRect.containsRect(w.tiledRect))
-                        ctrlReplacedTileGroup.push(w);
+            if (this._tileRect) {
+                // Ctrl-drag to replace some windows in a tile group / create a new tile group
+                // with at least 1 window being part of multiple tile groups.
+                let isCtrlReplacement = false;
+                const ctrlReplacedTileGroup = [];
+                const topTileGroup = Twm.getTopTileGroup({ skipTopWindow: true });
+                const pointerPos = { x: global.get_pointer()[0], y: global.get_pointer()[1] };
+                const twHovered = topTileGroup.some(w => w.tiledRect.containsPoint(pointerPos));
+                if (this._currPreviewMode === MoveModes.ADAPTIVE_TILING && !this._splitRects.size && twHovered) {
+                    isCtrlReplacement = true;
+                    ctrlReplacedTileGroup.push(window);
+                    topTileGroup.forEach(w => {
+                        if (!this._tileRect.containsRect(w.tiledRect))
+                            ctrlReplacedTileGroup.push(w);
+                    });
+                }
+
+                this._splitRects.forEach((rect, w) => Twm.tile(w, rect, { openTilingPopup: false }));
+                this._splitRects.clear();
+                Twm.tile(window, this._tileRect, {
+                    monitorNr: this._monitorNr,
+                    openTilingPopup: this._currPreviewMode !== MoveModes.ADAPTIVE_TILING,
+                    ignoreTA: this._ignoreTA
                 });
+                this._tileRect = null;
+
+                // Create a new tile group, in which some windows are already part
+                // of a different tile group, with ctrl-(super)-drag. The window may
+                // be maximized by ctrl-super-drag.
+                isCtrlReplacement && window.isTiled && Twm.updateTileGroup(ctrlReplacedTileGroup);
+            }
+        } finally {
+            if (this._posChangedId) {
+                window.disconnect(this._posChangedId);
+                this._posChangedId = 0;
             }
 
-            this._splitRects.forEach((rect, w) => Twm.tile(w, rect, { openTilingPopup: false }));
-            this._splitRects.clear();
-            Twm.tile(window, this._tileRect, {
-                monitorNr: this._monitorNr,
-                openTilingPopup: this._currPreviewMode !== MoveModes.ADAPTIVE_TILING,
-                ignoreTA: this._ignoreTA
-            });
-            this._tileRect = null;
-
-            // Create a new tile group, in which some windows are already part
-            // of a different tile group, with ctrl-(super)-drag. The window may
-            // be maximized by ctrl-super-drag.
-            isCtrlReplacement && window.isTiled && Twm.updateTileGroup(ctrlReplacedTileGroup);
+            this._favoriteLayout = [];
+            this._favoritePreviews?.forEach(p => p.destroy());
+            this._favoritePreviews = [];
+            this._freeScreenRects = [];
+            this._anchorRect = null;
+            this._topTileGroup = null;
+            this._tilePreview.close();
+            this._currPreviewMode = MoveModes.ADAPTIVE_TILING;
+            this._isGrabOp = false;
         }
-
-        this._favoriteLayout = [];
-        this._favoritePreviews?.forEach(p => p.destroy());
-        this._favoritePreviews = [];
-        this._freeScreenRects = [];
-        this._anchorRect = null;
-        this._topTileGroup = null;
-        this._tilePreview.close();
-        this._currPreviewMode = MoveModes.ADAPTIVE_TILING;
-        this._isGrabOp = false;
     }
 
     // If lowPerfMode is enabled in the settings:
