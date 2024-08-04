@@ -16,6 +16,11 @@ export class TilingWindowManager {
         // { windowId1: [windowIdX, windowIdY, ...], windowId2: [...], ... }
         this._tileGroups = new Map();
 
+        /**
+         * {windowId: {isTiled: boolean, tiledRect: {}, untiledRect: {}}}
+         */
+        this._tileStates = new Map();
+
         const assertExistenceFor = window => {
             window.assertExistence = () => {};
 
@@ -65,6 +70,7 @@ export class TilingWindowManager {
         });
 
         this._tileGroups.clear();
+        this._tileStates.clear();
 
         if (this._openAppTiledTimerId) {
             GLib.Source.remove(this._openAppTiledTimerId);
@@ -246,6 +252,7 @@ export class TilingWindowManager {
         // Maximized with gaps
         if (maximize) {
             this._updateGappedMaxWindowSignals(window);
+            this.saveTileState(window);
 
         // Tiled window
         } else if (!fakeTile) {
@@ -253,12 +260,14 @@ export class TilingWindowManager {
             // resizing or raising together. Also don't call the Tiling Popup.
             if (Settings.getBoolean('disable-tile-groups') || ignoreTA) {
                 this.updateTileGroup([window]);
+                this.saveTileState(window);
                 return;
             }
 
             // Setup the (new) tileGroup to raise tiled windows as a group
             const topTileGroup = this._getWindowsForBuildingTileGroup(monitor);
             this.updateTileGroup(topTileGroup);
+            this.saveTileState(window);
 
             this.emit('window-tiled', window);
 
@@ -334,6 +343,8 @@ export class TilingWindowManager {
         window.tiledRect = null;
         window.untiledRect = null;
 
+        this.deleteTilingState(window);
+
         this.emit('window-untiled', window);
     }
 
@@ -390,6 +401,17 @@ export class TilingWindowManager {
         // groups would have been created when moving one window after the other
         // to the new monitor. So update the tileGroup now with the full/old group.
         this.updateTileGroup(tileGroup);
+    }
+
+    static getTileStates() {
+        return this._tileStates;
+    }
+
+    /**
+     * @param {Map<number, object>} states -
+     */
+    static setTileStates(states) {
+        this._tileStates = states;
     }
 
     /**
@@ -1055,6 +1077,34 @@ export class TilingWindowManager {
         });
 
         app.open_new_window(-1);
+    }
+
+    static saveTileState(window) {
+        const windowState = this._tileStates.get(window.get_id());
+        const rectToJsObject = rect => {
+            return rect
+                ? { x: rect.x, y: rect.y, width: rect.width, height: rect.height }
+                : undefined;
+        };
+
+        if (windowState) {
+            windowState.isTiled = window.isTiled;
+            windowState.tiledRect = rectToJsObject(window.tiledRect);
+            windowState.untiledRect = rectToJsObject(window.untiledRect);
+        } else {
+            this._tileStates.set(
+                window.get_id(),
+                {
+                    isTiled: window.isTiled,
+                    tiledRect: rectToJsObject(window.tiledRect),
+                    untiledRect: rectToJsObject(window.untiledRect)
+                }
+            );
+        }
+    }
+
+    static deleteTilingState(window) {
+        this._tileStates.delete(window.get_id());
     }
 
     /**

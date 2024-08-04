@@ -274,30 +274,6 @@ export default class TilingAssistantExtension extends Extension {
 
         this._wasLocked = true;
 
-        const rectToJsObj = rect => rect && {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height
-        };
-
-        // can't just check for isTiled because maximized windows may
-        // have an untiledRect as well in case window gaps are used
-        const openWindows = this._twm.getWindows(true);
-        const savedWindows = openWindows.filter(w => w.untiledRect).map(w => {
-            return {
-                windowId: w.get_stable_sequence(),
-                isTiled: w.isTiled,
-                tiledRect: rectToJsObj(w.tiledRect),
-                untiledRect: rectToJsObj(w.untiledRect)
-            };
-        });
-
-        const saveObj = {
-            'windows': savedWindows,
-            'tileGroups': Array.from(this._twm.getTileGroups())
-        };
-
         const userPath = GLib.get_user_config_dir();
         const parentPath = GLib.build_filenamev([userPath, '/tiling-assistant']);
         const parent = Gio.File.new_for_path(parentPath);
@@ -310,7 +286,7 @@ export default class TilingAssistantExtension extends Extension {
             }
         }
 
-        const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore.json']);
+        const path = GLib.build_filenamev([parentPath, '/tiledSessionRestore2.json']);
         const file = Gio.File.new_for_path(path);
 
         try {
@@ -321,8 +297,16 @@ export default class TilingAssistantExtension extends Extension {
             }
         }
 
-        file.replace_contents(JSON.stringify(saveObj), null, false,
-            Gio.FileCreateFlags.REPLACE_DESTINATION, null);
+        file.replace_contents(
+            JSON.stringify({
+                windows: Object.fromEntries(this._twm.getTileStates()),
+                tileGroups: Object.fromEntries(this._twm.getTileGroups())
+            }),
+            null,
+            false,
+            Gio.FileCreateFlags.REPLACE_DESTINATION,
+            null
+        );
     }
 
     /**
@@ -336,7 +320,7 @@ export default class TilingAssistantExtension extends Extension {
         this._wasLocked = false;
 
         const userPath = GLib.get_user_config_dir();
-        const path = GLib.build_filenamev([userPath, '/tiling-assistant/tiledSessionRestore.json']);
+        const path = GLib.build_filenamev([userPath, '/tiling-assistant/tiledSessionRestore2.json']);
         const file = Gio.File.new_for_path(path);
         if (!file.query_exists(null))
             return;
@@ -353,30 +337,32 @@ export default class TilingAssistantExtension extends Extension {
         if (!success || !contents.length)
             return;
 
-        const openWindows = this._twm.getWindows(true);
-        const saveObj = JSON.parse(new TextDecoder().decode(contents));
+        const states = JSON.parse(new TextDecoder().decode(contents));
+        const keysAsNumbers = entries => entries.map(([key, value]) => [parseInt(key), value]);
+        const tileGroups = new Map(keysAsNumbers(Object.entries(states.tileGroups)));
+        const tileStates = new Map(keysAsNumbers(Object.entries(states.windows)));
+        const openWindows = global.display.list_all_windows();
 
-        const windowObjects = saveObj['windows'];
-        windowObjects.forEach(wObj => {
-            const { windowId, isTiled, tiledRect, untiledRect } = wObj;
-            const window = openWindows.find(w => w.get_stable_sequence() === windowId);
-            if (!window)
-                return;
-
-            const jsToRect = jsRect => jsRect && new Rect(
-                jsRect.x, jsRect.y, jsRect.width, jsRect.height
-            );
-
-            window.isTiled = isTiled;
-            window.tiledRect = jsToRect(tiledRect);
-            window.untiledRect = jsToRect(untiledRect);
-        });
-
-        const tileGroups = new Map(saveObj['tileGroups']);
         this._twm.setTileGroups(tileGroups);
-        openWindows.forEach(w => {
-            if (tileGroups.has(w.get_id())) {
-                const group = this._twm.getTileGroupFor(w);
+        this._twm.setTileStates(tileStates);
+
+        openWindows.forEach(window => {
+            const tileState = tileStates.get(window.get_id());
+
+            if (tileState) {
+                const { isTiled, tiledRect, untiledRect } = tileState;
+                const jsToRect = jsRect => jsRect && new Rect(
+                    jsRect.x, jsRect.y, jsRect.width, jsRect.height
+                );
+
+                window.isTiled = isTiled;
+                window.tiledRect = jsToRect(tiledRect);
+                window.untiledRect = jsToRect(untiledRect);
+            }
+
+
+            if (tileGroups.has(window.get_id())) {
+                const group = this._twm.getTileGroupFor(window);
                 this._twm.updateTileGroup(group);
             }
         });

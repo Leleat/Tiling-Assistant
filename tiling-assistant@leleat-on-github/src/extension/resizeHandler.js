@@ -352,6 +352,8 @@ export default class TilingResizeHandler {
             newGrabbedTiledRectHeight
         );
 
+        Twm.saveTileState(window);
+
         // Now calculate the new tiledRects for the windows, which were resized
         // along the window based on the diff of the window's tiledRect pre
         // and after the grab.
@@ -379,6 +381,8 @@ export default class TilingResizeHandler {
                 win.tiledRect.y += isResizingS ? tiledRectDiffHeight : 0;
                 win.tiledRect.height -= tiledRectDiffHeight;
             }
+
+            Twm.saveTileState(win);
         });
 
         this._preGrabRects.clear();
