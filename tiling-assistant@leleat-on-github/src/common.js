@@ -154,6 +154,13 @@ export class DynamicKeybindings {
     static FAVORITE_LAYOUT = 4;
 }
 
+export const FocusHint = Object.freeze({
+    DISABLED: 0,
+    ANIMATED_OUTLINE: 1,
+    ANIMATED_UPSCALE: 2,
+    STATIC_OUTLINE: 3
+});
+
 export class MoveModes {
     // Order comes from prefs
     static EDGE_TILING = 0;

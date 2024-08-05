@@ -280,41 +280,59 @@
         </object>
       </child>
       <!-- ======================================================================================== -->
-      <!-- = Group: Active Window Hint ============================================================ -->
+      <!-- = Group: Focus Hint ==================================================================== -->
       <!-- ======================================================================================== -->
       <child>
         <object class="AdwPreferencesGroup">
-        <property name="title" translatable="yes" comments="Translators: This is a header for a preference group in the 'General' tab">Active Window Hint</property>
+          <property name="title" translatable="yes" comments="Translators: This is a header for a preference group in the 'General' tab for settings to indicate the currently focused window">Focus Hint</property>
+          <property name="description" translatable="yes" comments="Translators: This is the explanation for the preference group 'Focus Hint' in the 'General' tab in the prefs window">Generally, the focused window will be indicated if it may be ambiguous. That means, if a window is focused with the pointer, the focus won't be indicated unless you use the Static Outline</property>
+          <property name="visible"
+                    bind-source="enable_advanced_experimental_features"
+                    bind-property="active"
+                    bind-flags="sync-create"/>
           <child>
-            <object class="AdwActionRow" id="active_window_hint_disabled_row">
-              <property name="title" translatable="yes" comments="Translators: This setting disables the 'Active Window Hint' in the 'General' tab">Disabled</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the 'Disabled' option for the 'Active Window Hint' in the 'General' tab">Don't indicate the focused window</property>
-              <property name="activatable-widget">active_window_hint_disabled_button</property>
+            <object class="AdwActionRow" id="disabled_focus_hint_row">
+              <property name="title" translatable="yes" comments="Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window">Disabled</property>
+              <property name="subtitle" translatable="yes" comments="Translators: This is the explanation for the setting 'Disabled' for the preference group 'Focus Hint' in the 'General' tab in the prefs window">Do &lt;i&gt;not&lt;/i&gt; indicate the focused window</property>
+              <property name="use-markup">1</property>
+              <property name="activatable-widget">disabled-focus-hint-button</property>
               <child type="prefix">
-                <object class="GtkCheckButton" id="active_window_hint_disabled_button"/>
+                <object class="GtkCheckButton" id="disabled-focus-hint-button"/>
               </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow" id="active_window_hint_minimal_row">
-              <property name="title" translatable="yes" comments="Translators: This is an option for 'Active Window Hint' in the 'General' tab. With it enabled the active (i. e. focused) window will be indicated under certain circumenstances. E. g. when switching workspaces.">Minimal</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the 'Minimal' option for the 'Active Window Hint' in the 'General' tab">Temporarily indicate the focused window when switching to a workspace with multiple non-overlapping windows</property>
-              <property name="activatable-widget">active_window_hint_minimal_button</property>
+            <object class="AdwActionRow" id="animated_outline_focus_hint_row">
+              <property name="title" translatable="yes" comments="Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will indicate the focused window by animating an outline around the focused window under certain circumstances">Outline Animation</property>
+              <property name="subtitle" translatable="yes" comments="Translators: This is the explanation for the setting 'Outline Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window">When the focus changes, temporarily outline the focused window. Maximized and fullscreen windows are exempt from this</property>
+              <property name="activatable-widget">animated-outline-focus-hint-button</property>
               <child type="prefix">
-                <object class="GtkCheckButton" id="active_window_hint_minimal_button">
-                  <property name="group">active_window_hint_disabled_button</property>
+                <object class="GtkCheckButton" id="animated-outline-focus-hint-button">
+                  <property name="group">disabled-focus-hint-button</property>
                 </object>
               </child>
             </object>
           </child>
           <child>
-            <object class="AdwActionRow" id="active_window_hint_always_row">
-              <property name="title" translatable="yes" comments="Translators: This is an option for 'Active Window Hint' in the 'General' tab. With it enabled the active (i. e. focused) window will always be indicated with a frame.">Always</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the 'Always' option for the 'Active Window Hint' in the 'General' tab">Always indicate the focused window unless it's maximized or in fullscreen. There are issues on Wayland with GTK4 popups</property>
-              <property name="activatable-widget">active_window_hint_always_button</property>
+            <object class="AdwActionRow" id="animated_upscale_focus_hint_row">
+              <property name="title" translatable="yes" comments="Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will scale the focused window up to indicate the focus under certain circumstances.">Upscale Animation</property>
+              <property name="subtitle" translatable="yes" comments="Translators: This is the explanation for the setting 'Upscale Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window">When the focus changes, temporarily scale the focused window up. Maximized and fullscreen windows are exempt from this</property>
+              <property name="activatable-widget">animated-upscale-focus-hint-button</property>
               <child type="prefix">
-                <object class="GtkCheckButton" id="active_window_hint_always_button">
-                  <property name="group">active_window_hint_disabled_button</property>
+                <object class="GtkCheckButton" id="animated-upscale-focus-hint-button">
+                  <property name="group">disabled-focus-hint-button</property>
+                </object>
+              </child>
+            </object>
+          </child>
+          <child>
+            <object class="AdwActionRow" id="static_outline_focus_hint_row">
+              <property name="title" translatable="yes" comments="Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will outline the focused window (almost) at all times. There is no animation, hence 'static'">Static Outline</property>
+              <property name="subtitle" translatable="yes" comments="Translators: This is the explanation for the setting 'Static Outline' for the preference group 'Focus Hint' in the 'General' tab in the prefs window">Indicate the focused window with a static outline unless it's maximized or in fullscreen.</property>
+              <property name="activatable-widget">static-outline-focus-hint-button</property>
+              <child type="prefix">
+                <object class="GtkCheckButton" id="static-outline-focus-hint-button">
+                  <property name="group">disabled-focus-hint-button</property>
                 </object>
               </child>
             </object>
@@ -328,36 +346,20 @@
                     bind-property="active"
                     bind-flags="sync-create"/>
           <child>
-            <object class="AdwActionRow" id="active_window_hint_color_row">
-              <property name="title" translatable="yes" comments="Translators: This is the color of the active window hint in the preference group 'Active Window Hint' in the 'General' tab">Hint Color</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the active window 'Hint Color' in the preference group 'Active Window Hint' in the 'General' tab">The color of the frame indicating the focused window</property>
-              <property name="activatable-widget">active_window_hint_color_button</property>
+            <object class="AdwActionRow">
+              <property name="title" translatable="yes" comments="Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window">Outline Color</property>
+              <property name="activatable-widget">focus_hint_color_button</property>
               <child>
-                <object class="GtkColorButton" id="active_window_hint_color_button">
+                <object class="GtkColorButton" id="focus_hint_color_button">
                   <property name="valign">center</property>
                 </object>
               </child>
             </object>
           </child>
           <child>
-            <object class="AdwSpinRow" id="active_window_hint_border_size">
-              <property name="title" translatable="yes" comments="Translators: This is the border size of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab">Border Size</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the 'Border size' setting of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab">The border size of the frame indicating the focused window for the always active hint</property>
-              <property name="activatable-widget">active_window_hint_border_size</property>
-              <property name="adjustment">
-                <object class="GtkAdjustment">
-                  <property name="upper">50</property>
-                  <property name="step-increment">1</property>
-                  <property name="page-increment">8</property>
-                </object>
-              </property>
-            </object>
-          </child>
-          <child>
-            <object class="AdwSpinRow" id="active_window_hint_inner_border_size">
-              <property name="title" translatable="yes" comments="Translators: This is the border size, that grows into and overlaps the window, of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab">Inner Border Size</property>
-              <property name="subtitle" translatable="yes" comments="Translators: This is an explanation for the 'Inner Border size' setting of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab">The border for the always active hint reaching inside the window frame. This is meant to cover rounded corners. However, GTK4 popups on Wayland will put the window behind the hint for whatever reason...</property>
-              <property name="activatable-widget">active_window_hint_inner_border_size</property>
+            <object class="AdwSpinRow" id="focus_hint_outline_size">
+              <property name="title" translatable="yes" comments="Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint">Outline Size</property>
+              <property name="activatable-widget">focus_hint_outline_size</property>
               <property name="adjustment">
                 <object class="GtkAdjustment">
                   <property name="upper">50</property>

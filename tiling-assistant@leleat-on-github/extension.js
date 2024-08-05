@@ -23,8 +23,8 @@ import MoveHandler from './src/extension/moveHandler.js';
 import ResizeHandler from './src/extension/resizeHandler.js';
 import KeybindingHandler from './src/extension/keybindingHandler.js';
 import LayoutsManager from './src/extension/layoutsManager.js';
-import ActiveWindowHint from './src/extension/activeWindowHint.js';
 import AltTabOverride from './src/extension/altTab.js';
+import FocusHintManager from './src/extension/focusHint.js';
 import { Rect } from './src/extension/utility.js';
 
 /**
@@ -160,7 +160,7 @@ export default class TilingAssistantExtension extends Extension {
         this._resizeHandler = new ResizeHandler();
         this._keybindingHandler = new KeybindingHandler();
         this._layoutsManager = new LayoutsManager();
-        this._activeWindowHintHandler = new ActiveWindowHint();
+        this._focusHintManager = new FocusHintManager();
         this._altTabOverride = new AltTabOverride();
 
         // Disable native tiling.
@@ -239,8 +239,8 @@ export default class TilingAssistantExtension extends Extension {
         this._keybindingHandler = null;
         this._layoutsManager.destroy();
         this._layoutsManager = null;
-        this._activeWindowHintHandler.destroy();
-        this._activeWindowHintHandler = null;
+        this._focusHintManager.destroy();
+        this._focusHintManager = null;
 
         this._altTabOverride.destroy();
         this._altTabOverride = null;
