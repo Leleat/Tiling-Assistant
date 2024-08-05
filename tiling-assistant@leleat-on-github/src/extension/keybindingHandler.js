@@ -102,10 +102,23 @@ export default class TilingKeybindingHandler {
                     Twm.untile(window);
                 }
 
-            // Maximize vertically even if the height may already be equal to the workArea
-            // e. g. via double-click titlebar, maximize-window-button or whatever
-            } else {
+            // is tiled normally
+            } else if (window.untiledRect) {
                 const tileRect = new Rect(currRect.x, workArea.y, currRect.width, workArea.height);
+                Twm.tile(window, tileRect);
+
+            // is floating
+            } else {
+                const width = Math.min(
+                    currRect.width + Settings.getInt('window-gap'),
+                    workArea.width
+                );
+                const constrainX = Math.max(
+                    currRect.x - Settings.getInt('window-gap') / 2,
+                    workArea.x
+                );
+                const finalX = Math.min(constrainX, workArea.x2 - width);
+                const tileRect = new Rect(finalX, workArea.y, width, workArea.height);
                 Twm.tile(window, tileRect);
             }
 
@@ -125,10 +138,23 @@ export default class TilingKeybindingHandler {
                     Twm.untile(window);
                 }
 
-            // Maximize horizontally even if the width may already be equal to the workArea
-            // e. g. via double-click titlebar, maximize-window-button or whatever
-            } else {
+            // is tiled normally
+            } else if (window.untiledRect) {
                 const tileRect = new Rect(workArea.x, currRect.y, workArea.width, currRect.height);
+                Twm.tile(window, tileRect);
+
+            // is floating
+            } else {
+                const height = Math.min(
+                    currRect.height + Settings.getInt('window-gap'),
+                    workArea.height
+                );
+                const constrainY = Math.max(
+                    currRect.y - Settings.getInt('window-gap') / 2,
+                    workArea.y
+                );
+                const finalY = Math.min(constrainY, workArea.y2 - height);
+                const tileRect = new Rect(workArea.x, finalY, workArea.width, height);
                 Twm.tile(window, tileRect);
             }
 

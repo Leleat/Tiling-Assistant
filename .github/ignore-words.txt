@@ -1,5 +1,7 @@
 allws
 Distro
+finalX
+finalY
 fullscreen
 gettext
 Journalctl
