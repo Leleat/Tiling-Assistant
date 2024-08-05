@@ -16,8 +16,28 @@ export class TilingWindowManager {
         // { windowId1: [windowIdX, windowIdY, ...], windowId2: [...], ... }
         this._tileGroups = new Map();
 
-        // [windowIds]
-        this._unmanagingWindows = [];
+        const assertExistenceFor = window => {
+            window.assertExistence = () => {};
+
+            window.connectObject(
+                'unmanaging',
+                () => {
+                    window.assertExistence = () => {
+                        throw new Error(
+                            'Trying to operate on an unmanaging window!'
+                        );
+                    };
+                },
+                this
+            );
+        };
+
+        global.display.list_all_windows().forEach(w => assertExistenceFor(w));
+        global.display.connectObject(
+            'window-created',
+            (_, window) => assertExistenceFor(window),
+            this
+        );
 
         global.workspace_manager.connectObject(
             'workspace-added',
@@ -36,9 +56,15 @@ export class TilingWindowManager {
         this._signals = null;
 
         global.workspace_manager.disconnectObject(this);
+        global.display.disconnectObject(this);
+
+        global.display.list_all_windows().forEach(w => {
+            w.disconnectObject(this);
+
+            delete w.assertExistence;
+        });
 
         this._tileGroups.clear();
-        this._unmanagingWindows = [];
 
         if (this._openAppTiledTimerId) {
             GLib.Source.remove(this._openAppTiledTimerId);
@@ -411,9 +437,8 @@ export class TilingWindowManager {
             const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
             unmanagingSignal && window.disconnect(unmanagingSignal);
 
-            const umId = window.connect('unmanaging', w => {
+            const umId = window.connect('unmanaging', () => {
                 this.clearTilingProps(windowId);
-                this._unmanagingWindows.push(w.get_stable_sequence());
             });
             signals.set(TilingSignals.UNMANAGING, umId);
 
@@ -1194,9 +1219,8 @@ export class TilingWindowManager {
         const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
         unmanagingSignal && window.disconnect(unmanagingSignal);
 
-        const umId = window.connect('unmanaging', w => {
+        const umId = window.connect('unmanaging', () => {
             this.clearTilingProps(window.get_id());
-            this._unmanagingWindows.push(w.get_stable_sequence());
         });
         signals.set(TilingSignals.UNMANAGING, umId);
 
@@ -1278,11 +1302,12 @@ export class TilingWindowManager {
      */
     static _onWindowWorkspaceChanged(window) {
         // Closing a window triggers a ws-changed signal, which may lead to a
-        // crash, if we try to operate on it any further. So we listen to the
-        // 'unmanaging'-signal to see, if there is a 'true  workspace change'
-        // or whether the window was just closed
-        if (this._unmanagingWindows.includes(window.get_stable_sequence()))
+        // crash, if we try to operate on it any further.
+        try {
+            window.assertExistence();
+        } catch {
             return;
+        }
 
         if (this._ignoreWsChange)
             return;
