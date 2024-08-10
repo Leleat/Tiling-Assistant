@@ -1,5 +1,22 @@
 # Changelog
 
+## [48] - 2024-08-10
+
+### Added
+
+- Add more Italian translation by albanobattistella (#352)
+- Add translations comments (#338)
+
+### Fixed
+
+- Ignore unused mods for determining the MoveModes (#340)
+- Don't spam logs that a config file exists when un/locking the screen by jtojnar (#346)
+- Mark 'Preferences' in the PanelButton for translation by ChrisLauinger77 (#351)
+- Maximize windows vertically/horizontally without gaps (#353)
+- Mark 'Disabled' for translation in prefs by ChrisLauinger77 (#356)
+- Work around a possible mutter assertion when trying to tile an app that crashed (#360)
+- Work around a possible crash when un/locking the screen (#361)
+
 ## [47] - 2024-04-21
 
 ### Fixed

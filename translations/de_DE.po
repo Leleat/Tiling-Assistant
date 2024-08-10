@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-06-08 14:57+0200\n"
+"POT-Creation-Date: 2024-08-10 18:13+0200\n"
 "PO-Revision-Date: 2024-06-08 15:03+0200\n"
 "Last-Translator: Christian Lauinger <christian@lauinger-clan.de>\n"
 "Language-Team: \n"
@@ -181,6 +181,8 @@ msgstr ""
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:514
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:14
+#: tiling-assistant@leleat-on-github/src/prefs/shortcutListener.js:102
 msgid "Disabled"
 msgstr "Deaktiviert"
 

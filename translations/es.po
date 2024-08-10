@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-04-21 14:58+0200\n"
+"POT-Creation-Date: 2024-08-10 18:13+0200\n"
 "PO-Revision-Date: 2022-12-03 18:38+0200\n"
 "Last-Translator: Sergio Varela <sergiovg01@outlook.com>\n"
 "Language-Team: \n"
@@ -18,52 +18,66 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Gtranslator 42.0\n"
 
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:10
 msgid "Report a Bug"
 msgstr "Informar de un error"
 
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
 msgid "User Guide"
 msgstr "Guía de usuario"
 
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
 msgid "License"
 msgstr "Licencia"
 
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:22
 msgid "Changelog"
 msgstr "Registro de cambios"
 
+#. Translators: This is a popup menu item in the headerbar of the prefs window that opens a dialog to enable the advanced and experimental settings
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:26
 msgid "Advanced..."
 msgstr "Avanzado..."
 
+#. Translators: This is the name of a tab in the prefs window
+#. Translators: This is a header for a preference group in the 'Keybindings' tab
+#. Translators: This is a header for a preference group in the 'Layouts' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:41
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:631
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:852
 msgid "General"
 msgstr "General"
 
+#. Translators: This is the header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:48
 msgid "Tiling Popup"
 msgstr "Ventana emergente de distribución en mosaico"
 
+#. Translators: This is a setting in the 'General' tab that decides whether the Tiling Popup will appear after tiling a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
 msgid "Open after tiling a window"
 msgstr "Abrir después de disponer en mosaico una ventana"
 
+#. Translators: This is a setting in the 'General' tab about including apps in the Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:56
 msgid "Include apps from all workspaces"
 msgstr "Incluir aplicaciones de todos los espacios de trabajo"
 
+#. Translators: This is the header for a preference group in the 'General' tab about grouping tiled windows together
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:71
 msgid "Tile Groups"
 msgstr "Grupos de ventanas en mosaico"
 
+#. Translators: This is the name of setting to disable tile groups in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:74
 msgid "Disable Tile Groups"
 msgstr "Desactivar los grupos de mosaicos"
 
+#. Translators: This is an explanation about the 'Disable Tile Groups' setting
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:75
 msgid ""
 "Tiled windows will no longer adapt their size to other tiled windows nor be "
@@ -71,10 +85,12 @@ msgid ""
 "and the Tiling Popup will also no longer work."
 msgstr ""
 
+#. Translators: This is a setting in the 'General' tab about raising grouped tiled windows into the foreground together
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:84
 msgid "Raise together"
 msgstr "Grupo en primer plano"
 
+#. Translators: This is an explanation for the 'Raise Together' setting
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:85
 msgid ""
 "A tile group is created when a window gets tiled. If a tiled window is "
@@ -83,11 +99,13 @@ msgstr ""
 "Se crea un grupo de ventanas cuando una ventana se dispone en mosaico . Si "
 "una de las ventanas del grupo pasa a primer plano, el resto también lo hacen"
 
+#. Translators: This is a (deprecated) setting under the 'Tile Groups' preference group in the 'General' tab. It's about tile groups appearing grouped together in the App Switcher (Alt-Tab) and the Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:90
 msgid "App Switcher and Tiling Popup"
 msgstr ""
 "Conmutador de aplicaciones y ventana emergente de disposición en mosaico"
 
+#. Translators: This is an explanation for the 'App Switcher and Tiling Popup' setting
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:91
 msgid ""
 "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
@@ -97,73 +115,93 @@ msgstr ""
 "aplicaciones (también conocidas como Alt+Tab). Es posible que tenga que "
 "reactivar esta o la otra extensión después de modificar esta configuración"
 
+#. Translators: This is a header for a preference group in the 'General' tab to add gaps between tiled windows
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:105
 msgid "Gaps"
 msgstr "Espaciado"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:108
 msgid "Windows"
 msgstr "Ventanas"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows and the screen edges
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:121
 msgid "Screen Edges"
 msgstr "Bordes de pantalla"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows and the top screen edge
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
 msgid "Screen Edge Top"
 msgstr "Borde de pantalla superior"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows and the left screen edge
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:155
 msgid "Screen Edge Left"
 msgstr "Borde de la pantalla izquierda"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows and the right screen edge
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:172
 msgid "Screen Edge Right"
 msgstr "Borde de la pantalla derecha"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to set the gaps between tiled windows and the bottom screen edge
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:189
 msgid "Screen Edge Bottom"
 msgstr "Borde inferior de la pantalla"
 
+#. Translators: This is a setting under the 'Gaps' preference group in the 'General' tab to add gaps between maximized windows and the screen edges
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:206
 msgid "Maximized Windows"
 msgstr "Ventanas maximizadas"
 
+#. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:216
 msgid "Dynamic Keybinding Behavior"
 msgstr "Comportamiento dinámico de los atajos de teclado"
 
+#. Translators: This is the explanation for the preference group 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:217
 msgid ""
 "The keybindings to maximize and tile to the top/bottom/left/right may change "
 "their behavior based on the window's tiling state"
 msgstr ""
 
+#. Translators: This setting disables the 'Dynamic Keybinding Behavior' in the 'General' tab
+#. Translators: This setting disables the 'Active Window Hint' in the 'General' tab
+#. Translators: This is a modifier for 'Adaptive Tiling Move Mode Activator' in the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:220
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:290
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:494
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:514
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:534
+#: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:14
+#: tiling-assistant@leleat-on-github/src/prefs/shortcutListener.js:102
 msgid "Disabled"
 msgstr "Desactivado"
 
+#. Translators: This is an explanation for the 'Disabled' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:221
 msgid "Don't change the keybindings' behavior"
 msgstr "No cambie el comportamiento de los enlaces de las teclas"
 
+#. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change window focus instead of tiling
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:230
 msgid "Window Focus"
 msgstr "Enfoque de ventana"
 
+#. Translators: This is an explanation for the 'Window Focus' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:231
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
 
+#. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change their tiling behavior based on the current windows' tiling state
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:242
 msgid "Tiling State"
 msgstr "Estado de disposición en mosaico"
 
+#. Translators: This is an explanation for the 'Tiling State' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:243
 msgid ""
 "Adapt the tiling state to the pressed shortcut. For instance, a window tiled "
@@ -171,10 +209,12 @@ msgid ""
 "is activated"
 msgstr ""
 
+#. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change their tiling behavior based on the current windows' tiling state. It behaves similarly to Windows (the OS).
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:254
 msgid "Tiling State (Windows)"
 msgstr "Estado de disposición en mosaico (Ventanas)"
 
+#. Translators: This is an explanation for the 'Tiling State (Windows)' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:255
 msgid ""
 "Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
@@ -185,65 +225,80 @@ msgstr ""
 "no está dispuesta en mosaico o lo está en la parte inferior, minimiza la "
 "ventana"
 
+#. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It will change some tiling shortcuts to shift the current window along the 'Favorite Layout' instead of the default half/quarter tiling
+#. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, windows can only be tiled to tiles in the favorite layout when using the mouse
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:266
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:429
 msgid "Favorite Layout"
 msgstr "Distribución favorita"
 
+#. Translators: This is an explanation for the 'Favorite Layout' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:267
 msgid "Move the window along your favorite Layout"
 msgstr "Mueve la ventana de acuerdo a tu distribución favorita"
 
+#. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Active Window Hint"
 msgstr "Sugerencia de ventana activa"
 
+#. Translators: This is an explanation for the 'Disabled' option for the 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:291
 msgid "Don't indicate the focused window"
 msgstr "No indicar la ventana enfocada"
 
+#. Translators: This is an option for 'Active Window Hint' in the 'General' tab. With it enabled the active (i. e. focused) window will be indicated under certain circumenstances. E. g. when switching workspaces.
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:300
 msgid "Minimal"
 msgstr "Mínimo"
 
+#. Translators: This is an explanation for the 'Minimal' option for the 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:301
 msgid ""
 "Temporarily indicate the focused window when switching to a workspace with "
 "multiple non-overlapping windows"
 msgstr ""
 
+#. Translators: This is an option for 'Active Window Hint' in the 'General' tab. With it enabled the active (i. e. focused) window will always be indicated with a frame.
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:312
 msgid "Always"
 msgstr "Siempre"
 
+#. Translators: This is an explanation for the 'Always' option for the 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:313
 msgid ""
 "Always indicate the focused window unless it's maximized or in fullscreen. "
 "There are issues on Wayland with GTK4 popups"
 msgstr ""
 
+#. Translators: This is the color of the active window hint in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
 msgid "Hint Color"
 msgstr "Color del indicio"
 
+#. Translators: This is an explanation for the active window 'Hint Color' in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:333
 msgid "The color of the frame indicating the focused window"
 msgstr "El color del marco que indica la ventana enfocada"
 
+#. Translators: This is the border size of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:344
 msgid "Border Size"
 msgstr "Tamaño de los bordes"
 
+#. Translators: This is an explanation for the 'Border size' setting of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:345
 msgid ""
 "The border size of the frame indicating the focused window for the always "
 "active hint"
 msgstr ""
 
+#. Translators: This is the border size, that grows into and overlaps the window, of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:358
 msgid "Inner Border Size"
 msgstr "Tamaño del borde interior"
 
+#. Translators: This is an explanation for the 'Inner Border size' setting of the 'Always' active window hint in the preference group 'Active Window Hint' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:359
 msgid ""
 "The border for the always active hint reaching inside the window frame. This "
@@ -251,31 +306,39 @@ msgid ""
 "the window behind the hint for whatever reason..."
 msgstr ""
 
+#. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:377
 msgid "Animations"
 msgstr "Animaciones"
 
+#. Translators: This setting enables tiling animations and is listed under the 'Animation' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:384
 msgid "Tiling"
 msgstr "Al disponer la ventana en mosaico"
 
+#. Translators: This setting enables untiling animations and is listed under the 'Animation' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:389
 msgid "Untiling"
 msgstr "Al sacar la ventana del mosaico"
 
+#. Translators: This is a header for a preference group in the 'General' tab. See https://github.com/Leleat/Tiling-Assistant/wiki/Window-Grab-Modes for more information
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:399
 msgid "Default Window Movement Mode"
 msgstr "Modo de movimiento de la ventana por defecto"
 
+#. Translators: This is the explanation for the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:400
 msgid "The movement mode that is activated when no modifier key is pressed"
 msgstr ""
 
+#. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, tiling will be activated, when the user drags a window to the screen edges
+#. Translators: This is a header for a preference group in the 'Keybindings' tab to tile windows to the screen halves
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:407
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:698
 msgid "Edge Tiling"
 msgstr "Disposición en mosaico en los bordes de la pantalla"
 
+#. Translators: This is the explanation for the 'Edge Tiling' option in the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:408
 msgid ""
 "Moving the window to the screen edges or corners will open the default tile "
@@ -284,10 +347,12 @@ msgstr ""
 "Al mover la ventana a los bordes o esquinas de la pantalla se abrirá la "
 "vista previa de disposición en mosaico por defecto"
 
+#. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, tiling a window may affect the current visible layout. E. g. A half-screen tile can be split into 2 quarter tiles
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:417
 msgid "Adaptive Tiling"
 msgstr "Disposición en mosaico adaptativa"
 
+#. Translators: This is the explanation for the 'Adaptive Tiling' option in the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:418
 msgid ""
 "Releasing the grab on a window while hovering over a tile will push the "
@@ -296,6 +361,7 @@ msgstr ""
 "Si se suelta una ventana mientras se pasa por encima de una ventana "
 "dispuesta en mosaico, se apartará la(s) ventana(s) superpuesta(s)"
 
+#. Translators: This is the explanation for the 'Favorite Layout' option in the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:430
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
@@ -303,22 +369,27 @@ msgstr ""
 "La vista previa de disposición en mosaico se ceñirá a tu distribución "
 "favorita de la página 'Distribuciones'"
 
+#. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode core features (Tiling Popup and Tile Groups) will be disabled
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:441
 msgid "Ignore Tiling Assistant"
 msgstr ""
 
+#. Translators: This is the explanation for the 'Ignore Tiling Assistant' option in the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:442
 msgid "Use Edge Tiling without Tiling Assistant's features"
 msgstr ""
 
+#. Translators: This is a header for misc settings in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:458
 msgid "Other"
 msgstr "Otro"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. When moving a window to a new monitor the tiling preview will stick for a short time (the 'Monitor Switch Grace Period') to the old monitor to make tiling on multi-monitor setups easier
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:461
 msgid "Monitor Switch Grace Period"
 msgstr ""
 
+#. Translators: This is the explanation for the 'Monitor Switch Grace Period' under the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:462
 msgid ""
 "When a window is dragged to a new monitor the tile preview will stick to the "
@@ -327,231 +398,290 @@ msgid ""
 "edge."
 msgstr ""
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. If the user has performance issue when dragging windows around, this will improve it but will decrease the accuracy of the tiling previews
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:467
 msgid "Low Performance Movement Mode"
 msgstr ""
 
+#. Translators: This is the explanation for the 'Low Performance Movement Mode' under the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:468
 msgid ""
 "Use this if there is a lag when moving windows around. This will however "
 "decrease the precision of the tile preview updates."
 msgstr ""
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. With this setting enabled, dragging windows to the screen edges won't use the default half-screen tiles but the tiles from the favorite layout
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:477
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
 msgstr ""
 "Adaptar la 'Disposición en mosaico en el borde' a tu distibución favorita"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This will set the modifier to activate the move mode 'Adaptive Tiling'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:486
 msgid "'Adaptive Tiling' Move Mode Activator"
 msgstr "Activador del modo de movimiento 'Organización en mosaico adaptativa'"
 
+#. Translators: This is a modifier for 'Adaptive Tiling Move Mode Activator' in the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:495
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:515
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:535
 msgid "Ctrl"
 msgstr "Ctrl"
 
+#. Translators: This is a modifier for 'Adaptive Tiling Move Mode Activator' in the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:496
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:516
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:536
 msgid "Alt"
 msgstr "Alt"
 
+#. Translators: This is a modifier for 'Adaptive Tiling Move Mode Activator' in the 'Other' preference group in the 'General' tab. RMB refers to the right mouse button
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:497
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:517
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:537
 msgid "RMB"
 msgstr "Botón derecho del ratón"
 
+#. Translators: This is a modifier for 'Adaptive Tiling Move Mode Activator' in the 'Other' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:498
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:518
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:538
 msgid "Super"
 msgstr ""
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This will set the modifier to activate the move mode 'Favorite Layout'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:506
 msgid "'Favorite Layout' Move Mode Activator"
 msgstr "Activador del modo de movimiento 'Distribución favorita'"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This will set the modifier to activate the move mode 'Ignore Tiling Assistant'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:526
 msgid "'Ignore Tiling Assistant' Mode Activator"
 msgstr ""
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This is the area (in pixels) around the screen edges on the vertical axis that activates the tile previews
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:546
 msgid "Vertical Edge Preview Trigger Area"
 msgstr "Área de activación de la vista previa del borde vertical"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This is the area (in pixels) around the screen edges on the horizontal axis that activates the tile previews
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:564
 msgid "Horizontal Edge Preview Trigger Area"
 msgstr "Área de activación de la vista previa del borde horizontal"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. By default, when using 'Edge Tiling' and dragging the window to the top screen edge, the maximize tiling preview will show up. After some time the preview will switch to the top-half-screen tiling preview. This setting determines the duration of that timer
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:582
 msgid "Inverse Top Screen Edge Action Timer"
 msgstr "Tiempo hasta conmutar la acción del borde superior"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. By default, when using 'Edge Tiling' and dragging the window to the top screen edge, the maximize tiling preview will show up. After some time the preview will switch to the top-half-screen tiling preview. This setting makes the top-half-screen tiling preview before the maxmize preview on landscape displays
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:600
 msgid "Inverse Top Screen Edge Action for Landscape Displays"
 msgstr ""
 "Acción en borde superior invertida para pantallas con disposición apaisada"
 
+#. Translators: This is a setting in the 'Other' preference group in the 'General' tab. By default, when using 'Edge Tiling' and dragging the window to the top screen edge, the maximize tiling preview will show up. After some time the preview will switch to the top-half-screen tiling preview. This setting makes the top-half-screen tiling preview before the maxmize preview on portrait displays
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:609
 msgid "Inverse Top Screen Edge Action for Portrait Displays"
 msgstr ""
 "Acción en borde superior invertida para pantallas con disposición vertical"
 
+#. Translators: This is the name of a tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:624
 msgid "Keybindings"
 msgstr "Atajos de teclado"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab that enables/disables the appearance of the Tiling Popup after a window is tiled
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:634
 msgid "Toggle 'Tiling Popup'"
 msgstr "Activar/desactivar la \"Ventana emergente de disposición en mosaico\""
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab that activates the 'Tile Editing Mode'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:639
 msgid "Tile Editing Mode"
 msgstr "Modo de edición de disposición en mosaico"
 
+#. Translators: This is the explanation for the keybinding 'Tile Editing Mode' in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
 msgid "A keyboard-driven mode to manage your tiled windows"
 msgstr "Un modo de manejo de las ventanas en mosaico mediante el teclado"
 
+#. Translators: This is a (deprecated) keybinding in the 'General' preference group in the 'Keybindings' tab. Its name is a bit misleading. The keybinding will only tile 1 window. Its behavior depends on the current tiling layout. It may cause a window to fill the main empty space or untile a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:645
 msgid "Auto-Tile"
 msgstr "Auto-organizar en mosaico"
 
+#. Translators: This is the explanation for the keybinding 'Auto-Tile' in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:646
 msgid "Un/tile the current window based on the visible tiles"
 msgstr ""
 "Disponer en mosaico o no la ventana actual en base a las ventanas en mosaico "
 "visibles"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:651
 msgid "Toggle 'Always on Top'"
 msgstr "Activar/desactivar 'siempre encima'"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:660
 msgid "Toggle Maximization"
 msgstr "Activar/desactivar el maximizado de la ventana"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:665
 msgid "Toggle Vertical Maximization"
 msgstr "Activar/desactivar el maximizado vertical de la ventana"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:674
 msgid "Toggle Horizontal Maximization"
 msgstr "Activar/desactivar el maximizado horizontal de la ventana"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:683
 msgid "Restore Window Size"
 msgstr "Restaurar el tamaño de la ventana"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:688
 msgid "Move Window to Center"
 msgstr "Mover la ventana al centro"
 
+#. Translators: This is a keybinding in the 'Edge Tiling' preference group in the 'Keybindings' tab to tile window to the top screen half
+#. Translators: This is a keybinding in the 'Edge Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the top screen half without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:701
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:761
 msgid "Tile to top"
 msgstr "Disponer en mosaico en el borde superior"
 
+#. Translators: This is a keybinding in the 'Edge Tiling' preference group in the 'Keybindings' tab to tile window to the bottom screen half
+#. Translators: This is a keybinding in the 'Edge Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the bottom screen half without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:706
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:766
 msgid "Tile to bottom"
 msgstr "Disponer en mosaico en el borde inferior"
 
+#. Translators: This is a keybinding in the 'Edge Tiling' preference group in the 'Keybindings' tab to tile window to the left screen half
+#. Translators: This is a keybinding in the 'Edge Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the left screen half without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:711
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:771
 msgid "Tile to left"
 msgstr "Disponer en mosaico en el borde izquierdo"
 
+#. Translators: This is a keybinding in the 'Edge Tiling' preference group in the 'Keybindings' tab to tile window to the right screen half
+#. Translators: This is a keybinding in the 'Edge Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the right screen half without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:716
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:776
 msgid "Tile to right"
 msgstr "Disponer en mosaico en el borde derecho"
 
+#. Translators: This is a header for a preference group in the 'Keybindings' tab to tile windows to quarters
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:726
 msgid "Corner Tiling"
 msgstr "Disposición en mosaico en las esquinas de la pantalla"
 
+#. Translators: This is a keybinding in the 'Corner Tiling' preference group in the 'Keybindings' tab to tile window to the top left quarter
+#. Translators: This is a keybinding in the 'Corner Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the top left quarter without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:729
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:793
 msgid "Tile to top-left"
 msgstr "Disponer en mosaico en la esquina superior izquierda"
 
+#. Translators: This is a keybinding in the 'Corner Tiling' preference group in the 'Keybindings' tab to tile window to the top right quarter
+#. Translators: This is a keybinding in the 'Corner Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the top right quarter without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:734
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:798
 msgid "Tile to top-right"
 msgstr "Disponer en mosaico en la esquina superior derecha"
 
+#. Translators: This is a keybinding in the 'Corner Tiling' preference group in the 'Keybindings' tab to tile window to the bottom left quarter
+#. Translators: This is a keybinding in the 'Corner Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the bottom left quarter without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:739
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:803
 msgid "Tile to bottom-left"
 msgstr "Disponer en mosaico en la esquina inferior izquierda"
 
+#. Translators: This is a keybinding in the 'Corner Tiling' preference group in the 'Keybindings' tab to tile window to the bottom right quarter
+#. Translators: This is a keybinding in the 'Corner Tiling without Tiling Assistant' preference group in the 'Keybindings' tab to tile window to the bottom right quarter without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:744
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:808
 msgid "Tile to bottom-right"
 msgstr "Disponer en mosaico en la esquina inferior derecha"
 
+#. Translators: This is a header for a preference group in the 'Keybindings' tab to tile windows to screen halves without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:754
 msgid "Edge Tiling without Tiling Assistant"
 msgstr ""
 
+#. Translators: This is a header for a preference group in the 'Keybindings' tab to tile windows to quarters without spawning a Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:786
 msgid "Corner Tiling without Tiling Assistant"
 msgstr ""
 
+#. Translators: This is a header for a preference group in the 'Keybindings' tab for some keybindings for debugging
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:818
 msgid "Debugging"
 msgstr "Depuración"
 
+#. Translators: This is a keybinding in the 'Debugging' preference group in the 'Keybindings' tab to visibly show the tiled windows rectangles
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:825
 msgid "Show Tiled Rects"
 msgstr "Mostrar los rectángulos del mosaico"
 
+#. Translators: This is a keybinding in the 'Debugging' preference group in the 'Keybindings' tab to visibly show the area of the tiles without windows
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:830
 msgid "Show Free Screen Rects"
 msgstr "Mostrar los rectángulos del espacio libre"
 
+#. Translators: This is the name of a tab in the prefs window to configure tiling presets ('Layouts')
+#. Translators: This is a header for a preference group in the 'Layouts' tab where user can define layouts (tiling presets)
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:841
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:871
 msgid "Layouts"
 msgstr "Distribuciones"
 
+#. Translators: This is a setting in the 'General' preference group in the 'Layouts' tab to enable an icon in the top panel with some settings for the layouts
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:855
 msgid "Panel Indicator"
 msgstr "Mostrar indicador en el panel"
 
+#. Translators: This is a keybinding in the 'General' preference group in the 'Layouts' tab to show a popup with a list of the defined layouts
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:860
 msgid "Search for a Layout"
 msgstr "Buscar una distribución"
 
+#. Translators: This is the explanation for the keybinding 'Search for a Layout' in the 'General' preference group in the 'Layouts' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:861
 msgid "Open a popup listing all the available layouts"
 msgstr ""
 "Abre una ventana emergente con una lista de todas las distribuciones "
 "disponibles"
 
+#. Translators: This is a tooltip for a button that defines a new tiling preset (layout) in the 'Layouts' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:895
 msgid "Add a new Layout."
 msgstr "Añadir una nueva distribución."
 
+#. Translators: This is a tooltip for a button that saves the changes to the defined tiling presets (layouts) in the 'Layouts' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:902
 msgid "Save the layouts to the disk. Invalid changes will be lost!"
 msgstr ""
 "Guardar las distribuciones en el disco. ¡Los cambios no válidos se perderán!"
 
+#. Translators: This is a tooltip for a button that reloads the the layouts from the disks in the 'Layouts' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:909
 msgid "Reload the layouts from the disk - discarding all non-saved changes."
 msgstr ""
 "Recargar las distribuciones desde el disco, descartando todos los cambios no "
 "guardados."
 
+#. Translators: This is the setting to toggle the visibility of advanced/experimental settings in the preference window that can be enabled via the headerbar popup menu
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:966
 msgid "Advanced / Experimental Settings"
 msgstr "Ajustes avanzados/experimentales"
 
+#. Translators: This is the explanation for the 'Advanced / Experimental Settings' setting in the preference window that can be enabled via the headerbar popup menu
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:967
 msgid "Show more settings in the main preference window"
 msgstr ""
@@ -568,38 +698,51 @@ msgstr ""
 msgid "Clear the keyboard shortcuts"
 msgstr "Borrar los atajos de teclado"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:56
+#. Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
 msgid "Tiling popup enabled"
 msgstr "Ventana emergente de disposición en mosaico habilitada"
 
-#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
+#. Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
+#: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:59
 msgid "Tiling popup was disabled"
 msgstr "La ventana emergente de disposición en mosaico fue deshabilitada"
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:104
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:494
+#. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
+#. Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:496
 msgid "No valid layouts defined."
 msgstr "No hay distribuciones válidas definidas."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:195
+#. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated and the user attached an app to a tile so that a new instance of that app will automatically open in the tile. But that app seems to have been uninstalled since the definition of the layout.
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:197
 msgid "Popup Layouts: App not found."
 msgstr "Ventana emergente de distribuciones: aplicación no encontrada."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:338
+#. Translators: This is the placeholder text for a search field.
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:340
 msgid "Type to search..."
 msgstr "Escriba para buscar..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:444
+#. Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:445
 msgid "Nameless layout..."
 msgstr "Distribución sin nombre..."
 
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:61
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:523
+msgid "Preferences"
+msgstr ""
+
+#. Translators: This is a notification that pops up if the user tries to enter the Tile Editing Mode via a keyboard shortcut.
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:62
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "No se puede activar el 'Modo de edición de distribución en mosaico' si no "
 "hay una ventana en mosaico visible."
 
-#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:37
+#. Translators: This is a placeholder text of an entry in the prefs when defining a tiling layout.
+#: tiling-assistant@leleat-on-github/src/prefs/layoutRowEntry.js:38
 msgid "'User Guide' for help..."
 msgstr "Ver 'Guía de usuario' para obtener ayuda..."
 
