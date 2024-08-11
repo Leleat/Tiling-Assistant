@@ -1,6 +1,6 @@
 export {
     Extension,
-    gettext as _
+    gettext as _,
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
 export * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';

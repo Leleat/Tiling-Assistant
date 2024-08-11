@@ -1,15 +1,15 @@
-import { Clutter, Meta } from '../dependencies/gi.js';
+import {Clutter, Meta} from '../dependencies/gi.js';
 
-import { Orientation } from '../common.js';
-import { Rect, Util } from './utility.js';
-import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import {Orientation} from '../common.js';
+import {Rect, Util} from './utility.js';
+import {TilingWindowManager as Twm} from './tilingWindowManager.js';
 
 const Side = {
     NONE: 0,
     SAME_H: 1,
     OPPOSING_H: 2,
     SAME_V: 4,
-    OPPOSING_V: 8
+    OPPOSING_V: 8,
 };
 
 /**
@@ -21,7 +21,7 @@ const Side = {
 
 export default class TilingResizeHandler {
     constructor() {
-        const isResizing = grabOp => {
+        const isResizing = (grabOp) => {
             switch (grabOp) {
                 case Meta.GrabOp.RESIZING_N:
                 case Meta.GrabOp.RESIZING_NW:
@@ -46,7 +46,7 @@ export default class TilingResizeHandler {
                 if (window && isResizing(grabOp))
                     this._onResizeStarted(window, grabOp);
             },
-            this
+            this,
         );
         global.display.connectObject(
             'grab-op-end',
@@ -56,7 +56,7 @@ export default class TilingResizeHandler {
                 if (window && isResizing(grabOp))
                     this._onResizeFinished(window, grabOp);
             },
-            this
+            this,
         );
 
         this._preGrabRects = new Map();
@@ -72,13 +72,12 @@ export default class TilingResizeHandler {
     }
 
     _onResizeStarted(window, grabOp) {
-        if (!window.isTiled)
-            return;
+        if (!window.isTiled) return;
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
         let topTileGroup = Twm.getTopTileGroup();
-        topTileGroup.forEach(w => {
+        topTileGroup.forEach((w) => {
             this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
 
             if (w !== window)
@@ -96,12 +95,10 @@ export default class TilingResizeHandler {
         // the resize op those windows will no longer match with the lower tile
         // group's tiles. So remove the shared windows from the lower tile group.
         const allWindows = Twm.getWindows();
-        allWindows.forEach(w => {
-            if (!w.isTiled)
-                return;
+        allWindows.forEach((w) => {
+            if (!w.isTiled) return;
 
-            if (topTileGroup.includes(w))
-                return;
+            if (topTileGroup.includes(w)) return;
 
             // Gets a tile group of windows without the ones
             // which are about to be resized
@@ -112,8 +109,7 @@ export default class TilingResizeHandler {
             }, []);
 
             // Tile groups are the same
-            if (group.length === newGroup.length)
-                return;
+            if (group.length === newGroup.length) return;
 
             // Remove old tile group and create new one
             Twm.clearTilingProps(w.get_id());
@@ -127,18 +123,24 @@ export default class TilingResizeHandler {
 
         // Holding Ctrl allows resizing windows which only directly (or transitively)
         // border the window being actively resized (instead of the entire tileGroup)
-        const isCtrlPressed = Util.isModPressed(Clutter.ModifierType.CONTROL_MASK);
+        const isCtrlPressed = Util.isModPressed(
+            Clutter.ModifierType.CONTROL_MASK,
+        );
         const singleEdgeResizeOp = [
             Meta.GrabOp.RESIZING_N,
             Meta.GrabOp.RESIZING_S,
             Meta.GrabOp.RESIZING_W,
-            Meta.GrabOp.RESIZING_E
+            Meta.GrabOp.RESIZING_E,
         ];
         if (isCtrlPressed && singleEdgeResizeOp.includes(grabOp))
-            topTileGroup = this._getWindowsForIndividualResize(window, topTileGroup, grabOp);
+            topTileGroup = this._getWindowsForIndividualResize(
+                window,
+                topTileGroup,
+                grabOp,
+            );
 
         switch (grabOp) {
-        // Resizing cardinal directions
+            // Resizing cardinal directions
             case Meta.GrabOp.RESIZING_N:
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
@@ -146,7 +148,7 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y, otherRect.y, margin),
                         Util.equal(grabbedRect.y, otherRect.y2, margin),
                         false,
-                        false
+                        false,
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -154,7 +156,7 @@ export default class TilingResizeHandler {
                 window.connectObject(
                     'size-changed',
                     this._onResizing.bind(this, window, grabOp, null),
-                    this
+                    this,
                 );
                 break;
 
@@ -165,7 +167,7 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y2, otherRect.y2, margin),
                         Util.equal(grabbedRect.y2, otherRect.y, margin),
                         false,
-                        false
+                        false,
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -173,7 +175,7 @@ export default class TilingResizeHandler {
                 window.connectObject(
                     'size-changed',
                     this._onResizing.bind(this, window, grabOp, null),
-                    this
+                    this,
                 );
                 break;
 
@@ -184,7 +186,7 @@ export default class TilingResizeHandler {
                         false,
                         false,
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -192,7 +194,7 @@ export default class TilingResizeHandler {
                 window.connectObject(
                     'size-changed',
                     this._onResizing.bind(this, window, null, grabOp),
-                    this
+                    this,
                 );
                 break;
 
@@ -203,7 +205,7 @@ export default class TilingResizeHandler {
                         false,
                         false,
                         Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
@@ -211,11 +213,11 @@ export default class TilingResizeHandler {
                 window.connectObject(
                     'size-changed',
                     this._onResizing.bind(this, window, null, grabOp),
-                    this
+                    this,
                 );
                 break;
 
-                // Resizing intercardinal directions:
+            // Resizing intercardinal directions:
             case Meta.GrabOp.RESIZING_NW:
                 for (const otherWindow of topTileGroup) {
                     const otherRect = otherWindow.tiledRect;
@@ -223,15 +225,20 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y, otherRect.y, margin),
                         Util.equal(grabbedRect.y, otherRect.y2, margin),
                         Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
 
                 window.connectObject(
                     'size-changed',
-                    this._onResizing.bind(this, window, Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_W),
-                    this
+                    this._onResizing.bind(
+                        this,
+                        window,
+                        Meta.GrabOp.RESIZING_N,
+                        Meta.GrabOp.RESIZING_W,
+                    ),
+                    this,
                 );
                 break;
 
@@ -242,15 +249,20 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y, otherRect.y, margin),
                         Util.equal(grabbedRect.y, otherRect.y2, margin),
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
 
                 window.connectObject(
                     'size-changed',
-                    this._onResizing.bind(this, window, Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_E),
-                    this
+                    this._onResizing.bind(
+                        this,
+                        window,
+                        Meta.GrabOp.RESIZING_N,
+                        Meta.GrabOp.RESIZING_E,
+                    ),
+                    this,
                 );
                 break;
 
@@ -261,15 +273,20 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y2, otherRect.y2, margin),
                         Util.equal(grabbedRect.y2, otherRect.y, margin),
                         Util.equal(grabbedRect.x, otherRect.x, margin),
-                        Util.equal(grabbedRect.x, otherRect.x2, margin)
+                        Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
 
                 window.connectObject(
                     'size-changed',
-                    this._onResizing.bind(this, window, Meta.GrabOp.RESIZING_S, Meta.GrabOp.RESIZING_W),
-                    this
+                    this._onResizing.bind(
+                        this,
+                        window,
+                        Meta.GrabOp.RESIZING_S,
+                        Meta.GrabOp.RESIZING_W,
+                    ),
+                    this,
                 );
                 break;
 
@@ -280,15 +297,20 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.y2, otherRect.y2, margin),
                         Util.equal(grabbedRect.y2, otherRect.y, margin),
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
-                        Util.equal(grabbedRect.x2, otherRect.x, margin)
+                        Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
                     resizeOp && this._resizeOps.set(otherWindow, resizeOp);
                 }
 
                 window.connectObject(
                     'size-changed',
-                    this._onResizing.bind(this, window, Meta.GrabOp.RESIZING_S, Meta.GrabOp.RESIZING_E),
-                    this
+                    this._onResizing.bind(
+                        this,
+                        window,
+                        Meta.GrabOp.RESIZING_S,
+                        Meta.GrabOp.RESIZING_E,
+                    ),
+                    this,
                 );
         }
     }
@@ -297,16 +319,17 @@ export default class TilingResizeHandler {
     _onResizeFinished(window, grabOp) {
         window.disconnectObject(this);
 
-        if (!window.isTiled)
-            return;
+        if (!window.isTiled) return;
 
         const monitor = window.get_monitor();
-        const screenTopGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap('screen-top-gap', monitor)
-            : Util.getScaledGap('single-screen-gap', monitor);
-        const screenLeftGap = Util.useIndividualGaps(monitor)
-            ? Util.getScaledGap('screen-left-gap', monitor)
-            : Util.getScaledGap('single-screen-gap', monitor);
+        const screenTopGap =
+            Util.useIndividualGaps(monitor) ?
+                Util.getScaledGap('screen-top-gap', monitor)
+            :   Util.getScaledGap('single-screen-gap', monitor);
+        const screenLeftGap =
+            Util.useIndividualGaps(monitor) ?
+                Util.getScaledGap('screen-left-gap', monitor)
+            :   Util.getScaledGap('single-screen-gap', monitor);
         const windowGap = Util.getScaledGap('window-gap', monitor);
         const workArea = window.get_work_area_for_monitor(monitor);
 
@@ -319,37 +342,51 @@ export default class TilingResizeHandler {
 
         const isResizingW = (grabOp & Meta.GrabOp.RESIZING_W) > 1;
         // Shift the tiledRect by the resize amount
-        let newGrabbedTiledRectX = window.tiledRect.x + (grabbedsNewRect.x - grabbedsOldRect.x);
+        let newGrabbedTiledRectX =
+            window.tiledRect.x + (grabbedsNewRect.x - grabbedsOldRect.x);
         // Switch the screenGap for a windowGap
         if (isResizingW && window.tiledRect.x === workArea.x)
-            newGrabbedTiledRectX = newGrabbedTiledRectX + screenLeftGap - windowGap / 2;
+            newGrabbedTiledRectX =
+                newGrabbedTiledRectX + screenLeftGap - windowGap / 2;
 
         // Same as W but different orientation
         const isResizingN = (grabOp & Meta.GrabOp.RESIZING_N) > 1;
-        let newGrabbedTiledRectY = window.tiledRect.y + (grabbedsNewRect.y - grabbedsOldRect.y);
+        let newGrabbedTiledRectY =
+            window.tiledRect.y + (grabbedsNewRect.y - grabbedsOldRect.y);
         if (isResizingN && window.tiledRect.y === workArea.y)
-            newGrabbedTiledRectY = newGrabbedTiledRectY + screenTopGap - windowGap / 2;
+            newGrabbedTiledRectY =
+                newGrabbedTiledRectY + screenTopGap - windowGap / 2;
 
         // If resizing on the E side, you can simply rely on get_frame_rect's
         // new width else x2 should stick to where it was (manual calc due
         // special cases like gnome-terminal)
         const isResizingE = (grabOp & Meta.GrabOp.RESIZING_E) > 1;
-        const newGrabbedTiledRectWidth = isResizingE
-            ? grabbedsNewRect.width + windowGap / 2 + (workArea.x === newGrabbedTiledRectX ? screenLeftGap : windowGap / 2)
-            : window.tiledRect.x2 - newGrabbedTiledRectX;
+        const newGrabbedTiledRectWidth =
+            isResizingE ?
+                grabbedsNewRect.width +
+                windowGap / 2 +
+                (workArea.x === newGrabbedTiledRectX ?
+                    screenLeftGap
+                :   windowGap / 2)
+            :   window.tiledRect.x2 - newGrabbedTiledRectX;
 
         // Same principal applies to the height and resizing on the S side
         const isResizingS = (grabOp & Meta.GrabOp.RESIZING_S) > 1;
-        const newGrabbedTiledRectHeight = isResizingS
-            ? grabbedsNewRect.height + windowGap / 2 + (workArea.y === newGrabbedTiledRectY ? screenTopGap : windowGap / 2)
-            : window.tiledRect.y2 - newGrabbedTiledRectY;
+        const newGrabbedTiledRectHeight =
+            isResizingS ?
+                grabbedsNewRect.height +
+                windowGap / 2 +
+                (workArea.y === newGrabbedTiledRectY ?
+                    screenTopGap
+                :   windowGap / 2)
+            :   window.tiledRect.y2 - newGrabbedTiledRectY;
 
         const grabbedsOldTiledRect = window.tiledRect;
         window.tiledRect = new Rect(
             newGrabbedTiledRectX,
             newGrabbedTiledRectY,
             newGrabbedTiledRectWidth,
-            newGrabbedTiledRectHeight
+            newGrabbedTiledRectHeight,
         );
 
         Twm.saveTileState(window);
@@ -359,12 +396,13 @@ export default class TilingResizeHandler {
         // and after the grab.
         const tiledRectDiffX = window.tiledRect.x - grabbedsOldTiledRect.x;
         const tiledRectDiffY = window.tiledRect.y - grabbedsOldTiledRect.y;
-        const tiledRectDiffWidth = window.tiledRect.width - grabbedsOldTiledRect.width;
-        const tiledRectDiffHeight = window.tiledRect.height - grabbedsOldTiledRect.height;
+        const tiledRectDiffWidth =
+            window.tiledRect.width - grabbedsOldTiledRect.width;
+        const tiledRectDiffHeight =
+            window.tiledRect.height - grabbedsOldTiledRect.height;
 
         this._resizeOps.forEach((resizeOp, win) => {
-            if (win === window)
-                return;
+            if (win === window) return;
 
             if (resizeOp.side & Side.SAME_H) {
                 win.tiledRect.x += tiledRectDiffX;
@@ -391,31 +429,48 @@ export default class TilingResizeHandler {
 
     _onResizing(resizedWindow, grabOpV, grabOpH) {
         this._resizeOps.forEach((resizeOp, window) => {
-            const rectV = this._getPassiveResizedRect(grabOpV, resizedWindow, window,
-                resizeOp.side & Side.SAME_V, resizeOp.side & Side.OPPOSING_V);
+            const rectV = this._getPassiveResizedRect(
+                grabOpV,
+                resizedWindow,
+                window,
+                resizeOp.side & Side.SAME_V,
+                resizeOp.side & Side.OPPOSING_V,
+            );
 
-            const rectH = this._getPassiveResizedRect(grabOpH, resizedWindow, window,
-                resizeOp.side & Side.SAME_H, resizeOp.side & Side.OPPOSING_H);
+            const rectH = this._getPassiveResizedRect(
+                grabOpH,
+                resizedWindow,
+                window,
+                resizeOp.side & Side.SAME_H,
+                resizeOp.side & Side.OPPOSING_H,
+            );
 
             if (rectV && rectH)
-                window.move_resize_frame(false, rectH[0], rectV[1], rectH[2], rectV[3]);
-            else if (rectV)
-                window.move_resize_frame(false, ...rectV);
-            else if (rectH)
-                window.move_resize_frame(false, ...rectH);
+                window.move_resize_frame(
+                    false,
+                    rectH[0],
+                    rectV[1],
+                    rectH[2],
+                    rectV[3],
+                );
+            else if (rectV) window.move_resize_frame(false, ...rectV);
+            else if (rectH) window.move_resize_frame(false, ...rectH);
         });
     }
 
     // Gets the rect for the non-grabbed window adapted to the resized
     // grabbed window *but* only adapted for 1 side (either vertically
     // or horizontally) at a time based on grabOp
-    _getPassiveResizedRect(grabOp, resizedWindow, window,
-            resizeOnSameSide, resizeOnOpposingSide) {
-        if (!grabOp)
-            return null;
+    _getPassiveResizedRect(
+        grabOp,
+        resizedWindow,
+        window,
+        resizeOnSameSide,
+        resizeOnOpposingSide,
+    ) {
+        if (!grabOp) return null;
 
-        if (!resizeOnSameSide && !resizeOnOpposingSide)
-            return null;
+        if (!resizeOnSameSide && !resizeOnOpposingSide) return null;
 
         const resizedRect = new Rect(resizedWindow.get_frame_rect());
         const wRect = new Rect(window.get_frame_rect());
@@ -424,24 +479,64 @@ export default class TilingResizeHandler {
 
         switch (grabOp) {
             case Meta.GrabOp.RESIZING_N:
-                return resizeOnSameSide
-                    ? [wRect.x, resizedRect.y, wRect.width, preGrabRect.y2 - resizedRect.y]
-                    : [wRect.x, wRect.y, wRect.width, resizedRect.y - wRect.y - windowGap];
+                return resizeOnSameSide ?
+                        [
+                            wRect.x,
+                            resizedRect.y,
+                            wRect.width,
+                            preGrabRect.y2 - resizedRect.y,
+                        ]
+                    :   [
+                            wRect.x,
+                            wRect.y,
+                            wRect.width,
+                            resizedRect.y - wRect.y - windowGap,
+                        ];
 
             case Meta.GrabOp.RESIZING_S:
-                return resizeOnSameSide
-                    ? [wRect.x, wRect.y, wRect.width, resizedRect.y2 - preGrabRect.y]
-                    : [wRect.x, resizedRect.y2 + windowGap, wRect.width, preGrabRect.y2 - resizedRect.y2 - windowGap];
+                return resizeOnSameSide ?
+                        [
+                            wRect.x,
+                            wRect.y,
+                            wRect.width,
+                            resizedRect.y2 - preGrabRect.y,
+                        ]
+                    :   [
+                            wRect.x,
+                            resizedRect.y2 + windowGap,
+                            wRect.width,
+                            preGrabRect.y2 - resizedRect.y2 - windowGap,
+                        ];
 
             case Meta.GrabOp.RESIZING_W:
-                return resizeOnSameSide
-                    ? [resizedRect.x, wRect.y, preGrabRect.x2 - resizedRect.x, wRect.height]
-                    : [wRect.x, wRect.y, resizedRect.x - wRect.x - windowGap, wRect.height];
+                return resizeOnSameSide ?
+                        [
+                            resizedRect.x,
+                            wRect.y,
+                            preGrabRect.x2 - resizedRect.x,
+                            wRect.height,
+                        ]
+                    :   [
+                            wRect.x,
+                            wRect.y,
+                            resizedRect.x - wRect.x - windowGap,
+                            wRect.height,
+                        ];
 
             case Meta.GrabOp.RESIZING_E:
-                return resizeOnSameSide
-                    ? [wRect.x, wRect.y, resizedRect.x2 - preGrabRect.x, wRect.height]
-                    : [resizedRect.x2 + windowGap, wRect.y, preGrabRect.x2 - resizedRect.x2 - windowGap, wRect.height];
+                return resizeOnSameSide ?
+                        [
+                            wRect.x,
+                            wRect.y,
+                            resizedRect.x2 - preGrabRect.x,
+                            wRect.height,
+                        ]
+                    :   [
+                            resizedRect.x2 + windowGap,
+                            wRect.y,
+                            preGrabRect.x2 - resizedRect.x2 - windowGap,
+                            wRect.height,
+                        ];
         }
     }
 
@@ -461,20 +556,31 @@ export default class TilingResizeHandler {
         const sameSide = [window];
         // Resizes on the opposite side as the one being resized by the user
         const oppositeSide = [];
-        const resizeIsNOrW = [Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_W].includes(grabOp);
-        const orientation = [Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_S].includes(grabOp)
-            ? Orientation.V : Orientation.H;
+        const resizeIsNOrW = [
+            Meta.GrabOp.RESIZING_N,
+            Meta.GrabOp.RESIZING_W,
+        ].includes(grabOp);
+        const orientation =
+            [Meta.GrabOp.RESIZING_N, Meta.GrabOp.RESIZING_S].includes(grabOp) ?
+                Orientation.V
+            :   Orientation.H;
 
         // Checks if the w1 and w2 border each other at a certain edge.
         const borders = (w1, w2, w1IsAfterW2) => {
-            const [start, end] = orientation === Orientation.H ? ['x', 'x2'] : ['y', 'y2'];
-            const overlap = orientation === Orientation.H ? 'vertOverlap' : 'horizOverlap';
+            const [start, end] =
+                orientation === Orientation.H ? ['x', 'x2'] : ['y', 'y2'];
+            const overlap =
+                orientation === Orientation.H ? 'vertOverlap' : 'horizOverlap';
             if (w1IsAfterW2) {
-                return w1.tiledRect[start] === w2.tiledRect[end] &&
-                        w1.tiledRect[overlap](w2.tiledRect);
+                return (
+                    w1.tiledRect[start] === w2.tiledRect[end] &&
+                    w1.tiledRect[overlap](w2.tiledRect)
+                );
             } else {
-                return w1.tiledRect[end] === w2.tiledRect[start] &&
-                        w1.tiledRect[overlap](w2.tiledRect);
+                return (
+                    w1.tiledRect[end] === w2.tiledRect[start] &&
+                    w1.tiledRect[overlap](w2.tiledRect)
+                );
             }
         };
 
@@ -489,12 +595,16 @@ export default class TilingResizeHandler {
          *      bordering is checked on. It's the relation of the checkingWindows
          *      to the actively resized windows.
          */
-        const findBorderingWindows = (uncheckedWindows, checkingWindows,
-                borderingWindows, sideDeterminant) => {
+        const findBorderingWindows = (
+            uncheckedWindows,
+            checkingWindows,
+            borderingWindows,
+            sideDeterminant,
+        ) => {
             const oldCount = borderingWindows.length;
 
-            checkingWindows.forEach(w => {
-                uncheckedWindows.forEach(unchecked => {
+            checkingWindows.forEach((w) => {
+                uncheckedWindows.forEach((unchecked) => {
                     if (borders(w, unchecked, sideDeterminant))
                         borderingWindows.push(unchecked);
                 });
@@ -505,10 +615,12 @@ export default class TilingResizeHandler {
                 // flipping the checkingWindows and borderingWindows arrays as well as
                 // the side that is checked with the borders function.
                 findBorderingWindows(
-                    uncheckedWindows.filter(w => !borderingWindows.includes(w)),
+                    uncheckedWindows.filter(
+                        (w) => !borderingWindows.includes(w),
+                    ),
                     borderingWindows,
                     checkingWindows,
-                    !sideDeterminant
+                    !sideDeterminant,
                 );
             }
         };
@@ -542,20 +654,20 @@ const ResizeOp = class ResizeOp {
      * @param {boolean} resizeOnOpposingSideH
      * @returns {ResizeOp|null}
      */
-    static createResizeOp(resizeOnSameSideV, resizeOnOpposingSideV,
-            resizeOnSameSideH, resizeOnOpposingSideH) {
+    static createResizeOp(
+        resizeOnSameSideV,
+        resizeOnOpposingSideV,
+        resizeOnSameSideH,
+        resizeOnOpposingSideH,
+    ) {
         let verticalResizeSide = Side.NONE;
         let horizontalResizeSide = Side.NONE;
 
-        if (resizeOnSameSideV)
-            verticalResizeSide = Side.SAME_V;
-        else if (resizeOnOpposingSideV)
-            verticalResizeSide = Side.OPPOSING_V;
+        if (resizeOnSameSideV) verticalResizeSide = Side.SAME_V;
+        else if (resizeOnOpposingSideV) verticalResizeSide = Side.OPPOSING_V;
 
-        if (resizeOnSameSideH)
-            horizontalResizeSide = Side.SAME_H;
-        else if (resizeOnOpposingSideH)
-            horizontalResizeSide = Side.OPPOSING_H;
+        if (resizeOnSameSideH) horizontalResizeSide = Side.SAME_H;
+        else if (resizeOnOpposingSideH) horizontalResizeSide = Side.OPPOSING_H;
 
         const resizeSide = verticalResizeSide | horizontalResizeSide;
         return resizeSide ? new ResizeOp(resizeSide) : null;

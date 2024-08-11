@@ -1,20 +1,13 @@
-import {
-    Clutter,
-    Gio,
-    GLib,
-    Meta,
-    Shell,
-    St
-} from '../dependencies/gi.js';
+import {Clutter, Gio, GLib, Meta, Shell, St} from '../dependencies/gi.js';
 import {
     AppFavorites,
     Main,
     OsdWindow,
-    SwitcherPopup
+    SwitcherPopup,
 } from '../dependencies/shell.js';
 import * as AltTab from '../dependencies/unexported/altTab.js';
 
-import { FocusHint, Settings } from '../common.js';
+import {FocusHint, Settings} from '../common.js';
 
 export default class FocusHintManager {
     _hint = null;
@@ -23,13 +16,16 @@ export default class FocusHintManager {
         // On a fresh install no color is set for the hint yet. Use the bg color
         // from the tile preview style by using a temporary widget.
         if (Settings.getString('focus-hint-color') === '') {
-            const widget = new St.Widget({ style_class: 'tile-preview' });
+            const widget = new St.Widget({style_class: 'tile-preview'});
             global.stage.add_child(widget);
 
             const color = widget.get_theme_node().get_background_color();
-            const { red, green, blue } = color;
+            const {red, green, blue} = color;
 
-            Settings.setString('focus-hint-color', `rgb(${red},${green},${blue})`);
+            Settings.setString(
+                'focus-hint-color',
+                `rgb(${red},${green},${blue})`,
+            );
 
             widget.destroy();
         }
@@ -37,7 +33,7 @@ export default class FocusHintManager {
         this._settingsChangedId = Settings.changed(
             'focus-hint',
             () => this._setHint(),
-            this
+            this,
         );
         this._setHint();
 
@@ -69,7 +65,7 @@ export default class FocusHintManager {
                 this._hint = null;
         }
     }
-};
+}
 
 class Hint {
     _actors = [];
@@ -102,7 +98,7 @@ class Hint {
     }
 
     resetAnimation() {
-        this._actors.forEach(actor => actor.destroy());
+        this._actors.forEach((actor) => actor.destroy());
         this._actors = [];
     }
 
@@ -120,8 +116,7 @@ class Hint {
 
                 const focus = global.display.focus_window;
 
-                if (this.shouldIndicate(focus))
-                    this.indicate(focus);
+                if (this.shouldIndicate(focus)) this.indicate(focus);
             });
         });
     }
@@ -130,7 +125,7 @@ class Hint {
         return [
             Meta.WindowType.NORMAL,
             Meta.WindowType.DIALOG,
-            Meta.WindowType.MODAL_DIALOG
+            Meta.WindowType.MODAL_DIALOG,
         ].includes(type);
     }
 
@@ -138,17 +133,16 @@ class Hint {
         global.display.connectObject(
             'window-created',
             (_, metaWindow) => this._onWindowCreated(metaWindow),
-            this
+            this,
         );
 
         global
             .get_window_actors()
-            .forEach(actor => this._onWindowCreated(actor.get_meta_window()));
+            .forEach((actor) => this._onWindowCreated(actor.get_meta_window()));
     }
 
     _onWindowCreated(window) {
-        if (!this._allowedWindowType(window.get_window_type()))
-            return;
+        if (!this._allowedWindowType(window.get_window_type())) return;
 
         window.connectObject(
             'unmanaged',
@@ -157,12 +151,10 @@ class Hint {
 
                 const focus = global.display.focus_window;
 
-                if (focus && this.shouldIndicate(focus))
-                    this.indicate(focus);
-                else
-                    this.resetAnimation();
+                if (focus && this.shouldIndicate(focus)) this.indicate(focus);
+                else this.resetAnimation();
             },
-            this
+            this,
         );
     }
 
@@ -196,8 +188,7 @@ class Hint {
 
             if (global.display.remove_keybinding(key)) {
                 const handler = (_, __, keybinding) => {
-                    if (!Main.sessionMode.hasOverview)
-                        return;
+                    if (!Main.sessionMode.hasOverview) return;
 
                     const [, , , target] = keybinding.get_name().split('-');
                     const apps = AppFavorites.getAppFavorites().getFavorites();
@@ -224,9 +215,11 @@ class Hint {
 
                 global.display.add_keybinding(
                     key,
-                    new Gio.Settings({ schema_id: 'org.gnome.shell.keybindings' }),
+                    new Gio.Settings({
+                        schema_id: 'org.gnome.shell.keybindings',
+                    }),
                     Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
-                    handler
+                    handler,
                 );
             }
         }
@@ -239,24 +232,23 @@ class Hint {
         const that = this;
 
         Main.wm._workspaceAnimation.animateSwitch = function (
-                from,
-                to,
-                direction,
-                onComplete
+            from,
+            to,
+            direction,
+            onComplete,
         ) {
             that._originalWorkspaceAnimationSwitch.call(
                 this,
                 from,
                 to,
                 direction,
-                onComplete
+                onComplete,
             );
 
             // This is set if the focused window moved to the new workspace
             // along with the workspace switch animation. E. g. when using
             // Shift + Super + Alt + Arrow_Keys.
-            if (this.movingWindow)
-                return;
+            if (this.movingWindow) return;
 
             // There are 2 different 'focus behaviors' during a workspace
             // animation. 1: When the workspace switch is initiated by an app or
@@ -276,21 +268,17 @@ class Hint {
                         global.workspace_manager.get_workspace_by_index(to);
                     const [newFocus] = AltTab.getWindows(newWorkspace);
 
-                    if (that.shouldIndicate(newFocus))
-                        that.indicate(newFocus);
-                    else
-                        that.resetAnimation();
-                }
+                    if (that.shouldIndicate(newFocus)) that.indicate(newFocus);
+                    else that.resetAnimation();
+                },
             );
         };
     }
 
     shouldIndicate(window) {
-        if (!window || !window.get_compositor_private())
-            return false;
+        if (!window || !window.get_compositor_private()) return false;
 
-        if (!this._allowedWindowType(window.get_window_type()))
-            return false;
+        if (!this._allowedWindowType(window.get_window_type())) return false;
 
         if (
             window.is_fullscreen() ||
@@ -325,10 +313,12 @@ class Hint {
             if (global.display.remove_keybinding(key)) {
                 Main.wm.addKeybinding(
                     key,
-                    new Gio.Settings({ schema_id: 'org.gnome.shell.keybindings' }),
+                    new Gio.Settings({
+                        schema_id: 'org.gnome.shell.keybindings',
+                    }),
                     Meta.KeyBindingFlags.IGNORE_AUTOREPEAT,
                     Shell.ActionMode.NORMAL | Shell.ActionMode.OVERVIEW,
-                    Main.wm._switchToApplication.bind(Main.wm)
+                    Main.wm._switchToApplication.bind(Main.wm),
                 );
             }
         }
@@ -344,7 +334,7 @@ class Hint {
     _stopIndicatingOnWindowClose() {
         global.display.disconnectObject(this);
 
-        global.get_window_actors().forEach(actor => {
+        global.get_window_actors().forEach((actor) => {
             actor.get_meta_window().disconnectObject(this);
         });
     }
@@ -364,14 +354,24 @@ class AnimatedOutlineHint extends Hint {
         });
 
         this._outlineSize = Settings.getInt('focus-hint-outline-size');
-        this._outlineSizeChangeId = Settings.changed('focus-hint-outline-size', () => {
-            this._outlineSize = Settings.getInt('focus-hint-outline-size');
-        });
+        this._outlineSizeChangeId = Settings.changed(
+            'focus-hint-outline-size',
+            () => {
+                this._outlineSize = Settings.getInt('focus-hint-outline-size');
+            },
+        );
 
-        this._outlineBorderRadius = Settings.getInt('focus-hint-outline-border-radius');
-        this._outlineBorderRadiusChangeId = Settings.changed('focus-hint-outline-border-radius', () => {
-            this._outlineBorderRadius = Settings.getInt('focus-hint-outline-border-radius');
-        });
+        this._outlineBorderRadius = Settings.getInt(
+            'focus-hint-outline-border-radius',
+        );
+        this._outlineBorderRadiusChangeId = Settings.changed(
+            'focus-hint-outline-border-radius',
+            () => {
+                this._outlineBorderRadius = Settings.getInt(
+                    'focus-hint-outline-border-radius',
+                );
+            },
+        );
     }
 
     destroy() {
@@ -385,33 +385,29 @@ class AnimatedOutlineHint extends Hint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window))
-            return;
+        if (!this.shouldIndicate(window)) return;
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
             findWindowCloneForWorkspaceAnimation(
                 windowActor,
-                !!Main.wm._workspaceAnimation._switchData
+                !!Main.wm._workspaceAnimation._switchData,
             );
         const [monitorContainer, workspaceContainer] = createContainers(
             window,
             workspaceAnimationWindowClone,
-            workspaceSwitchAnimationDuration
+            workspaceSwitchAnimationDuration,
         );
 
         this._actors.push(monitorContainer);
 
-        const customClone = createWindowClone(
-            windowActor,
-            monitorContainer
-        );
+        const customClone = createWindowClone(windowActor, monitorContainer);
         const outline = this._createOutline(window, monitorContainer);
         const {
             x: windowFrameX,
             y: windowFrameY,
             width: windowFrameWidth,
-            height: windowFrameHeight
+            height: windowFrameHeight,
         } = window.get_frame_rect();
 
         workspaceContainer.add_child(outline);
@@ -424,9 +420,10 @@ class AnimatedOutlineHint extends Hint {
             y: windowFrameY - monitorContainer.y - this._outlineSize,
             width: windowFrameWidth + 2 * this._outlineSize,
             height: windowFrameHeight + 2 * this._outlineSize,
-            delay: workspaceAnimationWindowClone
-                ? (175 / 250) * workspaceSwitchAnimationDuration
-                : 0,
+            delay:
+                workspaceAnimationWindowClone ?
+                    (175 / 250) * workspaceSwitchAnimationDuration
+                :   0,
             duration: 150,
             mode: Clutter.AnimationMode.EASE_OUT_BACK,
             onComplete: () => {
@@ -437,20 +434,20 @@ class AnimatedOutlineHint extends Hint {
                     height: windowFrameHeight,
                     duration: 100,
                     mode: Clutter.AnimationMode.EASE_IN,
-                    onComplete: () => this.resetAnimation()
+                    onComplete: () => this.resetAnimation(),
                 });
-            }
+            },
         });
     }
 
     _createOutline(window, monitorContainer) {
-        const { x, y, width, height } = window.get_frame_rect();
+        const {x, y, width, height} = window.get_frame_rect();
         const outline = new St.Widget({
             style: this._getCssStyle(),
             x: x - monitorContainer.x,
             y: y - monitorContainer.y,
             width,
-            height
+            height,
         });
 
         return outline;
@@ -470,28 +467,24 @@ class AnimatedUpscaleHint extends Hint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window))
-            return;
+        if (!this.shouldIndicate(window)) return;
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
             findWindowCloneForWorkspaceAnimation(
                 windowActor,
-                !!Main.wm._workspaceAnimation._switchData
+                !!Main.wm._workspaceAnimation._switchData,
             );
         const [monitorContainer, workspaceContainer] = createContainers(
             window,
             workspaceAnimationWindowClone,
-            workspaceSwitchAnimationDuration
+            workspaceSwitchAnimationDuration,
         );
 
         this._actors.push(monitorContainer);
 
-        const customClone = createWindowClone(
-            windowActor,
-            monitorContainer
-        );
-        const { x, y, width, height } = customClone;
+        const customClone = createWindowClone(windowActor, monitorContainer);
+        const {x, y, width, height} = customClone;
 
         workspaceContainer.add_child(customClone);
 
@@ -503,9 +496,10 @@ class AnimatedUpscaleHint extends Hint {
             y: y - this._scaleAmount,
             width: width + 2 * this._scaleAmount,
             height: height + 2 * this._scaleAmount,
-            delay: workspaceAnimationWindowClone
-                ? (175 / 250) * workspaceSwitchAnimationDuration
-                : 0,
+            delay:
+                workspaceAnimationWindowClone ?
+                    (175 / 250) * workspaceSwitchAnimationDuration
+                :   0,
             duration: 100,
             mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             onComplete: () => {
@@ -516,14 +510,14 @@ class AnimatedUpscaleHint extends Hint {
                     height,
                     duration: 150,
                     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                    onComplete: () => this.resetAnimation()
+                    onComplete: () => this.resetAnimation(),
                 });
-            }
+            },
         });
     }
 
     resetAnimation() {
-        global.get_window_actors().forEach(a => a.set_opacity(255));
+        global.get_window_actors().forEach((a) => a.set_opacity(255));
         super.resetAnimation();
     }
 }
@@ -535,7 +529,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     constructor() {
         super();
 
-        this._outline = new St.Widget({ style: this._getCssStyle() });
+        this._outline = new St.Widget({style: this._getCssStyle()});
         global.window_group.add_child(this._outline);
 
         // Originally, only `notify::focus-window` was used but that had issues
@@ -546,7 +540,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             () => this._updateOutline(),
             'notify::focus-window',
             () => this._updateOutline(),
-            this
+            this,
         );
 
         this._updateOutline();
@@ -558,7 +552,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             () => this._updateOutline(),
             'changed::focus-hint-outline-border-radius',
             () => this._updateOutline(),
-            this
+            this,
         );
     }
 
@@ -589,35 +583,30 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window))
-            return;
+        if (!this.shouldIndicate(window)) return;
 
         const animatingWorkspaceSwitch =
             !!Main.wm._workspaceAnimation._switchData;
 
         // Only need to use an animation to indicate the focus when switching
         // workspaces. In the other cases, there is the static `this._outline`.
-        if (!animatingWorkspaceSwitch)
-            return;
+        if (!animatingWorkspaceSwitch) return;
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
             findWindowCloneForWorkspaceAnimation(
                 windowActor,
-                animatingWorkspaceSwitch
+                animatingWorkspaceSwitch,
             );
         const [monitorContainer, workspaceContainer] = createContainers(
             window,
             workspaceAnimationWindowClone,
-            workspaceSwitchAnimationDuration
+            workspaceSwitchAnimationDuration,
         );
 
         this._actors.push(monitorContainer);
 
-        const customClone = createWindowClone(
-            windowActor,
-            monitorContainer
-        );
+        const customClone = createWindowClone(windowActor, monitorContainer);
         const outline = this._createOutline(window, monitorContainer);
 
         workspaceContainer.add_child(outline);
@@ -631,7 +620,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             () => {
                 this.resetAnimation();
                 this._resetTimer = 0;
-            }
+            },
         );
     }
 
@@ -643,13 +632,13 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     }
 
     _createOutline(window, monitorContainer) {
-        const { x, y, width, height } = window.get_frame_rect();
+        const {x, y, width, height} = window.get_frame_rect();
         const outline = new St.Widget({
             style: this._getCssStyle(),
             x: x - monitorContainer.x - this._outlineSize,
             y: y - monitorContainer.y - this._outlineSize,
             width: width + 2 * this._outlineSize,
-            height: height + 2 * this._outlineSize
+            height: height + 2 * this._outlineSize,
         });
 
         return outline;
@@ -658,8 +647,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     _queueGeometryUpdate() {
         const windowActor = this._window.get_compositor_private();
 
-        if (!windowActor)
-            return;
+        if (!windowActor) return;
 
         this._laterID = global.compositor
             .get_laters()
@@ -670,7 +658,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
 
                 global.window_group.set_child_below_sibling(
                     this._outline,
-                    windowActor
+                    windowActor,
                 );
 
                 this._laterID = 0;
@@ -696,7 +684,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             () => this._updateGeometry(),
             'size-changed',
             () => this._updateGeometry(),
-            this
+            this,
         );
 
         if (
@@ -704,18 +692,17 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             this._window.get_maximized() === Meta.MaximizeFlags.BOTH
         )
             this._outline.hide();
-        else
-            this._queueGeometryUpdate();
+        else this._queueGeometryUpdate();
     }
 
     _updateGeometry() {
-        const { x, y, width, height } = this._window.get_frame_rect();
+        const {x, y, width, height} = this._window.get_frame_rect();
 
         this._outline.set({
             x: x - this._outlineSize,
             y: y - this._outlineSize,
             width: width + this._outlineSize * 2,
-            height: height + this._outlineSize * 2
+            height: height + this._outlineSize * 2,
         });
     }
 }
@@ -729,7 +716,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
  * @returns {{x: number, y: number}}
  */
 function getAbsPos(actor) {
-    const pos = { x: actor.x, y: actor.y };
+    const pos = {x: actor.x, y: actor.y};
     let parent = actor.get_parent();
 
     while (parent) {
@@ -756,22 +743,25 @@ function getAbsPos(actor) {
 function createContainers(
     window,
     workspaceAnimationWindowClone,
-    workspaceSwitchAnimationDuration
+    workspaceSwitchAnimationDuration,
 ) {
     const monitorNr = window.get_monitor();
     const monitorRect = global.display.get_monitor_geometry(monitorNr);
     let startingPos;
 
     if (workspaceAnimationWindowClone) {
-        const actorAbsPos = getAbsPos(window.get_compositor_private(), monitorNr);
+        const actorAbsPos = getAbsPos(
+            window.get_compositor_private(),
+            monitorNr,
+        );
         const cloneAbsPos = getAbsPos(workspaceAnimationWindowClone, monitorNr);
 
         startingPos = {
             x: monitorRect.x + cloneAbsPos.x - actorAbsPos.x,
-            y: monitorRect.y + cloneAbsPos.y - actorAbsPos.y
+            y: monitorRect.y + cloneAbsPos.y - actorAbsPos.y,
         };
     } else {
-        startingPos = { x: 0, y: 0 };
+        startingPos = {x: 0, y: 0};
     }
 
     const monitorContainer = new Clutter.Actor({
@@ -779,7 +769,7 @@ function createContainers(
         x: monitorRect.x,
         y: monitorRect.y,
         width: monitorRect.width,
-        height: monitorRect.height
+        height: monitorRect.height,
     });
 
     // Allow tiled window to be animate above the panel. Also, When changing
@@ -787,12 +777,11 @@ function createContainers(
     if (workspaceAnimationWindowClone) {
         const osdWindow = Main.uiGroup
             .get_children()
-            .find(child => child instanceof OsdWindow.OsdWindow);
+            .find((child) => child instanceof OsdWindow.OsdWindow);
 
         if (osdWindow)
             Main.uiGroup.insert_child_below(monitorContainer, osdWindow);
-        else
-            Main.uiGroup.add_child(monitorContainer);
+        else Main.uiGroup.add_child(monitorContainer);
     } else {
         global.window_group.add_child(monitorContainer);
     }
@@ -801,7 +790,7 @@ function createContainers(
         x: startingPos.x,
         y: startingPos.y,
         width: monitorContainer.width,
-        height: monitorContainer.height
+        height: monitorContainer.height,
     });
 
     monitorContainer.add_child(workspaceContainer);
@@ -810,7 +799,7 @@ function createContainers(
         x: 0,
         y: 0,
         duration: workspaceSwitchAnimationDuration,
-        mode: Clutter.AnimationMode.EASE_OUT_CUBIC
+        mode: Clutter.AnimationMode.EASE_OUT_CUBIC,
     });
 
     return [monitorContainer, workspaceContainer];
@@ -827,14 +816,14 @@ function createContainers(
  */
 function createWindowClone(windowActor, container) {
     const monitor = windowActor.get_meta_window().get_monitor();
-    const { x, y } = getAbsPos(windowActor, monitor);
+    const {x, y} = getAbsPos(windowActor, monitor);
 
     const windowClone = new Clutter.Clone({
         source: windowActor,
         x: x - container.x,
         y: y - container.y,
         width: windowActor.width,
-        height: windowActor.height
+        height: windowActor.height,
     });
 
     return windowClone;
@@ -851,21 +840,19 @@ function createWindowClone(windowActor, container) {
  */
 function findWindowCloneForWorkspaceAnimation(
     windowActor,
-    animatingWorkspaceSwitch
+    animatingWorkspaceSwitch,
 ) {
-    if (!animatingWorkspaceSwitch)
-        return null;
+    if (!animatingWorkspaceSwitch) return null;
 
     const switchData = Main.wm._workspaceAnimation._switchData;
     let clone = null;
 
-    switchData.monitors.find(monitorGroup => {
-        return monitorGroup._workspaceGroups.find(workspaceGroup => {
-            return workspaceGroup._windowRecords.find(record => {
+    switchData.monitors.find((monitorGroup) => {
+        return monitorGroup._workspaceGroups.find((workspaceGroup) => {
+            return workspaceGroup._windowRecords.find((record) => {
                 const foundClone = record.windowActor === windowActor;
 
-                if (foundClone)
-                    ({ clone } = record);
+                if (foundClone) ({clone} = record);
 
                 return foundClone;
             });
