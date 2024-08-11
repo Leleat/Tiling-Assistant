@@ -285,7 +285,6 @@
       <child>
         <object class="AdwPreferencesGroup">
           <property name="title" translatable="yes" comments="Translators: This is a header for a preference group in the 'General' tab for settings to indicate the currently focused window">Focus Hint</property>
-          <property name="description" translatable="yes" comments="Translators: This is the explanation for the preference group 'Focus Hint' in the 'General' tab in the prefs window">Generally, the focused window will be indicated if it may be ambiguous. That means, if a window is focused with the pointer, the focus won't be indicated unless you use the Static Outline</property>
           <property name="visible"
                     bind-source="enable_advanced_experimental_features"
                     bind-property="active"
