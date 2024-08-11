@@ -1,5 +1,15 @@
 # Changelog
 
+## [49] - 2024-08-11
+
+### Added
+
+- Port to GNOME 47 (#363)
+
+### Changed
+
+- Replace the active window hint with https://github.com/Leleat/focus-indicator-prototype. It is disabled by default (#344)
+
 ## [48] - 2024-08-10
 
 ### Added

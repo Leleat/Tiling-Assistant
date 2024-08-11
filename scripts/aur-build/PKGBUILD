@@ -2,7 +2,7 @@
 # Contributor: VeldoraTheDragon <127216238+VeldoraTheDragon@users.noreply.github.com>
 
 pkgname=gnome-shell-extension-tiling-assistant
-pkgver=48
+pkgver=49
 pkgrel=1
 pkgdesc="A GNOME Shell extension to expand GNOME's native 2 column design."
 arch=('x86_64')
