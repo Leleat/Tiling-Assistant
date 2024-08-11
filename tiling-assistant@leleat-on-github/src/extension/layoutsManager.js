@@ -129,7 +129,9 @@ export default class TilingLayoutsManager {
      */
     startLayouting(index) {
         const layout = Util.getLayouts()?.[index];
-        if (!layout) return;
+        if (!layout) {
+            return;
+        }
 
         const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         this._remainingWindows = Twm.getWindows(allWs);
@@ -202,7 +204,12 @@ export default class TilingLayoutsManager {
         }
 
         const appId = this._currItem.appId;
-        appId ? this._openAppTiled(appId) : this._openTilingPopup();
+
+        if (appId) {
+            this._openAppTiled(appId);
+        } else {
+            this._openTilingPopup();
+        }
     }
 
     _openAppTiled(appId) {
@@ -219,7 +226,10 @@ export default class TilingLayoutsManager {
             (w) => winTracker.get_window_app(w) === app,
         );
         const window = this._remainingWindows[idx];
-        idx !== -1 && this._remainingWindows.splice(idx, 1);
+
+        if (idx !== -1) {
+            this._remainingWindows.splice(idx, 1);
+        }
 
         if (window) {
             Twm.tile(window, this._currRect, {
@@ -336,7 +346,7 @@ const LayoutSearch = GObject.registerClass(
             // We expect at least a keyboard grab here
             if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
                 Main.popModal(grab);
-                return false;
+                return;
             }
 
             this._grab = grab;
@@ -433,9 +443,13 @@ const LayoutSearch = GObject.registerClass(
         _onTextChanged(clutterText) {
             const filterText = clutterText.get_text();
             this._items.forEach((item) => {
-                item.text.toLowerCase().includes(filterText.toLowerCase()) ?
-                    item.show()
-                :   item.hide();
+                if (
+                    item.text.toLowerCase().includes(filterText.toLowerCase())
+                ) {
+                    item.show();
+                } else {
+                    item.hide();
+                }
             });
             const nextVisibleIdx = this._items.findIndex(
                 (item) => item.visible,
@@ -468,7 +482,10 @@ const LayoutSearch = GObject.registerClass(
         }
 
         _activate() {
-            this._focused !== -1 && this.emit('item-activated', this._focused);
+            if (this._focused !== -1) {
+                this.emit('item-activated', this._focused);
+            }
+
             this.destroy();
         }
     },

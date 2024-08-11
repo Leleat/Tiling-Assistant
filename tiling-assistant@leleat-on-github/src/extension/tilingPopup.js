@@ -58,7 +58,9 @@ export const TilingSwitcherPopup = GObject.registerClass(
 
             // Destroy popup when touching outside of popup
             this.connect('touch-event', () => {
-                if (Meta.is_wayland_compositor()) this.fadeAndDestroy();
+                if (Meta.is_wayland_compositor()) {
+                    this.fadeAndDestroy();
+                }
 
                 return Clutter.EVENT_PROPAGATE;
             });
@@ -75,7 +77,9 @@ export const TilingSwitcherPopup = GObject.registerClass(
                 tileGroup[0]?.get_monitor() ??
                 global.display.get_current_monitor();
 
-            if (!this._items.length) return false;
+            if (!this._items.length) {
+                return false;
+            }
 
             const grab = Main.pushModal(this);
             // We expect at least a keyboard grab here
@@ -141,7 +145,9 @@ export const TilingSwitcherPopup = GObject.registerClass(
                 mode: Clutter.AnimationMode.EASE_OUT_QUAD,
             });
 
-            if (!tiledWindow) return;
+            if (!tiledWindow) {
+                return;
+            }
 
             // Clones to correctly shade the background for consecutive tiling.
             for (let i = 1; i < tileGroup.length; i++) {
@@ -234,8 +240,9 @@ export const TilingSwitcherPopup = GObject.registerClass(
                 const spacing = this.get_theme_node().get_length('spacing');
 
                 cbox.x2 = cbox.x1 + cNatWidth;
-                if (cbox.x2 > monitor.x + monitor.width - rightPadd)
+                if (cbox.x2 > monitor.x + monitor.width - rightPadd) {
                     cbox.x2 = monitor.x + monitor.width - rightPadd;
+                }
                 cbox.y1 = this._switcherList.allocation.y2 + spacing;
                 this._thumbnails.addClones(
                     monitor.y + monitor.height - bottomPadding - cbox.y1,
@@ -268,13 +275,15 @@ export const TilingSwitcherPopup = GObject.registerClass(
             const moveRight = Util.isDirection(keysym, Direction.E);
 
             if (this._thumbnailsFocused) {
-                if (moveLeft)
+                if (moveLeft) {
                     this._select(this._selectedIndex, this._previousWindow());
-                else if (moveRight)
+                } else if (moveRight) {
                     this._select(this._selectedIndex, this._nextWindow());
-                else if (moveUp || moveDown)
+                } else if (moveUp || moveDown) {
                     this._select(this._selectedIndex, null, true);
-                else return Clutter.EVENT_PROPAGATE;
+                } else {
+                    return Clutter.EVENT_PROPAGATE;
+                }
             } else if (moveLeft) {
                 this._select(this._previous());
             } else if (moveRight) {
@@ -303,7 +312,9 @@ export const TilingSwitcherPopup = GObject.registerClass(
         }
 
         fadeAndDestroy() {
-            if (this._alreadyDestroyed) return;
+            if (this._alreadyDestroyed) {
+                return;
+            }
 
             this._alreadyDestroyed = true;
 
@@ -370,8 +381,9 @@ const TSwitcherList = GObject.registerClass(
             while (
                 this._items.length > 1 &&
                 this._items[j].style_class !== 'item-box'
-            )
+            ) {
                 j++;
+            }
 
             const themeNode = this._items[j].get_theme_node();
             this._list.ensure_style();
@@ -406,14 +418,17 @@ const TSwitcherList = GObject.registerClass(
                     iconSize = baseIconSizes[i];
                     const height = iconSizes[i] + iconSpacing;
                     const w = height * this._items.length + totalSpacing;
-                    if (w <= availWidth) break;
+                    if (w <= availWidth) {
+                        break;
+                    }
                 }
             }
 
             this._iconSize = iconSize;
 
-            for (let i = 0; i < this.icons.length; i++)
+            for (let i = 0; i < this.icons.length; i++) {
                 this.icons[i].set_size(iconSize);
+            }
         }
     },
 );

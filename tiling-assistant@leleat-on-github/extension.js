@@ -53,7 +53,9 @@ class SettingsOverrider {
     }
 
     _maybeUpdateOverriden(schemaId, key, value) {
-        if (this._wasOverridden) return undefined;
+        if (this._wasOverridden) {
+            return undefined;
+        }
 
         const savedSettings = this._settings
             .getValue('overridden-settings')
@@ -61,9 +63,11 @@ class SettingsOverrider {
         const prefKey = `${schemaId}.${key}`;
         const oldValue = savedSettings[prefKey];
 
-        if (value !== undefined)
+        if (value !== undefined) {
             savedSettings[prefKey] = value ?? this._maybeNullValue;
-        else delete savedSettings[prefKey];
+        } else {
+            delete savedSettings[prefKey];
+        }
 
         this._settings.setValue(
             'overridden-settings',
@@ -78,7 +82,9 @@ class SettingsOverrider {
         const userValue = settings.get_user_value(key);
 
         const values = this._overrides.get(settings.schemaId) ?? new Map();
-        if (!values.size) this._overrides.set(settings.schemaId, values);
+        if (!values.size) {
+            this._overrides.set(settings.schemaId, values);
+        }
         values.set(key, userValue);
 
         settings.set_value(key, value);
@@ -92,15 +98,22 @@ class SettingsOverrider {
 
     remove(schema, key) {
         const settings = this._originalSettings.get(schema);
-        if (!settings) return;
+        if (!settings) {
+            return;
+        }
 
         const values = this._overrides.get(settings.schemaId);
         const value = values?.get(key);
 
-        if (value === undefined) return;
+        if (value === undefined) {
+            return;
+        }
 
-        if (value) settings.set_value(key, value);
-        else settings.reset(key);
+        if (value) {
+            settings.set_value(key, value);
+        } else {
+            settings.reset(key);
+        }
 
         values.delete(key);
         this._maybeUpdateOverriden(settings.schemaId, key, undefined);
@@ -122,14 +135,20 @@ class SettingsOverrider {
                     new Gio.Settings({schema_id: schemaId});
 
                 value = value.get_variant();
-                if (value.equal(this._maybeNullValue)) settings.reset(key);
-                else settings.set_value(key, value);
+                if (value.equal(this._maybeNullValue)) {
+                    settings.reset(key);
+                } else {
+                    settings.set_value(key, value);
+                }
             });
         } else {
             this._originalSettings.forEach((settings) => {
                 this._overrides.get(settings.schemaId).forEach((value, key) => {
-                    if (value) settings.set_value(key, value);
-                    else settings.reset(key);
+                    if (value) {
+                        settings.set_value(key, value);
+                    } else {
+                        settings.reset(key);
+                    }
                 });
             });
         }
@@ -316,7 +335,9 @@ export default class TilingAssistantExtension extends Extension {
      * properties of windows before locking the screen.
      */
     _saveBeforeSessionLock() {
-        if (!Main.sessionMode.isLocked) return;
+        if (!Main.sessionMode.isLocked) {
+            return;
+        }
 
         this._wasLocked = true;
 
@@ -330,7 +351,9 @@ export default class TilingAssistantExtension extends Extension {
         try {
             parent.make_directory_with_parents(null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) throw e;
+            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+                throw e;
+            }
         }
 
         const path = GLib.build_filenamev([
@@ -342,7 +365,9 @@ export default class TilingAssistantExtension extends Extension {
         try {
             file.create(Gio.FileCreateFlags.NONE, null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) throw e;
+            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+                throw e;
+            }
         }
 
         file.replace_contents(
@@ -362,7 +387,9 @@ export default class TilingAssistantExtension extends Extension {
      * reload them here.
      */
     _loadAfterSessionLock() {
-        if (!this._wasLocked) return;
+        if (!this._wasLocked) {
+            return;
+        }
 
         this._wasLocked = false;
 
@@ -372,16 +399,22 @@ export default class TilingAssistantExtension extends Extension {
             '/tiling-assistant/tiledSessionRestore2.json',
         ]);
         const file = Gio.File.new_for_path(path);
-        if (!file.query_exists(null)) return;
+        if (!file.query_exists(null)) {
+            return;
+        }
 
         try {
             file.create(Gio.FileCreateFlags.NONE, null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) throw e;
+            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+                throw e;
+            }
         }
 
         const [success, contents] = file.load_contents(null);
-        if (!success || !contents.length) return;
+        if (!success || !contents.length) {
+            return;
+        }
 
         const states = JSON.parse(new TextDecoder().decode(contents));
         const keysAsNumbers = (entries) =>

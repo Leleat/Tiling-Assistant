@@ -80,7 +80,9 @@ export default class {
         // Try to load layouts file.
         const saveFile = this._makeFile();
         const [success, contents] = saveFile.load_contents(null);
-        if (!success) return;
+        if (!success) {
+            return;
+        }
 
         let layouts = [];
 
@@ -89,17 +91,21 @@ export default class {
             layouts = JSON.parse(new TextDecoder().decode(contents));
             // Ensure at least 1 empty row otherwise the listbox won't have
             // a height but a weird looking shadow only.
-            layouts.length ?
+            if (layouts.length) {
                 layouts.forEach((layout, idx) =>
                     this._createLayoutRow(idx, layout),
-                )
-            :   this._createLayoutRow(0);
+                );
+            } else {
+                this._createLayoutRow(0);
+            }
 
             // Otherwise import the examples... but only do it once!
             // Use a setting as a flag.
         } else {
             const importExamples = 'import-layout-examples';
-            if (!this._settings.get_boolean(importExamples)) return;
+            if (!this._settings.get_boolean(importExamples)) {
+                return;
+            }
 
             this._settings.set_boolean(importExamples, false);
             const exampleFile = this._makeFile(
@@ -107,7 +113,9 @@ export default class {
                 'layouts_example.json',
             );
             const [succ, c] = exampleFile.load_contents(null);
-            if (!succ) return;
+            if (!succ) {
+                return;
+            }
 
             layouts = c.length ? JSON.parse(new TextDecoder().decode(c)) : [];
             layouts.forEach((layout, idx) =>
@@ -129,7 +137,9 @@ export default class {
                 // Check, if all layoutRows were valid so far. Use getIdx()
                 // instead of forEach's idx because a layoutRow may have been
                 // deleted by the user.
-                if (layoutRow.getIdx() === layouts.length - 1) return;
+                if (layoutRow.getIdx() === layouts.length - 1) {
+                    return;
+                }
 
                 // Invalid or empty layouts are ignored. For example, the user
                 // defined a valid layout with a keybinding on row idx 3 but left
@@ -223,11 +233,15 @@ export default class {
     /**
      * @param {number} index the index of the new layouts row.
      * @param {Layout} layout the parsed JS Object from the layouts file.
+     *
+     * @returns {LayoutRow|undefined} the new LayoutRow.
      */
     _createLayoutRow(index, layout = null) {
         // Layouts are limited to 20 since there are only
         // that many keybindings in the schemas.xml file
-        if (index >= 20) return;
+        if (index >= 20) {
+            return null;
+        }
 
         const layoutRow = new LayoutRow(layout, this._settings);
         layoutRow.connect('changed', (row, ok) => {
@@ -243,7 +257,7 @@ export default class {
     _forEachLayoutRow(callback) {
         for (
             let i = 0, child = this._layoutsListBox.get_first_child();
-            !!child;
+            child;
             i++
         ) {
             // Get a ref to the next widget in case the curr widget

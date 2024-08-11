@@ -65,7 +65,7 @@ export const TileEditor = GObject.registerClass(
                 );
                 Main.notify('Tiling Assistant', msg);
                 this.close();
-                return;
+                return false;
             }
 
             this.monitor = this._windows[0].get_monitor();
@@ -80,11 +80,13 @@ export const TileEditor = GObject.registerClass(
             // The windows may not be at the foreground. They just weren't
             // overlapping other windows. So raise the entire tile group.
             this._windows.forEach((w) => {
-                if (w.raise_and_make_recent_on_workspace)
+                if (w.raise_and_make_recent_on_workspace) {
                     w.raise_and_make_recent_on_workspace(
                         global.workspace_manager.get_active_workspace(),
                     );
-                else w.raise_and_make_recent();
+                } else {
+                    w.raise_and_make_recent();
+                }
             });
 
             // Create the active selection indicator.
@@ -97,6 +99,8 @@ export const TileEditor = GObject.registerClass(
             );
             this._selectIndicator.focus(window.tiledRect, window);
             this.add_child(this._selectIndicator);
+
+            return true;
         }
 
         close() {
@@ -110,17 +114,23 @@ export const TileEditor = GObject.registerClass(
 
             // this._selectIndicator may be undefined, if Tile Editing Mode is
             // left as soon as it's entered (e. g. when there's no tile group).
-            this._selectIndicator?.window?.activate(global.get_current_time());
-            this._selectIndicator?.ease({
-                x: this._selectIndicator.x + SCALE_SIZE / 2,
-                y: this._selectIndicator.y + SCALE_SIZE / 2,
-                width: this._selectIndicator.width - SCALE_SIZE,
-                height: this._selectIndicator.height - SCALE_SIZE,
-                opacity: 0,
-                duration: 150,
-                mode: Clutter.AnimationMode.EASE_OUT_QUAD,
-                onComplete: () => this.destroy(),
-            }) ?? this.destroy();
+            if (this._selectIndicator) {
+                this._selectIndicator.window?.activate(
+                    global.get_current_time(),
+                );
+                this._selectIndicator.ease({
+                    x: this._selectIndicator.x + SCALE_SIZE / 2,
+                    y: this._selectIndicator.y + SCALE_SIZE / 2,
+                    width: this._selectIndicator.width - SCALE_SIZE,
+                    height: this._selectIndicator.height - SCALE_SIZE,
+                    opacity: 0,
+                    duration: 150,
+                    mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+                    onComplete: () => this.destroy(),
+                });
+            } else {
+                this.destroy();
+            }
         }
 
         vfunc_button_press_event() {
@@ -133,32 +143,46 @@ export const TileEditor = GObject.registerClass(
             let newMode;
 
             // Swap windows
-            if (mods & Clutter.ModifierType.CONTROL_MASK) newMode = Modes.SWAP;
+            if (mods & Clutter.ModifierType.CONTROL_MASK) {
+                newMode = Modes.SWAP;
+            }
             // Move group to different workspace / monitor
-            else if (mods & Clutter.ModifierType.SHIFT_MASK)
+            else if (mods & Clutter.ModifierType.SHIFT_MASK) {
                 newMode = Modes.MOVE;
+            }
             // Resize windows
-            else if (mods & Clutter.ModifierType.MOD4_MASK)
+            else if (mods & Clutter.ModifierType.MOD4_MASK) {
                 newMode = Modes.RESIZE;
+            }
             // Default keys
-            else newMode = Modes.DEFAULT;
+            else {
+                newMode = Modes.DEFAULT;
+            }
 
             // First switch mode, if a new mod is pressed.
-            if (newMode !== this._mode) this._switchMode(newMode);
+            if (newMode !== this._mode) {
+                this._switchMode(newMode);
+            }
 
             // Handle the key press and get mode depending on that.
             newMode = await this._keyHandler.handleKeyPress(keyEvent);
 
-            if (newMode && newMode !== this._mode) this._switchMode(newMode);
+            if (newMode && newMode !== this._mode) {
+                this._switchMode(newMode);
+            }
         }
 
         vfunc_key_release_event(keyEvent) {
             const newMode = this._keyHandler.handleKeyRelease(keyEvent);
-            if (newMode && newMode !== this._mode) this._switchMode(newMode);
+            if (newMode && newMode !== this._mode) {
+                this._switchMode(newMode);
+            }
         }
 
         _switchMode(newMode) {
-            if (!newMode) return;
+            if (!newMode) {
+                return;
+            }
 
             this._mode = newMode;
             this._keyHandler.prepareLeave();
@@ -189,9 +213,9 @@ export const TileEditor = GObject.registerClass(
 const Indicator = GObject.registerClass(
     class TileEditingModeIndicator extends St.Widget {
         /**
-         * @param {string} widgetParams
          * @param {Rect} rect the final rect / pos of the indicator
          * @param {number} monitor
+         * @param {object} [widgetParams]
          */
         _init(rect, monitor, widgetParams = {}) {
             // Start from a scaled down position.
@@ -273,28 +297,38 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             // [E]xpand to fill the available space
         } else if (keyVal === Clutter.KEY_e || keyVal === Clutter.KEY_E) {
             const window = this._selectIndicator.window;
-            if (!window) return Modes.DEFAULT;
+            if (!window) {
+                return Modes.DEFAULT;
+            }
 
             const tiledRect = this._windows.map((w) => w.tiledRect);
             const tileRect = Twm.getBestFreeRect(tiledRect, {
                 currRect: window.tiledRect,
             });
-            if (window.tiledRect.equal(tileRect)) return Modes.DEFAULT;
+            if (window.tiledRect.equal(tileRect)) {
+                return Modes.DEFAULT;
+            }
 
             const workArea = window.get_work_area_current_monitor();
             const maximize = tileRect.equal(workArea);
-            if (maximize && this._windows.length > 1) return Modes.DEFAULT;
+            if (maximize && this._windows.length > 1) {
+                return Modes.DEFAULT;
+            }
 
             Twm.tile(window, tileRect, {openTilingPopup: false});
 
-            if (maximize) return Modes.CLOSE;
+            if (maximize) {
+                return Modes.CLOSE;
+            }
 
             this._selectIndicator.focus(window.tiledRect, window);
 
             // [C]ycle through halves of the available space around the window
         } else if (keyVal === Clutter.KEY_c || keyVal === Clutter.KEY_C) {
             const window = this._selectIndicator.window;
-            if (!window) return Modes.DEFAULT;
+            if (!window) {
+                return Modes.DEFAULT;
+            }
 
             const tiledRects = this._windows.map((w) => w.tiledRect);
             const fullRect = Twm.getBestFreeRect(tiledRects, {
@@ -330,31 +364,41 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             // [Q]uit a window
         } else if (keyVal === Clutter.KEY_q || keyVal === Clutter.KEY_Q) {
             const window = this._selectIndicator.window;
-            if (!window) return Modes.DEFAULT;
+            if (!window) {
+                return Modes.DEFAULT;
+            }
 
             this._windows.splice(this._windows.indexOf(window), 1);
             window.delete(global.get_current_time());
             const newWindow = this._windows[0];
-            if (!newWindow) return Modes.CLOSE;
+            if (!newWindow) {
+                return Modes.CLOSE;
+            }
 
             this._selectIndicator.focus(newWindow.tiledRect, newWindow);
 
             // [R]estore a window's size
         } else if (keyVal === Clutter.KEY_r || keyVal === Clutter.KEY_R) {
             const window = this._selectIndicator.window;
-            if (!window) return Modes.DEFAULT;
+            if (!window) {
+                return Modes.DEFAULT;
+            }
 
             const selectedRect = window.tiledRect.copy();
             this._windows.splice(this._windows.indexOf(window), 1);
             Twm.untile(window);
-            if (!this._windows.length) return Modes.CLOSE;
+            if (!this._windows.length) {
+                return Modes.CLOSE;
+            }
 
             // Re-raise tile group, so it isn't below the just-untiled window
-            if (this._windows[0].raise_and_make_recent_on_workspace)
+            if (this._windows[0].raise_and_make_recent_on_workspace) {
                 this._windows[0].raise_and_make_recent_on_workspace(
                     global.workspace_manager.get_active_workspace(),
                 );
-            else this._windows[0].raise_and_make_recent();
+            } else {
+                this._windows[0].raise_and_make_recent();
+            }
             this._selectIndicator.focus(selectedRect, null);
 
             // [Enter] / [Esc]ape Tile Editing Mode
@@ -383,13 +427,18 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             }
 
             tilingPopup.connect('closed', (popup, canceled) => {
-                if (canceled) return;
+                if (canceled) {
+                    return;
+                }
 
                 const {tiledWindow} = popup;
                 const replaced = this._windows.findIndex((w) =>
                     w.tiledRect.equal(tiledWindow.tiledRect),
                 );
-                replaced !== -1 && this._windows.splice(replaced, 1);
+
+                if (replaced !== -1) {
+                    this._windows.splice(replaced, 1);
+                }
 
                 // Create the new tile group to allow 1 window to be part of multiple tile groups
                 Twm.updateTileGroup([tiledWindow, ...this._windows]);
@@ -406,9 +455,11 @@ const DefaultKeyHandler = class DefaultKeyHandler {
      * Automatically called on a keyEvent.
      *
      * @param {number} keyEvent
+     *
      * @returns {Modes|undefined} The mode to enter after the event was handled.
      */
-    handleKeyRelease() {
+    // eslint-disable-next-line no-unused-vars
+    handleKeyRelease(keyEvent) {
         return undefined;
     }
 
@@ -428,7 +479,9 @@ const DefaultKeyHandler = class DefaultKeyHandler {
             dir,
             screenRects,
         );
-        if (!nearestRect) return;
+        if (!nearestRect) {
+            return;
+        }
 
         const newWindow = this._windows.find((w) =>
             w.tiledRect.equal(nearestRect),
@@ -485,10 +538,13 @@ const SwapKeyHandler = class SwapKeyHandler extends DefaultKeyHandler {
         const direction = Util.getDirection(keyEvent.get_key_symbol());
 
         // [Directions] to choose a window to swap with WASD, hjkl or arrow keys
-        if (direction) this._focusInDir(direction);
+        if (direction) {
+            this._focusInDir(direction);
+        }
         // [Esc]ape Tile Editing Mode
-        else if (keyEvent.get_key_symbol() === Clutter.KEY_Escape)
+        else if (keyEvent.get_key_symbol() === Clutter.KEY_Escape) {
             return Modes.DEFAULT;
+        }
 
         return Modes.SWAP;
     }
@@ -541,33 +597,37 @@ const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
             // To new workspace
             if (moveWorkspace) {
                 let metaDir = Meta.MotionDirection.UP;
-                if (direction === Direction.N)
+                if (direction === Direction.N) {
                     metaDir = Meta.MotionDirection.UP;
-                else if (direction === Direction.S)
+                } else if (direction === Direction.S) {
                     metaDir = Meta.MotionDirection.DOWN;
-                else if (direction === Direction.W)
+                } else if (direction === Direction.W) {
                     metaDir = Meta.MotionDirection.LEFT;
-                else if (direction === Direction.E)
+                } else if (direction === Direction.E) {
                     metaDir = Meta.MotionDirection.RIGHT;
+                }
 
                 const activeWs =
                     global.workspace_manager.get_active_workspace();
                 const newWs = activeWs.get_neighbor(metaDir);
-                if (activeWs === newWs) return Modes.MOVE;
+                if (activeWs === newWs) {
+                    return Modes.MOVE;
+                }
 
                 Twm.moveGroupToWorkspace(this._tileEditor._windows, newWs);
 
                 // To new monitor
             } else {
                 let metaDir = Meta.DisplayDirection.UP;
-                if (direction === Direction.N)
+                if (direction === Direction.N) {
                     metaDir = Meta.DisplayDirection.UP;
-                else if (direction === Direction.S)
+                } else if (direction === Direction.S) {
                     metaDir = Meta.DisplayDirection.DOWN;
-                else if (direction === Direction.W)
+                } else if (direction === Direction.W) {
                     metaDir = Meta.DisplayDirection.LEFT;
-                else if (direction === Direction.E)
+                } else if (direction === Direction.E) {
                     metaDir = Meta.DisplayDirection.RIGHT;
+                }
 
                 // get_current_monitor isn't accurate for our case
                 const currMonitor = this._tileEditor.monitor;
@@ -575,7 +635,9 @@ const MoveKeyHandler = class MoveKeyHandler extends DefaultKeyHandler {
                     currMonitor,
                     metaDir,
                 );
-                if (newMonitor === -1) return Modes.MOVE;
+                if (newMonitor === -1) {
+                    return Modes.MOVE;
+                }
 
                 Twm.moveGroupToMonitor(
                     this._tileEditor._windows,
@@ -618,7 +680,9 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         const direction = Util.getDirection(keyEvent.get_key_symbol());
         if (direction) {
             const window = this._selectIndicator.window;
-            if (!window) return Modes.DEFAULT;
+            if (!window) {
+                return Modes.DEFAULT;
+            }
 
             // First call: Go to an edge.
             if (!this._currEdge) {
@@ -673,16 +737,19 @@ const ResizeKeyHandler = class ResizeKeyHandler extends DefaultKeyHandler {
         let resizeAmount = 50;
 
         // Limit resizeAmount to the workArea
-        if (this._currEdge === Direction.N && keyDir === Direction.N)
+        if (this._currEdge === Direction.N && keyDir === Direction.N) {
             resizeAmount = Math.min(resizeAmount, resizedRect.y - workArea.y);
-        else if (this._currEdge === Direction.S && keyDir === Direction.S)
+        } else if (this._currEdge === Direction.S && keyDir === Direction.S) {
             resizeAmount = Math.min(resizeAmount, workArea.y2 - resizedRect.y2);
-        else if (this._currEdge === Direction.W && keyDir === Direction.W)
+        } else if (this._currEdge === Direction.W && keyDir === Direction.W) {
             resizeAmount = Math.min(resizeAmount, resizedRect.x - workArea.x);
-        else if (this._currEdge === Direction.E && keyDir === Direction.E)
+        } else if (this._currEdge === Direction.E && keyDir === Direction.E) {
             resizeAmount = Math.min(resizeAmount, workArea.x2 - resizedRect.x2);
+        }
 
-        if (resizeAmount <= 0) return;
+        if (resizeAmount <= 0) {
+            return;
+        }
 
         // Function to update the passed rect by the resizeAmount depending on
         // the edge that is resized. Some windows will resize on the same edge

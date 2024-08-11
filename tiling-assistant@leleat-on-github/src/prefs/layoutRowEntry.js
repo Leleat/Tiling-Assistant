@@ -51,9 +51,6 @@ export const LayoutRowEntry = GObject.registerClass(
             this._rectAppButton.set_icon_name(iconName);
         }
 
-        /**
-         * @param {Gtk.Button} appButton src of the event.
-         */
         _onAppButtonClicked() {
             // Reset app button, if it already has an app attached
             if (this._item.appId) {
@@ -119,8 +116,9 @@ export const LayoutRowEntry = GObject.registerClass(
         _validateFormat(text) {
             const values = text.split('--');
             // 4 -> x, y, width, height; 5 -> additionally, a loopType
-            if (values.length < 4 || values.length > 5)
+            if (values.length < 4 || values.length > 5) {
                 return [false, 'Wrong format: invalid count.'];
+            }
 
             const notJustNrs = ['x', 'y', 'width', 'height'].some((p, idx) => {
                 return Number.isNaN(parseFloat(values[idx].trim()));

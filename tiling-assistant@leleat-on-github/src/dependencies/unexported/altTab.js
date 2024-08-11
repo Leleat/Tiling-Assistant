@@ -3,6 +3,10 @@ import {Meta} from '../gi.js';
 export const baseIconSizes = [96, 64, 48, 32, 22];
 export const APP_ICON_HOVER_TIMEOUT = 200; // milliseconds
 
+/**
+ *
+ * @param {Meta.Workspace} workspace
+ */
 export function getWindows(workspace) {
     // We ignore skip-taskbar windows in switchers, but if they are attached
     // to their parent, their position in the MRU list may be more appropriate

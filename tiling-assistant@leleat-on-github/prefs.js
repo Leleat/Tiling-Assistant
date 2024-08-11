@@ -36,14 +36,21 @@ export default class Prefs extends ExtensionPreferences {
         settings.connect(
             'changed::enable-advanced-experimental-features',
             () => {
-                settings.get_boolean('enable-advanced-experimental-features') ?
-                    window.add(layoutsPage)
-                :   window.remove(layoutsPage);
+                if (
+                    settings.get_boolean(
+                        'enable-advanced-experimental-features',
+                    )
+                ) {
+                    window.add(layoutsPage);
+                } else {
+                    window.remove(layoutsPage);
+                }
             },
         );
 
-        if (settings.get_boolean('enable-advanced-experimental-features'))
+        if (settings.get_boolean('enable-advanced-experimental-features')) {
             window.add(layoutsPage);
+        }
 
         // Bind settings to GUI
         this._bindSwitches(settings, builder);
@@ -115,8 +122,11 @@ export default class Prefs extends ExtensionPreferences {
         });
     }
 
-    /*
+    /**
      * Bind GUI AdwComboRows to settings.
+     *
+     * @param {Gio.Settings} settings
+     * @param {Gtk.Builder} builder
      */
     _bindComboRows(settings, builder) {
         const comboRows = [
@@ -137,8 +147,11 @@ export default class Prefs extends ExtensionPreferences {
         });
     }
 
-    /*
+    /**
      * Bind GUI color buttons to settings.
+     *
+     * @param {Gio.Settings} settings
+     * @param {Gtk.Builder} builder
      */
     _bindColorButtons(settings, builder) {
         const switches = ['focus-hint-color'];
@@ -158,8 +171,11 @@ export default class Prefs extends ExtensionPreferences {
         });
     }
 
-    /*
+    /**
      * Bind radioButtons to settings.
+     *
+     * @param {Gio.Settings} settings
+     * @param {Gtk.Builder} builder
      */
     _bindRadioButtons(settings, builder) {
         // These 'radioButtons' are basically just used as a 'fake ComboBox' with
@@ -207,13 +223,18 @@ export default class Prefs extends ExtensionPreferences {
                 );
 
                 // Set initial state
-                if (idx === currActive) checkButton.activate();
+                if (idx === currActive) {
+                    checkButton.activate();
+                }
             });
         });
     }
 
-    /*
+    /**
      * Bind keybinding widgets to settings.
+     *
+     * @param {Gio.Settings} settings
+     * @param {Gtk.Builder} builder
      */
     _bindKeybindings(settings, builder) {
         const shortcuts = Shortcuts.getAllKeys();
@@ -229,6 +250,9 @@ export default class Prefs extends ExtensionPreferences {
      * discoverable through the GUI and need to first be set with the gsetting.
      * The normal rows should have the id of: GSETTING_WITH_UNDERSCORES_row.
      * ShortcutListeners have the format of GSETTING_WITH_UNDERSCORES.
+     *
+     * @param {Gio.Settings} settings
+     * @param {Gtk.Builder} builder
      */
     _setDeprecatedSettings(settings, builder) {
         // Keybindings
@@ -252,6 +276,12 @@ export default class Prefs extends ExtensionPreferences {
         });
     }
 
+    /**
+     *
+     * @param {Adw.fillPreferencesWindow} window - The preferences window
+     * @param {Gio.Settings} settings - The settings object
+     * @param {Gtk.Builder} builder - The builder object
+     */
     _addHeaderBarInfoButton(window, settings, builder) {
         // Add headerBar button for menu
         // TODO: is this a 'reliable' method to access the headerbar?
@@ -310,6 +340,10 @@ export default class Prefs extends ExtensionPreferences {
         returnButton.connect('clicked', () => window.close_subpage());
     }
 
+    /**
+     *
+     * @param {Adw.PreferencesWindow} window
+     */
     _openBugReport(window) {
         Gtk.show_uri(
             window,
@@ -318,6 +352,10 @@ export default class Prefs extends ExtensionPreferences {
         );
     }
 
+    /**
+     *
+     * @param {Adw.PreferencesWindow} window
+     */
     _openUserGuide(window) {
         Gtk.show_uri(
             window,
@@ -326,6 +364,10 @@ export default class Prefs extends ExtensionPreferences {
         );
     }
 
+    /**
+     *
+     * @param {Adw.PreferencesWindow} window
+     */
     _openChangelog(window) {
         Gtk.show_uri(
             window,
@@ -334,6 +376,10 @@ export default class Prefs extends ExtensionPreferences {
         );
     }
 
+    /**
+     *
+     * @param {Adw.PreferencesWindow} window
+     */
     _openLicense(window) {
         Gtk.show_uri(
             window,
@@ -342,6 +388,11 @@ export default class Prefs extends ExtensionPreferences {
         );
     }
 
+    /**
+     *
+     * @param {Adw.PreferencesWindow} window
+     * @param {Gtk.Builder} builder
+     */
     _openHiddenSettings(window, builder) {
         const hiddenSettingsPage = builder.get_object('hidden_settings');
         window.present_subpage(hiddenSettingsPage);

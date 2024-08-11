@@ -182,10 +182,18 @@ export class Direction {
 
     static opposite(dir) {
         let opposite = 0;
-        if (dir & this.N) opposite |= this.S;
-        if (dir & this.S) opposite |= this.N;
-        if (dir & this.W) opposite |= this.E;
-        if (dir & this.E) opposite |= this.W;
+        if (dir & this.N) {
+            opposite |= this.S;
+        }
+        if (dir & this.S) {
+            opposite |= this.N;
+        }
+        if (dir & this.W) {
+            opposite |= this.E;
+        }
+        if (dir & this.E) {
+            opposite |= this.W;
+        }
 
         return opposite;
     }
@@ -275,7 +283,9 @@ export class Layout {
      */
     validate() {
         const rects = this.getItems().map((i) => i.rect);
-        if (!rects.length) return [false, 'No valid rectangles defined.', -1];
+        if (!rects.length) {
+            return [false, 'No valid rectangles defined.', -1];
+        }
 
         const getOverlapArea = (r1, r2) => {
             return (
@@ -295,23 +305,27 @@ export class Layout {
         for (let i = 0; i < rects.length; i++) {
             const rect = rects[i];
 
-            if (rect.width <= 0 || rect.width > 1)
+            if (rect.width <= 0 || rect.width > 1) {
                 return [false, `Rectangle ${i} has an invalid width.`, i];
+            }
 
-            if (rect.height <= 0 || rect.height > 1)
+            if (rect.height <= 0 || rect.height > 1) {
                 return [false, `Rectangle ${i} has an invalid height.`, i];
+            }
 
             if (
                 rect.x < 0 ||
                 rect.y < 0 ||
                 rect.x + rect.width > 1 ||
                 rect.y + rect.height > 1
-            )
+            ) {
                 return [false, `Rectangle ${i} extends beyond the screen.`, i];
+            }
 
             for (let j = i + 1; j < rects.length; j++) {
-                if (getOverlapArea(rect, rects[j]) !== 0)
+                if (getOverlapArea(rect, rects[j]) !== 0) {
                     return [false, `Rectangles ${i} and ${j} overlap.`, j];
+                }
             }
         }
 

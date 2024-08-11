@@ -119,7 +119,9 @@ export class TilingWindowManager {
             // extension can crash GNOME Shell.. so guard against it. A way to
             // have a window's monitor be -1, for example, is explained here:
             // https://gitlab.gnome.org/GNOME/gnome-shell/-/issues/4713
-            if (w.get_monitor() === -1) return false;
+            if (w.get_monitor() === -1) {
+                return false;
+            }
 
             // Assumption: a maximized window can also resize (once unmaximized)
             const canResize =
@@ -147,18 +149,19 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window to tile.
      * @param {Rect} newRect the Rect the `window` will be tiled to.
-     * @param {boolean} [openTilingPopup=true] decides, if we open a Tiling
+     * @param {object} param
+     * @param {boolean} [param.openTilingPopup] decides, if we open a Tiling
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
-     * @param {number} [number=null] is used to get the workArea in which the
+     * @param {boolean} [param.ignoreTA]
+     * @param {number} [param.monitorNr] is used to get the workArea in which the
      *      window tiles on. It's used for gap calculation. We can't always rely on
      *      window.get_monitor with its monitor or global.display.get_current_monitor
      *      (the pointer monitor) because of the 'grace period' during a quick dnd
      *      towards a screen border since the pointer and the window will be on the
      *      'wrong' monitor.
-     * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
-     * @param {boolean} [tileGroup=null] forces the creation of this tile group.
-     * @param {boolean} [fakeTile=false] don't create a new tile group, don't
+     * @param {boolean} [param.skipAnim] decides, if we skip the tile animation.
+     * @param {boolean} [param.fakeTile] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
     static async tile(
@@ -172,14 +175,20 @@ export class TilingWindowManager {
             fakeTile = false,
         } = {},
     ) {
-        if (!window || window.is_skip_taskbar()) return;
+        if (!window || window.is_skip_taskbar()) {
+            return;
+        }
 
         const wasMaximized = window.get_maximized();
-        if (wasMaximized) window.unmaximize(wasMaximized);
+        if (wasMaximized) {
+            window.unmaximize(wasMaximized);
+        }
 
         window.unmake_fullscreen();
 
-        if (!window.allows_resize() || !window.allows_move()) return;
+        if (!window.allows_resize() || !window.allows_move()) {
+            return;
+        }
 
         // Remove window from the other windows' tileGroups so it
         // doesn't falsely get raised with them.
@@ -189,11 +198,13 @@ export class TilingWindowManager {
         window.unminimize();
         // Raise window since tiling with the popup means that
         // the window can be below others.
-        if (window.raise_and_make_recent_on_workspace)
+        if (window.raise_and_make_recent_on_workspace) {
             window.raise_and_make_recent_on_workspace(
                 global.workspace_manager.get_active_workspace(),
             );
-        else window.raise_and_make_recent();
+        } else {
+            window.raise_and_make_recent();
+        }
 
         const oldRect = new Rect(window.get_frame_rect());
         const monitor = monitorNr ?? window.get_monitor();
@@ -201,7 +212,9 @@ export class TilingWindowManager {
         const maximize = newRect.equal(workArea);
 
         window.isTiled = !maximize;
-        if (!window.untiledRect) window.untiledRect = oldRect;
+        if (!window.untiledRect) {
+            window.untiledRect = oldRect;
+        }
 
         if (maximize && !Settings.getBoolean('maximize-with-gap')) {
             window.tiledRect = null;
@@ -278,7 +291,9 @@ export class TilingWindowManager {
 
             this.emit('window-tiled', window);
 
-            if (openTilingPopup) await this.tryOpeningTilingPopup();
+            if (openTilingPopup) {
+                await this.tryOpeningTilingPopup();
+            }
         }
     }
 
@@ -286,13 +301,15 @@ export class TilingWindowManager {
      * Untiles a tiled window and delete all tiling properties.
      *
      * @param {Meta.Window} window a Meta.Window to untile.
-     * @param {boolean} [restoreFullPos=true] decides, if we restore the
+     * @param {object} param
+     * @param {boolean} [param.restoreFullPos] decides, if we restore the
      *      pre-tile position or whether the size while keeping the titlebar
      *      at the relative same position.
-     * @param {number} [xAnchor=undefined] used when wanting to restore the
+     * @param {number} [param.xAnchor] used when wanting to restore the
      *      size while keeping titlebar at the relative x position. By default,
      *      we use the pointer position.
-     * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
+     * @param {boolean} [param.skipAnim] decides, if we skip the until animation.
+     * @param {boolean} [param.clampToWorkspace]
      */
     static untile(
         window,
@@ -304,25 +321,30 @@ export class TilingWindowManager {
         } = {},
     ) {
         const wasMaximized = window.get_maximized();
-        if (wasMaximized) window.unmaximize(wasMaximized);
+        if (wasMaximized) {
+            window.unmaximize(wasMaximized);
+        }
 
         if (
             !window.untiledRect ||
             !window.allows_resize() ||
             !window.allows_move()
-        )
+        ) {
             return;
+        }
 
         // If you tiled a window and then used the popup to tile more
         // windows, the consecutive windows will be raised above the first
         // one. So untiling the initial window after tiling more windows with
         // the popup (without re-focusing the initial window), means the
         // untiled window will be below the others.
-        if (window.raise_and_make_recent_on_workspace)
+        if (window.raise_and_make_recent_on_workspace) {
             window.raise_and_make_recent_on_workspace(
                 global.workspace_manager.get_active_workspace(),
             );
-        else window.raise_and_make_recent();
+        } else {
+            window.raise_and_make_recent();
+        }
 
         // Animation
         const untileAnim = Settings.getBoolean('enable-untile-animations');
@@ -358,8 +380,9 @@ export class TilingWindowManager {
             const newPosX = xAnchor - oldRect.width * relativeMouseX;
 
             // Wayland workaround for DND / restore position
-            Meta.is_wayland_compositor() &&
+            if (Meta.is_wayland_compositor()) {
                 window.move_frame(true, newPosX, currWindowFrame.y);
+            }
 
             window.move_resize_frame(
                 userOp,
@@ -431,8 +454,9 @@ export class TilingWindowManager {
             newTile.height = Math.floor(w.tiledRect.height * (1 / vScale));
 
             // Try to align with all previously scaled tiles and the workspace to prevent gaps
-            for (let i = 0; i < idx; i++)
+            for (let i = 0; i < idx; i++) {
                 newTile.tryAlignWith(tileGroup[i].tiledRect);
+            }
 
             newTile.tryAlignWith(newWorkArea, 10);
 
@@ -506,7 +530,9 @@ export class TilingWindowManager {
 
             // Reconnect unmanaging signal
             const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
-            unmanagingSignal && window.disconnect(unmanagingSignal);
+            if (unmanagingSignal) {
+                window.disconnect(unmanagingSignal);
+            }
 
             const umId = window.connect('unmanaging', () => {
                 this.clearTilingProps(windowId);
@@ -515,7 +541,9 @@ export class TilingWindowManager {
 
             // Reconnect ws-changed signal
             const wsChangeSignal = signals.get(TilingSignals.WS_CHANGED);
-            wsChangeSignal && window.disconnect(wsChangeSignal);
+            if (wsChangeSignal) {
+                window.disconnect(wsChangeSignal);
+            }
 
             const wsId = window.connect('workspace-changed', () =>
                 this._onWindowWorkspaceChanged(window),
@@ -524,7 +552,9 @@ export class TilingWindowManager {
 
             // Reconnect raise signal
             const raiseSignal = signals.get(TilingSignals.RAISE);
-            raiseSignal && window.disconnect(raiseSignal);
+            if (raiseSignal) {
+                window.disconnect(raiseSignal);
+            }
 
             const raiseId = window.connect('raised', (raisedWindow) => {
                 const raisedWindowId = raisedWindow.get_id();
@@ -547,11 +577,13 @@ export class TilingWindowManager {
 
                         // Prevent an infinite loop of windows raising each other
                         w.block_signal_handler(otherRaiseId);
-                        if (w.raise_and_make_recent_on_workspace)
+                        if (w.raise_and_make_recent_on_workspace) {
                             w.raise_and_make_recent_on_workspace(
                                 global.workspace_manager.get_active_workspace(),
                             );
-                        else w.raise_and_make_recent();
+                        } else {
+                            w.raise_and_make_recent();
+                        }
                         w.unblock_signal_handler(otherRaiseId);
                     });
 
@@ -562,11 +594,13 @@ export class TilingWindowManager {
                         .getSignalsFor(raisedWindowId)
                         .get(TilingSignals.RAISE);
                     raisedWindow.block_signal_handler(signalId);
-                    if (raisedWindow.raise_and_make_recent_on_workspace)
+                    if (raisedWindow.raise_and_make_recent_on_workspace) {
                         raisedWindow.raise_and_make_recent_on_workspace(
                             global.workspace_manager.get_active_workspace(),
                         );
-                    else raisedWindow.raise_and_make_recent();
+                    } else {
+                        raisedWindow.raise_and_make_recent();
+                    }
                     raisedWindow.unblock_signal_handler(signalId);
                 }
 
@@ -594,39 +628,46 @@ export class TilingWindowManager {
         const signals = this._signals.getSignalsFor(windowId);
 
         if (signals.get(TilingSignals.RAISE)) {
-            window && window.disconnect(signals.get(TilingSignals.RAISE));
+            window?.disconnect(signals.get(TilingSignals.RAISE));
             signals.set(TilingSignals.RAISE, 0);
         }
 
         if (signals.get(TilingSignals.WS_CHANGED)) {
-            window && window.disconnect(signals.get(TilingSignals.WS_CHANGED));
+            window?.disconnect(signals.get(TilingSignals.WS_CHANGED));
             signals.set(TilingSignals.WS_CHANGED, 0);
         }
 
         if (signals.get(TilingSignals.UNMANAGING)) {
-            window && window.disconnect(signals.get(TilingSignals.UNMANAGING));
+            window?.disconnect(signals.get(TilingSignals.UNMANAGING));
             signals.set(TilingSignals.UNMANAGING, 0);
         }
 
-        if (!this._tileGroups.has(windowId)) return;
+        if (!this._tileGroups.has(windowId)) {
+            return;
+        }
 
         // Delete window's tileGroup
         this._tileGroups.delete(windowId);
         // Delete window from other windows' tileGroup
         this._tileGroups.forEach((tileGroup) => {
             const idx = tileGroup.indexOf(windowId);
-            idx !== -1 && tileGroup.splice(idx, 1);
+            if (idx !== -1) {
+                tileGroup.splice(idx, 1);
+            }
         });
     }
 
     /**
      * @param {Meta.Window} window a Meta.Window.
+     *
      * @returns {Meta.Window[]} an array of Meta.Windows, which are in `window`'s
      *      tile group (including the `window` itself).
      */
     static getTileGroupFor(window) {
         const tileGroup = this._tileGroups.get(window.get_id());
-        if (!tileGroup) return [];
+        if (!tileGroup) {
+            return [];
+        }
 
         return this._getAllWindows().filter((w) =>
             tileGroup.includes(w.get_id()),
@@ -639,12 +680,14 @@ export class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [skipTopWindow=true] whether we ignore the focused window
+     * @param {object} param
+     * @param {boolean} [param.skipTopWindow] whether we ignore the focused window
      *      in the active search for the top tile group. The focused window may
      *      still be part of the returned array if it is part of another high-
      *      stacked window's tile group. This is mainly only useful, if the
      *      focused window isn't tiled (for example when dnd-ing a window).
-     * @param {number} [monitor=null] get the group for the monitor number.
+     * @param {number} [param.monitor] get the group for the monitor number.
+     *
      * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
      */
     static getTopTileGroup({skipTopWindow = false, monitor = null} = {}) {
@@ -657,13 +700,17 @@ export class TilingWindowManager {
             Settings.getBoolean('disable-tile-groups')
         ) {
             const openWindows = this.getWindows();
-            if (!openWindows.length) return [];
+            if (!openWindows.length) {
+                return [];
+            }
 
             if (skipTopWindow) {
                 // the focused window isn't necessarily the top window due to always
                 // on top windows.
                 const idx = openWindows.indexOf(global.display.focus_window);
-                idx !== -1 && openWindows.splice(idx, 1);
+                if (idx !== -1) {
+                    openWindows.splice(idx, 1);
+                }
             }
 
             const ignoredWindows = [];
@@ -673,11 +720,15 @@ export class TilingWindowManager {
                 openWindows[0].get_monitor();
 
             for (const window of openWindows) {
-                if (window.get_monitor() !== mon) continue;
+                if (window.get_monitor() !== mon) {
+                    continue;
+                }
 
                 // Ignore non-tiled windows, which are always-on-top, for the
                 // calculation since they are probably some utility apps etc.
-                if (window.is_above() && !window.isTiled) continue;
+                if (window.is_above() && !window.isTiled) {
+                    continue;
+                }
 
                 // Find the first not overlapped tile group, if it exists
                 if (window.isTiled) {
@@ -687,8 +738,11 @@ export class TilingWindowManager {
                         return rect.overlap(window.tiledRect);
                     });
 
-                    if (overlapsIgnoredWindow) ignoredWindows.push(window);
-                    else return this.getTileGroupFor(window);
+                    if (overlapsIgnoredWindow) {
+                        ignoredWindows.push(window);
+                    } else {
+                        return this.getTileGroupFor(window);
+                    }
                 } else {
                     ignoredWindows.push(window);
                 }
@@ -718,7 +772,9 @@ export class TilingWindowManager {
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeScreenRects = workArea.minus(rectList);
-        if (!freeScreenRects.length) return null;
+        if (!freeScreenRects.length) {
+            return null;
+        }
 
         // Create the union of all freeScreenRects and calculate the sum
         // of their areas. If the area of the union-rect equals the area
@@ -738,10 +794,14 @@ export class TilingWindowManager {
             {checkSum: 0, combinedRect: startRect},
         );
 
-        if (combinedRect.area !== checkSum) return null;
+        if (combinedRect.area !== checkSum) {
+            return null;
+        }
 
         // Random min. size requirement
-        if (combinedRect.width < 250 || combinedRect.height < 250) return null;
+        if (combinedRect.width < 250 || combinedRect.height < 250) {
+            return null;
+        }
 
         return combinedRect;
     }
@@ -753,10 +813,12 @@ export class TilingWindowManager {
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
      *      Like usual, they shouldn't overlap each other.
-     * @param {Rect} [currRect=null] a Rect, which may be expanded.
-     * @param {Orientation} [orientation=null] The orientation we want to expand
+     * @param {object} param
+     * @param {Rect} [param.currRect] a Rect, which may be expanded.
+     * @param {Orientation} [param.orientation] The orientation we want to expand
      *      `currRect` into. If `null`, expand in both orientations.
-     * @param {Rect} [monitor=null] defaults to pointer monitor.
+     * @param {Rect} [param.monitorNr] defaults to pointer monitor.
+     *
      * @returns {Rect} a new Rect.
      */
     static getBestFreeRect(
@@ -767,7 +829,9 @@ export class TilingWindowManager {
         const monitor = monitorNr ?? global.display.get_current_monitor();
         const workArea = new Rect(activeWs.get_work_area_for_monitor(monitor));
         const freeRects = workArea.minus(rectList);
-        if (!freeRects.length) return currRect ?? new Rect(workArea);
+        if (!freeRects.length) {
+            return currRect ?? new Rect(workArea);
+        }
 
         // Try to expand the currRect to fill the rest of the space
         // that is available around it.
@@ -797,10 +861,11 @@ export class TilingWindowManager {
             // or after (right / bottom) the current rect.
             const {before, after} = borderingRects.reduce(
                 (result, r) => {
-                    if (currRect[xpndPos1] === r[xpndPos2])
+                    if (currRect[xpndPos1] === r[xpndPos2]) {
                         result.before.push(r);
-                    else if (currRect[xpndPos2] === r[xpndPos1])
+                    } else if (currRect[xpndPos2] === r[xpndPos1]) {
                         result.after.push(r);
+                    }
 
                     return result;
                 },
@@ -919,7 +984,9 @@ export class TilingWindowManager {
         const getRect = (w) => w.tiledRect ?? new Rect(w.get_frame_rect());
         const rects = windows.map((w) => getRect(w));
         const nearestRect = getRect(currWindow).getNeighbor(dir, rects, wrap);
-        if (!nearestRect) return null;
+        if (!nearestRect) {
+            return null;
+        }
 
         return windows.find((w) => getRect(w).equal(nearestRect));
     }
@@ -942,12 +1009,14 @@ export class TilingWindowManager {
      *      used to implement the 'grace period' to enable quickly tiling a
      *      window using the screen edges even if there is another monitor
      *      at that edge.
-     * @returns a Rect.
+     *
+     * @returns {Rect} a Rect.
      */
     static getTileFor(shortcut, workArea, monitor = null) {
         // Don't try to adapt a tile rect
-        if (Settings.getBoolean('disable-tile-groups'))
+        if (Settings.getBoolean('disable-tile-groups')) {
             return this.getDefaultTileFor(shortcut, workArea);
+        }
 
         const topTileGroup = this.getTopTileGroup({
             skipTopWindow: true,
@@ -961,7 +1030,11 @@ export class TilingWindowManager {
         // part of the returned array if it's part of another high-stackeing
         // window's tile group.
         const idx = topTileGroup.indexOf(global.display.focus_window);
-        idx !== -1 && topTileGroup.splice(idx, 1);
+
+        if (idx !== -1) {
+            topTileGroup.splice(idx, 1);
+        }
+
         const favLayout = Util.getFavoriteLayout(monitor);
         const useFavLayout =
             favLayout.length &&
@@ -969,13 +1042,17 @@ export class TilingWindowManager {
         const twRects =
             (useFavLayout && favLayout) || topTileGroup.map((w) => w.tiledRect);
 
-        if (!twRects.length) return this.getDefaultTileFor(shortcut, workArea);
+        if (!twRects.length) {
+            return this.getDefaultTileFor(shortcut, workArea);
+        }
 
         // Return the adapted rect only if it doesn't overlap an existing tile.
         // Ignore an overlap, if a fav layout is used since we always prefer the
         // user set layout in that case.
         const getTile = (rect) => {
-            if (useFavLayout) return rect;
+            if (useFavLayout) {
+                return rect;
+            }
 
             const overlapsTiles = twRects.some((r) => r.overlap(rect));
             return overlapsTiles ?
@@ -1128,12 +1205,15 @@ export class TilingWindowManager {
                 return getTile(result);
             }
         }
+
+        throw new Error('Invalid shortcut');
     }
 
     /**
      * @param {string} shortcut determines, which half/quarter to get the tile for
      * @param {Rect} workArea
-     * @returns
+     *
+     * @returns {Rect}
      */
     static getDefaultTileFor(shortcut, workArea) {
         switch (shortcut) {
@@ -1180,6 +1260,8 @@ export class TilingWindowManager {
                     .getUnitAt(1, workArea.width / 2, Orientation.V)
                     .getUnitAt(1, workArea.height / 2, Orientation.H);
         }
+
+        throw new Error('Invalid shortcut');
     }
 
     /**
@@ -1187,7 +1269,9 @@ export class TilingWindowManager {
      * and offer to tile an open window to that spot.
      */
     static async tryOpeningTilingPopup() {
-        if (!Settings.getBoolean('enable-tiling-popup')) return;
+        if (!Settings.getBoolean('enable-tiling-popup')) {
+            return;
+        }
 
         const allWs = Settings.getBoolean('tiling-popup-all-workspace');
         const openWindows = this.getWindows(allWs);
@@ -1195,19 +1279,25 @@ export class TilingWindowManager {
         topTileGroup.forEach((w) =>
             openWindows.splice(openWindows.indexOf(w), 1),
         );
-        if (!openWindows.length) return;
+        if (!openWindows.length) {
+            return;
+        }
 
         const tRects = topTileGroup.map((w) => w.tiledRect);
         const monitor = topTileGroup[0]?.get_monitor(); // for the grace period
         const freeSpace = this.getFreeScreen(tRects, monitor);
-        if (!freeSpace) return;
+        if (!freeSpace) {
+            return;
+        }
 
         const TilingPopup = await import('./tilingPopup.js');
         const popup = new TilingPopup.TilingSwitcherPopup(
             openWindows,
             freeSpace,
         );
-        if (!popup.show(topTileGroup)) popup.destroy();
+        if (!popup.show(topTileGroup)) {
+            popup.destroy();
+        }
     }
 
     /**
@@ -1215,6 +1305,7 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window.
      * @param {Rect} rect the Rect the `window` tiles to or untiles from.
+     * @param {object} params
      */
     static toggleTiling(window, rect, params = {}) {
         const workArea = window.get_work_area_current_monitor();
@@ -1223,9 +1314,11 @@ export class TilingWindowManager {
         if (
             (window.isTiled && equalsTile) ||
             (this.isMaximized(window) && equalsWA)
-        )
+        ) {
             this.untile(window, params);
-        else this.tile(window, rect, params);
+        } else {
+            this.tile(window, rect, params);
+        }
     }
 
     /**
@@ -1237,7 +1330,9 @@ export class TilingWindowManager {
      *      appear, if there is free screen space after the `app` was tiled.
      */
     static openAppTiled(app, rect, openTilingPopup = false) {
-        if (!app?.can_open_new_window()) return;
+        if (!app?.can_open_new_window()) {
+            return;
+        }
 
         let createId = global.display.connect(
             'window-created',
@@ -1273,16 +1368,24 @@ export class TilingWindowManager {
                 // window doesn't match the original app. It may be a loading screen
                 // or the user started an app in between etc... but in case the checks/
                 // signals above fail disconnect the signals after 1 min at the latest
-                this._openAppTiledTimerId &&
+                if (this._openAppTiledTimerId) {
                     GLib.Source.remove(this._openAppTiledTimerId);
+                }
+
                 this._openAppTiledTimerId = GLib.timeout_add(
                     GLib.PRIORITY_DEFAULT,
                     60000,
                     () => {
-                        createId && global.display.disconnect(createId);
-                        createId = 0;
-                        firstFrameId && wActor.disconnect(firstFrameId);
-                        firstFrameId = 0;
+                        if (createId) {
+                            global.display.disconnect(createId);
+                            createId = 0;
+                        }
+
+                        if (firstFrameId) {
+                            wActor.disconnect(firstFrameId);
+                            firstFrameId = 0;
+                        }
+
                         this._openAppTiledTimerId = null;
                         return GLib.SOURCE_REMOVE;
                     },
@@ -1326,10 +1429,14 @@ export class TilingWindowManager {
     /**
      * Gets the top windows, which are supposed to be in a tile group. That
      * means windows, which are tiled, and don't overlap each other.
+     *
+     * @param {number} [monitor]
      */
     static _getWindowsForBuildingTileGroup(monitor = null) {
         const openWindows = this.getWindows();
-        if (!openWindows.length) return [];
+        if (!openWindows.length) {
+            return [];
+        }
 
         const ignoredWindows = [];
         const result = [];
@@ -1339,14 +1446,22 @@ export class TilingWindowManager {
             openWindows[0].get_monitor();
 
         for (const window of openWindows) {
-            if (window.get_monitor() !== mon) continue;
+            if (window.get_monitor() !== mon) {
+                continue;
+            }
 
-            if (window.is_above() && !window.isTiled) continue;
+            if (window.is_above() && !window.isTiled) {
+                continue;
+            }
 
             if (window.isTiled) {
                 // Window was already checked as part of another's tileGroup.
-                if (ignoredWindows.includes(window) || result.includes(window))
+                if (
+                    ignoredWindows.includes(window) ||
+                    result.includes(window)
+                ) {
                     continue;
+                }
 
                 // Check for the other windows in the tile group as well regardless
                 // of the 'raise tile group' setting so that once the setting is
@@ -1371,13 +1486,17 @@ export class TilingWindowManager {
                         ),
                 );
 
-                tileGroupOverlaps ?
-                    tileGroup.forEach((w) => ignoredWindows.push(w))
-                :   tileGroup.forEach((w) => result.push(w));
+                if (tileGroupOverlaps) {
+                    tileGroup.forEach((w) => ignoredWindows.push(w));
+                } else {
+                    tileGroup.forEach((w) => result.push(w));
+                }
             } else {
                 // The window is maximized, so all windows below it can't belong
                 // to this group anymore.
-                if (this.isMaximized(window)) break;
+                if (this.isMaximized(window)) {
+                    break;
+                }
 
                 ignoredWindows.push(window);
             }
@@ -1394,13 +1513,17 @@ export class TilingWindowManager {
      */
     static _getTopTiledWindows({skipTopWindow = false, monitor = null} = {}) {
         const openWindows = this.getWindows();
-        if (!openWindows.length) return [];
+        if (!openWindows.length) {
+            return [];
+        }
 
         if (skipTopWindow) {
             // the focused window isn't necessarily the top window due to always
             // on top windows.
             const idx = openWindows.indexOf(global.display.focus_window);
-            idx !== -1 && openWindows.splice(idx, 1);
+            if (idx !== -1) {
+                openWindows.splice(idx, 1);
+            }
         }
 
         const topTiledWindows = [];
@@ -1411,9 +1534,13 @@ export class TilingWindowManager {
             openWindows[0].get_monitor();
 
         for (const window of openWindows) {
-            if (window.get_monitor() !== mon) continue;
+            if (window.get_monitor() !== mon) {
+                continue;
+            }
 
-            if (window.is_above() && !window.isTiled) continue;
+            if (window.is_above() && !window.isTiled) {
+                continue;
+            }
 
             if (window.isTiled) {
                 const wRect = window.tiledRect;
@@ -1430,13 +1557,17 @@ export class TilingWindowManager {
                     w.tiledRect.overlap(wRect),
                 );
 
-                overlapsIgnoredWindow || overlapsTopTiledWindows ?
-                    ignoredWindows.push(window)
-                :   topTiledWindows.push(window);
+                if (overlapsIgnoredWindow || overlapsTopTiledWindows) {
+                    ignoredWindows.push(window);
+                } else {
+                    topTiledWindows.push(window);
+                }
             } else {
                 // The window is maximized, so all windows below it can't belong
                 // to this group anymore.
-                if (this.isMaximized(window)) break;
+                if (this.isMaximized(window)) {
+                    break;
+                }
 
                 ignoredWindows.push(window);
             }
@@ -1459,7 +1590,9 @@ export class TilingWindowManager {
         ];
         blockedSignals.forEach((s) => {
             const id = signals.get(s);
-            id && window.block_signal_handler(id);
+            if (id) {
+                window.block_signal_handler(id);
+            }
         });
     }
 
@@ -1478,7 +1611,9 @@ export class TilingWindowManager {
         ];
         blockedSignals.forEach((s) => {
             const id = signals.get(s);
-            id && window.unblock_signal_handler(id);
+            if (id) {
+                window.unblock_signal_handler(id);
+            }
         });
     }
 
@@ -1493,7 +1628,9 @@ export class TilingWindowManager {
 
         // Refresh 'unmanaging' signal
         const unmanagingSignal = signals.get(TilingSignals.UNMANAGING);
-        unmanagingSignal && window.disconnect(unmanagingSignal);
+        if (unmanagingSignal) {
+            window.disconnect(unmanagingSignal);
+        }
 
         const umId = window.connect('unmanaging', () => {
             this.clearTilingProps(window.get_id());
@@ -1519,7 +1656,7 @@ export class TilingWindowManager {
      * Gets the window matching a window id
      *
      * @param {number} id
-     * @returns {Meta.Window}
+     * @returns {Meta.Window|undefined}
      */
     static _getWindow(id) {
         return this._getAllWindows().find((w) => w.get_id() === id);
@@ -1535,7 +1672,11 @@ export class TilingWindowManager {
      */
     static _onWorkspaceAdded() {
         this._ignoreWsChange = true;
-        this._wsAddedTimer && GLib.Source.remove(this._wsAddedTimer);
+
+        if (this._wsAddedTimer) {
+            GLib.Source.remove(this._wsAddedTimer);
+        }
+
         this._wsAddedTimer = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 50, () => {
             this._ignoreWsChange = false;
             this._wsAddedTimer = null;
@@ -1553,7 +1694,11 @@ export class TilingWindowManager {
      */
     static _onWorkspaceRemoved() {
         this._ignoreWsChange = true;
-        this._wsRemovedTimer && GLib.Source.remove(this._wsRemovedTimer);
+
+        if (this._wsRemovedTimer) {
+            GLib.Source.remove(this._wsRemovedTimer);
+        }
+
         this._wsRemovedTimer = GLib.timeout_add(
             GLib.PRIORITY_DEFAULT,
             50,
@@ -1591,12 +1736,16 @@ export class TilingWindowManager {
             return;
         }
 
-        if (this._ignoreWsChange) return;
+        if (this._ignoreWsChange) {
+            return;
+        }
 
         if (this.isMaximized(window)) {
             const wA = window.get_work_area_for_monitor(window.get_monitor());
             const workArea = new Rect(wA);
-            if (workArea.equal(window.tiledRect)) return;
+            if (workArea.equal(window.tiledRect)) {
+                return;
+            }
 
             this.tile(window, workArea, {
                 openTilingPopup: false,
@@ -1649,7 +1798,10 @@ const TilingSignals = GObject.registerClass(
             );
             this._ids.forEach((signals, windowId) => {
                 const window = allWindows.find((w) => w.get_id() === windowId);
-                window && signals.forEach((s) => s && window.disconnect(s));
+
+                if (window) {
+                    signals.forEach((s) => s && window.disconnect(s));
+                }
             });
 
             super.destroy();

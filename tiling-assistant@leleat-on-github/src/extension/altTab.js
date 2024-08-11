@@ -22,15 +22,18 @@ import {TilingWindowManager as Twm} from './tilingWindowManager.js';
  */
 export default class AltTabOverride {
     constructor() {
-        if (Settings.getBoolean('tilegroups-in-app-switcher'))
+        if (Settings.getBoolean('tilegroups-in-app-switcher')) {
             this._overrideNativeAppSwitcher();
+        }
 
         this._settingsId = Settings.changed(
             'tilegroups-in-app-switcher',
             () => {
-                if (Settings.getBoolean('tilegroups-in-app-switcher'))
+                if (Settings.getBoolean('tilegroups-in-app-switcher')) {
                     this._overrideNativeAppSwitcher();
-                else this._restoreNativeAppSwitcher();
+                } else {
+                    this._restoreNativeAppSwitcher();
+                }
             },
         );
     }
@@ -64,8 +67,9 @@ export default class AltTabOverride {
      * @param {*} binding -
      */
     _startSwitcher(display, window, binding) {
-        if (Main.wm._workspaceSwitcherPopup !== null)
+        if (Main.wm._workspaceSwitcherPopup !== null) {
             Main.wm._workspaceSwitcherPopup.destroy();
+        }
 
         const tabPopup = new TilingAppSwitcherPopup();
 
@@ -75,8 +79,9 @@ export default class AltTabOverride {
                 binding.get_name(),
                 binding.get_mask(),
             )
-        )
+        ) {
             tabPopup.destroy();
+        }
     }
 }
 
@@ -104,7 +109,9 @@ export const TilingAppSwitcherPopup = GObject.registerClass(
         // Called when closing an entire app / tileGroup
         _quitApplication(index) {
             const item = this._items[index];
-            if (!item) return;
+            if (!item) {
+                return;
+            }
 
             item.cachedWindows.forEach((w) =>
                 w.delete(global.get_current_time()),
@@ -117,7 +124,9 @@ export const TilingAppSwitcherPopup = GObject.registerClass(
         // meaning that .cachedWindow of an item was updated via signals
         _windowRemoved(thumbnailSwitcher, n) {
             const item = this._items[this._selectedIndex];
-            if (!item) return;
+            if (!item) {
+                return;
+            }
 
             if (item.cachedWindows.length) {
                 const newIndex = Math.min(n, item.cachedWindows.length - 1);
@@ -205,8 +214,9 @@ export const TilingAppSwitcher = GObject.registerClass(
             this._apps = [...new Set(allApps)];
             this._stateChangedIds = this._apps.map((app) =>
                 app.connect('notify::state', () => {
-                    if (app.state !== Shell.AppState.RUNNING)
+                    if (app.state !== Shell.AppState.RUNNING) {
                         this.icons.forEach((item) => item.removeApp(app));
+                    }
                 }),
             );
 
@@ -214,8 +224,9 @@ export const TilingAppSwitcher = GObject.registerClass(
         }
 
         _onDestroy() {
-            if (this._mouseTimeOutId !== 0)
+            if (this._mouseTimeOutId !== 0) {
                 GLib.source_remove(this._mouseTimeOutId);
+            }
 
             this._stateChangedIds?.forEach((id, index) =>
                 this._apps[index].disconnect(id),
@@ -229,8 +240,9 @@ export const TilingAppSwitcher = GObject.registerClass(
             while (
                 this._items.length > 1 &&
                 this._items[j].style_class !== 'item-box'
-            )
+            ) {
                 j++;
+            }
 
             let themeNode = this._items[j].get_theme_node();
             this._list.ensure_style();
@@ -265,21 +277,26 @@ export const TilingAppSwitcher = GObject.registerClass(
                     iconSize = baseIconSizes[i];
                     let height = iconSizes[i] + iconSpacing;
                     let w = height * this._items.length + totalSpacing;
-                    if (w <= availWidth) break;
+                    if (w <= availWidth) {
+                        break;
+                    }
                 }
             }
 
             this._iconSize = iconSize;
 
             for (let i = 0; i < this.icons.length; i++) {
-                // eslint-disable-next-line eqeqeq
-                if (this.icons[i].icon != null) break;
+                if (this.icons[i].icon != null) {
+                    break;
+                }
                 this.icons[i].set_size(iconSize);
             }
         }
 
         vfunc_get_preferred_height(forWidth) {
-            if (!this._iconSize) this._setIconSize();
+            if (!this._iconSize) {
+                this._setIconSize();
+            }
 
             return super.vfunc_get_preferred_height(forWidth);
         }
@@ -317,8 +334,9 @@ export const TilingAppSwitcher = GObject.registerClass(
             if (
                 item === this._items[this._highlighted] ||
                 item === this._items[this._delayedHighlighted]
-            )
+            ) {
                 return Clutter.EVENT_PROPAGATE;
+            }
 
             const index = this._items.indexOf(item);
 
@@ -358,8 +376,9 @@ export const TilingAppSwitcher = GObject.registerClass(
                 x,
                 y,
             );
-            if (this._items[index].contains(pickedActor))
+            if (this._items[index].contains(pickedActor)) {
                 this._itemEntered(index);
+            }
         }
 
         // We override SwitcherList's highlight() method to also deal with
@@ -371,12 +390,13 @@ export const TilingAppSwitcher = GObject.registerClass(
         // highlighted.
         highlight(n, justOutline) {
             if (this.icons[this._highlighted]) {
-                if (this.icons[this._highlighted].cachedWindows.length === 1)
+                if (this.icons[this._highlighted].cachedWindows.length === 1) {
                     this._arrows[this._highlighted].hide();
-                else
+                } else {
                     this._arrows[this._highlighted].remove_style_pseudo_class(
                         'highlighted',
                     );
+                }
             }
 
             super.highlight(n, justOutline);
@@ -385,12 +405,13 @@ export const TilingAppSwitcher = GObject.registerClass(
                 if (
                     justOutline &&
                     this.icons[this._highlighted].cachedWindows.length === 1
-                )
+                ) {
                     this._arrows[this._highlighted].show();
-                else
+                } else {
                     this._arrows[this._highlighted].add_style_pseudo_class(
                         'highlighted',
                     );
+                }
             }
         }
 
@@ -401,8 +422,9 @@ export const TilingAppSwitcher = GObject.registerClass(
             appIcon.app.connectObject(
                 'notify::state',
                 (app) => {
-                    if (app.state !== Shell.AppState.RUNNING)
+                    if (app.state !== Shell.AppState.RUNNING) {
                         this._removeIcon(app);
+                    }
                 },
                 this,
             );
@@ -414,13 +436,18 @@ export const TilingAppSwitcher = GObject.registerClass(
             this.add_child(arrow);
             this._arrows.push(arrow);
 
-            if (appIcon.cachedWindows.length === 1) arrow.hide();
-            else item.add_accessible_state(Atk.StateType.EXPANDABLE);
+            if (appIcon.cachedWindows.length === 1) {
+                arrow.hide();
+            } else {
+                item.add_accessible_state(Atk.StateType.EXPANDABLE);
+            }
         }
 
         _removeIcon(item) {
             const index = this.icons.findIndex((i) => i === item);
-            if (index === -1) return;
+            if (index === -1) {
+                return;
+            }
 
             this._arrows[index].destroy();
             this._arrows.splice(index, 1);
@@ -494,7 +521,11 @@ const AppSwitcherItem = GObject.registerClass(
                     // Only unique apps
                 :   this.cachedWindows.reduce((allApps, w) => {
                         const a = winTracker.get_window_app(w);
-                        !allApps.includes(a) && allApps.push(a);
+
+                        if (!allApps.includes(a)) {
+                            allApps.push(a);
+                        }
+
                         return allApps;
                     }, []);
 
@@ -505,7 +536,9 @@ const AppSwitcherItem = GObject.registerClass(
                 this.appIcons.push(appIcon);
 
                 // Add chain to the right AppIcon except for the last AppIcon
-                if (idx >= apps.length - 1) return;
+                if (idx >= apps.length - 1) {
+                    return;
+                }
 
                 // Chain
                 const chain = new St.Icon({
@@ -529,7 +562,9 @@ const AppSwitcherItem = GObject.registerClass(
         removeApp(app) {
             for (let i = this.appIcons.length - 1; i >= 0; i--) {
                 const appIcon = this.appIcons[i];
-                if (appIcon.app !== app) continue;
+                if (appIcon.app !== app) {
+                    continue;
+                }
 
                 this.appIcons.splice(i, 1);
                 appIcon.destroy();
@@ -537,7 +572,9 @@ const AppSwitcherItem = GObject.registerClass(
                 chain?.destroy();
             }
 
-            if (!this.appIcons.length) this.emit('all-icons-removed');
+            if (!this.appIcons.length) {
+                this.emit('all-icons-removed');
+            }
         }
     },
 );

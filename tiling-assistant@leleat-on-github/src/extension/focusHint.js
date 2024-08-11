@@ -37,8 +37,9 @@ export default class FocusHintManager {
         );
         this._setHint();
 
-        if (this._hint?.shouldIndicate(initialWindow))
+        if (this._hint?.shouldIndicate(initialWindow)) {
             this._hint.indicate(initialWindow);
+        }
     }
 
     destroy() {
@@ -106,17 +107,24 @@ class Hint {
         const idleMonitor = global.backend.get_core_idle_monitor();
         const idleTime = 120 * 1000;
 
-        this._activeWatchId && idleMonitor.remove_watch(this._activeWatchId);
-        this._activeWatchId = 0;
+        if (this._activeWatchId) {
+            idleMonitor.remove_watch(this._activeWatchId);
+            this._activeWatchId = 0;
+        }
 
-        this._idleWatchId && idleMonitor.remove_watch(this._idleWatchId);
+        if (this._idleWatchId) {
+            idleMonitor.remove_watch(this._idleWatchId);
+        }
+
         this._idleWatchId = idleMonitor.add_idle_watch(idleTime, () => {
             this._activeWatchId = idleMonitor.add_user_active_watch(() => {
                 this._activeWatchId = 0;
 
                 const focus = global.display.focus_window;
 
-                if (this.shouldIndicate(focus)) this.indicate(focus);
+                if (this.shouldIndicate(focus)) {
+                    this.indicate(focus);
+                }
             });
         });
     }
@@ -142,7 +150,9 @@ class Hint {
     }
 
     _onWindowCreated(window) {
-        if (!this._allowedWindowType(window.get_window_type())) return;
+        if (!this._allowedWindowType(window.get_window_type())) {
+            return;
+        }
 
         window.connectObject(
             'unmanaged',
@@ -151,8 +161,11 @@ class Hint {
 
                 const focus = global.display.focus_window;
 
-                if (focus && this.shouldIndicate(focus)) this.indicate(focus);
-                else this.resetAnimation();
+                if (focus && this.shouldIndicate(focus)) {
+                    this.indicate(focus);
+                } else {
+                    this.resetAnimation();
+                }
             },
             this,
         );
@@ -188,7 +201,9 @@ class Hint {
 
             if (global.display.remove_keybinding(key)) {
                 const handler = (_, __, keybinding) => {
-                    if (!Main.sessionMode.hasOverview) return;
+                    if (!Main.sessionMode.hasOverview) {
+                        return;
+                    }
 
                     const [, , , target] = keybinding.get_name().split('-');
                     const apps = AppFavorites.getAppFavorites().getFavorites();
@@ -248,7 +263,9 @@ class Hint {
             // This is set if the focused window moved to the new workspace
             // along with the workspace switch animation. E. g. when using
             // Shift + Super + Alt + Arrow_Keys.
-            if (this.movingWindow) return;
+            if (this.movingWindow) {
+                return;
+            }
 
             // There are 2 different 'focus behaviors' during a workspace
             // animation. 1: When the workspace switch is initiated by an app or
@@ -268,23 +285,31 @@ class Hint {
                         global.workspace_manager.get_workspace_by_index(to);
                     const [newFocus] = AltTab.getWindows(newWorkspace);
 
-                    if (that.shouldIndicate(newFocus)) that.indicate(newFocus);
-                    else that.resetAnimation();
+                    if (that.shouldIndicate(newFocus)) {
+                        that.indicate(newFocus);
+                    } else {
+                        that.resetAnimation();
+                    }
                 },
             );
         };
     }
 
     shouldIndicate(window) {
-        if (!window || !window.get_compositor_private()) return false;
+        if (!window || !window.get_compositor_private()) {
+            return false;
+        }
 
-        if (!this._allowedWindowType(window.get_window_type())) return false;
+        if (!this._allowedWindowType(window.get_window_type())) {
+            return false;
+        }
 
         if (
             window.is_fullscreen() ||
             window.get_maximized() === Meta.MaximizeFlags.BOTH
-        )
+        ) {
             return false;
+        }
 
         return true;
     }
@@ -292,11 +317,15 @@ class Hint {
     _removeIdleWatcher() {
         const idleMonitor = global.backend.get_core_idle_monitor();
 
-        this._activeWatchId && idleMonitor.remove_watch(this._activeWatchId);
-        this._activeWatchId = 0;
+        if (this._activeWatchId) {
+            idleMonitor.remove_watch(this._activeWatchId);
+            this._activeWatchId = 0;
+        }
 
-        this._idleWatchId && idleMonitor.remove_watch(this._idleWatchId);
-        this._idleWatchId = 0;
+        if (this._idleWatchId) {
+            idleMonitor.remove_watch(this._idleWatchId);
+            this._idleWatchId = 0;
+        }
     }
 
     _restoreSwitcherPopupFinish() {
@@ -385,7 +414,9 @@ class AnimatedOutlineHint extends Hint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window)) return;
+        if (!this.shouldIndicate(window)) {
+            return;
+        }
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
@@ -467,7 +498,9 @@ class AnimatedUpscaleHint extends Hint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window)) return;
+        if (!this.shouldIndicate(window)) {
+            return;
+        }
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
@@ -583,14 +616,18 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     indicate(window, workspaceSwitchAnimationDuration = 250) {
         this.resetAnimation();
 
-        if (!this.shouldIndicate(window)) return;
+        if (!this.shouldIndicate(window)) {
+            return;
+        }
 
         const animatingWorkspaceSwitch =
             !!Main.wm._workspaceAnimation._switchData;
 
         // Only need to use an animation to indicate the focus when switching
         // workspaces. In the other cases, there is the static `this._outline`.
-        if (!animatingWorkspaceSwitch) return;
+        if (!animatingWorkspaceSwitch) {
+            return;
+        }
 
         const windowActor = window.get_compositor_private();
         const workspaceAnimationWindowClone =
@@ -647,7 +684,9 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     _queueGeometryUpdate() {
         const windowActor = this._window.get_compositor_private();
 
-        if (!windowActor) return;
+        if (!windowActor) {
+            return;
+        }
 
         this._laterID = global.compositor
             .get_laters()
@@ -690,9 +729,11 @@ class StaticOutlineHint extends AnimatedOutlineHint {
         if (
             this._window.is_fullscreen() ||
             this._window.get_maximized() === Meta.MaximizeFlags.BOTH
-        )
+        ) {
             this._outline.hide();
-        else this._queueGeometryUpdate();
+        } else {
+            this._queueGeometryUpdate();
+        }
     }
 
     _updateGeometry() {
@@ -779,9 +820,11 @@ function createContainers(
             .get_children()
             .find((child) => child instanceof OsdWindow.OsdWindow);
 
-        if (osdWindow)
+        if (osdWindow) {
             Main.uiGroup.insert_child_below(monitorContainer, osdWindow);
-        else Main.uiGroup.add_child(monitorContainer);
+        } else {
+            Main.uiGroup.add_child(monitorContainer);
+        }
     } else {
         global.window_group.add_child(monitorContainer);
     }
@@ -842,7 +885,9 @@ function findWindowCloneForWorkspaceAnimation(
     windowActor,
     animatingWorkspaceSwitch,
 ) {
-    if (!animatingWorkspaceSwitch) return null;
+    if (!animatingWorkspaceSwitch) {
+        return null;
+    }
 
     const switchData = Main.wm._workspaceAnimation._switchData;
     let clone = null;
@@ -852,7 +897,9 @@ function findWindowCloneForWorkspaceAnimation(
             return workspaceGroup._windowRecords.find((record) => {
                 const foundClone = record.windowActor === windowActor;
 
-                if (foundClone) ({clone} = record);
+                if (foundClone) {
+                    ({clone} = record);
+                }
 
                 return foundClone;
             });

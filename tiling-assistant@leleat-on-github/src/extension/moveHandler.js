@@ -23,8 +23,9 @@ export default class TilingMoveHandler {
             (src, window, grabOp) => {
                 grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-                if (window && moveOps.includes(grabOp))
+                if (window && moveOps.includes(grabOp)) {
                     this._onMoveStarted(window, grabOp);
+                }
             },
             this,
         );
@@ -60,16 +61,18 @@ export default class TilingMoveHandler {
             if (currMod === '<Alt>') {
                 for (const key of modKeys) {
                     const mod = Settings.getInt(key);
-                    if (mod === 2)
+                    if (mod === 2) {
                         // Alt
                         Settings.setInt(key, 0);
+                    }
                 }
             } else if (currMod === '<Super>') {
                 for (const key of modKeys) {
                     const mod = Settings.getInt(key);
-                    if (mod === 4)
+                    if (mod === 4) {
                         // Super
                         Settings.setInt(key, 0);
+                    }
                 }
             }
         };
@@ -115,10 +118,11 @@ export default class TilingMoveHandler {
     }
 
     _onMonitorEntered(src, monitorNr, window) {
-        if (this._isGrabOp)
+        if (this._isGrabOp) {
             // Reset preview mode:
             // Currently only needed to grab the favorite layout for the new monitor.
             this._preparePreviewModeChange(this._currPreviewMode, window);
+        }
     }
 
     _onMoveStarted(window, grabOp) {
@@ -131,8 +135,10 @@ export default class TilingMoveHandler {
         // Try to restore the window size
         if (window.tiledRect || this._wasMaximizedOnStart) {
             let counter = 0;
-            this._restoreSizeTimerId &&
+            if (this._restoreSizeTimerId) {
                 GLib.Source.remove(this._restoreSizeTimerId);
+            }
+
             this._restoreSizeTimerId = GLib.timeout_add(
                 GLib.PRIORITY_HIGH_IDLE,
                 10,
@@ -234,8 +240,9 @@ export default class TilingMoveHandler {
                     isCtrlReplacement = true;
                     ctrlReplacedTileGroup.push(window);
                     topTileGroup.forEach((w) => {
-                        if (!this._tileRect.containsRect(w.tiledRect))
+                        if (!this._tileRect.containsRect(w.tiledRect)) {
                             ctrlReplacedTileGroup.push(w);
+                        }
                     });
                 }
 
@@ -254,9 +261,9 @@ export default class TilingMoveHandler {
                 // Create a new tile group, in which some windows are already part
                 // of a different tile group, with ctrl-(super)-drag. The window may
                 // be maximized by ctrl-super-drag.
-                isCtrlReplacement &&
-                    window.isTiled &&
+                if (isCtrlReplacement && window.isTiled) {
                     Twm.updateTileGroup(ctrlReplacedTileGroup);
+                }
             }
         } finally {
             if (this._posChangedId) {
@@ -320,8 +327,9 @@ export default class TilingMoveHandler {
             const updateInterval = 500;
             const timeSinceLastUpdate =
                 this._movingTimerDuration * this._movingTimeoutsSinceUpdate;
-            if (timeSinceLastUpdate < updateInterval && !forceMoveUpdate)
+            if (timeSinceLastUpdate < updateInterval && !forceMoveUpdate) {
                 return GLib.SOURCE_CONTINUE;
+            }
 
             this._movingTimeoutsSinceUpdate = 0;
         }
@@ -367,13 +375,19 @@ export default class TilingMoveHandler {
 
         let newMode = '';
 
-        if (useAdaptiveTiling) newMode = MoveModes.ADAPTIVE_TILING;
-        else if (usefavLayout) newMode = MoveModes.FAVORITE_LAYOUT;
-        else if (useIgnoreTa) newMode = MoveModes.IGNORE_TA;
-        else newMode = MoveModes.EDGE_TILING;
+        if (useAdaptiveTiling) {
+            newMode = MoveModes.ADAPTIVE_TILING;
+        } else if (usefavLayout) {
+            newMode = MoveModes.FAVORITE_LAYOUT;
+        } else if (useIgnoreTa) {
+            newMode = MoveModes.IGNORE_TA;
+        } else {
+            newMode = MoveModes.EDGE_TILING;
+        }
 
-        if (this._currPreviewMode !== newMode)
+        if (this._currPreviewMode !== newMode) {
             this._preparePreviewModeChange(newMode, window);
+        }
 
         switch (newMode) {
             case MoveModes.IGNORE_TA:
@@ -470,8 +484,11 @@ export default class TilingMoveHandler {
             if (this._lastMonitorNr !== currMonitorNr) {
                 this._monitorNr = this._lastMonitorNr;
                 let timerId = 0;
-                this._latestMonitorLockTimerId &&
+
+                if (this._latestMonitorLockTimerId) {
                     GLib.Source.remove(this._latestMonitorLockTimerId);
+                }
+
                 this._latestMonitorLockTimerId = GLib.timeout_add(
                     GLib.PRIORITY_DEFAULT,
                     150,
@@ -480,8 +497,9 @@ export default class TilingMoveHandler {
                         if (timerId === this._latestMonitorLockTimerId) {
                             this._monitorNr =
                                 global.display.get_current_monitor();
-                            if (global.display.is_grabbed())
+                            if (global.display.is_grabbed()) {
                                 this._edgeTilingPreview(window, grabOp);
+                            }
                         }
 
                         this._latestMonitorLockTimerId = null;
@@ -599,8 +617,9 @@ export default class TilingMoveHandler {
                 this._tilePreview._rect &&
                 (holdTileRect.equal(this._tilePreview._rect) ||
                     this._tilePreview._rect.equal(tileRect.meta))
-            )
+            ) {
                 return;
+            }
 
             this._tileRect = tileRect;
             this._tilePreview.open(
@@ -610,8 +629,11 @@ export default class TilingMoveHandler {
             );
 
             let timerId = 0;
-            this._latestPreviewTimerId &&
+
+            if (this._latestPreviewTimerId) {
                 GLib.Source.remove(this._latestPreviewTimerId);
+            }
+
             this._latestPreviewTimerId = GLib.timeout_add(
                 GLib.PRIORITY_DEFAULT,
                 Settings.getInt('toggle-maximize-tophalf-timer'),
@@ -735,14 +757,16 @@ export default class TilingMoveHandler {
             const atRightEdge =
                 this._lastPointerPos.x > hoveredRect.x2 - edgeRadius;
 
-            atTopEdge || atBottomEdge || atLeftEdge || atRightEdge ?
+            if (atTopEdge || atBottomEdge || atLeftEdge || atRightEdge) {
                 this._adaptiveTilingPreviewGroup(window, hoveredRect, {
                     atTopEdge,
                     atBottomEdge,
                     atLeftEdge,
                     atRightEdge,
-                })
-            :   this._adaptiveTilingPreviewSingle(window, hoveredRect);
+                });
+            } else {
+                this._adaptiveTilingPreviewSingle(window, hoveredRect);
+            }
         }
     }
 
@@ -781,7 +805,9 @@ export default class TilingMoveHandler {
             this._tileRect = hoveredRect.copy();
         }
 
-        if (!this._tilePreview.needsUpdate(this._tileRect)) return;
+        if (!this._tilePreview.needsUpdate(this._tileRect)) {
+            return;
+        }
 
         const monitor = global.display.get_current_monitor();
         this._tilePreview.open(window, this._tileRect.meta, monitor);
@@ -791,11 +817,15 @@ export default class TilingMoveHandler {
             return w.tiledRect.containsPoint(this._lastPointerPos);
         });
 
-        if (!hoveredWindow) return;
+        if (!hoveredWindow) {
+            return;
+        }
 
         // Don't halve the window, if we compelety cover it i. e.
         // the user is hovering the tiled window at the center.
-        if (hoveredWindow.tiledRect.equal(this._tileRect)) return;
+        if (hoveredWindow.tiledRect.equal(this._tileRect)) {
+            return;
+        }
 
         const splitRect = hoveredWindow.tiledRect.minus(this._tileRect)[0];
         this._splitRects.set(hoveredWindow, splitRect);
@@ -822,34 +852,38 @@ export default class TilingMoveHandler {
                 if (
                     w.tiledRect.y === hoveredRect.y ||
                     w.tiledRect.y2 === hoveredRect.y
-                )
+                ) {
                     return w.tiledRect.height < smallest.tiledRect.height ?
                             w
                         :   smallest;
+                }
             } else if (hovered.atBottomEdge) {
                 if (
                     w.tiledRect.y === hoveredRect.y2 ||
                     w.tiledRect.y2 === hoveredRect.y2
-                )
+                ) {
                     return w.tiledRect.height < smallest.tiledRect.height ?
                             w
                         :   smallest;
+                }
             } else if (hovered.atLeftEdge) {
                 if (
                     w.tiledRect.x === hoveredRect.x ||
                     w.tiledRect.x2 === hoveredRect.x
-                )
+                ) {
                     return w.tiledRect.width < smallest.tiledRect.width ?
                             w
                         :   smallest;
+                }
             } else if (hovered.atRightEdge) {
                 if (
                     w.tiledRect.x === hoveredRect.x2 ||
                     w.tiledRect.x2 === hoveredRect.x2
-                )
+                ) {
                     return w.tiledRect.width < smallest.tiledRect.width ?
                             w
                         :   smallest;
+                }
             }
 
             return smallest;
@@ -972,7 +1006,9 @@ export default class TilingMoveHandler {
 
         this._tileRect.tryAlignWith(workArea);
 
-        if (!this._tilePreview.needsUpdate(this._tileRect)) return;
+        if (!this._tilePreview.needsUpdate(this._tileRect)) {
+            return;
+        }
 
         this._tilePreview.open(window, this._tileRect.meta, monitor);
         this._splitRects.clear();
@@ -981,7 +1017,9 @@ export default class TilingMoveHandler {
             const leftOver = w.tiledRect.minus(this._tileRect);
             const splitRect = leftOver[0];
             // w isn't an affected window.
-            if (splitRect?.equal(this._tileRect) ?? true) return;
+            if (splitRect?.equal(this._tileRect) ?? true) {
+                return;
+            }
 
             this._splitRects.set(w, splitRect);
         });
@@ -1038,11 +1076,15 @@ const TilePreview = GObject.registerClass(
         // Added param for animation and removed style for rounded corners
         open(window, tileRect, monitorIndex, animateTo = undefined) {
             const windowActor = window.get_compositor_private();
-            if (!windowActor) return;
+            if (!windowActor) {
+                return;
+            }
 
             global.window_group.set_child_below_sibling(this, windowActor);
 
-            if (this._rect && this._rect.equal(tileRect)) return;
+            if (this._rect && this._rect.equal(tileRect)) {
+                return;
+            }
 
             const changeMonitor =
                 this._monitorIndex === -1 ||
@@ -1080,12 +1122,26 @@ const TilePreview = GObject.registerClass(
                     mode: Clutter.AnimationMode.EASE_OUT_QUAD,
                 };
             } else {
-                animateTo.x === undefined && this.set_x(tileRect.x);
-                animateTo.y === undefined && this.set_y(tileRect.y);
-                animateTo.width === undefined && this.set_width(tileRect.width);
-                animateTo.height === undefined &&
+                if (animateTo.x === undefined) {
+                    this.set_x(tileRect.x);
+                }
+
+                if (animateTo.y === undefined) {
+                    this.set_y(tileRect.y);
+                }
+
+                if (animateTo.width === undefined) {
+                    this.set_width(tileRect.width);
+                }
+
+                if (animateTo.height === undefined) {
                     this.set_height(tileRect.height);
-                animateTo.opacity === undefined && this.set_opacity(255);
+                }
+
+                if (animateTo.opacity === undefined) {
+                    this.set_opacity(255);
+                }
+
                 animateTo.duration =
                     animateTo.duration ?? WINDOW_ANIMATION_TIME;
                 animateTo.mode =

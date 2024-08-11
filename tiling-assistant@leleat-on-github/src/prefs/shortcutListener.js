@@ -46,7 +46,9 @@ export const ShortcutListener = GObject.registerClass(
          * @param {ShortcutListener} shortcutListener the new active ShortcutListener
          */
         static listen(shortcutListener) {
-            if (shortcutListener === ShortcutListener.listener) return;
+            if (shortcutListener === ShortcutListener.listener) {
+                return;
+            }
 
             ShortcutListener.stopListening();
 
@@ -60,7 +62,9 @@ export const ShortcutListener = GObject.registerClass(
          * Stops listening for a keyboard shortcut.
          */
         static stopListening() {
-            if (!ShortcutListener.isListening) return;
+            if (!ShortcutListener.isListening) {
+                return;
+            }
 
             ShortcutListener.isListening = false;
             ShortcutListener.isAppendingShortcut = false;
@@ -101,7 +105,9 @@ export const ShortcutListener = GObject.registerClass(
             const kbLabel = this.keybinding.reduce((label, kb) => {
                 const [, keyval, mask] = Gtk.accelerator_parse(kb);
                 const l = Gtk.accelerator_get_label(keyval, mask);
-                if (!label) return l;
+                if (!label) {
+                    return l;
+                }
 
                 return l ? `${label} / ${l}` : label;
             }, '');
@@ -110,9 +116,11 @@ export const ShortcutListener = GObject.registerClass(
         }
 
         _onActivated() {
-            this.isActive ?
-                ShortcutListener.stopListening()
-            :   ShortcutListener.listen(this);
+            if (this.isActive) {
+                ShortcutListener.stopListening();
+            } else {
+                ShortcutListener.listen(this);
+            }
         }
 
         _onKeybindingChanged() {
@@ -127,7 +135,9 @@ export const ShortcutListener = GObject.registerClass(
         }
 
         _onKeyPressed(eventControllerKey, keyval, keycode, state) {
-            if (this !== ShortcutListener.listener) return Gdk.EVENT_PROPAGATE;
+            if (this !== ShortcutListener.listener) {
+                return Gdk.EVENT_PROPAGATE;
+            }
 
             let mask = state & Gtk.accelerator_get_default_mod_mask();
             mask &= ~Gdk.ModifierType.LOCK_MASK;
@@ -157,8 +167,9 @@ export const ShortcutListener = GObject.registerClass(
             if (
                 !this._isBindingValid({mask, keycode, keyval}) ||
                 !Gtk.accelerator_valid(keyval, mask)
-            )
+            ) {
                 return Gdk.EVENT_STOP;
+            }
 
             const sc = Gtk.accelerator_name_with_keycode(
                 null,
@@ -204,8 +215,9 @@ export const ShortcutListener = GObject.registerClass(
                         keyval <= Gdk.KEY_Hangul_J_YeorinHieuh) ||
                     (keyval === Gdk.KEY_space && mask === 0) ||
                     this._isKeyvalForbidden(keyval)
-                )
+                ) {
                     return false;
+                }
             }
             return true;
         }

@@ -70,7 +70,9 @@ export default class TilingKeybindingHandler {
         }
 
         const window = global.display.focus_window;
-        if (!window) return;
+        if (!window) {
+            return;
+        }
 
         // Auto-tile: tile to empty space. If there's none: untile,
         // if it's already tiled else maximize
@@ -96,7 +98,11 @@ export default class TilingKeybindingHandler {
 
             // Toggle always-on-top
         } else if (shortcutName === 'toggle-always-on-top') {
-            window.is_above() ? window.unmake_above() : window.make_above();
+            if (window.is_above()) {
+                window.unmake_above();
+            } else {
+                window.make_above();
+            }
 
             // Toggle maximization vertically
         } else if (shortcutName === 'tile-maximize-vertically') {
@@ -202,11 +208,12 @@ export default class TilingKeybindingHandler {
 
             // Restore window size
         } else if (shortcutName === 'restore-window') {
-            if (window.untiledRect)
+            if (window.untiledRect) {
                 // Tiled & maximized with gaps
                 Twm.untile(window, {clampToWorkspace: true});
-            else if (window.get_maximized())
+            } else if (window.get_maximized()) {
                 window.unmaximize(window.get_maximized());
+            }
 
             // Center window
         } else if (shortcutName === 'center-window') {
@@ -220,26 +227,35 @@ export default class TilingKeybindingHandler {
                     currRect.height,
                 );
 
-                if (tileRect.equal(currRect)) return;
+                if (tileRect.equal(currRect)) {
+                    return;
+                }
 
                 Twm.tile(window, tileRect, {openTilingPopup: false});
             } else if (!Twm.isMaximized(window)) {
-                if (!window.allows_move()) return;
+                if (!window.allows_move()) {
+                    return;
+                }
 
                 const currRect = window.get_frame_rect();
                 const x = workArea.center.x - Math.floor(currRect.width / 2);
                 const y = workArea.center.y - Math.floor(currRect.height / 2);
 
-                if (x === currRect.x && y === currRect.y) return;
+                if (x === currRect.x && y === currRect.y) {
+                    return;
+                }
 
                 const wActor = window.get_compositor_private();
-                wActor &&
+
+                if (wActor) {
                     Main.wm._prepareAnimationInfo(
                         global.window_manager,
                         wActor,
                         currRect,
                         Meta.SizeChange.UNMAXIMIZE,
                     );
+                }
+
                 window.move_frame(false, x, y);
             }
             // Tile a window but ignore T-A features
@@ -594,9 +610,13 @@ export default class TilingKeybindingHandler {
                         workArea,
                         window.get_monitor(),
                     );
-                    isWindowsStyle ?
-                        window.minimize()
-                    :   Twm.toggleTiling(window, rect);
+
+                    if (isWindowsStyle) {
+                        window.minimize();
+                    } else {
+                        Twm.toggleTiling(window, rect);
+                    }
+
                     return;
             }
         } else if (isTopLeftQuarter) {
@@ -662,9 +682,13 @@ export default class TilingKeybindingHandler {
                         workArea,
                         window.get_monitor(),
                     );
-                    isWindowsStyle ?
-                        window.minimize()
-                    :   Twm.toggleTiling(window, rect);
+
+                    if (isWindowsStyle) {
+                        window.minimize();
+                    } else {
+                        Twm.toggleTiling(window, rect);
+                    }
+
                     return;
             }
         } else if (isBottomRightQuarter) {
@@ -692,9 +716,13 @@ export default class TilingKeybindingHandler {
                         workArea,
                         window.get_monitor(),
                     );
-                    isWindowsStyle ?
-                        window.minimize()
-                    :   Twm.toggleTiling(window, rect);
+
+                    if (isWindowsStyle) {
+                        window.minimize();
+                    } else {
+                        Twm.toggleTiling(window, rect);
+                    }
+
                     return;
             }
         }

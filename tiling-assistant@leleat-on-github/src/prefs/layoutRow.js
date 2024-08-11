@@ -52,6 +52,7 @@ export const LayoutRow = GObject.registerClass(
          * @param {{_name: string, _items: {rect: object, appId: ?string, loopType: ?string}[]
          *      }|null} layout a parsed JS object representing a layout from the
          *      layouts.json file.
+         * @param {Gio.Settings} settings
          */
         _init(layout, settings) {
             super._init();

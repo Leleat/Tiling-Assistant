@@ -43,8 +43,9 @@ export default class TilingResizeHandler {
             (d, window, grabOp) => {
                 grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-                if (window && isResizing(grabOp))
+                if (window && isResizing(grabOp)) {
                     this._onResizeStarted(window, grabOp);
+                }
             },
             this,
         );
@@ -53,8 +54,9 @@ export default class TilingResizeHandler {
             (d, window, grabOp) => {
                 grabOp &= ~1024; // META_GRAB_OP_WINDOW_FLAG_UNCONSTRAINED
 
-                if (window && isResizing(grabOp))
+                if (window && isResizing(grabOp)) {
                     this._onResizeFinished(window, grabOp);
+                }
             },
             this,
         );
@@ -72,7 +74,9 @@ export default class TilingResizeHandler {
     }
 
     _onResizeStarted(window, grabOp) {
-        if (!window.isTiled) return;
+        if (!window.isTiled) {
+            return;
+        }
 
         // Use the same margin for the alignment and equality check below.
         const margin = 5;
@@ -80,13 +84,14 @@ export default class TilingResizeHandler {
         topTileGroup.forEach((w) => {
             this._preGrabRects.set(w, new Rect(w.get_frame_rect()));
 
-            if (w !== window)
+            if (w !== window) {
                 // There is no snapping for tiled windows, if the user set a window
                 // gap. So the windows may not align properly, if the user tried
                 // to manually resize them to be edge to edge. In that case, assume
                 // that windows that are within a certain margin distance to each
                 // other are meant to align and resize them together.
                 w.tiledRect.tryAlignWith(window.tiledRect, margin);
+            }
         });
 
         // Windows can be part of multiple tile groups. We however only resize
@@ -96,20 +101,29 @@ export default class TilingResizeHandler {
         // group's tiles. So remove the shared windows from the lower tile group.
         const allWindows = Twm.getWindows();
         allWindows.forEach((w) => {
-            if (!w.isTiled) return;
+            if (!w.isTiled) {
+                return;
+            }
 
-            if (topTileGroup.includes(w)) return;
+            if (topTileGroup.includes(w)) {
+                return;
+            }
 
             // Gets a tile group of windows without the ones
             // which are about to be resized
             const group = Twm.getTileGroupFor(w);
             const newGroup = group.reduce((gr, win) => {
-                !topTileGroup.includes(win) && gr.push(win);
+                if (!topTileGroup.includes(win)) {
+                    gr.push(win);
+                }
+
                 return gr;
             }, []);
 
             // Tile groups are the same
-            if (group.length === newGroup.length) return;
+            if (group.length === newGroup.length) {
+                return;
+            }
 
             // Remove old tile group and create new one
             Twm.clearTilingProps(w.get_id());
@@ -132,12 +146,13 @@ export default class TilingResizeHandler {
             Meta.GrabOp.RESIZING_W,
             Meta.GrabOp.RESIZING_E,
         ];
-        if (isCtrlPressed && singleEdgeResizeOp.includes(grabOp))
+        if (isCtrlPressed && singleEdgeResizeOp.includes(grabOp)) {
             topTileGroup = this._getWindowsForIndividualResize(
                 window,
                 topTileGroup,
                 grabOp,
             );
+        }
 
         switch (grabOp) {
             // Resizing cardinal directions
@@ -150,7 +165,9 @@ export default class TilingResizeHandler {
                         false,
                         false,
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -169,7 +186,9 @@ export default class TilingResizeHandler {
                         false,
                         false,
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -188,7 +207,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
                         Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -207,7 +228,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x, otherRect.x, margin),
                         Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -227,7 +250,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x, otherRect.x, margin),
                         Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -251,7 +276,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
                         Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -275,7 +302,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x, otherRect.x, margin),
                         Util.equal(grabbedRect.x, otherRect.x2, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -299,7 +328,9 @@ export default class TilingResizeHandler {
                         Util.equal(grabbedRect.x2, otherRect.x2, margin),
                         Util.equal(grabbedRect.x2, otherRect.x, margin),
                     );
-                    resizeOp && this._resizeOps.set(otherWindow, resizeOp);
+                    if (resizeOp) {
+                        this._resizeOps.set(otherWindow, resizeOp);
+                    }
                 }
 
                 window.connectObject(
@@ -319,7 +350,9 @@ export default class TilingResizeHandler {
     _onResizeFinished(window, grabOp) {
         window.disconnectObject(this);
 
-        if (!window.isTiled) return;
+        if (!window.isTiled) {
+            return;
+        }
 
         const monitor = window.get_monitor();
         const screenTopGap =
@@ -345,17 +378,19 @@ export default class TilingResizeHandler {
         let newGrabbedTiledRectX =
             window.tiledRect.x + (grabbedsNewRect.x - grabbedsOldRect.x);
         // Switch the screenGap for a windowGap
-        if (isResizingW && window.tiledRect.x === workArea.x)
+        if (isResizingW && window.tiledRect.x === workArea.x) {
             newGrabbedTiledRectX =
                 newGrabbedTiledRectX + screenLeftGap - windowGap / 2;
+        }
 
         // Same as W but different orientation
         const isResizingN = (grabOp & Meta.GrabOp.RESIZING_N) > 1;
         let newGrabbedTiledRectY =
             window.tiledRect.y + (grabbedsNewRect.y - grabbedsOldRect.y);
-        if (isResizingN && window.tiledRect.y === workArea.y)
+        if (isResizingN && window.tiledRect.y === workArea.y) {
             newGrabbedTiledRectY =
                 newGrabbedTiledRectY + screenTopGap - windowGap / 2;
+        }
 
         // If resizing on the E side, you can simply rely on get_frame_rect's
         // new width else x2 should stick to where it was (manual calc due
@@ -402,7 +437,9 @@ export default class TilingResizeHandler {
             window.tiledRect.height - grabbedsOldTiledRect.height;
 
         this._resizeOps.forEach((resizeOp, win) => {
-            if (win === window) return;
+            if (win === window) {
+                return;
+            }
 
             if (resizeOp.side & Side.SAME_H) {
                 win.tiledRect.x += tiledRectDiffX;
@@ -445,7 +482,7 @@ export default class TilingResizeHandler {
                 resizeOp.side & Side.OPPOSING_H,
             );
 
-            if (rectV && rectH)
+            if (rectV && rectH) {
                 window.move_resize_frame(
                     false,
                     rectH[0],
@@ -453,8 +490,11 @@ export default class TilingResizeHandler {
                     rectH[2],
                     rectV[3],
                 );
-            else if (rectV) window.move_resize_frame(false, ...rectV);
-            else if (rectH) window.move_resize_frame(false, ...rectH);
+            } else if (rectV) {
+                window.move_resize_frame(false, ...rectV);
+            } else if (rectH) {
+                window.move_resize_frame(false, ...rectH);
+            }
         });
     }
 
@@ -468,9 +508,13 @@ export default class TilingResizeHandler {
         resizeOnSameSide,
         resizeOnOpposingSide,
     ) {
-        if (!grabOp) return null;
+        if (!grabOp) {
+            return null;
+        }
 
-        if (!resizeOnSameSide && !resizeOnOpposingSide) return null;
+        if (!resizeOnSameSide && !resizeOnOpposingSide) {
+            return null;
+        }
 
         const resizedRect = new Rect(resizedWindow.get_frame_rect());
         const wRect = new Rect(window.get_frame_rect());
@@ -538,6 +582,8 @@ export default class TilingResizeHandler {
                             wRect.height,
                         ];
         }
+
+        return null;
     }
 
     /**
@@ -605,8 +651,9 @@ export default class TilingResizeHandler {
 
             checkingWindows.forEach((w) => {
                 uncheckedWindows.forEach((unchecked) => {
-                    if (borders(w, unchecked, sideDeterminant))
+                    if (borders(w, unchecked, sideDeterminant)) {
                         borderingWindows.push(unchecked);
+                    }
                 });
             });
 
@@ -663,11 +710,17 @@ const ResizeOp = class ResizeOp {
         let verticalResizeSide = Side.NONE;
         let horizontalResizeSide = Side.NONE;
 
-        if (resizeOnSameSideV) verticalResizeSide = Side.SAME_V;
-        else if (resizeOnOpposingSideV) verticalResizeSide = Side.OPPOSING_V;
+        if (resizeOnSameSideV) {
+            verticalResizeSide = Side.SAME_V;
+        } else if (resizeOnOpposingSideV) {
+            verticalResizeSide = Side.OPPOSING_V;
+        }
 
-        if (resizeOnSameSideH) horizontalResizeSide = Side.SAME_H;
-        else if (resizeOnOpposingSideH) horizontalResizeSide = Side.OPPOSING_H;
+        if (resizeOnSameSideH) {
+            horizontalResizeSide = Side.SAME_H;
+        } else if (resizeOnOpposingSideH) {
+            horizontalResizeSide = Side.OPPOSING_H;
+        }
 
         const resizeSide = verticalResizeSide | horizontalResizeSide;
         return resizeSide ? new ResizeOp(resizeSide) : null;
