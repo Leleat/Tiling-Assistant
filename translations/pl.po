@@ -719,7 +719,7 @@ msgstr "Zacznij pisać, aby wyszukać..."
 #. Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:445
 msgid "Nameless layout..."
-msgstr ""
+msgstr "Układ bez nazwy..."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:523
 msgid "Preferences"
