@@ -112,8 +112,9 @@ msgid ""
 "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
 "may need to re-enable this or the other extension after toggling this setting"
 msgstr ""
-"Może powodować konflikt z innym przełącznikiem (np. alt+Tab) rozszerzenia."
-"Możesz go włączyć ponownie lub inne rozszerzenie po przełączeniu tego ustawienia." 
+"Może powodować konflikt z innym rozszerzeniami zmieniającymi zmianę okien"
+"(np. alt+Tab). Możliwe że będziesz potrzebować zrestartować to lub"
+" inne rozszerzenie po zmienie tego ustawienia" 
 
 #. Translators: This is a header for a preference group in the 'General' tab to add gaps between tiled windows
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:105
