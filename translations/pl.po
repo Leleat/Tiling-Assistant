@@ -198,7 +198,7 @@ msgstr "Aktywne okno"
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
 msgstr ""
-"Zmień  okno na aktywne zgodnie z skrótem klawiszowym"
+"Zmień okno na aktywne zgodnie z skrótem klawiszowym"
 
 #. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change their tiling behavior based on the current windows' tiling state
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:242
