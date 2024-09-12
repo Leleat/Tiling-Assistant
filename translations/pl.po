@@ -69,7 +69,7 @@ msgstr "Uwzględnij aplikacje ze wszystkich przestrzeni roboczych"
 #. Translators: This is the header for a preference group in the 'General' tab about grouping tiled windows together
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:71
 msgid "Tile Groups"
-msgstr "grupowanie rozmieszczanych okien"
+msgstr "Grupowanie rozmieszczanych okien"
 
 #. Translators: This is the name of setting to disable tile groups in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:74
