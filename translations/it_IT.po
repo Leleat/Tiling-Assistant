@@ -9,7 +9,7 @@ msgstr ""
 "Project-Id-Version: Tiling-Assistant\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-11 22:38+0200\n"
-"PO-Revision-Date: 2024-06-08 19:11+0100\n"
+"PO-Revision-Date: 2024-10-23 12:11+0100\n"
 "Last-Translator: Albano Battistella <albanobattistella@gmail.com>\n"
 "Language-Team: Italian <>\n"
 "Language: it\n"
@@ -252,17 +252,17 @@ msgstr "Sposta la finestra seguendo il layout preferito delle finestre"
 #. Translators: This is a header for a preference group in the 'General' tab for settings to indicate the currently focused window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Focus Hint"
-msgstr ""
+msgstr "Suggerimento di messa a fuoco"
 
 #. Translators: This is the explanation for the setting 'Disabled' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:295
 msgid "Do <i>not</i> indicate the focused window"
-msgstr ""
+msgstr "<i>Non</i> indicare la finestra focalizzata"
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will indicate the focused window by animating an outline around the focused window under certain circumstances
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:305
 msgid "Outline Animation"
-msgstr ""
+msgstr "Animazione di contorno"
 
 #. Translators: This is the explanation for the setting 'Outline Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:306
@@ -270,11 +270,13 @@ msgid ""
 "When the focus changes, temporarily outline the focused window. Maximized "
 "and fullscreen windows are exempt from this"
 msgstr ""
+"Quando cambia il focus, evidenzia temporaneamente la finestra focalizzata. Le finestre "
+"massimizzate e a schermo intero sono esenti da questo"
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will scale the focused window up to indicate the focus under certain circumstances.
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:317
 msgid "Upscale Animation"
-msgstr ""
+msgstr "Animazione raffinata"
 
 #. Translators: This is the explanation for the setting 'Upscale Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:318
@@ -282,11 +284,13 @@ msgid ""
 "When the focus changes, temporarily scale the focused window up. Maximized "
 "and fullscreen windows are exempt from this"
 msgstr ""
+"Quando cambia il focus, ridimensiona temporaneamente la finestra focalizzata. Le finestre "
+"massimizzate e a schermo intero sono esenti da questo"
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will outline the focused window (almost) at all times. There is no animation, hence 'static'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:329
 msgid "Static Outline"
-msgstr ""
+msgstr "Contorno statico"
 
 #. Translators: This is the explanation for the setting 'Static Outline' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:330
@@ -294,16 +298,18 @@ msgid ""
 "Indicate the focused window with a static outline unless it's maximized or "
 "in fullscreen."
 msgstr ""
+"Indica la finestra evidenziata con un contorno statico a meno che non sia ingrandita o "
+"a schermo intero."
 
 #. Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:349
 msgid "Outline Color"
-msgstr ""
+msgstr "Colore del contorno"
 
 #. Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:360
 msgid "Outline Size"
-msgstr ""
+msgstr "Dimensione del contorno"
 
 #. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
