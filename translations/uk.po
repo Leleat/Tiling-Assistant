@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2024-08-11 22:38+0200\n"
-"PO-Revision-Date: 2024-01-14 14:43+0200\n"
+"PO-Revision-Date: 2024-11-04 00:45+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: \n"
 "Language: uk\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 3.4\n"
+"X-Generator: Poedit 3.4.4\n"
 
 #. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:10
@@ -54,12 +54,12 @@ msgstr "Загальне"
 #. Translators: This is the header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:48
 msgid "Tiling Popup"
-msgstr "Спливаюче вікно мозаїки"
+msgstr "Спливаюче вікно укладання"
 
 #. Translators: This is a setting in the 'General' tab that decides whether the Tiling Popup will appear after tiling a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
 msgid "Open after tiling a window"
-msgstr "Відкривати після укладання вікна як плитки"
+msgstr "Відкривати після укладання вікна"
 
 #. Translators: This is a setting in the 'General' tab about including apps in the Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:56
@@ -83,10 +83,10 @@ msgid ""
 "raised or resized together. The Dynamic Keybinding Behavior 'Window Focus' "
 "and the Tiling Popup will also no longer work."
 msgstr ""
-"Вікна, укладені як плитки, більше не будуть припасовуватися до розмірів "
-"інших вікон мозаїки, як і не будуть одночасно підійматися та змінювати свої "
-"розміри. Cпливаюче вікно мозаїки та динамічні клавіатурні скорочення "
-"'Фокусування вікон' також перестануть працювати."
+"Укладені вікна більше не будуть припасовуватися до розмірів інших вікон "
+"мозаїки, як і не будуть одночасно підійматися та змінювати свої розміри. "
+"Cпливаюче вікно укладання та динамічні клавіатурні скорочення 'Фокусування "
+"вікон' також перестануть працювати."
 
 #. Translators: This is a setting in the 'General' tab about raising grouped tiled windows into the foreground together
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:84
@@ -99,14 +99,13 @@ msgid ""
 "A tile group is created when a window gets tiled. If a tiled window is "
 "raised, raise the other windows of its tile group as well"
 msgstr ""
-"Група плиток формується під час укладання вікна як плитки. Коли підіймається "
-"одне вікно мозаїки, то інші вікна, що належать до групи плиток, підіймаються "
-"також"
+"Група плиток формується під час укладання вікон. Коли підіймається одне "
+"укладене вікно, то інші вікна групи плиток, підіймаються також"
 
 #. Translators: This is a (deprecated) setting under the 'Tile Groups' preference group in the 'General' tab. It's about tile groups appearing grouped together in the App Switcher (Alt-Tab) and the Tiling Popup
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:90
 msgid "App Switcher and Tiling Popup"
-msgstr "Перемикач програм та спливаюче вікно мозаїки"
+msgstr "Перемикач програм та спливаюче вікно укладання"
 
 #. Translators: This is an explanation for the 'App Switcher and Tiling Popup' setting
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:91
@@ -114,9 +113,9 @@ msgid ""
 "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You "
 "may need to re-enable this or the other extension after toggling this setting"
 msgstr ""
-"Це може створити несумісність з іншими розширеннями перемикача програм "
-"(alt+Tab). Можливо, вам доведеться переувімкнути поточне, або ж інше "
-"розширення після зміни цього параметра"
+"Може конфліктувати з іншими розширеннями перемикання програм (alt+Tab). "
+"Можливо, вам доведеться перезавантажити поточне або інші розширення після "
+"зміни цього параметра"
 
 #. Translators: This is a header for a preference group in the 'General' tab to add gaps between tiled windows
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:105
@@ -199,7 +198,7 @@ msgstr "Фокусування вікон"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:231
 msgid ""
 "Switch focus to the tiled window in the direction of the pressed shortcut"
-msgstr "Перемикати фокус на вікно мозаїки у напрямку клавіатурного скорочення"
+msgstr "Перемикати фокус на укладене вікно у напрямку клавіатурного скорочення"
 
 #. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change their tiling behavior based on the current windows' tiling state
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:242
@@ -213,14 +212,14 @@ msgid ""
 "to the right half will tile to the bottom-right quarter, if 'tile to bottom' "
 "is activated"
 msgstr ""
-"Змінювати положення плиток в залежності від використання клавіатурного "
-"скорочення. Наприклад, вікно, укладене на правій половині, при активації "
-"'укласти знизу', переміститься до правої нижньої чверті"
+"Динамічне переміщення плиток клавіатурними скороченнями. Наприклад, якщо "
+"вікно, укладене в правій половині, то скорочення 'укласти знизу', "
+"перемістить його до правої нижньої чверті"
 
 #. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It causes some shortcuts to change their tiling behavior based on the current windows' tiling state. It behaves similarly to Windows (the OS).
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:254
 msgid "Tiling State (Windows)"
-msgstr "Положення плиток (вікна)"
+msgstr "Положення плиток (вікон)"
 
 #. Translators: This is an explanation for the 'Tiling State (Windows)' option for the 'Dynamic Keybinding Behavior' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:255
@@ -228,9 +227,8 @@ msgid ""
 "Like 'Tiling State' but if the window isn't tiled or is already tiled to the "
 "bottom and the 'tile to bottom' shortcut is activated, minimize the window"
 msgstr ""
-"Відмінність від 'Положення плиток' полягає в тому, що у разі, коли вікно не "
-"укладене чи укладене знизу, активація скорочення 'укласти знизу' приховає "
-"вікно"
+"Як 'Положення плиток', але якщо вікно не укладене чи укладене знизу, то "
+"скорочення 'укласти знизу' сховає вікно"
 
 #. Translators: This setting is under the preference group 'Dynamic Keybinding Behavior' in the 'General' tab. It will change some tiling shortcuts to shift the current window along the 'Favorite Layout' instead of the default half/quarter tiling
 #. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, windows can only be tiled to tiles in the favorite layout when using the mouse
@@ -247,17 +245,17 @@ msgstr "Розміщувати вікна, як на улюбленому мак
 #. Translators: This is a header for a preference group in the 'General' tab for settings to indicate the currently focused window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:287
 msgid "Focus Hint"
-msgstr ""
+msgstr "Підказка фокусування"
 
 #. Translators: This is the explanation for the setting 'Disabled' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:295
 msgid "Do <i>not</i> indicate the focused window"
-msgstr ""
+msgstr "<i>Не</i> позначати вікно у фокусі"
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will indicate the focused window by animating an outline around the focused window under certain circumstances
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:305
 msgid "Outline Animation"
-msgstr ""
+msgstr "Анімація контуру"
 
 #. Translators: This is the explanation for the setting 'Outline Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:306
@@ -265,23 +263,25 @@ msgid ""
 "When the focus changes, temporarily outline the focused window. Maximized "
 "and fullscreen windows are exempt from this"
 msgstr ""
+"Під час зміни фокуса, додавати тимчасовий контур до вікна у фокусі. За "
+"винятком розгорнутих та повноекранних вікон"
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will scale the focused window up to indicate the focus under certain circumstances.
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:317
 msgid "Upscale Animation"
-msgstr ""
+msgstr "Анімація масштабування"
 
 #. Translators: This is the explanation for the setting 'Upscale Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:318
 msgid ""
 "When the focus changes, temporarily scale the focused window up. Maximized "
 "and fullscreen windows are exempt from this"
-msgstr ""
+msgstr "Під час зміни фокуса,тимчасово збільшити вікно у фокусі."
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will outline the focused window (almost) at all times. There is no animation, hence 'static'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:329
 msgid "Static Outline"
-msgstr ""
+msgstr "Статичний контур"
 
 #. Translators: This is the explanation for the setting 'Static Outline' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:330
@@ -289,16 +289,18 @@ msgid ""
 "Indicate the focused window with a static outline unless it's maximized or "
 "in fullscreen."
 msgstr ""
+"Позначати вікно у фокусі статичним контуром (якщо вікно не розгорнуте та не "
+"повноекранне)"
 
 #. Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:349
 msgid "Outline Color"
-msgstr ""
+msgstr "Колір контуру"
 
 #. Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:360
 msgid "Outline Size"
-msgstr ""
+msgstr "Розмір контуру"
 
 #. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:378
@@ -324,6 +326,7 @@ msgstr "Типовий режим переміщення вікон"
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:401
 msgid "The movement mode that is activated when no modifier key is pressed"
 msgstr ""
+"Режим руху, який активується, коли не задіяна жодна клавіша-модифікатор"
 
 #. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, tiling will be activated, when the user drags a window to the screen edges
 #. Translators: This is a header for a preference group in the 'Keybindings' tab to tile windows to the screen halves
@@ -338,8 +341,8 @@ msgid ""
 "Moving the window to the screen edges or corners will open the default tile "
 "preview"
 msgstr ""
-"Після пересування вікна до краю чи кута екрана буде відкриватися типове "
-"спливаюче вікно пропозиції щодо укладання"
+"Пересування вікна до краю чи кута екрана активує типове спливаюче вікно "
+"попереднього перегляду укладання"
 
 #. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode, tiling a window may affect the current visible layout. E. g. A half-screen tile can be split into 2 quarter tiles
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:418
@@ -360,8 +363,8 @@ msgstr ""
 msgid ""
 "The tile preview will stick to your favorite layout from the 'Layouts' page"
 msgstr ""
-"Пропозиція щодо укладання буде формуватися в залежності від вашого "
-"улюбленого макета зі сторінки 'Макети'"
+"Попередній перегляд укладання буде адаптовано до вашого улюбленого макета зі "
+"сторінки 'Макети'"
 
 #. Translators: This is an option for the preference group 'Default Window Movement Mode' in the 'General' tab. In this mode core features (Tiling Popup and Tile Groups) will be disabled
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:442
@@ -391,7 +394,7 @@ msgid ""
 "'throwing' it towards any screen edge even if a monitor is bordering that "
 "edge."
 msgstr ""
-"Коли вікно перетягується на інший монітор, пропозиція щодо укладання "
+"Коли вікно перетягується на інший монітор, попередній перегляд укладання "
 "короткочасно активується на початковому моніторі. Таким чином, є можливість "
 "укладати вікна, 'cкидаючи' їх до краю екрана, навіть якщо монітори межують "
 "по цьому краю."
@@ -408,12 +411,12 @@ msgid ""
 "decrease the precision of the tile preview updates."
 msgstr ""
 "Використовуйте у разі, якщо є затримка при переміщенні вікон. Зауважте, що "
-"це знизить точність оновлення пропозиції щодо укладання."
+"це знизить точність оновлення попереднього перегляду укладання."
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. With this setting enabled, dragging windows to the screen edges won't use the default half-screen tiles but the tiles from the favorite layout
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:478
 msgid "Adapt 'Edge Tiling' to your Favorite Layout"
-msgstr "'Укладання від краю' буде адаптовано до вашого улюбленого макету"
+msgstr "'Укладання від краю' згідно вашого улюбленого макету"
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This will set the modifier to activate the move mode 'Adaptive Tiling'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:487
@@ -462,19 +465,20 @@ msgstr "Активує переміщення в режимі 'Ігнорува�
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:547
 msgid "Vertical Edge Preview Trigger Area"
 msgstr ""
-"Ділянка біля вертикальної межі, на якій активується пропозиції щодо укладання"
+"Ділянка біля вертикальної межі, на якій активується попередній перегляд "
+"укладання"
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. This is the area (in pixels) around the screen edges on the horizontal axis that activates the tile previews
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:565
 msgid "Horizontal Edge Preview Trigger Area"
 msgstr ""
-"Ділянка біля горизонтальної межі, на якій активується пропозиції щодо "
+"Ділянка біля горизонтальної межі, на якій активується попередній перегляд "
 "укладання"
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. By default, when using 'Edge Tiling' and dragging the window to the top screen edge, the maximize tiling preview will show up. After some time the preview will switch to the top-half-screen tiling preview. This setting determines the duration of that timer
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:583
 msgid "Inverse Top Screen Edge Action Timer"
-msgstr "Таймер зворотної дії у верхній частині екрана"
+msgstr "Час зворотної дії у верхній частині екрана"
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. By default, when using 'Edge Tiling' and dragging the window to the top screen edge, the maximize tiling preview will show up. After some time the preview will switch to the top-half-screen tiling preview. This setting makes the top-half-screen tiling preview before the maxmize preview on landscape displays
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:601
@@ -496,7 +500,7 @@ msgstr "Клавіатурні скорочення"
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab that enables/disables the appearance of the Tiling Popup after a window is tiled
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:635
 msgid "Toggle 'Tiling Popup'"
-msgstr "Увімкнути 'Спливаюче вікно мозаїки'"
+msgstr "Перемкнути 'Спливаюче вікно укладання'"
 
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab that activates the 'Tile Editing Mode'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:640
@@ -506,7 +510,7 @@ msgstr "Режим редагування мозаїки"
 #. Translators: This is the explanation for the keybinding 'Tile Editing Mode' in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:641
 msgid "A keyboard-driven mode to manage your tiled windows"
-msgstr "Керування вікнами мозаїки за допомогою клавіатури"
+msgstr "Керування укладеними вікнами за допомогою клавіатури"
 
 #. Translators: This is a (deprecated) keybinding in the 'General' preference group in the 'Keybindings' tab. Its name is a bit misleading. The keybinding will only tile 1 window. Its behavior depends on the current tiling layout. It may cause a window to fill the main empty space or untile a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:646
@@ -521,22 +525,22 @@ msgstr "Укласти/відокремити поточне вікно з ур�
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:652
 msgid "Toggle 'Always on Top'"
-msgstr "Завжди зверху"
+msgstr "Перемкнути 'Завжди зверху'"
 
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:661
 msgid "Toggle Maximization"
-msgstr "Розгортання"
+msgstr "Перемкнути розгортання"
 
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:666
 msgid "Toggle Vertical Maximization"
-msgstr "Вертикальне розгортання"
+msgstr "Перемкнути вертикальне розгортання"
 
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:675
 msgid "Toggle Horizontal Maximization"
-msgstr "Горизонтальне розгортання"
+msgstr "Перемкнути горизонтальне розгортання"
 
 #. Translators: This is a keybinding in the 'General' preference group in the 'Keybindings' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:684
@@ -679,15 +683,15 @@ msgstr "Розширені / Експериментальні налаштува
 #. Translators: This is the explanation for the 'Advanced / Experimental Settings' setting in the preference window that can be enabled via the headerbar popup menu
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:968
 msgid "Show more settings in the main preference window"
-msgstr "Додати налаштування в основне вікно параметрів"
+msgstr "Показати більше налаштувань в основному вікні параметрів"
 
 #: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:11
 msgid ""
 "Replace the keyboard shortcuts. Press 'space' or 'return' when listening for "
 "a shortcut to append a new one to the existing shortcuts instead."
 msgstr ""
-"Заміна клавіатурних скорочень. Для того, щоб до вже існуючих додати нове "
-"скорочення, на етапі очікування введення, натисніть клавішу 'пробіл' чи "
+"Заміна клавіатурних скорочень. Для додавання нового скорочення до вже "
+"існуючих, на етапі очікування введення, натисніть клавішу 'пропуск' чи "
 "'enter'."
 
 #: tiling-assistant@leleat-on-github/src/ui/shortcutListener.ui:23
@@ -697,19 +701,19 @@ msgstr "Очистити клавіатурні скорочення"
 #. Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
 #: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:57
 msgid "Tiling popup enabled"
-msgstr "Спливаюче вікно мозаїки увімкнено "
+msgstr "Спливаюче вікно укладання увімкнено"
 
 #. Translators: This is the notification text when the Tiling Popup is enabled/disabled via the keyboard shortcut
 #: tiling-assistant@leleat-on-github/src/extension/keybindingHandler.js:59
 msgid "Tiling popup was disabled"
-msgstr "Спливаюче вікно мозаїки вимкнено"
+msgstr "Спливаюче вікно укладання вимкнено"
 
 #. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
 #. Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:496
 msgid "No valid layouts defined."
-msgstr "Не визначено жодного коректного макета"
+msgstr "Не знайдено жодного коректного макета"
 
 #. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated and the user attached an app to a tile so that a new instance of that app will automatically open in the tile. But that app seems to have been uninstalled since the definition of the layout.
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:197
@@ -728,7 +732,7 @@ msgstr "Безіменний макет..."
 
 #: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:523
 msgid "Preferences"
-msgstr ""
+msgstr "Налаштування"
 
 #. Translators: This is a notification that pops up if the user tries to enter the Tile Editing Mode via a keyboard shortcut.
 #: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:62
