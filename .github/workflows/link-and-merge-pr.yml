@@ -1,0 +1,87 @@
+name: Link and merge PR
+run-name: Link and merge PR
+
+on:
+  pull_request:
+    types:
+      - labeled
+
+jobs:
+  auto-merge:
+    if: github.event.label.name == 'auto-merge'
+    runs-on: ubuntu-latest
+    permissions:
+      # Permission to merge the pr
+      contents: write
+      # Permission to update the pr
+      pull-requests: write
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        # We need to check out the correct ref (instead of the default one).
+        # Otherwise, there will be an extra merge commit: https://github.com/ad-m/github-push-action/issues/20
+        ref: refs/heads/${{ github.head_ref }}
+    - name: Install git-filter-repo
+      run: pip install git-filter-repo
+    - name: Link PR in commit messages
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git filter-repo --message-callback '
+            import re
+
+            trailer = b"Part-of: ${{ github.event.pull_request.html_url }}"
+            lines = message.strip().splitlines()
+            last_line_is_trailer = lines and re.search(b"^\w+: ", lines[-1]) is not None
+
+            if not lines:
+              return b"\n" + trailer
+            elif last_line_is_trailer:
+              return message.strip() + b"\n" + trailer
+            else:
+              return message.strip() + b"\n\n" + trailer
+        ' --refs ${{github.event.pull_request.base.sha}}..HEAD
+
+        git push -f origin HEAD:${{ github.head_ref }}
+    - name: Merge PR
+      id: merge
+      continue-on-error: true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        SUBJECT="Merging #${{ github.event.pull_request.number }} from ${{ github.actor }}/${{ github.head_ref}}"
+        BODY="${{ github.event.pull_request.title }}
+
+        Part-of: ${{ github.event.pull_request.html_url }}"
+
+        # There seems to be something racey where the PR can't be merged yet
+        # after force-pushing. Retry a few times.
+        for i in {1..5}; do
+          if gh pr merge ${{ github.event.pull_request.number }} --auto --merge --delete-branch --subject "$SUBJECT" --body "$BODY"; then
+            break
+          fi
+
+          if [[ $i -eq 5 ]]; then
+            echo "Failed to merge PR"
+            exit 1
+          fi
+
+          echo "Failed to merge PR... retrying in 5 seconds"
+
+          sleep 5
+        done
+    - name: Merge failed, restore original commits
+      if: steps.merge.outcome != 'success'
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      run: |
+        git reset --hard ${{ github.event.pull_request.head.sha }}
+        git push -f origin HEAD:${{ github.head_ref }}
+
+        gh issue edit ${{ github.event.pull_request.number }} --remove-label auto-merge
+
+        echo "Failed to merge PR, restored original commits..."
+
+        exit 1
