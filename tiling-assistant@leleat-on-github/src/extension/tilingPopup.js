@@ -1,5 +1,6 @@
 import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
-import { Main, SwitcherPopup } from '../dependencies/shell.js';
+import { Main } from '../dependencies/shell.js';
+import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
 
 import { Direction, Orientation } from '../common.js';
 import { Util } from './utility.js';
