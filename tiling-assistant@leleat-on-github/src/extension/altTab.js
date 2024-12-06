@@ -9,15 +9,16 @@ import {
     St
 } from '../dependencies/gi.js';
 import {
-    AltTab,
     Extension,
-    Main,
-    SwitcherPopup
+    Main
 } from '../dependencies/shell.js';
 import {
+    AppSwitcherPopup,
+    AppIcon as BaseAppIcon,
     baseIconSizes,
     APP_ICON_HOVER_TIMEOUT
 } from '../dependencies/unexported/altTab.js';
+import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
 
 import { Settings } from '../common.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
@@ -78,7 +79,7 @@ export default class AltTabOverride {
 }
 
 export const TilingAppSwitcherPopup = GObject.registerClass(
-class TilingAppSwitcherPopup extends AltTab.AppSwitcherPopup {
+class TilingAppSwitcherPopup extends AppSwitcherPopup {
     _init() {
         SwitcherPopup.SwitcherPopup.prototype._init.call(this);
 
@@ -477,7 +478,7 @@ const AppSwitcherItem = GObject.registerClass({
 });
 
 const AppIcon = GObject.registerClass(
-class AppIcon extends AltTab.AppIcon {
+class AppIcon extends BaseAppIcon {
     // Don't make the SwitcherButtons squares since 1 SwitcherButton
     // may contain multiple AppIcons for a tileGroup.
     vfunc_get_preferred_width() {
