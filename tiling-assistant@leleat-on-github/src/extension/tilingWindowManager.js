@@ -169,7 +169,9 @@ export class TilingWindowManager {
         if (!window || window.is_skip_taskbar())
             return;
 
+        const wasTiled = window.isTiled;
         const wasMaximized = window.get_maximized();
+
         if (wasMaximized)
             window.unmaximize(wasMaximized);
 
@@ -219,7 +221,12 @@ export class TilingWindowManager {
 
         // Animations
         const wActor = window.get_compositor_private();
-        if (Settings.getBoolean('enable-tile-animations') && wActor && !skipAnim) {
+        if (
+            Settings.getBoolean('enable-tile-animations') &&
+            wActor &&
+            !wasTiled &&
+            !skipAnim
+        ) {
             wActor.remove_all_transitions();
             // HACK => journalctl: 'error in size change accounting'...?
             // TODO: no animation if going from maximized -> tiled and back to back multiple times?
