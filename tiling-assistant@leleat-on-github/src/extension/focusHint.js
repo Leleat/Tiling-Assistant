@@ -14,7 +14,7 @@ import {
 } from '../dependencies/shell.js';
 import * as AltTab from '../dependencies/unexported/altTab.js';
 
-import { FocusHint, Settings } from '../common.js';
+import { FocusHint, FocusHintOutlineStyle, Settings } from '../common.js';
 
 export default class FocusHintManager {
     _hint = null;
@@ -354,6 +354,7 @@ class AnimatedOutlineHint extends Hint {
     _color = '';
     _outlineSize = 0;
     _outlineBorderRadius = 0;
+    _outlineStyle = 0;
 
     constructor() {
         super();
@@ -372,12 +373,18 @@ class AnimatedOutlineHint extends Hint {
         this._outlineBorderRadiusChangeId = Settings.changed('focus-hint-outline-border-radius', () => {
             this._outlineBorderRadius = Settings.getInt('focus-hint-outline-border-radius');
         });
+
+        this._outlineStyle = Settings.getInt('focus-hint-outline-style');
+        this._outlineStyleChangeId = Settings.changed('focus-hint-outline-style', () => {
+            this._outlineStyle = Settings.getInt('focus-hint-outline-style');
+        });
     }
 
     destroy() {
         Settings.disconnect(this._colorChangeId);
         Settings.disconnect(this._outlineSizeChangeId);
         Settings.disconnect(this._outlineBorderRadiusChangeId);
+        Settings.disconnect(this._outlineStyleChangeId);
 
         super.destroy();
     }
@@ -457,8 +464,13 @@ class AnimatedOutlineHint extends Hint {
     }
 
     _getCssStyle() {
+        const backgroundColor = this._outlineStyle === FocusHintOutlineStyle.SOLID_BG
+            ? `background-color: ${this._color};`
+            : '';
+
         return `
-            background-color: ${this._color};
+            ${backgroundColor}
+            border: ${this._outlineSize}px solid ${this._color};
             border-radius: ${this._outlineBorderRadius}px;
         `;
     }
@@ -558,6 +570,8 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             () => this._updateOutline(),
             'changed::focus-hint-outline-border-radius',
             () => this._updateOutline(),
+            'changed::focus-hint-outline-style',
+            () => this._updateOutline(),
             this
         );
     }
@@ -640,19 +654,6 @@ class StaticOutlineHint extends AnimatedOutlineHint {
             global.compositor.get_laters().remove(this._laterID);
             this._laterID = 0;
         }
-    }
-
-    _createOutline(window, monitorContainer) {
-        const { x, y, width, height } = window.get_frame_rect();
-        const outline = new St.Widget({
-            style: this._getCssStyle(),
-            x: x - monitorContainer.x - this._outlineSize,
-            y: y - monitorContainer.y - this._outlineSize,
-            width: width + 2 * this._outlineSize,
-            height: height + 2 * this._outlineSize
-        });
-
-        return outline;
     }
 
     _queueGeometryUpdate() {
