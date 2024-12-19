@@ -382,6 +382,19 @@
               </property>
             </object>
           </child>
+          <child>
+            <object class="AdwSpinRow" id="focus_hint_outline_border_radius">
+              <property name="title" translatable="yes" comments="Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint border radius">Outline Border Radius</property>
+              <property name="activatable-widget">focus_hint_outline_border_radius</property>
+              <property name="adjustment">
+                <object class="GtkAdjustment">
+                  <property name="upper">50</property>
+                  <property name="step-increment">1</property>
+                  <property name="page-increment">8</property>
+                </object>
+              </property>
+            </object>
+          </child>
         </object>
       </child>
       <!-- ======================================================================================== -->

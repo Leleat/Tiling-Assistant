@@ -101,6 +101,7 @@ export default class Prefs extends ExtensionPreferences {
             'screen-right-gap',
             'screen-bottom-gap',
             'focus-hint-outline-size',
+            'focus-hint-outline-border-radius',
             'toggle-maximize-tophalf-timer',
             'vertical-preview-area',
             'horizontal-preview-area'
