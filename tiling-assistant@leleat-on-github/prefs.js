@@ -117,6 +117,7 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindComboRows(settings, builder) {
         const comboRows = [
+            'focus-hint-outline-style',
             'move-adaptive-tiling-mod',
             'move-favorite-layout-mod',
             'ignore-ta-mod'

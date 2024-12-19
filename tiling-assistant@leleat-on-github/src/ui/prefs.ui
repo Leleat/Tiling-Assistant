@@ -345,6 +345,20 @@
                     bind-property="active"
                     bind-flags="sync-create"/>
           <child>
+            <object class="AdwComboRow" id="focus_hint_outline_style">
+              <property name="title" translatable="yes" comments="Translators: This is the setting for the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window">Outline Style</property>
+              <property name="subtitle" translatable="yes" comments="Translators: This is the explanation for the setting 'Outline Style' for the preference group 'Focus Hint' in the 'General' tab in the prefs window">'Border' is recommended if you use transparent windows</property>
+              <property name="model">
+                <object class="GtkStringList">
+                  <items>
+                    <item translatable="yes" comments="Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window">Solid Background</item>
+                    <item translatable="yes" comments="Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window">Border</item>
+                  </items>
+                </object>
+              </property>
+            </object>
+          </child>
+          <child>
             <object class="AdwActionRow">
               <property name="title" translatable="yes" comments="Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window">Outline Color</property>
               <property name="activatable-widget">focus_hint_color_button</property>

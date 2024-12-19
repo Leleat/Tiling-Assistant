@@ -161,6 +161,11 @@ export const FocusHint = Object.freeze({
     STATIC_OUTLINE: 3
 });
 
+export const FocusHintOutlineStyle = Object.freeze({
+    SOLID_BG: 0,
+    BORDER: 1
+});
+
 export class MoveModes {
     // Order comes from prefs
     static EDGE_TILING = 0;
