@@ -101,6 +101,7 @@ export default class Prefs extends ExtensionPreferences {
             'screen-right-gap',
             'screen-bottom-gap',
             'focus-hint-outline-size',
+            'focus-hint-outline-border-radius',
             'toggle-maximize-tophalf-timer',
             'vertical-preview-area',
             'horizontal-preview-area'
@@ -117,6 +118,7 @@ export default class Prefs extends ExtensionPreferences {
     */
     _bindComboRows(settings, builder) {
         const comboRows = [
+            'focus-hint-outline-style',
             'move-adaptive-tiling-mod',
             'move-favorite-layout-mod',
             'ignore-ta-mod'

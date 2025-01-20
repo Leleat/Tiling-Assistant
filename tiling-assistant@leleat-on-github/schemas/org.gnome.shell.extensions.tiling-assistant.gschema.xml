@@ -32,6 +32,10 @@
 		<key name="focus-hint-outline-size" type="i">
 			<default>8</default>
 		</key>
+		<key name="focus-hint-outline-style" type="i">
+			<!-- 0: Solid Background, 1: Border -->
+			<default>0</default>
+		</key>
 		<key name="window-gap" type="i">
 			<default>0</default>
 		</key>
