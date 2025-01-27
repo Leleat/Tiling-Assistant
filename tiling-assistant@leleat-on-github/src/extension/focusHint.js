@@ -195,7 +195,7 @@ class Hint {
             const key = `switch-to-application-${i}`;
 
             if (global.display.remove_keybinding(key)) {
-                const handler = (_, __, keybinding) => {
+                const handler = (_, __, ___, keybinding) => {
                     if (!Main.sessionMode.hasOverview)
                         return;
 
