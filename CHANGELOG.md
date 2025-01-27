@@ -1,5 +1,20 @@
 # Changelog
 
+## [50] - 2025-01-27
+
+### Added
+
+- Add Russian translation by Ser82-png (#367)
+- Add Polish translation by alewicki95 (#369)
+- Add Italian translation by albanobattistella (#377)
+- Add Ukrainian translation by xalt7x (#379)
+
+### Fixed
+
+- Added option to make the Outline Focus Hint an actual outline to improve the compatibility with transparent windows (#384)
+- Workaround retiling already tiled windows freezing by disabling animations for them (#385)
+- Fixed some compatibility issues with AATWS (#386)
+
 ## [49] - 2024-08-11
 
 ### Added
