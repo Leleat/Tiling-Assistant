@@ -88,18 +88,6 @@ export class TilingWindowManager {
         }
     }
 
-    static connect(signal, func) {
-        return this._signals.connect(signal, func);
-    }
-
-    static disconnect(id) {
-        this._signals.disconnect(id);
-    }
-
-    static emit(...params) {
-        this._signals.emit(...params);
-    }
-
     /**
      * Gets windows, which can be tiled
      *
@@ -276,8 +264,6 @@ export class TilingWindowManager {
             this.updateTileGroup(topTileGroup);
             this.saveTileState(window);
 
-            this.emit('window-tiled', window);
-
             if (openTilingPopup)
                 await this.tryOpeningTilingPopup();
         }
@@ -342,8 +328,6 @@ export class TilingWindowManager {
         window.untiledRect = null;
 
         this.deleteTilingState(window);
-
-        this.emit('window-untiled', window);
     }
 
     /**
@@ -1380,12 +1364,7 @@ export class TilingWindowManager {
  * Ws-changed: for untiling a tiled window after its ws changed.
  * Unmanaging: to remove unmanaging tiled windows from the other tileGroups.
  */
-const TilingSignals = GObject.registerClass({
-    Signals: {
-        'window-tiled': { param_types: [Meta.Window.$gtype] },
-        'window-untiled': { param_types: [Meta.Window.$gtype] }
-    }
-}, class TilingSignals extends Clutter.Actor {
+class TilingSignals {
     // Relevant 'signal types' (sorta used as an enum / key for the signal map).
     // Tiled windows use all 3 signals; maximized-with-gaps windows only use the
     // workspace-changed and unmanaging signal.
@@ -1393,9 +1372,7 @@ const TilingSignals = GObject.registerClass({
     static WS_CHANGED = 'WS_CHANGED';
     static UNMANAGING = 'UNMANAGING';
 
-    _init() {
-        super._init();
-
+    constructor() {
         // { windowId1: { RAISE: signalId1, WS_CHANGED: signalId2, UNMANAGING: signalId3 }, ... }
         this._ids = new Map();
     }
@@ -1407,8 +1384,6 @@ const TilingSignals = GObject.registerClass({
             const window = allWindows.find(w => w.get_id() === windowId);
             window && signals.forEach(s => s && window.disconnect(s));
         });
-
-        super.destroy();
     }
 
     /**
@@ -1428,4 +1403,4 @@ const TilingSignals = GObject.registerClass({
 
         return ret;
     }
-});
+};
