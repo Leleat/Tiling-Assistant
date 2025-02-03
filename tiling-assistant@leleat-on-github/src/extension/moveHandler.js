@@ -141,7 +141,7 @@ export default class TilingMoveHandler {
 
                 counter += 10;
                 if (counter >= 400) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+                    this._restoreSizeAndRestartGrab(window, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
@@ -151,7 +151,7 @@ export default class TilingMoveHandler {
                 const oldPoint = { x, y };
                 const moveDist = Util.getDistance(currPoint, oldPoint);
                 if (moveDist > 10) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+                    this._restoreSizeAndRestartGrab(window, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
@@ -422,10 +422,9 @@ export default class TilingMoveHandler {
         }
     }
 
-    _restoreSizeAndRestartGrab(window, px, py, grabOp) {
+    _restoreSizeAndRestartGrab(window, grabOp) {
         Twm.untile(window, {
             restoreFullPos: false,
-            xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
 

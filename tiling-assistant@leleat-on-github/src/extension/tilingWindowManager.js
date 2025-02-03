@@ -290,12 +290,9 @@ export class TilingWindowManager {
      * @param {boolean} [restoreFullPos=true] decides, if we restore the
      *      pre-tile position or whether the size while keeping the titlebar
      *      at the relative same position.
-     * @param {number} [xAnchor=undefined] used when wanting to restore the
-     *      size while keeping titlebar at the relative x position. By default,
-     *      we use the pointer position.
      * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
      */
-    static untile(window, { restoreFullPos = true, xAnchor = undefined, skipAnim = false, clampToWorkspace = false } = {}) {
+    static untile(window, { restoreFullPos = true, skipAnim = false, clampToWorkspace = false } = {}) {
         const wasMaximized = window.get_maximized();
         if (wasMaximized)
             window.unmaximize(wasMaximized);
@@ -335,14 +332,8 @@ export class TilingWindowManager {
         } else {
             // Resize the window while keeping the relative x pos (of the pointer)
             const currWindowFrame = new Rect(window.get_frame_rect());
-            xAnchor = xAnchor ?? global.get_pointer()[0];
-            const relativeMouseX = (xAnchor - currWindowFrame.x) / currWindowFrame.width;
-            const newPosX = xAnchor - oldRect.width * relativeMouseX;
 
-            // Wayland workaround for DND / restore position
-            Meta.is_wayland_compositor() && window.move_frame(true, newPosX, currWindowFrame.y);
-
-            window.move_resize_frame(userOp, newPosX, currWindowFrame.y, oldRect.width, oldRect.height);
+            window.move_resize_frame(userOp, currWindowFrame.x, currWindowFrame.y, oldRect.width, oldRect.height);
         }
 
         this.clearTilingProps(window.get_id());
