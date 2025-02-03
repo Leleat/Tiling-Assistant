@@ -217,7 +217,7 @@ const Indicator = GObject.registerClass(class TileEditingModeIndicator extends S
         const workArea = new Rect(activeWs.get_work_area_for_monitor(this._monitor));
 
         // Adjusted for window / screen gaps
-        const { x, y, width, height } = rect.addGaps(workArea);
+        const { x, y, width, height } = rect.addGaps(workArea, this._monitor);
 
         this.ease({
             x: x - display.x,

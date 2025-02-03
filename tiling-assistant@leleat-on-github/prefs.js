@@ -144,7 +144,7 @@ export default class Prefs extends ExtensionPreferences {
                 settings.set_string(key, widget.get_rgba().to_string());
             });
 
-            // initilaize color
+            // initialize color
             const rgba = new Gdk.RGBA();
             rgba.parse(settings.get_string(key));
             widget.set_rgba(rgba);

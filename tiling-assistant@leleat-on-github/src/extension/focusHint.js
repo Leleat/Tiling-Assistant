@@ -36,8 +36,7 @@ export default class FocusHintManager {
 
         this._settingsChangedId = Settings.changed(
             'focus-hint',
-            () => this._setHint(),
-            this
+            () => this._setHint()
         );
         this._setHint();
 
@@ -97,7 +96,9 @@ class Hint {
         this._removeIdleWatcher();
     }
 
-    indicate() {
+    /** @param {Meta.Window} focus */
+    // eslint-disable-next-line no-unused-vars
+    indicate(focus) {
         throw new Error('`indicate` not implemented by Hint subclass!');
     }
 
@@ -597,7 +598,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
     /**
      * This is really only used for the indication when changing workspaces...
      *
-     * @param {Window} window -
+     * @param {Meta.Window} window -
      * @param {number} workspaceSwitchAnimationDuration -
      */
     indicate(window, workspaceSwitchAnimationDuration = 250) {
@@ -764,8 +765,8 @@ function createContainers(
     let startingPos;
 
     if (workspaceAnimationWindowClone) {
-        const actorAbsPos = getAbsPos(window.get_compositor_private(), monitorNr);
-        const cloneAbsPos = getAbsPos(workspaceAnimationWindowClone, monitorNr);
+        const actorAbsPos = getAbsPos(window.get_compositor_private());
+        const cloneAbsPos = getAbsPos(workspaceAnimationWindowClone);
 
         startingPos = {
             x: monitorRect.x + cloneAbsPos.x - actorAbsPos.x,
@@ -827,8 +828,7 @@ function createContainers(
  * @returns {Clutter.Clone}
  */
 function createWindowClone(windowActor, container) {
-    const monitor = windowActor.get_meta_window().get_monitor();
-    const { x, y } = getAbsPos(windowActor, monitor);
+    const { x, y } = getAbsPos(windowActor);
 
     const windowClone = new Clutter.Clone({
         source: windowActor,

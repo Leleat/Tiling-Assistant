@@ -1,4 +1,4 @@
-import { Clutter, GLib, GObject, Meta, Mtk, Shell } from '../dependencies/gi.js';
+import { GLib, Meta, Mtk, Shell } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 import { getWindows } from '../dependencies/unexported/altTab.js';
 
@@ -13,7 +13,12 @@ export class TilingWindowManager {
     static initialize() {
         this._signals = new TilingSignals();
 
-        // { windowId1: [windowIdX, windowIdY, ...], windowId2: [...], ... }
+        /**
+         * @type {Map<number, number[]>} - {
+         *      windowId1: [windowIdX, windowIdY, ...],
+         *      windowId2: [...],
+         * }
+         */
         this._tileGroups = new Map();
 
         /**
@@ -93,7 +98,7 @@ export class TilingWindowManager {
      *
      * @param {boolean} [allWorkspaces=false] determines whether we only want
      *      the windows from the current workspace.
-     * @returns {Meta.Windows[]} an array of of the open Meta.Windows in
+     * @returns {Meta.Window[]} an array of of the open Meta.Windows in
      *      stacking order.
      */
     static getWindows(allWorkspaces = false) {
@@ -118,7 +123,7 @@ export class TilingWindowManager {
 
     /**
      * @param {Meta.Window} window a Meta.Window.
-     * @param {Meta.WorkArea|Rect|null} workArea useful for the grace period
+     * @param {Mtk.Rectangle|Rect|null} workArea useful for the grace period
      * @returns whether the window is maximized. Be it using GNOME's native
      *      maximization or the maximization by this extension when using gaps.
      */
@@ -133,18 +138,15 @@ export class TilingWindowManager {
      *
      * @param {Meta.Window} window a Meta.Window to tile.
      * @param {Rect} newRect the Rect the `window` will be tiled to.
-     * @param {boolean} [openTilingPopup=true] decides, if we open a Tiling
+     * @param {object} [param] the Rect the `window` will be tiled to.
+     * @param {boolean} [param.openTilingPopup=true] decides, if we open a Tiling
      *      Popup after the window is tiled and there is unambiguous free
      *      screen space.
-     * @param {number} [number=null] is used to get the workArea in which the
-     *      window tiles on. It's used for gap calculation. We can't always rely on
-     *      window.get_monitor with its monitor or global.display.get_current_monitor
-     *      (the pointer monitor) because of the 'grace period' during a quick dnd
-     *      towards a screen border since the pointer and the window will be on the
-     *      'wrong' monitor.
-     * @param {boolean} [skipAnim=false] decides, if we skip the tile animation.
-     * @param {boolean} [tileGroup=null] forces the creation of this tile group.
-     * @param {boolean} [fakeTile=false] don't create a new tile group, don't
+     * @param {boolean} [param.ignoreTA=false]
+     * @param {number} [param.monitorNr=null]
+     * @param {boolean} [param.skipAnim=false] decides, if we skip the tile animation.
+     * @param {boolean} [param.tileGroup=null] forces the creation of this tile group.
+     * @param {boolean} [param.fakeTile=false] don't create a new tile group, don't
      *      emit 'tiled' signal or open the Tiling Popup
      */
     static async tile(window, newRect, {
@@ -273,10 +275,12 @@ export class TilingWindowManager {
      * Untiles a tiled window and delete all tiling properties.
      *
      * @param {Meta.Window} window a Meta.Window to untile.
-     * @param {boolean} [restoreFullPos=true] decides, if we restore the
+     * @param {object} [params]
+     * @param {boolean} [params.restoreFullPos=true] decides, if we restore the
      *      pre-tile position or whether the size while keeping the titlebar
      *      at the relative same position.
-     * @param {boolean} [skipAnim=false] decides, if we skip the until animation.
+     * @param {boolean} [params.skipAnim=false] decides, if we skip the until animation.
+     * @param {boolean} [params.clampToWorkspace=false]
      */
     static untile(window, { restoreFullPos = true, skipAnim = false, clampToWorkspace = false } = {}) {
         const wasMaximized = window.get_maximized();
@@ -397,16 +401,14 @@ export class TilingWindowManager {
     }
 
     /**
-     * @returns {Map<number,number>}
-     *      For ex: { windowId1: [windowIdX, windowIdY, ...], windowId2: ... }
+     * @returns {Map<number,number[]>}
      */
     static getTileGroups() {
         return this._tileGroups;
     }
 
     /**
-     * @param {Map<number, number>} tileGroups
-     *      For ex: { windowId1: [windowIdX, windowIdY, ...], windowId2: ... }
+     * @param {Map<number, number[]>} tileGroups
      */
     static setTileGroups(tileGroups) {
         this._tileGroups = tileGroups;
@@ -421,7 +423,7 @@ export class TilingWindowManager {
      * (i. e. ctrl-drag or tile editing mode+space). So manually create the
      * tile group in those cases.
      *
-     * @param {Meta.Windows[]} tileGroup an array of Meta.Windows to group
+     * @param {Meta.Window[]} tileGroup an array of Meta.Windows to group
      *      together.
      */
     static updateTileGroup(tileGroup) {
@@ -563,13 +565,15 @@ export class TilingWindowManager {
      * *tracked* tile groups since floating windows may overlap some tiled
      * windows *at the moment* when this function is called.
      *
-     * @param {boolean} [skipTopWindow=true] whether we ignore the focused window
+     * @param {object} [params]
+     * @param {boolean} [params.skipTopWindow=true] whether we ignore the focused window
      *      in the active search for the top tile group. The focused window may
      *      still be part of the returned array if it is part of another high-
      *      stacked window's tile group. This is mainly only useful, if the
      *      focused window isn't tiled (for example when dnd-ing a window).
-     * @param {number} [monitor=null] get the group for the monitor number.
-     * @returns {Meta.Windows[]} an array of tiled Meta.Windows.
+     * @param {number} [params.monitor=null] get the group for the monitor number.
+     *
+     * @returns {Meta.Window[]} an array of tiled Meta.Windows.
      */
     static getTopTileGroup({ skipTopWindow = false, monitor = null } = {}) {
         // 'Raise Tile Group' setting is enabled so we just return the tracked
@@ -674,10 +678,11 @@ export class TilingWindowManager {
      *
      * @param {Rect[]} rectList an array of Rects, which occupy the screen.
      *      Like usual, they shouldn't overlap each other.
-     * @param {Rect} [currRect=null] a Rect, which may be expanded.
-     * @param {Orientation} [orientation=null] The orientation we want to expand
+     * @param {object} [params]
+     * @param {Rect} [params.currRect=null] a Rect, which may be expanded.
+     * @param {Orientation} [params.orientation=null] The orientation we want to expand
      *      `currRect` into. If `null`, expand in both orientations.
-     * @param {Rect} [monitor=null] defaults to pointer monitor.
+     * @param {number} [params.monitorNr=null] defaults to pointer monitor.
      * @returns {Rect} a new Rect.
      */
     static getBestFreeRect(rectList, { currRect = null, orientation = null, monitorNr = null } = {}) {
@@ -802,9 +807,9 @@ export class TilingWindowManager {
     /**
      * Gets the nearest Meta.Window in the direction of `dir`.
      *
-     * @param {Meta.Windows} currWindow the Meta.Window that the search starts
+     * @param {Meta.Window} currWindow the Meta.Window that the search starts
      *      from.
-     * @param {Meta.Windows[]} windows an array of the available Meta.Windows.
+     * @param {Meta.Window[]} windows an array of the available Meta.Windows.
      *      It may contain the current window itself. The windows shouldn't
      *      overlap each other.
      * @param {Direction} dir the direction that is look into.
@@ -1153,7 +1158,9 @@ export class TilingWindowManager {
      * Gets the top most non-overlapped/ing tiled windows ignoring
      * the stacking order and tile groups.
      *
-     * @param {{boolean, number}} param1
+     * @param {object} [param]
+     * @param {boolean} [param.skipTopWindow=false]
+     * @param {number} [param.monitor=null]
      */
     static _getTopTiledWindows({ skipTopWindow = false, monitor = null } = {}) {
         const openWindows = this.getWindows();

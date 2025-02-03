@@ -247,7 +247,7 @@ export class Util {
      */
     static async __debugPrintTileGroups() {
         log('--- Tiling Assistant: Start ---');
-        const twm = await import('./tilingWindowManager.js');
+        const twm = (await import('./tilingWindowManager.js')).TilingWindowManager;
         const openWindows = twm.getWindows();
         openWindows.forEach(w => {
             if (!w.isTiled)
@@ -300,7 +300,7 @@ export class Rect {
      * Gets a new rectangle where the screen and window gaps were
      * added/subbed to/from `this`.
      *
-     * @param {Rect} rect a tiled Rect
+     * @param {Rect} workArea a tiled Rect
      * @param {number} monitor the number of the monitor to scale the gap to
      * @returns {Rect} the rectangle after the gaps were taken into account
      */
@@ -382,7 +382,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     containsRect(rect) {
@@ -398,7 +398,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     couldFitRect(rect) {
@@ -407,7 +407,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     equal(rect) {
@@ -540,7 +540,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     horizOverlap(rect) {
@@ -549,7 +549,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {[boolean, Rect]}
      */
     intersect(rect) {
@@ -653,7 +653,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     overlap(rect) {
@@ -699,7 +699,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {Rect}
      */
     union(rect) {
@@ -708,7 +708,7 @@ export class Rect {
     }
 
     /**
-     * @param {Rect} rect
+     * @param {Rect|Mtk.Rectangle} rect
      * @returns {boolean}
      */
     vertOverlap(rect) {
