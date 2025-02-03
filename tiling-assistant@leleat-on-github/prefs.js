@@ -3,8 +3,7 @@ import { ExtensionPreferences } from './src/dependencies/prefs.js';
 
 import LayoutPrefs from './src/prefs/layoutsPrefs.js';
 import { Shortcuts } from './src/common.js';
-// eslint-disable-next-line no-unused-vars
-import { ShortcutListener } from './src/prefs/shortcutListener.js';
+import './src/prefs/shortcutListener.js';
 
 export default class Prefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
