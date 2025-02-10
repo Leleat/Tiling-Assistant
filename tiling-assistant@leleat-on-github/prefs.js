@@ -3,8 +3,7 @@ import { ExtensionPreferences } from './src/dependencies/prefs.js';
 
 import LayoutPrefs from './src/prefs/layoutsPrefs.js';
 import { Shortcuts } from './src/common.js';
-// eslint-disable-next-line no-unused-vars
-import { ShortcutListener } from './src/prefs/shortcutListener.js';
+import './src/prefs/shortcutListener.js';
 
 export default class Prefs extends ExtensionPreferences {
     fillPreferencesWindow(window) {
@@ -145,7 +144,7 @@ export default class Prefs extends ExtensionPreferences {
                 settings.set_string(key, widget.get_rgba().to_string());
             });
 
-            // initilaize color
+            // initialize color
             const rgba = new Gdk.RGBA();
             rgba.parse(settings.get_string(key));
             widget.set_rgba(rgba);

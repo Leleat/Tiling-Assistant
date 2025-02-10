@@ -18,7 +18,7 @@ export class Settings {
     }
 
     /**
-     * @returns {Gio.Settings} the Gio.Settings object.
+     * @returns {import("./dependencies/gi.js").Gio.Settings} the Gio.Settings object.
      */
     static getGioObject() {
         return this._settings;
@@ -279,7 +279,7 @@ export class Layout {
     }
 
     /**
-     * @returns {[boolean, string]} whether the layout has valid rects and
+     * @returns {[boolean, string, number]} whether the layout has valid rects and
      *      a potential error message.
      */
     validate() {

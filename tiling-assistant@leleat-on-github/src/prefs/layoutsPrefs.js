@@ -169,9 +169,8 @@ export default class {
         try {
             parentDir.make_directory_with_parents(null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+            if (e.code !== Gio.IOErrorEnum.EXISTS)
                 throw e;
-            }
         }
 
         // Create file, if it doesn't exist.
@@ -182,9 +181,8 @@ export default class {
         try {
             file.create(Gio.FileCreateFlags.NONE, null);
         } catch (e) {
-            if (e.code !== Gio.IOErrorEnum.EXISTS) {
+            if (e.code !== Gio.IOErrorEnum.EXISTS)
                 throw e;
-            }
         }
 
         return file;

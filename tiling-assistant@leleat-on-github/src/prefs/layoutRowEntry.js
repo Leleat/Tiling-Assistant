@@ -47,9 +47,6 @@ export const LayoutRowEntry = GObject.registerClass({
         this._rectAppButton.set_icon_name(iconName);
     }
 
-    /**
-     * @param {Gtk.Button} appButton src of the event.
-     */
     _onAppButtonClicked() {
         // Reset app button, if it already has an app attached
         if (this._item.appId) {

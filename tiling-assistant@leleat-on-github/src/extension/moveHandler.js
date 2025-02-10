@@ -141,7 +141,7 @@ export default class TilingMoveHandler {
 
                 counter += 10;
                 if (counter >= 400) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+                    this._restoreSizeAndRestartGrab(window, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
@@ -151,7 +151,7 @@ export default class TilingMoveHandler {
                 const oldPoint = { x, y };
                 const moveDist = Util.getDistance(currPoint, oldPoint);
                 if (moveDist > 10) {
-                    this._restoreSizeAndRestartGrab(window, x, y, grabOp);
+                    this._restoreSizeAndRestartGrab(window, grabOp);
                     this._restoreSizeTimerId = null;
                     return GLib.SOURCE_REMOVE;
                 }
@@ -175,7 +175,7 @@ export default class TilingMoveHandler {
             // as often when compared to the position-changed signal.
             if (Settings.getBoolean('low-performance-move-mode')) {
                 this._movingTimerId = GLib.timeout_add(
-                    GLib.PRIORITY_IDLE,
+                    GLib.PRIORITY_DEFAULT_IDLE,
                     this._movingTimerDuration,
                     this._onMoving.bind(
                         this,
@@ -343,7 +343,7 @@ export default class TilingMoveHandler {
         const useIgnoreTa = defaultMode !== MoveModes.IGNORE_TA && pressed[ignoreTAMod] ||
             noMod && defaultMode === MoveModes.IGNORE_TA;
 
-        let newMode = '';
+        let newMode;
 
         if (useAdaptiveTiling)
             newMode = MoveModes.ADAPTIVE_TILING;
@@ -422,10 +422,9 @@ export default class TilingMoveHandler {
         }
     }
 
-    _restoreSizeAndRestartGrab(window, px, py, grabOp) {
+    _restoreSizeAndRestartGrab(window, grabOp) {
         Twm.untile(window, {
             restoreFullPos: false,
-            xAnchor: px,
             skipAnim: this._wasMaximizedOnStart
         });
 
