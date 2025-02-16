@@ -1,5 +1,15 @@
 # Changelog
 
+## [51] - 2025-02-16
+
+### Added
+
+- Port to GNOME 48 (#388)
+
+### Fixed
+
+- Don't show tile preview for unresizable and skip_taskbar windows (#389)
+
 ## [50] - 2025-01-27
 
 ### Added
