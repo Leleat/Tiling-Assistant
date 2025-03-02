@@ -257,7 +257,7 @@ msgstr "<i>Nie</i> informuj o aktywnym oknie"
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will indicate the focused window by animating an outline around the focused window under certain circumstances
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:305
 msgid "Outline Animation"
-msgstr "Animacja rysowania"
+msgstr "Animacja konturu"
 
 #. Translators: This is the explanation for the setting 'Outline Animation' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:306
@@ -265,7 +265,7 @@ msgid ""
 "When the focus changes, temporarily outline the focused window. Maximized "
 "and fullscreen windows are exempt from this"
 msgstr ""
-"Jeśli zmieni się aktywne okno, zostanie zastosowane tymczasowe rysowanie "
+"Jeśli zmieni się aktywne okno, zostanie zastosowane tymczasowe konturowanie "
 "aktywnego okna. Maksymalizacja oraz okna na pełnym ekranie są wykluczone."
 
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will scale the focused window up to indicate the focus under certain circumstances.
@@ -285,7 +285,7 @@ msgstr ""
 #. Translators: This is a setting for the preference group 'Focus Hint' in the 'General' tab in the prefs window. This setting will outline the focused window (almost) at all times. There is no animation, hence 'static'
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:329
 msgid "Static Outline"
-msgstr "Stałe rysowanie"
+msgstr "Stały kontur"
 
 #. Translators: This is the explanation for the setting 'Static Outline' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:330
@@ -293,43 +293,43 @@ msgid ""
 "Indicate the focused window with a static outline unless it's maximized or "
 "in fullscreen."
 msgstr ""
-"Powiadom o aktywnym oknie ze stałym rysowaniem, chyba że jest ono "
+"Powiadom o aktywnym oknie ze stałym konturem, chyba że jest ono "
 "zmaksymalizowane lub na pełnym ekranie."
 
 #. Translators: This is the setting for the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:349
 msgid "Outline Style"
-msgstr ""
+msgstr "Styl konturu"
 
 #. Translators: This is the explanation for the setting 'Outline Style' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:350
 msgid "'Border' is recommended if you use transparent windows"
-msgstr ""
+msgstr "'Granica' jest wymagana, jeśli używasz przezroczystych okien"
 
 #. Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:354
 msgid "Solid Background"
-msgstr ""
+msgstr "Pełny kolor tła"
 
 #. Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:355
 msgid "Border"
-msgstr ""
+msgstr "Granica"
 
 #. Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:363
 msgid "Outline Color"
-msgstr "Kolor rysowania"
+msgstr "Kolor konturu"
 
 #. Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:374
 msgid "Outline Size"
-msgstr "Rozmiar rysowania"
+msgstr "Rozmiar konturu"
 
 #. Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint border radius
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:387
 msgid "Outline Border Radius"
-msgstr ""
+msgstr "Zaokrąglenie granicy konturu"
 
 #. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:405
