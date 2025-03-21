@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-01-27 12:21+0100\n"
-"PO-Revision-Date: 2024-08-13 09:44+1000\n"
+"PO-Revision-Date: 2025-03-21 22:09+1000\n"
 "Last-Translator: Ser82-png <asvmail.as@gmail.com>\n"
 "Language-Team: \n"
 "Language: ru\n"
@@ -304,22 +304,22 @@ msgstr ""
 #. Translators: This is the setting for the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:349
 msgid "Outline Style"
-msgstr ""
+msgstr "Стиль контура"
 
 #. Translators: This is the explanation for the setting 'Outline Style' for the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:350
 msgid "'Border' is recommended if you use transparent windows"
-msgstr ""
+msgstr "Если у вас прозрачные окна, рекомендуется использовать «Рамку»"
 
 #. Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:354
 msgid "Solid Background"
-msgstr ""
+msgstr "Сплошной фон"
 
 #. Translators: This is an option for the setting of the style of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:355
 msgid "Border"
-msgstr ""
+msgstr "Рамка"
 
 #. Translators: This is the setting for the color of the focus hint in the preference group 'Focus Hint' in the 'General' tab in the prefs window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:363
@@ -334,7 +334,7 @@ msgstr "Размер контура"
 #. Translators: This is a setting under the 'Focus Hint' preference group in the 'General' tab in the prefs window to set the size of the focus hint border radius
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:387
 msgid "Outline Border Radius"
-msgstr ""
+msgstr "Радиус контура рамки"
 
 #. Translators: This is a header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:405
@@ -408,7 +408,7 @@ msgstr "Игнорировать Tiling Assistant"
 #. Translators: This is the explanation for the 'Ignore Tiling Assistant' option in the preference group 'Default Window Movement Mode' in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:470
 msgid "Use Edge Tiling without Tiling Assistant's features"
-msgstr "Использовать укладку от края без функций Tiling Assistant"
+msgstr "Использовать укладку от края без функционала Tiling Assistant"
 
 #. Translators: This is a header for misc settings in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:486
@@ -428,9 +428,9 @@ msgid ""
 "'throwing' it towards any screen edge even if a monitor is bordering that "
 "edge."
 msgstr ""
-"Когда окно перетаскивается на другой монитор, предварительный просмотр "
-"укладки плиток ненадолго активируется на исходном мониторе. Таким образом, "
-"есть возможность укладывать окна, «сбрасывая» их к краю экрана, даже если "
+"Когда окно перетаскивается на другой монитор, на исходном мониторе ненадолго "
+"активируется предварительный просмотр укладки плиток. Таким образом, есть "
+"возможность укладывать окна, «сбрасывая» их к краю экрана, даже если "
 "мониторы граничат по этому краю."
 
 #. Translators: This is a setting in the 'Other' preference group in the 'General' tab. If the user has performance issue when dragging windows around, this will improve it but will decrease the accuracy of the tiling previews
