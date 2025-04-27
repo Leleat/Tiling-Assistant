@@ -120,7 +120,7 @@ export default class TilingMoveHandler {
     }
 
     _onMoveStarted(window, grabOp) {
-        if (!window.allows_resize() || window.is_skip_taskbar())
+        if (window.is_skip_taskbar())
             return;
 
         // Also work with a window, which was maximized by GNOME natively
