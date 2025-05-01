@@ -1,5 +1,16 @@
 # Changelog
 
+## [52] - 2025-05-01
+
+### Added
+
+- More Russian translation by Ser82-png (#399)
+- More Ukrainian translation by xalt7x (#395)
+
+### Fixed
+
+- Fixed maximized windows not being tilable via DND (#402)
+
 ## [51] - 2025-02-16
 
 ### Added
