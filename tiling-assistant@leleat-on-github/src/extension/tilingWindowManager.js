@@ -129,7 +129,7 @@ export class TilingWindowManager {
      */
     static isMaximized(window, workArea = null) {
         const area = workArea ?? window.get_work_area_current_monitor();
-        return window.get_maximized() === Meta.MaximizeFlags.BOTH ||
+        return (window.maximizedHorizontally && window.maximizedVertically) ||
                 window.tiledRect?.equal(area);
     }
 
@@ -160,10 +160,12 @@ export class TilingWindowManager {
             return;
 
         const wasTiled = window.isTiled;
-        const wasMaximized = window.get_maximized();
+        const wasMaximized = window.maximizedHorizontally || window.maximizedVertically;
 
-        if (wasMaximized)
-            window.unmaximize(wasMaximized);
+        if (wasMaximized && window.get_maximized)
+            window.unmaximize(window.get_maximized());
+        else if (wasMaximized)
+            window.unmaximize();
 
         window.unmake_fullscreen();
 
@@ -283,9 +285,12 @@ export class TilingWindowManager {
      * @param {boolean} [params.clampToWorkspace=false]
      */
     static untile(window, { restoreFullPos = true, skipAnim = false, clampToWorkspace = false } = {}) {
-        const wasMaximized = window.get_maximized();
-        if (wasMaximized)
-            window.unmaximize(wasMaximized);
+        const wasMaximized = window.maximizedHorizontally || window.maximizedVertically;
+
+        if (wasMaximized && window.get_maximized)
+            window.unmaximize(window.get_maximized());
+        else if (wasMaximized)
+            window.unmaximize();
 
         if (!window.untiledRect || !window.allows_resize() || !window.allows_move())
             return;
@@ -1040,7 +1045,8 @@ export class TilingWindowManager {
                 // WindowType.Normal window for their loading screen, which we
                 // don't want to trigger the tiling for.
                 if (createId && openedWindowApp && openedWindowApp === app &&
-                        (window.allows_resize() && window.allows_move() || window.get_maximized())
+                        (window.allows_resize() && window.allows_move() ||
+                         window.maximizedHorizontally || window.maximizedVertically)
                 ) {
                     global.display.disconnect(createId);
                     createId = 0;

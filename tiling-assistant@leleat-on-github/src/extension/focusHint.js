@@ -295,7 +295,7 @@ class Hint {
 
         if (
             window.is_fullscreen() ||
-            window.get_maximized() === Meta.MaximizeFlags.BOTH
+            (window.maximizedHorizontally && window.maximizedVertically)
         )
             return false;
 
@@ -703,7 +703,7 @@ class StaticOutlineHint extends AnimatedOutlineHint {
 
         if (
             this._window.is_fullscreen() ||
-            this._window.get_maximized() === Meta.MaximizeFlags.BOTH
+            (this._window.maximizedHorizontally && this._window.maximizedVertically)
         )
             this._outline.hide();
         else

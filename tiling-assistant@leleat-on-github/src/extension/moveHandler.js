@@ -126,7 +126,7 @@ export default class TilingMoveHandler {
         // Also work with a window, which was maximized by GNOME natively
         // because it may have been tiled with this extension before being
         // maximized so we need to restore its size to pre-tiling.
-        this._wasMaximizedOnStart = window.get_maximized();
+        this._wasMaximizedOnStart = window.maximizedHorizontally || window.maximizedVertically;
         const [x, y] = global.get_pointer();
 
         // Try to restore the window size
