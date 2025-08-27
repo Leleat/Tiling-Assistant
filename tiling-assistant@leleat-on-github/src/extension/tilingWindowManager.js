@@ -200,7 +200,7 @@ export class TilingWindowManager {
             // This is very easy to reproduce when dragging a window on the
             // lower half with Super + LMB.
             window.move_to_monitor(monitor);
-            if (window.maximized.length === 0) // Gnome 49 removed the parameter in maximize()
+            if (window.maximize.length === 0) // Gnome 49 removed the parameter in maximize()
                 window.maximize();
             else
                 window.maximize(Meta.MaximizeFlags.BOTH);
