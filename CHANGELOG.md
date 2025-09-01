@@ -1,5 +1,12 @@
 # Changelog
 
+## [53] - 2025-09-01
+
+### Added
+
+- Port to GNOME 49 by 3v1n0 and Ser82-png (#409 and #411)
+- Add Slovak translation by jose1711 (#414)
+
 ## [52] - 2025-05-01
 
 ### Added
