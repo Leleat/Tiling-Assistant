@@ -213,8 +213,6 @@ export const TilingSwitcherPopup = GObject.registerClass({
             this._finish(global.get_current_time());
             return Clutter.EVENT_PROPAGATE;
         }
-
-        return super.vfunc_button_press_event(buttonEvent);
     }
 
     _keyPressHandler(keysym) {
