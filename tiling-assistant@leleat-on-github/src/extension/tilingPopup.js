@@ -1,4 +1,4 @@
-import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
+import { Clutter, GLib, GObject, Meta, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
 
@@ -273,14 +273,28 @@ export const TilingSwitcherPopup = GObject.registerClass({
     }
 
     _tileWindow(window) {
-        let rect = this._freeScreenRect;
-
         // Halve the tile rect.
         // If isShiftPressed, then put the window at the top / left side;
         // if isAltPressed, then put it at the bottom / right side.
         // The orientation depends on the available screen space.
         const isShiftPressed = Util.isModPressed(Clutter.ModifierType.SHIFT_MASK);
         const isAltPressed = Util.isModPressed(Clutter.ModifierType.MOD1_MASK);
+
+        this.tiledWindow = window;
+
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const needsWorkspaceChange = window.get_workspace() !== activeWs;
+        const wasMaximized = window.maximizedHorizontally || window.maximizedVertically;
+        
+        if (needsWorkspaceChange)
+            window.change_workspace(activeWs);
+
+        // Clear the tiling signals before so that the old tile group
+        // won't be accidentally raised.
+        Twm.clearTilingProps(window.get_id());
+        
+        // Calculate the target rect
+        let rect = this._freeScreenRect;
         if (isShiftPressed || isAltPressed) {
             // Prefer vertical a bit more (because screens are usually horizontal)
             const vertical = rect.width >= rect.height * 1.25;
@@ -289,24 +303,63 @@ export const TilingSwitcherPopup = GObject.registerClass({
             const idx = isShiftPressed ? 0 : 1;
             rect = rect.getUnitAt(idx, rect[size] / 2, orientation);
         }
-
-        this.tiledWindow = window;
-
-        window.change_workspace(global.workspace_manager.get_active_workspace());
-
-        // We want to activate/focus the window after it was tiled with the
-        // Tiling Popup. Calling activate/focus() after tile() doesn't seem to
-        // work for GNOME Terminal if it is maximized before trying to tile it.
-        // It won't be tiled properly in that case for some reason... Instead
-        // activate first but clear the tiling signals before so that the old
-        // tile group won't be accidentally raised.
-        Twm.clearTilingProps(window.get_id());
-        window.activate(global.get_current_time());
-        Twm.tile(window, rect, {
-            monitorNr: this._monitor,
-            openTilingPopup: this._allowConsecutivePopup,
-            skipAnim: this._skipAnim
-        });
+        
+        // Helper to verify and correct window position after tiling.
+        // When tiling a maximized window, it sometimes gets sized correctly
+        // but positioned incorrectly. This fixes that issue.
+        const setupPositionCorrection = () => {
+            let sizeChangedId = null;
+            let timeoutId = null;
+            
+            const checkAndFixPosition = () => {
+                if (sizeChangedId) {
+                    window.disconnect(sizeChangedId);
+                    sizeChangedId = null;
+                }
+                if (timeoutId) {
+                    GLib.Source.remove(timeoutId);
+                    timeoutId = null;
+                }
+                
+                const currentRect = window.get_frame_rect();
+                if (currentRect.x !== rect.x || currentRect.y !== rect.y) {
+                    window.move_frame(true, rect.x, rect.y);
+                }
+            };
+            
+            // Listen for size-changed signal
+            sizeChangedId = window.connect('size-changed', () => {
+                checkAndFixPosition();
+            });
+            
+            // Fallback timeout in case signal doesn't fire
+            timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
+                checkAndFixPosition();
+                return GLib.SOURCE_REMOVE;
+            });
+        };
+        
+        // When a window is maximized or changing workspaces, wait briefly
+        // before tiling to allow the state transition to complete.
+        if (needsWorkspaceChange || wasMaximized) {
+            GLib.timeout_add(GLib.PRIORITY_DEFAULT, 100, () => {
+                Twm.tile(window, rect, {
+                    monitorNr: this._monitor,
+                    openTilingPopup: this._allowConsecutivePopup,
+                    skipAnim: this._skipAnim
+                });
+                setupPositionCorrection();
+                return GLib.SOURCE_REMOVE;
+            });
+        } else {
+            // Activate before tiling for non-maximized windows.
+            window.activate(global.get_current_time());
+            Twm.tile(window, rect, {
+                monitorNr: this._monitor,
+                openTilingPopup: this._allowConsecutivePopup,
+                skipAnim: this._skipAnim
+            });
+        }
     }
 
     // Dont _finish(), if no mods are pressed
