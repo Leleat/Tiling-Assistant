@@ -285,14 +285,14 @@ export const TilingSwitcherPopup = GObject.registerClass({
         const activeWs = global.workspace_manager.get_active_workspace();
         const needsWorkspaceChange = window.get_workspace() !== activeWs;
         const wasMaximized = window.maximizedHorizontally || window.maximizedVertically;
-        
+
         if (needsWorkspaceChange)
             window.change_workspace(activeWs);
 
         // Clear the tiling signals before so that the old tile group
         // won't be accidentally raised.
         Twm.clearTilingProps(window.get_id());
-        
+
         // Calculate the target rect
         let rect = this._freeScreenRect;
         if (isShiftPressed || isAltPressed) {
@@ -303,14 +303,14 @@ export const TilingSwitcherPopup = GObject.registerClass({
             const idx = isShiftPressed ? 0 : 1;
             rect = rect.getUnitAt(idx, rect[size] / 2, orientation);
         }
-        
+
         // Helper to verify and correct window position after tiling.
         // When tiling a maximized window, it sometimes gets sized correctly
         // but positioned incorrectly. This fixes that issue.
         const setupPositionCorrection = () => {
             let sizeChangedId = null;
             let timeoutId = null;
-            
+
             const checkAndFixPosition = () => {
                 if (sizeChangedId) {
                     window.disconnect(sizeChangedId);
@@ -320,25 +320,24 @@ export const TilingSwitcherPopup = GObject.registerClass({
                     GLib.Source.remove(timeoutId);
                     timeoutId = null;
                 }
-                
+
                 const currentRect = window.get_frame_rect();
-                if (currentRect.x !== rect.x || currentRect.y !== rect.y) {
+                if (currentRect.x !== rect.x || currentRect.y !== rect.y)
                     window.move_frame(true, rect.x, rect.y);
-                }
             };
-            
+
             // Listen for size-changed signal
             sizeChangedId = window.connect('size-changed', () => {
                 checkAndFixPosition();
             });
-            
+
             // Fallback timeout in case signal doesn't fire
             timeoutId = GLib.timeout_add(GLib.PRIORITY_DEFAULT, 200, () => {
                 checkAndFixPosition();
                 return GLib.SOURCE_REMOVE;
             });
         };
-        
+
         // When a window is maximized or changing workspaces, wait briefly
         // before tiling to allow the state transition to complete.
         if (needsWorkspaceChange || wasMaximized) {
