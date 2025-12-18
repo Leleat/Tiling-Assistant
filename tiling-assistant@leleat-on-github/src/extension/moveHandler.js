@@ -2,7 +2,7 @@ import { Clutter, GLib, GObject, Gio, Meta, Mtk } from '../dependencies/gi.js';
 import { Main, WindowManager } from '../dependencies/shell.js';
 import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.js';
 
-import { Orientation, MoveModes, Settings } from '../common.js';
+import { Orientation, MoveModes, Settings, is_wayland_compositor } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
@@ -319,7 +319,7 @@ export default class TilingMoveHandler {
         const altL = Clutter.ModifierType.MOD1_MASK;
         const altGr = Clutter.ModifierType.MOD5_MASK;
         const meta = Clutter.ModifierType.MOD4_MASK;
-        const rmb = Meta.is_wayland_compositor()
+        const rmb = is_wayland_compositor()
             ? Clutter.ModifierType.BUTTON2_MASK
             : Clutter.ModifierType.BUTTON3_MASK;
         const pressed = [ // idxs come from settings
