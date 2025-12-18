@@ -3,7 +3,8 @@
   "name": "Tiling Assistant",
   "shell-version": [
     "48",
-    "49"
+    "49",
+    "50"
   ],
   "url": "https://github.com/Leleat/Tiling-Assistant",
   "uuid": "tiling-assistant@leleat-on-github",
