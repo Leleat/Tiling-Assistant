@@ -1,8 +1,8 @@
-import { Clutter, GObject, Meta, St } from '../dependencies/gi.js';
+import { Clutter, GObject, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
 import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
 
-import { Direction, Orientation } from '../common.js';
+import { Direction, Orientation, is_wayland_compositor } from '../common.js';
 import { Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import * as AltTab from './altTab.js';
@@ -52,7 +52,7 @@ export const TilingSwitcherPopup = GObject.registerClass({
 
         // Destroy popup when touching outside of popup
         this.connect('touch-event', () => {
-            if (Meta.is_wayland_compositor())
+            if (is_wayland_compositor())
                 this.fadeAndDestroy();
 
             return Clutter.EVENT_PROPAGATE;
