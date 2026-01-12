@@ -1,11 +1,15 @@
 import { Clutter, GObject, St } from '../dependencies/gi.js';
 import { Main } from '../dependencies/shell.js';
-import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
+import * as SwitcherPopup49 from '../dependencies/unexported/switcherPopup.js';
+import * as SwitcherPopup48 from '../dependencies/unexported/switcherPopup-48.js';
 
 import { Direction, Orientation, is_wayland_compositor } from '../common.js';
 import { Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 import * as AltTab from './altTab.js';
+
+const [MajorShellVersion] = Util.getShellVersion();
+const SwitcherPopup = MajorShellVersion < 49 ? SwitcherPopup48 : SwitcherPopup49;
 
 /**
  * Classes for the Tiling Popup, which opens when tiling a window
@@ -213,6 +217,9 @@ export const TilingSwitcherPopup = GObject.registerClass({
             this._finish(global.get_current_time());
             return Clutter.EVENT_PROPAGATE;
         }
+
+        if (MajorShellVersion < 49)
+            return super.vfunc_button_press_event(buttonEvent);
     }
 
     _keyPressHandler(keysym) {

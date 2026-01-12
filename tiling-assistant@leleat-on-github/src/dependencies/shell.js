@@ -3,6 +3,7 @@ export {
     gettext as _
 } from 'resource:///org/gnome/shell/extensions/extension.js';
 
+export * as Config from 'resource:///org/gnome/shell/misc/config.js';
 export * as AppFavorites from 'resource:///org/gnome/shell/ui/appFavorites.js';
 export * as AltTab from 'resource:///org/gnome/shell/ui/altTab.js';
 export * as Main from 'resource:///org/gnome/shell/ui/main.js';

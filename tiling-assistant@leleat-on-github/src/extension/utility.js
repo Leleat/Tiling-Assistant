@@ -1,7 +1,9 @@
 import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
-import { Main } from '../dependencies/shell.js';
+import { Config, Main } from '../dependencies/shell.js';
 
 import { Direction, Orientation, Settings } from '../common.js';
+
+const ShellVerison = Config.PACKAGE_VERSION.split('.').map(Number.parseInt);
 
 /**
  * Library of commonly used functions for the extension.js' files
@@ -174,6 +176,15 @@ export class Util {
 
         favoriteLayout.forEach(rect => rect.tryAlignWith(workArea));
         return favoriteLayout;
+    }
+
+    /**
+     * Gets the GNOME Shell version
+     *
+     * @returns {[number, number]}
+     */
+    static getShellVersion() {
+        return ShellVerison;
     }
 
     /**
