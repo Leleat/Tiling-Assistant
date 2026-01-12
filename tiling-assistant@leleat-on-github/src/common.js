@@ -3,8 +3,6 @@
  * *and* prefs files
  */
 
-import { Meta } from './dependencies/gi.js';
-
 /**
  * A Singleton providing access to the settings.
  */
@@ -323,8 +321,3 @@ var LayoutItem = class LayoutItem {
         this.loopType = null;
     }
 };
-
-export function is_wayland_compositor() {
-    return Meta.is_wayland_compositor === undefined ||
-           Meta.is_wayland_compositor();
-}

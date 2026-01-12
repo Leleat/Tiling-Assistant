@@ -1,4 +1,4 @@
-import { Clutter, Gio, GLib, Mtk, St } from '../dependencies/gi.js';
+import { Clutter, Gio, GLib, Meta, Mtk, St } from '../dependencies/gi.js';
 import { Config, Main } from '../dependencies/shell.js';
 
 import { Direction, Orientation, Settings } from '../common.js';
@@ -185,6 +185,10 @@ export class Util {
      */
     static getShellVersion() {
         return ShellVerison;
+    }
+
+    static is_wayland_compositor() {
+        return Meta.is_wayland_compositor === undefined || Meta.is_wayland_compositor();
     }
 
     /**
