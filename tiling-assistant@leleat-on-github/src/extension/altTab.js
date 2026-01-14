@@ -13,15 +13,20 @@ import {
     Main
 } from '../dependencies/shell.js';
 import {
-    AppSwitcherPopup,
+    AppSwitcherPopup as AppSwitcherPopup49,
     AppIcon as BaseAppIcon,
     baseIconSizes,
     APP_ICON_HOVER_TIMEOUT
 } from '../dependencies/unexported/altTab.js';
+import { AppSwitcherPopup as AppSwitcherPopup48 } from '../dependencies/unexported/altTab-48.js';
 import * as SwitcherPopup from '../dependencies/unexported/switcherPopup.js';
 
 import { Settings } from '../common.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import { Util } from './utility.js';
+
+const [MajorShellVersion] = Util.getShellVersion();
+const AppSwitcherPopup = MajorShellVersion < 49 ? AppSwitcherPopup48 : AppSwitcherPopup49;
 
 /**
  * Optionally, override GNOME's altTab / appSwitcher to group tileGroups
