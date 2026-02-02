@@ -1,6 +1,10 @@
 import { Clutter, GLib, GObject, St } from '../gi.js';
 import { Main } from '../shell.js';
 
+import { Util } from '../../extension/utility.js';
+
+const [MajorShellVersion] = Util.getShellVersion();
+
 const POPUP_DELAY_TIMEOUT = 150; // milliseconds
 
 const POPUP_SCROLL_TIME = 100; // milliseconds
@@ -120,11 +124,15 @@ export const SwitcherPopup = GObject.registerClass({
             return false;
 
         const grab = Main.pushModal(this);
-        // We expect at least a keyboard grab here
-        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
-            Main.popModal(grab);
-            return false;
+
+        if (MajorShellVersion < 50) {
+            // We expect at least a keyboard grab here
+            if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+                Main.popModal(grab);
+                return false;
+            }
         }
+
         this._grab = grab;
         this._haveModal = true;
         this._modifierMask = primaryModifier(mask);

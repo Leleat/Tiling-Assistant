@@ -5,6 +5,8 @@ import { Direction, Orientation, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+const [MajorShellVersion] = Util.getShellVersion();
+
 const SCALE_SIZE = 100;
 const Modes = {
     DEFAULT: 1,
@@ -47,10 +49,13 @@ class TileEditingMode extends St.Widget {
         this._windows = Twm.getTopTileGroup();
 
         const grab = Main.pushModal(this);
-        // We expect at least a keyboard grab here
-        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
-            Main.popModal(grab);
-            return false;
+
+        if (MajorShellVersion < 50) {
+            // We expect at least a keyboard grab here
+            if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+                Main.popModal(grab);
+                return false;
+            }
         }
 
         this._grab = grab;

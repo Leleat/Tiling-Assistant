@@ -11,6 +11,8 @@ import { Layout, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+const [MajorShellVersion] = Util.getShellVersion();
+
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
  * See src/prefs/layoutsPrefs.js for more details and general info about layouts.
@@ -311,10 +313,13 @@ const LayoutSearch = GObject.registerClass({
         Main.uiGroup.add_child(this);
 
         const grab = Main.pushModal(this);
-        // We expect at least a keyboard grab here
-        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
-            Main.popModal(grab);
-            return false;
+
+        if (MajorShellVersion < 50) {
+            // We expect at least a keyboard grab here
+            if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+                Main.popModal(grab);
+                return false;
+            }
         }
 
         this._grab = grab;
