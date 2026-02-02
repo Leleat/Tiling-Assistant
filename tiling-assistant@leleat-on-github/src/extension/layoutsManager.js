@@ -478,6 +478,22 @@ const PanelIndicator = GObject.registerClass({
 
         const menuAlignment = 0.0;
         this.setMenu(new PopupMenu.PopupMenu(this, menuAlignment, St.Side.TOP));
+
+        if (MajorShellVersion >= 50) {
+            // Remove action that is set via PanelMenu.Button so that we can use
+            // can set a new action with our own code.
+            this.remove_action(this._clickGesture);
+
+            this._clickGesture = new Clutter.ClickGesture();
+            this._clickGesture.set_recognize_on_press(true);
+            this._clickGesture.set_enabled(true);
+            this._clickGesture.connect('recognize', () => {
+                this._updateItems();
+                this.menu.toggle();
+            });
+
+            this.add_action(this._clickGesture);
+        }
     }
 
     vfunc_event(event) {
