@@ -11,6 +11,8 @@ import { Layout, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
 
+const [MajorShellVersion] = Util.getShellVersion();
+
 /**
  * Here are the classes to handle PopupLayouts on the shell / extension side.
  * See src/prefs/layoutsPrefs.js for more details and general info about layouts.
@@ -311,10 +313,13 @@ const LayoutSearch = GObject.registerClass({
         Main.uiGroup.add_child(this);
 
         const grab = Main.pushModal(this);
-        // We expect at least a keyboard grab here
-        if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
-            Main.popModal(grab);
-            return false;
+
+        if (MajorShellVersion < 50) {
+            // We expect at least a keyboard grab here
+            if ((grab.get_seat_state() & Clutter.GrabState.KEYBOARD) === 0) {
+                Main.popModal(grab);
+                return false;
+            }
         }
 
         this._grab = grab;
@@ -473,6 +478,22 @@ const PanelIndicator = GObject.registerClass({
 
         const menuAlignment = 0.0;
         this.setMenu(new PopupMenu.PopupMenu(this, menuAlignment, St.Side.TOP));
+
+        if (MajorShellVersion >= 50) {
+            // Remove action that is set via PanelMenu.Button so that we can use
+            // can set a new action with our own code.
+            this.remove_action(this._clickGesture);
+
+            this._clickGesture = new Clutter.ClickGesture();
+            this._clickGesture.set_recognize_on_press(true);
+            this._clickGesture.set_enabled(true);
+            this._clickGesture.connect('recognize', () => {
+                this._updateItems();
+                this.menu.toggle();
+            });
+
+            this.add_action(this._clickGesture);
+        }
     }
 
     vfunc_event(event) {
