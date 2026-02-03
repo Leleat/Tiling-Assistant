@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-01-27 12:21+0100\n"
+"POT-Creation-Date: 2026-02-03 22:14+0100\n"
 "PO-Revision-Date: 2025-02-18 23:48+0200\n"
 "Last-Translator: Yevhen Popok <xalt7x.service@gmail.com>\n"
 "Language-Team: \n"
@@ -734,32 +734,32 @@ msgstr "Спливаюче вікно укладання вимкнено"
 
 #. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated but no layout was defined by the user.
 #. Translators: This is a placeholder text within a popup, if the user didn't define a tiling layout.
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:105
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:496
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:107
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:517
 msgid "No valid layouts defined."
 msgstr "Не знайдено жодного коректного макета"
 
 #. Translators: This is a notification that pops up when a keyboard shortcut to activate a user-defined tiling layout is activated and the user attached an app to a tile so that a new instance of that app will automatically open in the tile. But that app seems to have been uninstalled since the definition of the layout.
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:197
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:199
 msgid "Popup Layouts: App not found."
 msgstr "Спливаюче вікно макетів: програму не знайдено"
 
 #. Translators: This is the placeholder text for a search field.
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:340
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:345
 msgid "Type to search..."
 msgstr "Пишіть тут для пошуку..."
 
 #. Translators: This is the text that will be displayed as the name of the user-defined tiling layout if it hasn't been given a name.
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:445
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:450
 msgid "Nameless layout..."
 msgstr "Безіменний макет..."
 
-#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:523
+#: tiling-assistant@leleat-on-github/src/extension/layoutsManager.js:544
 msgid "Preferences"
 msgstr "Налаштування"
 
 #. Translators: This is a notification that pops up if the user tries to enter the Tile Editing Mode via a keyboard shortcut.
-#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:62
+#: tiling-assistant@leleat-on-github/src/extension/tileEditingMode.js:67
 msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
 msgstr ""
 "'Режим редагування мозаїки' недоступний, коли відсутні видимі укладені вікна."

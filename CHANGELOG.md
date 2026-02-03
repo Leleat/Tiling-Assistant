@@ -1,5 +1,15 @@
 # Changelog
 
+## [54] - 2026-02-03
+
+### Added
+
+- Port to GNOME 50 by vanvugt (#430) and leleat (#432, #436)
+
+### Fixed
+
+- Make Tiling Popup work with mouse again (#423, #436)
+
 ## [53] - 2025-09-01
 
 ### Added
