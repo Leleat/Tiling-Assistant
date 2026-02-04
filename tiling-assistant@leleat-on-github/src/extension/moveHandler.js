@@ -566,15 +566,10 @@ export default class TilingMoveHandler {
      * @param {Meta.Window} window
      * @param {Meta.GrabOp} grabOp
      */
-    _adaptiveTilingPreview(window, grabOp) {
-        if (!this._topTileGroup.length) {
-            this._edgeTilingPreview(window, grabOp);
-            return;
-        }
-
-        const screenRects = this._topTileGroup
-            .map(w => w.tiledRect)
-            .concat(this._freeScreenRects);
+    _adaptiveTilingPreview(window) {
+        const screenRects = this._topTileGroup.length
+            ? this._topTileGroup.map(w => w.tiledRect).concat(this._freeScreenRects)
+            : this._freeScreenRects;
         const hoveredRect = screenRects.find(r => r.containsPoint(this._lastPointerPos));
         if (!hoveredRect) {
             this._tilePreview.close();
@@ -805,7 +800,22 @@ export default class TilingMoveHandler {
                     this._anchorRect = this._anchorRect ?? rect;
                     this._tileRect = rect.union(this._anchorRect);
                 } else {
-                    this._tileRect = rect.copy();
+                    // Check if we should use adaptive tiling behavior (split the rect)
+                    const atTop = this._lastPointerPos.y < rect.y + rect.height * .25;
+                    const atBottom = this._lastPointerPos.y > rect.y + rect.height * .75;
+                    const atRight = this._lastPointerPos.x > rect.x + rect.width * .75;
+                    const atLeft = this._lastPointerPos.x < rect.x + rect.width * .25;
+                    const splitVertically = atTop || atBottom;
+                    const splitHorizontally = atLeft || atRight;
+
+                    if (splitHorizontally || splitVertically) {
+                        const idx = atTop && !atRight || atLeft ? 0 : 1;
+                        const size = splitHorizontally ? rect.width : rect.height;
+                        const orientation = splitHorizontally ? Orientation.V : Orientation.H;
+                        this._tileRect = rect.getUnitAt(idx, size / 2, orientation);
+                    } else {
+                        this._tileRect = rect.copy();
+                    }
                     this._anchorRect = null;
                 }
 
@@ -816,6 +826,18 @@ export default class TilingMoveHandler {
                     height: this._tileRect.height,
                     opacity: 200
                 });
+
+                // Handle splitting of existing tiled window in favorite rect if applicable
+                this._splitRects.clear();
+                const hoveredWindow = this._topTileGroup.find(w => {
+                    return w.tiledRect.containsPoint(this._lastPointerPos);
+                });
+                if (hoveredWindow && !hoveredWindow.tiledRect.equal(this._tileRect)) {
+                    const splitRect = hoveredWindow.tiledRect.minus(this._tileRect)[0];
+                    if (splitRect)
+                        this._splitRects.set(hoveredWindow, splitRect);
+                }
+
                 return;
             }
         }
