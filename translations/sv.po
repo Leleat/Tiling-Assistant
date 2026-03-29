@@ -1,0 +1,529 @@
+# Swedish translation for Tiling Assistant GNOME Extension
+# Copyright (C) 2026 Daniel Nylander
+# This file is distributed under the same license as the Tiling Assistant package.
+# Daniel Nylander <po@danielnylander.se>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: tiling-assistant\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-02-03 22:14+0100\n"
+"PO-Revision-Date: 2026-03-28 15:00+0100\n"
+"Last-Translator: Daniel Nylander <po@danielnylander.se>\n"
+"Language-Team: Swedish <tp-sv@listor.tp-sv.se>\n"
+"Language: sv\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:10
+msgid "Report a Bug"
+msgstr "Rapportera en bugg"
+
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:14
+msgid "User Guide"
+msgstr "Användarguide"
+
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:18
+msgid "License"
+msgstr "Licens"
+
+#. Translators: This is a popup menu item in the headerbar of the prefs window that links to Github
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:22
+msgid "Changelog"
+msgstr "Ändringslogg"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:29
+msgid "Advanced..."
+msgstr "Avancerat..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:35
+msgid "General"
+msgstr "Allmänt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:38
+msgid "Tiling Popup"
+msgstr "Mosaikpopup"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:40
+msgid "Open after tiling a window"
+msgstr "Öppna efter mosaikplacering av ett fönster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:44
+msgid "Include apps from all workspaces"
+msgstr "Inkludera appar från alla arbetsytor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:48
+msgid "Tile Groups"
+msgstr "Mosaikgrupper"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:50
+msgid "Disable Tile Groups"
+msgstr "Inaktivera mosaikgrupper"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:55
+msgid "Raise together"
+msgstr "Lyft tillsammans"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:60
+msgid "App Switcher and Tiling Popup"
+msgstr "Programväxlare och mosaikpopup"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:68
+msgid "Gaps"
+msgstr "Mellanrum"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:70
+msgid "Windows"
+msgstr "Fönster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:74
+msgid "Screen Edges"
+msgstr "Skärmkanter"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:76
+msgid "Screen Edge Top"
+msgstr "Skärmkant överkant"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:80
+msgid "Screen Edge Left"
+msgstr "Skärmkant vänster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:84
+msgid "Screen Edge Right"
+msgstr "Skärmkant höger"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:88
+msgid "Screen Edge Bottom"
+msgstr "Skärmkant nederkant"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:92
+msgid "Maximized Windows"
+msgstr "Maximerade fönster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:94
+msgid "Dynamic Keybinding Behavior"
+msgstr "Dynamiskt tangentbindningsbeteende"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:97
+msgid "Disabled"
+msgstr "Inaktiverad"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:98
+msgid "Don't change the keybindings' behavior"
+msgstr "Ändra inte tangentbindningarnas beteende"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:100
+msgid "Window Focus"
+msgstr "Fönsterfokus"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:103
+msgid "Tiling State"
+msgstr "Mosaiktillstånd"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:106
+msgid "Tiling State (Windows)"
+msgstr "Mosaiktillstånd (fönster)"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:110
+msgid "Favorite Layout"
+msgstr "Favoritlayout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:111
+msgid "Move the window along your favorite Layout"
+msgstr "Flytta fönstret enligt din favoritlayout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:113
+msgid "Focus Hint"
+msgstr "Fokusindikering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:115
+msgid "Do <i>not</i> indicate the focused window"
+msgstr "<i>Visa inte</i> vilket fönster som har fokus"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:118
+msgid "Outline Animation"
+msgstr "Konturanimering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:120
+msgid "Upscale Animation"
+msgstr "Uppskalningsanimering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:122
+msgid "Static Outline"
+msgstr "Statisk kontur"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:126
+msgid "Outline Style"
+msgstr "Konturstil"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:127
+msgid "'Border' is recommended if you use transparent windows"
+msgstr "\"Kantlinje\" rekommenderas om du använder transparenta fönster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:129
+msgid "Solid Background"
+msgstr "Enfärgad bakgrund"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:131
+msgid "Border"
+msgstr "Kantlinje"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:135
+msgid "Outline Color"
+msgstr "Konturfärg"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:138
+msgid "Outline Size"
+msgstr "Konturstorlek"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:143
+msgid "Outline Border Radius"
+msgstr "Konturens hörnradie"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:149
+msgid "Animations"
+msgstr "Animeringar"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:151
+msgid "Tiling"
+msgstr "Mosaikplacering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:155
+msgid "Untiling"
+msgstr "Ta bort mosaikplacering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:161
+msgid "Default Window Movement Mode"
+msgstr "Standardläge för fönsterflyttning"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:162
+msgid "The movement mode that is activated when no modifier key is pressed"
+msgstr "Flyttläget som aktiveras när ingen modifieringstangent är nedtryckt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:164
+msgid "Edge Tiling"
+msgstr "Kantmosaik"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:167
+msgid "Adaptive Tiling"
+msgstr "Adaptiv mosaikplacering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:171
+msgid "Ignore Tiling Assistant"
+msgstr "Ignorera mosaikassistenten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:172
+msgid "Use Edge Tiling without Tiling Assistant's features"
+msgstr "Använd kantmosaik utan mosaikassistentens funktioner"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:176
+msgid "Other"
+msgstr "Övrigt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:178
+msgid "Monitor Switch Grace Period"
+msgstr "Respittid vid skärmbyte"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:184
+msgid "Low Performance Movement Mode"
+msgstr "Prestandasnålt flyttläge"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:189
+msgid "Adapt 'Edge Tiling' to your Favorite Layout"
+msgstr "Anpassa \"Kantmosaik\" till din favoritlayout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:191
+msgid "'Adaptive Tiling' Move Mode Activator"
+msgstr "Aktivering av läget \"Adaptiv mosaikplacering\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:193
+msgid "Ctrl"
+msgstr "Ctrl"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:195
+msgid "Alt"
+msgstr "Alt"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:197
+msgid "RMB"
+msgstr "Höger musknapp"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:199
+msgid "Super"
+msgstr "Super"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:203
+msgid "'Favorite Layout' Move Mode Activator"
+msgstr "Aktivering av läget \"Favoritlayout\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:216
+msgid "'Ignore Tiling Assistant' Mode Activator"
+msgstr "Aktivering av läget \"Ignorera mosaikassistenten\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:229
+msgid "Vertical Edge Preview Trigger Area"
+msgstr "Utlösningsområde för vertikal kantförhandsvisning"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:234
+msgid "Horizontal Edge Preview Trigger Area"
+msgstr "Utlösningsområde för horisontell kantförhandsvisning"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:240
+msgid "Inverse Top Screen Edge Action Timer"
+msgstr "Timer för inverterad åtgärd vid övre skärmkant"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:246
+msgid "Inverse Top Screen Edge Action for Landscape Displays"
+msgstr "Inverterad åtgärd vid övre skärmkant för liggande skärmar"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:249
+msgid "Inverse Top Screen Edge Action for Portrait Displays"
+msgstr "Inverterad åtgärd vid övre skärmkant för stående skärmar"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:253
+msgid "Keybindings"
+msgstr "Tangentbindningar"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:255
+msgid "Toggle 'Tiling Popup'"
+msgstr "Växla \"Mosaikpopup\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:258
+msgid "Tile Editing Mode"
+msgstr "Mosaikredigeringsläge"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:259
+msgid "A keyboard-driven mode to manage your tiled windows"
+msgstr "Ett tangentbordsstyrt läge för att hantera dina mosaikplacerade fönster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:261
+msgid "Auto-Tile"
+msgstr "Automatisk mosaikplacering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:262
+msgid "Un/tile the current window based on the visible tiles"
+msgstr "Lägg till/ta bort mosaikplacering baserat på synliga rutor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:264
+msgid "Toggle 'Always on Top'"
+msgstr "Växla \"Alltid överst\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:267
+msgid "Toggle Maximization"
+msgstr "Växla maximering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:270
+msgid "Toggle Vertical Maximization"
+msgstr "Växla vertikal maximering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:273
+msgid "Toggle Horizontal Maximization"
+msgstr "Växla horisontell maximering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:276
+msgid "Restore Window Size"
+msgstr "Återställ fönsterstorlek"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:279
+msgid "Move Window to Center"
+msgstr "Flytta fönstret till mitten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:282
+msgid "Tile to top"
+msgstr "Placera i överkant"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:285
+msgid "Tile to bottom"
+msgstr "Placera i nederkant"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:288
+msgid "Tile to left"
+msgstr "Placera till vänster"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:291
+msgid "Tile to right"
+msgstr "Placera till höger"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:294
+msgid "Corner Tiling"
+msgstr "Hörnmosaik"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:296
+msgid "Tile to top-left"
+msgstr "Placera i övre vänstra hörnet"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:299
+msgid "Tile to top-right"
+msgstr "Placera i övre högra hörnet"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:302
+msgid "Tile to bottom-left"
+msgstr "Placera i nedre vänstra hörnet"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:305
+msgid "Tile to bottom-right"
+msgstr "Placera i nedre högra hörnet"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:308
+msgid "Edge Tiling without Tiling Assistant"
+msgstr "Kantmosaik utan mosaikassistenten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:311
+msgid "Corner Tiling without Tiling Assistant"
+msgstr "Hörnmosaik utan mosaikassistenten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:314
+msgid "Debugging"
+msgstr "Felsökning"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:316
+msgid "Show Tiled Rects"
+msgstr "Visa mosaikruta"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:319
+msgid "Show Free Screen Rects"
+msgstr "Visa lediga skärmytor"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:323
+msgid "Layouts"
+msgstr "Layouter"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:325
+msgid "Panel Indicator"
+msgstr "Panelindikator"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:328
+msgid "Search for a Layout"
+msgstr "Sök efter en layout"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:330
+msgid "Open a popup listing all the available layouts"
+msgstr "Öppna en popup som visar alla tillgängliga layouter"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:335
+msgid "Add a new Layout."
+msgstr "Lägg till en ny layout."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:340
+msgid "Save the layouts to the disk. Invalid changes will be lost!"
+msgstr "Spara layouterna till disk. Ogiltiga ändringar kommer att gå förlorade!"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:345
+msgid "Reload the layouts from the disk - discarding all non-saved changes."
+msgstr "Ladda om layouterna från disk – alla osparade ändringar förkastas."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:353
+msgid "Advanced / Experimental Settings"
+msgstr "Avancerade / experimentella inställningar"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:354
+msgid "Show more settings in the main preference window"
+msgstr "Visa fler inställningar i huvudinställningsfönstret"
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutDialog.ui:7
+msgid "Clear the keyboard shortcuts"
+msgstr "Rensa tangentbindningarna"
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:116
+msgid "Tiling popup enabled"
+msgstr "Mosaikpopup aktiverad"
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:118
+msgid "Tiling popup was disabled"
+msgstr "Mosaikpopup inaktiverad"
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:205
+msgid "No valid layouts defined."
+msgstr "Inga giltiga layouter definierade."
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:225
+msgid "Popup Layouts: App not found."
+msgstr "Popup-layouter: appen hittades inte."
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:287
+msgid "Type to search..."
+msgstr "Skriv för att söka..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:332
+msgid "Nameless layout..."
+msgstr "Namnlös layout..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:26
+msgid "Preferences"
+msgstr "Inställningar"
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:100
+msgid "Can't enter 'Tile Editing Mode', if no tiled window is visible."
+msgstr "Kan inte aktivera \"Mosaikredigeringsläge\" om inget mosaikplacerat fönster syns."
+
+#: tiling-assistant@leleat-on-github/src/ui/tileEditingMode.js:101
+msgid "'User Guide' for help..."
+msgstr "\"Användarguide\" för hjälp..."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
+msgid "Tiled windows will no longer adapt their size to other tiled windows nor be raised together."
+msgstr "Mosaikplacerade fönster kommer inte längre att anpassa sin storlek till andra mosaikplacerade fönster eller lyftas tillsammans."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:52
+msgid "A tile group is created when a window gets tiled. If a tiled window is raised, resized or moved, the other windows in the tile group will adapt to it."
+msgstr "En mosaikgrupp skapas när ett fönster mosaikplaceras. Om ett mosaikplacerat fönster lyfts, storleksändras eller flyttas, anpassas de andra fönstren i mosaikgruppen."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:61
+msgid "This could conflict with other App Switcher (a.k.a. alt+Tab) extensions. You may need to restart the GNOME Shell (log out) after enabling/disabling this setting."
+msgstr "Det kan orsaka konflikter med andra programväxlartillägg (t.ex. alt+Tab). Du kan behöva starta om GNOME Shell (logga ut) efter att ha aktiverat/inaktiverat den här inställningen."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:95
+msgid "The keybindings to maximize and tile to the top/bottom/left/right may change their behavior. Only the keybindings that are set in the 'Keybindings' section are affected."
+msgstr "Tangentbindningarna för att maximera och placera i överkant/nederkant/vänster/höger kan ändra sitt beteende. Bara tangentbindningarna som är inställda i avsnittet \"Tangentbindningar\" påverkas."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:101
+msgid "Switch focus to the tiled window in the direction of the pressed shortcut"
+msgstr "Byt fokus till det mosaikplacerade fönstret i riktningen för den trycka tangenten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:104
+msgid "Adapt the tiling state to the pressed shortcut. For instance, a window tiled to the left and pressing the 'tile to the right' shortcut will maximize it"
+msgstr "Anpassa mosaiktillståndet till den trycka tangenten. Till exempel, ett fönster placerat till vänster som får tangenten \"placera till höger\" kommer att maximeras"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:107
+msgid "Like 'Tiling State' but if the window isn't tiled or is already tiled to the bottom/right, move it to the next monitor in the direction of the pressed shortcut"
+msgstr "Som \"Mosaiktillstånd\" men om fönstret inte är mosaikplacerat eller redan är placerat i nederkant/höger, flytta det till nästa skärm i riktningen för den tryckta tangenten"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:116
+msgid "When the focus changes, temporarily outline the focused window. Maximized and fullscreen windows are excluded."
+msgstr "Visa en tillfällig kontur runt fönstret som får fokus när fokus ändras. Maximerade fönster och fönster i helskärmsläge undantas."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:119
+msgid "When the focus changes, temporarily scale the focused window up. Maximized and fullscreen windows are excluded."
+msgstr "Skala tillfälligt upp fönstret som får fokus när fokus ändras. Maximerade fönster och fönster i helskärmsläge undantas."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:121
+msgid "Indicate the focused window with a static outline unless it's maximized or in fullscreen."
+msgstr "Visa en statisk kontur runt fönstret som har fokus, såvida det inte är maximerat eller i helskärmsläge."
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:165
+msgid "Moving the window to the screen edges or corners will open the default tile preview"
+msgstr "Att flytta fönstret till skärmkanter eller hörn öppnar standardförhandsvisningen för mosaikplacering"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:168
+msgid "Releasing the grab on a window while hovering over a tile will push the overlapping tiled windows aside to make space for the grabbed window"
+msgstr "Om du släpper fönstret ovanpå en mosaik skjuts de överlappande mosaikplacerade fönstren åt sidan för att göra plats"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:190
+msgid "The tile preview will stick to your favorite layout from the 'Layouts' page"
+msgstr "Förhandsvisningen för mosaik följer din favoritlayout från sidan \"Layouter\""
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:179
+msgid "When a window is dragged to a new monitor the tile preview will stick to the old monitor for a brief time period"
+msgstr "När ett fönster dras till en ny skärm stannar förhandsvisningen kvar på den gamla skärmen en kort stund"
+
+#: tiling-assistant@leleat-on-github/src/ui/prefs.ui:185
+msgid "Use this if there is a lag when moving windows around. This will however decrease the preview's quality and the tiling interaction."
+msgstr "Använd det här om det laggar när du flyttar fönster. Det minskar dock kvaliteten på förhandsvisningen och mosaikinteraktionen."
+
+#: tiling-assistant@leleat-on-github/src/ui/shortcutDialog.ui:5
+msgid "Replace the keyboard shortcuts. Press 'space' or 'return' when listening for a shortcut to disable it."
+msgstr "Ersätt tangentbindningarna. Tryck \"mellanslag\" eller \"retur\" för att inaktivera en tangentbindning."
