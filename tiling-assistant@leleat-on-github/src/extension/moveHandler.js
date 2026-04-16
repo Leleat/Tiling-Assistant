@@ -100,7 +100,7 @@ export default class TilingMoveHandler {
         this._wmPrefs = null;
 
         global.display.disconnectObject(this);
-        global.stage.dicconnectObject(this);
+        global.stage.disconnectObject(this);
 
         this._tilePreview.destroy();
 
