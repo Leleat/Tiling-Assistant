@@ -16,7 +16,7 @@ function iconPath(name) {
     return path;
 }
 
-const LayoutPickerTileType = {
+export const LayoutPickerTileType = {
     NONE: 0,
     LEFT: 1,
     RIGHT: 2,
@@ -66,39 +66,44 @@ class LayoutPicker extends St.Bin {
             this._allocationId = null;
             this._updateAllocation();
         });
+
+	this._dragging = false;
     }
 
     get tileType() {
         return this._tileType;
     }
 
+    get picking() {
+        return this._tileType !== LayoutPickerTileType.NONE;
+    }
+
     _setVisibility(visibility) {
         this._visibility = visibility;
+        console.log(this._visibility);
         this._updateAllocation();
     }
 
     onMoving(curX, curY) {
+	if (this._dragging === false)
+	    return;
+
         let [mx, my] = this.get_transformed_position();
         let [w, h] = this.get_size();
-        
-	const monitorIndex = global.display.get_current_monitor();
+
+        const monitorIndex = global.display.get_current_monitor();
         const monitorArea = Main.layoutManager.monitors[monitorIndex];
-	const monitorY = monitorArea ? monitorArea.y : my; // fallback to my just in case monitorArea is null;
+        const monitorY = monitorArea ? monitorArea.y : my; // fallback to my just in case monitorArea is null;
 
-	// 1.75 acts as an early trigger when transitioning from PEAK to SHOWN.
-	// This ensures the picker becomes visible before the cursor reaches it.
-	// The multiplier is only applied for PEAK → SHOWN, not SHOWN → PEAK.
-	const triggerHeight = this._visibility === LayoutPickerVisibility.PEAK ? h * 1.75 :  h;
+        // 1.75 acts as an early trigger when transitioning from PEAK to SHOWN.
+        // This ensures the picker becomes visible before the cursor reaches it.
+        // The multiplier is only applied for PEAK → SHOWN, not SHOWN → PEAK.
+        const triggerHeight = this._visibility === LayoutPickerVisibility.PEAK ? h * 1.75 : h;
 
-	// using monitorY instead (my) as upper bound to compensate with chromes such us the top bar height
-	// placing cursor above my could cause glitch. (my) and monitorY will be same for other monitor anyways.
-        if (
-            curY >= monitorY &&
-	    curY <= my + triggerHeight &&
-            curX >= mx &&
-	    curX <= mx + w
-        ) {
-            this._setVisibility(LayoutPickerVisibility.SHOWN);
+        // using monitorY instead (my) as upper bound to compensate with chromes such us the top bar height
+        // placing cursor above my could cause glitch. (my) and monitorY will be same for other monitor anyways.
+        if (curY >= monitorY && curY <= my + triggerHeight && curX >= mx && curX <= mx + w) {
+	    this._setVisibility(LayoutPickerVisibility.SHOWN);
 	} else {
             this._setVisibility(LayoutPickerVisibility.PEAK);
 	}
@@ -108,10 +113,12 @@ class LayoutPicker extends St.Bin {
     }
 
     onMoveStarted() {
+	this._dragging = true;
         this._setVisibility(LayoutPickerVisibility.PEAK);
     }
 
     onMoveFinished() {
+	this._dragging = false;
         this._setVisibility(LayoutPickerVisibility.HIDDEN);
     }
 
@@ -208,8 +215,7 @@ class LayoutPicker extends St.Bin {
         };
         let contains = (icon, x, y) => {
             let [mx, my, mw, mh] = rect(icon);
-            return x >= mx && x <= mx + mw &&
-				y >= my && y <= my + mh;
+            return x >= mx && x <= mx + mw && y >= my && y <= my + mh;
         };
 
         if (contains(this._horIcon, curX, curY)) {
@@ -218,7 +224,7 @@ class LayoutPicker extends St.Bin {
 
             if (curX <= mid)
                 this._tileType = LayoutPickerTileType.LEFT;
-			 else
+            else
                 this._tileType = LayoutPickerTileType.RIGHT;
         } else if (contains(this._vertIcon, curX, curY)) {
             let [mx_, my, mw_, mh] = rect(this._vertIcon);
@@ -226,7 +232,7 @@ class LayoutPicker extends St.Bin {
 
             if (curY <= mid)
                 this._tileType = LayoutPickerTileType.TOP;
-			 else
+            else
                 this._tileType = LayoutPickerTileType.BOTTOM;
         } else if (contains(this._quartIcon, curX, curY)) {
             let [mx, my, mw, mh] = rect(this._quartIcon);
@@ -235,11 +241,11 @@ class LayoutPicker extends St.Bin {
 
             if (curX >= midX && curY <= midY)
                 this._tileType = LayoutPickerTileType.Q1;
-			 else if (curX < midX && curY <= midY)
+            else if (curX < midX && curY <= midY)
                 this._tileType = LayoutPickerTileType.Q2;
-			 else if (curX < midX && curY > midY)
+            else if (curX < midX && curY > midY)
                 this._tileType = LayoutPickerTileType.Q3;
-			 else
+            else
                 this._tileType = LayoutPickerTileType.Q4;
         }
         else {
@@ -269,17 +275,16 @@ class LayoutPicker extends St.Bin {
         } else if (this._visibility === LayoutPickerVisibility.SHOWN) {
             this.y = workArea.y;
         }
-	
+
         this.set_clip(0, Math.abs(this.y - workArea.y), workArea.width, workArea.height);
-	
     }
 
     _addChrome() {
-        	Main.layoutManager.addChrome(this);
+        Main.layoutManager.addChrome(this);
     }
 
     _untrackChrome() {
-        	Main.layoutManager.untrackChrome(this);
+        Main.layoutManager.untrackChrome(this);
     }
 
     destroy() {
