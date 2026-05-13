@@ -5,6 +5,7 @@ import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.
 import { MoveModes, Orientation, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import { LayoutPicker } from './layoutPicker.js';
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
@@ -93,6 +94,9 @@ export default class TilingMoveHandler {
             this
         );
         handleWindowActionKeyConflict();
+
+	this._layoutPicker = new LayoutPicker();
+	
     }
 
     destroy() {
@@ -103,6 +107,8 @@ export default class TilingMoveHandler {
         global.stage.disconnectObject(this);
 
         this._tilePreview.destroy();
+	
+	this._layoutPicker.destroy();
 
         if (this._latestMonitorLockTimerId) {
             GLib.Source.remove(this._latestMonitorLockTimerId);
@@ -142,6 +148,8 @@ export default class TilingMoveHandler {
     _onMoveStarted(window, grabOp) {
         if (window.is_skip_taskbar())
             return;
+
+	this._layoutPicker.onMoveStarted();
 
         // Also work with a window, which was maximized by GNOME natively
         // because it may have been tiled with this extension before being
@@ -237,6 +245,9 @@ export default class TilingMoveHandler {
     }
 
     _onMoveFinished(window) {
+
+	this._layoutPicker.onMoveFinished();
+
         try {
             window.assertExistence();
 
@@ -303,6 +314,8 @@ export default class TilingMoveHandler {
     _onMoving(grabOp, window, lowPerfMode = false) {
         const [x, y] = this.getDragCoords();
         const currPointerPos = { x, y };
+
+	this._layoutPicker.onMoving(x, y)
 
         if (lowPerfMode) {
             if (!this._isGrabOp) {
