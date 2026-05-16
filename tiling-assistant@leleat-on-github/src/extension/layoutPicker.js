@@ -40,14 +40,13 @@ class LayoutPicker extends St.Bin {
             orientation: Clutter.Orientation.HORIZONTAL,
             style_class: 'popup-menu-content'
         });
+
         this._visibility = LayoutPickerVisibility.HIDDEN;
+        this._dragging = false;
 
         this.set_child(this._container);
 
         this._addChrome();
-
-        this.reactive = true;
-        this.visible = false;
 
         this._vertIcon = this._createIcon(iconPath('tile-vertical'));
         this._horIcon = this._createIcon(iconPath('tile-horizontal'));
@@ -59,15 +58,17 @@ class LayoutPicker extends St.Bin {
 
         this._tileType = LayoutPickerTileType.NONE;
 
+        // just in case extension is enabled and disable
+        this._updateAllocation(global.display.get_current_monitor());
 
-        // Defer allocation until after the actor has been laid out
-        this._allocationId = this.connect('notify::allocation', () => {
-            this.disconnect(this._allocationId);
-            this._allocationId = null;
-            this._updateAllocation();
-        });
-
-	this._dragging = false;
+        this.connectObject('notify::translation-y', () => {
+            this.set_clip(
+                0,
+                this.height - this.translation_y,
+                this.width,
+                this.height
+            );
+        }, this);
     }
 
     get tileType() {
@@ -79,46 +80,67 @@ class LayoutPicker extends St.Bin {
     }
 
     _setVisibility(visibility) {
+        if (this._visibility === visibility)
+            return;
+
         this._visibility = visibility;
-        console.log(this._visibility);
-        this._updateAllocation();
+
+        this.opacity = 255;
+        this.reactive = true;
+
+        let positions = [
+            0,
+	    this._container.get_theme_node().get_padding(St.Side.Bottom),
+            this.height
+        ];
+
+        this.remove_all_transitions();
+
+        this.ease({
+            translation_y: positions[visibility],
+            duration: 250,
+            mode: Clutter.AnimationMode.EASE_OUT_QUAD,
+	    onComplete: () => {
+		    this.opacity = this._visibility !== LayoutPickerVisibility.HIDDEN ? 255 : 0;
+		    this.reactive = this._visibility !== LayoutPickerVisibility.HIDDEN;
+	    }
+
+        });
+    }
+
+    onMonitorEntered(monitorIndex) {
+	    this._updateAllocation(monitorIndex);
     }
 
     onMoving(curX, curY) {
-	if (this._dragging === false)
-	    return;
+        if (this._dragging === false)
+            return;
 
-        let [mx, my] = this.get_transformed_position();
         let [w, h] = this.get_size();
+        let [mx, my_] = this.get_transformed_position();
 
         const monitorIndex = global.display.get_current_monitor();
         const monitorArea = Main.layoutManager.monitors[monitorIndex];
-        const monitorY = monitorArea ? monitorArea.y : my; // fallback to my just in case monitorArea is null;
+        const activeWs = global.workspace_manager.get_active_workspace();
+        const workArea = activeWs.get_work_area_for_monitor(monitorIndex);
 
-        // 1.75 acts as an early trigger when transitioning from PEAK to SHOWN.
-        // This ensures the picker becomes visible before the cursor reaches it.
-        // The multiplier is only applied for PEAK → SHOWN, not SHOWN → PEAK.
-        const triggerHeight = this._visibility === LayoutPickerVisibility.PEAK ? h * 1.75 : h;
-
-        // using monitorY instead (my) as upper bound to compensate with chromes such us the top bar height
-        // placing cursor above my could cause glitch. (my) and monitorY will be same for other monitor anyways.
-        if (curY >= monitorY && curY <= my + triggerHeight && curX >= mx && curX <= mx + w) {
-	    this._setVisibility(LayoutPickerVisibility.SHOWN);
-	} else {
+        // using monitorArea.y instead  of workArea.y as upper bound to compensate with chromes such us the top bar height
+        // placing cursor above workArea.y causes visibility glitch. workArea.y and monitorArea.y will be same for other monitor anyways.
+        if (curY >= monitorArea.y && curY <= workArea.y + h && curX >= mx && curX <= mx + w)
+            this._setVisibility(LayoutPickerVisibility.SHOWN);
+        else
             this._setVisibility(LayoutPickerVisibility.PEAK);
-	}
-
 
         this._updateLayoutPickerTileType(curX, curY);
     }
 
     onMoveStarted() {
-	this._dragging = true;
+        this._dragging = true;
         this._setVisibility(LayoutPickerVisibility.PEAK);
     }
 
     onMoveFinished() {
-	this._dragging = false;
+        this._dragging = false;
         this._setVisibility(LayoutPickerVisibility.HIDDEN);
     }
 
@@ -255,32 +277,34 @@ class LayoutPicker extends St.Bin {
         this._setLayoutPickerIcon(this._tileType);
     }
 
-    _updateAllocation() {
+    _updateAllocation(monitorIndex) {
         const activeWs = global.workspace_manager.get_active_workspace();
-        const monitorIndex = global.display.get_current_monitor();
         const workArea = activeWs.get_work_area_for_monitor(monitorIndex);
 
-        if (!workArea)
-            return;
+        if (workArea === null)
+	    return;
 
-        this.x = (workArea.x + (workArea.width * 0.5)) - this.width * 0.5;
+        const [, natWidth] = this.get_preferred_width(-1);
+        const [, natHeight] = this.get_preferred_height(-1);
 
-        this.visible = true;
+        this.set_position(
+            Math.round(workArea.x + (workArea.width - natWidth) / 2),
+            Math.round(workArea.y - natHeight)
+        );
 
-        if (this._visibility === LayoutPickerVisibility.HIDDEN) {
-            this.y = workArea.y - this.height;
-            this.visible = false;
-        } else if (this._visibility === LayoutPickerVisibility.PEAK) {
-            this.y = workArea.y - this.height + this._container.get_theme_node().get_padding(St.Side.Bottom);
-        } else if (this._visibility === LayoutPickerVisibility.SHOWN) {
-            this.y = workArea.y;
-        }
+        this.remove_all_transitions();
 
-        this.set_clip(0, Math.abs(this.y - workArea.y), workArea.width, workArea.height);
+        this._visibility = LayoutPickerVisibility.HIDDEN;
+        this.translation_y = 0;
+        this.opacity = 0;
+        this.reactive = false;
     }
 
     _addChrome() {
-        Main.layoutManager.addChrome(this);
+        Main.layoutManager.addChrome(this, {
+	    affectsStruts: false,
+	    trackFullscreen: false
+        });
     }
 
     _untrackChrome() {

@@ -135,6 +135,7 @@ export default class TilingMoveHandler {
             // Reset preview mode:
             // Currently only needed to grab the favorite layout for the new monitor.
             this._preparePreviewModeChange(this._currPreviewMode, window);
+	this._layoutPicker.onMonitorEntered(monitorNr);
     }
 
     getDragCoords() {
