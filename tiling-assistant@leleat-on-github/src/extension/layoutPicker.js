@@ -91,9 +91,11 @@ class LayoutPicker extends St.Bin {
         this.opacity = 255;
         this.reactive = true;
 
+
         let positions = [
             0,
-	    this._container.get_theme_node().get_padding(St.Side.Bottom),
+            this._container.get_theme_node().get_padding(St.Side.Bottom) +
+                this.get_theme_node().get_padding(St.Side.BOTTOM),
             this.height
         ];
 
@@ -128,6 +130,7 @@ class LayoutPicker extends St.Bin {
             return;
 
         let [w, h] = this.get_size();
+        let bottomPadding = this.get_theme_node().get_padding(St.Side.BOTTOM);
         let [mx, my_] = this.get_transformed_position();
 
         const monitorIndex = global.display.get_current_monitor();
@@ -137,7 +140,7 @@ class LayoutPicker extends St.Bin {
 
         // using monitorArea.y instead  of workArea.y as upper bound to compensate with chromes such us the top bar height
         // placing cursor above workArea.y causes visibility glitch. workArea.y and monitorArea.y will be same for other monitor anyways.
-        if (curY >= monitorArea.y && curY <= workArea.y + h && curX >= mx && curX <= mx + w)
+        if (curY >= monitorArea.y && curY <= workArea.y + h - bottomPadding && curX >= mx && curX <= mx + w)
             this._setVisibility(LayoutPickerVisibility.SHOWN);
         else
             this._setVisibility(LayoutPickerVisibility.PEAK);
