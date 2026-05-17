@@ -61,6 +61,15 @@ class LayoutPicker extends St.Bin {
 
         this._tileType = LayoutPickerTileType.NONE;
 
+	// e.g ubuntu dock is enabled and or disabled
+	global.display.connectObject('workareas-changed', () => {
+	    this._updateAllocation(global.display.get_current_monitor());
+	}, this);
+
+	Main.layoutManager.connectObject('monitors-changed', () => {
+	    this._updateAllocation(global.display.get_current_monitor());
+	}, this);
+
         // just in case extension is enabled and disable
         this._updateAllocation(global.display.get_current_monitor());
 
@@ -332,6 +341,9 @@ class LayoutPicker extends St.Bin {
 
     destroy() {
         this._untrackChrome();
+	
+	global.display.disconnectObject(this);
+	Main.layoutManager.disconnectObject(this);
 
         this._container?.destroy();
         this._container = null;
