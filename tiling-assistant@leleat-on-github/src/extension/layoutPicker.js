@@ -25,7 +25,8 @@ export const LayoutPickerTileType = {
     Q1: 5,
     Q2: 6,
     Q3: 7,
-    Q4: 8
+    Q4: 8,
+    MAXIMIZE: 9
 };
 
 export const LayoutPicker = GObject.registerClass(
@@ -51,10 +52,12 @@ class LayoutPicker extends St.Bin {
         this._vertIcon = this._createIcon(iconPath('tile-vertical'));
         this._horIcon = this._createIcon(iconPath('tile-horizontal'));
         this._quartIcon = this._createIcon(iconPath('tile-quarter'));
+        this._maxIcon = this._createIcon(iconPath('tile-base'));
 
         this._container.add_child(this._vertIcon);
         this._container.add_child(this._horIcon);
         this._container.add_child(this._quartIcon);
+        this._container.add_child(this._maxIcon);
 
         this._tileType = LayoutPickerTileType.NONE;
 
@@ -212,6 +215,13 @@ class LayoutPicker extends St.Bin {
                 );
                 break;
             }
+
+	    case LayoutPickerTileType.MAXIMIZE: {
+                this._maxIcon.gicon = Gio.FileIcon.new(
+                    Gio.File.new_for_path(iconPath('tile-maximize'))
+                );
+                break;
+            }
         }
     }
 
@@ -234,6 +244,9 @@ class LayoutPicker extends St.Bin {
         );
         this._quartIcon.gicon = Gio.FileIcon.new(
             Gio.File.new_for_path(iconPath('tile-quarter'))
+        );
+        this._maxIcon.gicon = Gio.FileIcon.new(
+            Gio.File.new_for_path(iconPath('tile-base'))
         );
     }
 
@@ -277,6 +290,8 @@ class LayoutPicker extends St.Bin {
                 this._tileType = LayoutPickerTileType.Q3;
             else
                 this._tileType = LayoutPickerTileType.Q4;
+        } else if (contains(this._maxIcon, curX, curY)) {
+	    this._tileType = LayoutPickerTileType.MAXIMIZE;
         }
         else {
             this._tileType = LayoutPickerTileType.NONE;

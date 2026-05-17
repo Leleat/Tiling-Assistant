@@ -512,7 +512,8 @@ export default class TilingMoveHandler {
 
         const vDetectionSize = Settings.getInt('vertical-preview-area');
         let pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize ||
-		    layoutPickerTileType === LayoutPickerTileType.TOP;
+		    layoutPickerTileType === LayoutPickerTileType.TOP ||
+		    layoutPickerTileType === LayoutPickerTileType.MAXIMIZE;
         let pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - vDetectionSize ||
 		    layoutPickerTileType === LayoutPickerTileType.BOTTOM;
         const hDetectionSize = Settings.getInt('horizontal-preview-area');
@@ -560,10 +561,10 @@ export default class TilingMoveHandler {
             const shouldMaximize =
                     isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-landscape') ||
                     !isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-portrait');
-            const tileRect = shouldMaximize && !this._layoutPicker.picking
+            const tileRect = shouldMaximize && !this._layoutPicker.picking || layoutPickerTileType === LayoutPickerTileType.MAXIMIZE 
                 ? workArea
                 : Twm.getTileFor('tile-top-half', workArea, this._monitorNr);
-            const holdTileRect = shouldMaximize
+            const holdTileRect = shouldMaximize && !this._layoutPicker.picking || layoutPickerTileType === LayoutPickerTileType.TOP
                 ? Twm.getTileFor('tile-top-half', workArea, this._monitorNr)
                 : workArea;
             // Dont open preview / start new timer if preview was already one for the top
