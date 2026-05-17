@@ -49,10 +49,10 @@ class LayoutPicker extends St.Bin {
 
         this._addChrome();
 
-        this._vertIcon = this._createIcon(iconPath('tile-vertical'));
-        this._horIcon = this._createIcon(iconPath('tile-horizontal'));
-        this._quartIcon = this._createIcon(iconPath('tile-quarter'));
-        this._maxIcon = this._createIcon(iconPath('tile-base'));
+        this._vertIcon = this._createIcon('tile-vertical');
+        this._horIcon = this._createIcon('tile-horizontal');
+        this._quartIcon = this._createIcon('tile-quarter');
+        this._maxIcon = this._createIcon('tile-base');
 
         this._container.add_child(this._vertIcon);
         this._container.add_child(this._horIcon);
@@ -165,92 +165,85 @@ class LayoutPicker extends St.Bin {
                 break;
             }
             case LayoutPickerTileType.LEFT: {
-                this._horIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-left'))
-                );
+                this._updateIcon(this._horIcon, 'tile-left');
                 break;
             }
             case LayoutPickerTileType.RIGHT: {
-                this._horIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-right'))
-                );
+                this._updateIcon(this._horIcon, 'tile-right');
                 break;
             }
 
             case LayoutPickerTileType.TOP: {
-                this._vertIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-top'))
-                );
+                this._updateIcon(this._vertIcon, 'tile-top');
                 break;
             }
 
             case LayoutPickerTileType.BOTTOM: {
-                this._vertIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-bottom'))
-                );
+                this._updateIcon(this._vertIcon, 'tile-bottom');
                 break;
             }
 
             case LayoutPickerTileType.Q1: {
-                this._quartIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-q1'))
-                );
+                this._updateIcon(this._quartIcon, 'tile-q1');
                 break;
             }
 
             case LayoutPickerTileType.Q2: {
-                this._quartIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-q2'))
-                );
+                this._updateIcon(this._quartIcon, 'tile-q2');
                 break;
             }
 
             case LayoutPickerTileType.Q3: {
-                this._quartIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-q3'))
-                );
+                this._updateIcon(this._quartIcon, 'tile-q3');
                 break;
             }
 
             case LayoutPickerTileType.Q4: {
-                this._quartIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-q4'))
-                );
+                this._updateIcon(this._quartIcon, 'tile-q4');
                 break;
             }
 
 	    case LayoutPickerTileType.MAXIMIZE: {
-                this._maxIcon.gicon = Gio.FileIcon.new(
-                    Gio.File.new_for_path(iconPath('tile-maximize'))
-                );
+                this._updateIcon(this._maxIcon, 'tile-maximize');
                 break;
             }
         }
     }
 
-    _createIcon(path) {
-        let gicon = Gio.FileIcon.new(
-            Gio.File.new_for_path(path)
+    _createIcon(name) {
+        let fallback_gicon = Gio.FileIcon.new(
+            Gio.File.new_for_path(iconPath(name))
         );
 
+        let gicon = new Gio.ThemedIcon({
+            name: `${name}-symbolic`
+        });
+
         return new St.Icon({
-            gicon
+            gicon,
+	    fallback_gicon
+        });
+    }
+
+    _updateIcon(icon, name) {
+        let fallback_gicon = Gio.FileIcon.new(
+            Gio.File.new_for_path(iconPath(name))
+        );
+
+        let gicon = new Gio.ThemedIcon({
+            name: `${name}-symbolic`
+        });
+        icon.set({
+	    gicon,
+	    fallback_gicon
         });
     }
 
     _clearIcons() {
-        this._vertIcon.gicon = Gio.FileIcon.new(
-            Gio.File.new_for_path(iconPath('tile-vertical'))
-        );
-        this._horIcon.gicon = Gio.FileIcon.new(
-            Gio.File.new_for_path(iconPath('tile-horizontal'))
-        );
-        this._quartIcon.gicon = Gio.FileIcon.new(
-            Gio.File.new_for_path(iconPath('tile-quarter'))
-        );
-        this._maxIcon.gicon = Gio.FileIcon.new(
-            Gio.File.new_for_path(iconPath('tile-base'))
-        );
+        this._updateIcon(this._vertIcon, 'tile-vertical');
+        this._updateIcon(this._horIcon, 'tile-horizontal');
+        this._updateIcon(this._quartIcon, 'tile-quarter');
+        this._updateIcon(this._maxIcon, 'tile-base');
     }
 
     _updateLayoutPickerTileType(curX, curY) {
