@@ -9,7 +9,7 @@
 
 .tiling-menu-container {
 	padding: 0;
-	padding-top: 6px;
+	padding-top: 20px;
 }
 
 .tiling-menu-container > StBoxLayout {
