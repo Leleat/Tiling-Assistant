@@ -161,6 +161,8 @@ export default class TilingMoveHandler {
 
         // Try to restore the window size
         if (window.tiledRect || this._wasMaximizedOnStart) {
+	    this._layoutPicker.onMoveFinished();
+
             let counter = 0;
             this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
