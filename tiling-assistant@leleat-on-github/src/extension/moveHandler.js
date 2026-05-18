@@ -5,6 +5,7 @@ import { WINDOW_ANIMATION_TIME } from '../dependencies/unexported/windowManager.
 import { MoveModes, Orientation, Settings } from '../common.js';
 import { Rect, Util } from './utility.js';
 import { TilingWindowManager as Twm } from './tilingWindowManager.js';
+import { LayoutPicker, LayoutPickerTileType } from './layoutPicker.js';
 
 /**
  * This class gets to handle the move events (grab & monitor change) of windows.
@@ -93,6 +94,8 @@ export default class TilingMoveHandler {
             this
         );
         handleWindowActionKeyConflict();
+
+        this._layoutPicker = new LayoutPicker();
     }
 
     destroy() {
@@ -103,6 +106,8 @@ export default class TilingMoveHandler {
         global.stage.disconnectObject(this);
 
         this._tilePreview.destroy();
+
+        this._layoutPicker.destroy();
 
         if (this._latestMonitorLockTimerId) {
             GLib.Source.remove(this._latestMonitorLockTimerId);
@@ -142,6 +147,8 @@ export default class TilingMoveHandler {
     _onMoveStarted(window, grabOp) {
         if (window.is_skip_taskbar())
             return;
+        
+	this._layoutPicker.onMoveStarted();
 
         // Also work with a window, which was maximized by GNOME natively
         // because it may have been tiled with this extension before being
@@ -153,6 +160,8 @@ export default class TilingMoveHandler {
 
         // Try to restore the window size
         if (window.tiledRect || this._wasMaximizedOnStart) {
+	    this._layoutPicker.onMoveFinished();
+
             let counter = 0;
             this._restoreSizeTimerId && GLib.Source.remove(this._restoreSizeTimerId);
             this._restoreSizeTimerId = GLib.timeout_add(GLib.PRIORITY_HIGH_IDLE, 10, () => {
@@ -237,6 +246,8 @@ export default class TilingMoveHandler {
     }
 
     _onMoveFinished(window) {
+        this._layoutPicker.onMoveFinished();
+
         try {
             window.assertExistence();
 
@@ -303,6 +314,8 @@ export default class TilingMoveHandler {
     _onMoving(grabOp, window, lowPerfMode = false) {
         const [x, y] = this.getDragCoords();
         const currPointerPos = { x, y };
+
+        this._layoutPicker.onMoving(x, y);
 
         if (lowPerfMode) {
             if (!this._isGrabOp) {
@@ -496,23 +509,39 @@ export default class TilingMoveHandler {
         const wRect = window.get_frame_rect();
         const workArea = new Rect(window.get_work_area_for_monitor(this._monitorNr));
 
+        const layoutPickerTileType = this._layoutPicker.tileType;
+
         const vDetectionSize = Settings.getInt('vertical-preview-area');
-        const pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize;
-        const pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - vDetectionSize;
+        let pointerAtTopEdge = this._lastPointerPos.y <= workArea.y + vDetectionSize ||
+		    layoutPickerTileType === LayoutPickerTileType.TOP ||
+		    layoutPickerTileType === LayoutPickerTileType.MAXIMIZE;
+        let pointerAtBottomEdge = this._lastPointerPos.y >= workArea.y2 - vDetectionSize ||
+		    layoutPickerTileType === LayoutPickerTileType.BOTTOM;
         const hDetectionSize = Settings.getInt('horizontal-preview-area');
-        const pointerAtLeftEdge = this._lastPointerPos.x <= workArea.x + hDetectionSize;
-        const pointerAtRightEdge = this._lastPointerPos.x >= workArea.x2 - hDetectionSize;
+        let pointerAtLeftEdge = this._lastPointerPos.x <= workArea.x + hDetectionSize ||
+		    layoutPickerTileType === LayoutPickerTileType.LEFT;
+        let pointerAtRightEdge = this._lastPointerPos.x >= workArea.x2 - hDetectionSize || 
+		    layoutPickerTileType === LayoutPickerTileType.RIGHT;
         // Also use window's pos for top and bottom area detection for quarters
         // because global.get_pointer's y isn't accurate (no idea why...) when
         // grabbing the titlebar & slowly going from the left/right sides to
         // the top/bottom corners.
         const titleBarGrabbed = this._lastPointerPos.y - wRect.y < 50;
-        const windowAtTopEdge = titleBarGrabbed && wRect.y === workArea.y;
-        const windowAtBottomEdge = wRect.y >= workArea.y2 - 75;
-        const tileTopLeftQuarter = pointerAtLeftEdge && (pointerAtTopEdge || windowAtTopEdge);
-        const tileTopRightQuarter = pointerAtRightEdge && (pointerAtTopEdge || windowAtTopEdge);
-        const tileBottomLeftQuarter = pointerAtLeftEdge && (pointerAtBottomEdge || windowAtBottomEdge);
-        const tileBottomRightQuarter = pointerAtRightEdge && (pointerAtBottomEdge || windowAtBottomEdge);
+        const windowAtTopEdge = titleBarGrabbed && wRect.y === workArea.y && !this._layoutPicker.picking;
+        const windowAtBottomEdge = wRect.y >= workArea.y2 - 75 && !this._layoutPicker.picking;
+        const tileTopLeftQuarter = pointerAtLeftEdge && (pointerAtTopEdge || windowAtTopEdge) ||
+		    layoutPickerTileType === LayoutPickerTileType.Q2;
+        const tileTopRightQuarter = pointerAtRightEdge && (pointerAtTopEdge || windowAtTopEdge) ||
+		    layoutPickerTileType === LayoutPickerTileType.Q1;
+        const tileBottomLeftQuarter = pointerAtLeftEdge && (pointerAtBottomEdge || windowAtBottomEdge)||
+		    layoutPickerTileType === LayoutPickerTileType.Q3;
+        const tileBottomRightQuarter = pointerAtRightEdge && (pointerAtBottomEdge || windowAtBottomEdge) ||
+		    layoutPickerTileType === LayoutPickerTileType.Q4;
+
+        // we cannot just for example do this:
+        // const tileTopLeftQuarter = pointerAtLeftEdge && (pointerAtTopEdge || windowAtTopEdge) || layoutPickerTileType == LayoutPickerTileType.Q2;
+        // this can be buggy when both are true like triggering top right preview even when in LayoutPickerTileType.RIGHT
+        // so reassigning the value is a must
 
         if (tileTopLeftQuarter) {
             this._tileRect = Twm.getTileFor('tile-topleft-quarter', workArea, this._monitorNr);
@@ -533,10 +562,10 @@ export default class TilingMoveHandler {
             const shouldMaximize =
                     isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-landscape') ||
                     !isLandscape && !Settings.getBoolean('enable-hold-maximize-inverse-portrait');
-            const tileRect = shouldMaximize
+            const tileRect = shouldMaximize && !this._layoutPicker.picking || layoutPickerTileType === LayoutPickerTileType.MAXIMIZE 
                 ? workArea
                 : Twm.getTileFor('tile-top-half', workArea, this._monitorNr);
-            const holdTileRect = shouldMaximize
+            const holdTileRect = shouldMaximize && !this._layoutPicker.picking || layoutPickerTileType === LayoutPickerTileType.TOP
                 ? Twm.getTileFor('tile-top-half', workArea, this._monitorNr)
                 : workArea;
             // Dont open preview / start new timer if preview was already one for the top

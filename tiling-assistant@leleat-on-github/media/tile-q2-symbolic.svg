@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="64"
+   height="64"
+   viewBox="0 0 64 64"
+   version="1.1"
+   id="svg1"
+   xml:space="preserve"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg"><defs
+     id="defs1" /><path
+     d="M 8,0 C 3.568,0 0,3.568 0,8 V 31 H 1.5 3 5 26 28 31 V 28 3 1.5 0 Z M 8,3 H 28 V 28 H 26 5 3 V 8 C 3,5.23 5.23,3 8,3 Z"
+     style="fill:#2e3436;fill-opacity:0.35;fill-rule:evenodd"
+     id="path20" /><path
+     d="m 0,33 v 23 c 0,4.432 3.568,8 8,8 H 31 V 62.5 61 59 38 36 33 H 28 26 5 3 1.5 Z m 3,3 h 2 21 2 v 2 21 2 H 8 C 5.23,61 3,58.77 3,56 Z"
+     style="fill:#2e3436;fill-opacity:0.35;fill-rule:evenodd"
+     id="path19" /><path
+     d="m 33,33 v 3 2 21 2 1.5 1.5 h 23 c 4.432,0 8,-3.568 8,-8 V 33 H 62.5 61 36 Z m 3,3 h 25 v 20 c 0,2.77 -2.23,5 -5,5 H 36 V 59 38 Z"
+     style="fill:#2e3436;fill-opacity:0.35;fill-rule:evenodd"
+     id="path18" /><path
+     d="M 33,0 V 1.5 3 28 31 h 3 25 1.5 1.5 V 8 C 64,3.568 60.432,0 56,0 Z m 3,3 h 20 c 2.77,0 5,2.23 5,5 V 28 H 36 Z"
+     style="fill:#2e3436;fill-opacity:0.35;fill-rule:evenodd"
+     id="path17" /><path
+     d="M 26,26 V 5 H 8 C 6.303405,5 5,6.303405 5,8 v 18 z"
+     style="baseline-shift:baseline;display:inline;overflow:visible;vector-effect:none;fill:#2e3436;fill-rule:evenodd;enable-background:accumulate;stop-color:#000000;stop-opacity:1"
+     id="path16" /></svg>

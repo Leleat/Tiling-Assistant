@@ -6,3 +6,17 @@
 .layout-shortcut .boxed-list {
     box-shadow: none;
 }
+
+.tiling-menu-container {
+	padding: 20px;
+}
+
+.tiling-menu-container > StBoxLayout {
+	spacing: 15px;
+	padding: 15px;
+	border-radius: 20px;
+}
+
+.tiling-menu-container > StBoxLayout > StIcon {
+	icon-size: 64px; 
+}
