@@ -266,50 +266,66 @@ class LayoutPicker extends St.Bin {
 
     _updateLayoutPickerTileType(curX, curY) {
         let rect = icon => {
-            let [mx, my] = icon.get_transformed_position();
-            let [mw, mh] = icon.get_size();
-            return [mx, my, mw, mh];
-        };
-        let contains = (icon, x, y) => {
-            let [mx, my, mw, mh] = rect(icon);
-            return x >= mx && x <= mx + mw && y >= my && y <= my + mh;
+	    let [x, y] = icon.get_transformed_position();
+	    let [w, h] = icon.get_size();
+	    return { x, y, w, h };
         };
 
-        if (contains(this._icons.horizontal, curX, curY)) {
-            let [mx, my_, mw, mh_] = rect(this._icons.horizontal);
-            let mid = mx + (mw * 0.5);
+        let contains = ({ x, y, w, h }) => (
+	    curX >= x &&
+	    curX <= x + w &&
+	    curY >= y &&
+	    curY <= y + h
+        );
 
-            if (curX <= mid)
-                this._tileType = LayoutPickerTileType.LEFT;
-            else
-                this._tileType = LayoutPickerTileType.RIGHT;
-        } else if (contains(this._icons.vertical, curX, curY)) {
-            let [mx_, my, mw_, mh] = rect(this._icons.vertical);
-            let mid = my + (mh * 0.5);
+        const horizontal = rect(this._icons.horizontal);
 
-            if (curY <= mid)
-                this._tileType = LayoutPickerTileType.TOP;
-            else
-                this._tileType = LayoutPickerTileType.BOTTOM;
-        } else if (contains(this._icons.quarter, curX, curY)) {
-            let [mx, my, mw, mh] = rect(this._icons.quarter);
-            let midX = mx + (mw * 0.5);
-            let midY = my + (mh * 0.5);
+        if (contains(horizontal)) {
+	    const leftPortion = curX < horizontal.x + horizontal.w / 2;
 
-            if (curX >= midX && curY <= midY)
-                this._tileType = LayoutPickerTileType.Q1;
-            else if (curX < midX && curY <= midY)
-                this._tileType = LayoutPickerTileType.Q2;
-            else if (curX < midX && curY > midY)
-                this._tileType = LayoutPickerTileType.Q3;
-            else
-                this._tileType = LayoutPickerTileType.Q4;
-        } else if (contains(this._icons.maximize, curX, curY)) {
-	    this._tileType = LayoutPickerTileType.MAXIMIZE;
+	    this._tileType = leftPortion
+                ? LayoutPickerTileType.LEFT
+                : LayoutPickerTileType.RIGHT;
+
+	    this._setLayoutPickerIcon(this._tileType);
+	    return;
         }
-        else {
-            this._tileType = LayoutPickerTileType.NONE;
+
+        const vertical = rect(this._icons.vertical);
+
+        if (contains(vertical)) {
+	    const topPortion = curY <= horizontal.y + horizontal.h / 2;
+
+	    this._tileType = topPortion 
+                ? LayoutPickerTileType.TOP
+                : LayoutPickerTileType.BOTTOM;
+
+	    this._setLayoutPickerIcon(this._tileType);
+	    return;
         }
+
+	const quarter = rect(this._icons.quarter);
+	
+	if (contains(quarter)) {
+	    const leftPortion = curX < quarter.x + quarter.w / 2;
+	    const topPortion = curY <= quarter.y + quarter.h / 2;
+
+	    if (topPortion)
+		this._tileType = leftPortion
+		    ? LayoutPickerTileType.Q2
+		    : LayoutPickerTileType.Q1;
+	    else
+		this._tileType = leftPortion
+		    ? LayoutPickerTileType.Q3
+		    : LayoutPickerTileType.Q4;
+	    
+	    this._setLayoutPickerIcon(this._tileType);
+	    return;
+	}
+
+        this._tileType = contains(rect(this._icons.maximize))
+	    ? LayoutPickerTileType.MAXIMIZE
+	    : LayoutPickerTileType.NONE;
 
         this._setLayoutPickerIcon(this._tileType);
     }
