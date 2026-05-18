@@ -29,6 +29,46 @@ export const LayoutPickerTileType = {
     MAXIMIZE: 9
 };
 
+// ommit '-symbolic.svg' as it is managed by iconPath function already
+const ICONS = {
+    vertical: {
+        none: 'tile-vertical',
+
+        states: {
+            [LayoutPickerTileType.TOP]: 'tile-top',
+            [LayoutPickerTileType.BOTTOM]: 'tile-bottom'
+        }
+    },
+
+    horizontal: {
+        none: 'tile-horizontal',
+
+        states: {
+            [LayoutPickerTileType.LEFT]: 'tile-left',
+            [LayoutPickerTileType.RIGHT]: 'tile-right'
+        }
+    },
+
+    quarter: {
+        none: 'tile-quarter',
+
+        states: {
+            [LayoutPickerTileType.Q1]: 'tile-q1',
+            [LayoutPickerTileType.Q2]: 'tile-q2',
+            [LayoutPickerTileType.Q3]: 'tile-q3',
+            [LayoutPickerTileType.Q4]: 'tile-q4'
+        }
+    },
+
+    maximize: {
+        none: 'tile-base',
+
+        states: {
+            [LayoutPickerTileType.MAXIMIZE]: 'tile-maximize'
+        }
+    }
+};
+
 export const LayoutPicker = GObject.registerClass(
 class LayoutPicker extends St.Bin {
     _init() {
@@ -49,15 +89,17 @@ class LayoutPicker extends St.Bin {
 
         this._addChrome();
 
-        this._vertIcon = this._createIcon('tile-vertical');
-        this._horIcon = this._createIcon('tile-horizontal');
-        this._quartIcon = this._createIcon('tile-quarter');
-        this._maxIcon = this._createIcon('tile-base');
+        this._icons = {};
 
-        this._container.add_child(this._vertIcon);
-        this._container.add_child(this._horIcon);
-        this._container.add_child(this._quartIcon);
-        this._container.add_child(this._maxIcon);
+        for (const [group, config] of Object.entries(ICONS)) {
+	    // start with icons that appear to be not hovered
+            const icon = this._createIcon(config.none);
+
+            config.icon = icon;
+            this._icons[group] = icon;
+
+            this._container.add_child(icon);
+        }
 
         this._tileType = LayoutPickerTileType.NONE;
 
@@ -174,55 +216,17 @@ class LayoutPicker extends St.Bin {
         this._setVisibility(LayoutPickerVisibility.HIDDEN);
     }
 
-    _setLayoutPickerIcon(hoveredType) {
+    _setLayoutPickerIcon(tileType) {
         this._clearIcons();
-        switch (hoveredType) {
-            case LayoutPickerTileType.NONE: {
-                break;
-            }
-            case LayoutPickerTileType.LEFT: {
-                this._updateIcon(this._horIcon, 'tile-left');
-                break;
-            }
-            case LayoutPickerTileType.RIGHT: {
-                this._updateIcon(this._horIcon, 'tile-right');
-                break;
-            }
 
-            case LayoutPickerTileType.TOP: {
-                this._updateIcon(this._vertIcon, 'tile-top');
-                break;
-            }
+        for (const config of Object.values(ICONS)) {
+            const iconName = config.states[tileType];
 
-            case LayoutPickerTileType.BOTTOM: {
-                this._updateIcon(this._vertIcon, 'tile-bottom');
-                break;
-            }
+            if (!iconName)
+                continue;
 
-            case LayoutPickerTileType.Q1: {
-                this._updateIcon(this._quartIcon, 'tile-q1');
-                break;
-            }
-
-            case LayoutPickerTileType.Q2: {
-                this._updateIcon(this._quartIcon, 'tile-q2');
-                break;
-            }
-
-            case LayoutPickerTileType.Q3: {
-                this._updateIcon(this._quartIcon, 'tile-q3');
-                break;
-            }
-
-            case LayoutPickerTileType.Q4: {
-                this._updateIcon(this._quartIcon, 'tile-q4');
-                break;
-            }
-
-	    case LayoutPickerTileType.MAXIMIZE: {
-                this._updateIcon(this._maxIcon, 'tile-maximize');
-                break;
-            }
+            this._updateIcon(config.icon, iconName);
+            break;
         }
     }
 
@@ -256,10 +260,8 @@ class LayoutPicker extends St.Bin {
     }
 
     _clearIcons() {
-        this._updateIcon(this._vertIcon, 'tile-vertical');
-        this._updateIcon(this._horIcon, 'tile-horizontal');
-        this._updateIcon(this._quartIcon, 'tile-quarter');
-        this._updateIcon(this._maxIcon, 'tile-base');
+        for (const config of Object.values(ICONS))
+            this._updateIcon(config.icon, config.none);
     }
 
     _updateLayoutPickerTileType(curX, curY) {
@@ -273,24 +275,24 @@ class LayoutPicker extends St.Bin {
             return x >= mx && x <= mx + mw && y >= my && y <= my + mh;
         };
 
-        if (contains(this._horIcon, curX, curY)) {
-            let [mx, my_, mw, mh_] = rect(this._horIcon);
+        if (contains(this._icons.horizontal, curX, curY)) {
+            let [mx, my_, mw, mh_] = rect(this._icons.horizontal);
             let mid = mx + (mw * 0.5);
 
             if (curX <= mid)
                 this._tileType = LayoutPickerTileType.LEFT;
             else
                 this._tileType = LayoutPickerTileType.RIGHT;
-        } else if (contains(this._vertIcon, curX, curY)) {
-            let [mx_, my, mw_, mh] = rect(this._vertIcon);
+        } else if (contains(this._icons.vertical, curX, curY)) {
+            let [mx_, my, mw_, mh] = rect(this._icons.vertical);
             let mid = my + (mh * 0.5);
 
             if (curY <= mid)
                 this._tileType = LayoutPickerTileType.TOP;
             else
                 this._tileType = LayoutPickerTileType.BOTTOM;
-        } else if (contains(this._quartIcon, curX, curY)) {
-            let [mx, my, mw, mh] = rect(this._quartIcon);
+        } else if (contains(this._icons.quarter, curX, curY)) {
+            let [mx, my, mw, mh] = rect(this._icons.quarter);
             let midX = mx + (mw * 0.5);
             let midY = my + (mh * 0.5);
 
@@ -302,7 +304,7 @@ class LayoutPicker extends St.Bin {
                 this._tileType = LayoutPickerTileType.Q3;
             else
                 this._tileType = LayoutPickerTileType.Q4;
-        } else if (contains(this._maxIcon, curX, curY)) {
+        } else if (contains(this._icons.maximize, curX, curY)) {
 	    this._tileType = LayoutPickerTileType.MAXIMIZE;
         }
         else {
