@@ -130,13 +130,11 @@ class LayoutPicker extends St.Bin {
         });
     }
 
-    onMonitorEntered(monitorIndex) {
-	    this._updateAllocation(monitorIndex);
-    }
-
     onMoving(curX, curY) {
         if (this._dragging === false)
             return;
+
+        this._updateAllocation(global.display.get_current_monitor());
 
         let [w, h] = this.get_size();
         let [mx, my_] = this.get_transformed_position();
@@ -324,10 +322,13 @@ class LayoutPicker extends St.Bin {
         const [, natWidth] = this.get_preferred_width(-1);
         const [, natHeight] = this.get_preferred_height(-1);
 
-        this.set_position(
-            Math.round(workArea.x + (workArea.width - natWidth) / 2),
-            Math.round(workArea.y - natHeight)
-        );
+        const targetX = Math.round(workArea.x + (workArea.width - natWidth) / 2);
+        const targetY = Math.round(workArea.y - natHeight);
+
+        if (targetX === this.x && targetY === this.y)
+	    return;
+
+        this.set_position(targetX, targetY);
 
         this.remove_all_transitions();
 
