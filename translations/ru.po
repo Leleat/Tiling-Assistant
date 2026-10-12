@@ -56,12 +56,12 @@ msgstr "Общие"
 #. Translators: This is the header for a preference group in the 'General' tab for the picker shown while moving a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:48
 msgid "Layout Picker"
-msgstr ""
+msgstr "Меню макетов размещения"
 
 #. Translators: This is a setting in the 'Layout Picker' preference group in the 'General' tab. When enabled, a menu with tiling options is revealed while dragging a window
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:51
 msgid "Show Layout Picker"
-msgstr ""
+msgstr "Показывать Меню макетов размещения"
 
 #. Translators: This is the explanation for the 'Show Layout Picker' under the 'Layout Picker' preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:52
@@ -69,6 +69,8 @@ msgid ""
 "When moving a window, reveal a menu at the top of the screen to pick a tile "
 "(halves, quarters or maximize) with the pointer."
 msgstr ""
+"При перемещении окна показывать в верхней части экрана меню для выбора с помощью указателя мыши варианта размещения "
+"(разделить пополам, на четверти или развернуть на весь экран)."
 
 #. Translators: This is the header for a preference group in the 'General' tab
 #: tiling-assistant@leleat-on-github/src/ui/prefs.ui:62
